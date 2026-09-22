@@ -173,19 +173,6 @@
   button.btn-primary { background: var(--blue); color: #fff; border: none; padding: 12px 20px; border-radius: 8px; font-size: 14px; font-weight: 700; cursor: pointer; }
   button.btn-secondary { background: #eef1f7; color: var(--navy); border: 1px solid var(--border); padding: 10px 16px; border-radius: 8px; font-size: 13px; font-weight: 700; cursor: pointer; }
 
-  /* AI 코멘트 스티키 노트 */
-  .ai-sticky {
-    background: #fff59d;
-    border-radius: 8px;
-    padding: 16px 18px;
-    box-shadow: 2px 4px 10px rgba(0,0,0,.1);
-    font-size: 13.5px;
-    line-height: 1.7;
-    color: #463f0a;
-    margin-bottom: 12px;
-  }
-  .ai-sticky-title { font-weight: 800; color: #7c4a03; margin-bottom: 8px; }
-
   /* 모달 */
   .modal-overlay {
     position: fixed;
@@ -219,7 +206,6 @@
     .desktop-table-view { display: none; }
     .lead-card-list { display: block; }
     
-    /* 모바일 하단 탭바 */
     .m-tabbar {
       position: fixed;
       bottom: 0; left: 0; right: 0;
@@ -246,10 +232,6 @@
     }
     .m-tab-btn.active { color: var(--navy); font-weight: 800; }
     .m-tab-icon { font-size: 18px; line-height: 1; }
-    
-    /* 탭 페이지 전환 */
-    .tab-section { display: none; }
-    .tab-section.active { display: block; }
   }
 
   /* 로그인 화면 */
@@ -277,7 +259,7 @@
 </head>
 <body>
 
-<!-- 1. 로그인 화면 (기존 Supabase app_users 테이블 연동) -->
+<!-- 1. 로그인 화면 -->
 <div id="loginOverlay">
   <div class="login-card">
     <h1>S1 북서울지사 영업 TA</h1>
@@ -312,12 +294,12 @@
   </header>
 
   <main class="app-container">
-    <!-- 상단 대분류 필터 -->
+    <!-- 상단 상품 카테고리 필터 -->
     <div class="filter-row" id="categoryFilterRow">
-      <button type="button" class="filter-chip active" data-category="일반알람">일반알람</button>
+      <button type="button" class="filter-chip active" data-category="all">전체 상품</button>
+      <button type="button" class="filter-chip" data-category="일반알람">일반알람</button>
       <button type="button" class="filter-chip" data-category="디지털(정보보안)">디지털(정보보안)</button>
       <button type="button" class="filter-chip" data-category="안전상품">안전상품</button>
-      <button type="button" class="filter-chip" data-category="all">전체</button>
     </div>
 
     <!-- 금일 수주 예정 배너 -->
@@ -334,7 +316,7 @@
 
     <!-- ==================== 지사장 전용 뷰 ==================== -->
     <div id="masterSection" style="display:none;">
-      <!-- KPI -->
+      <!-- KPI 종합 현황 -->
       <div class="panel">
         <h2>지사 전체 TA 종합 현황 <span id="currentMonthStr" style="font-size:12px; color:var(--muted); font-weight:normal;"></span></h2>
         <div class="kpi-grid">
@@ -363,104 +345,6 @@
           </table>
         </div>
       </div>
-
-      <!-- 공지사항 관리 패널 -->
-      <div class="panel">
-        <h2>지사 공지사항 관리</h2>
-        <div style="display:flex; gap:10px;">
-          <input type="text" id="noticeInput" placeholder="전 컨설턴트에게 알릴 공지사항을 입력하세요" style="flex:1; padding:10px; border:1px solid var(--border); border-radius:8px;">
-          <button type="button" class="btn-primary" id="btnSaveNotice">공지 등록</button>
-          <button type="button" class="btn-secondary" id="btnDeleteNotice" style="color:var(--red);">삭제</button>
-        </div>
-        <div id="noticeCurrentText" style="margin-top:8px; font-size:12.5px; color:var(--muted);"></div>
-      </div>
-
-      <!-- 실시간 변경 이력 (Activity Log) -->
-      <div class="panel">
-        <h2>실시간 변경 이력 (Activity Log)</h2>
-        <div class="table-scroll" style="max-height:300px;">
-          <table class="data-table">
-            <thead><tr><th>시간</th><th>컨설턴트</th><th>구분</th><th>서비스제공처</th><th>내역</th></tr></thead>
-            <tbody id="activityLogTbody"></tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-
-    <!-- ==================== 컨설턴트 전용 뷰 ==================== -->
-    <div id="consultantSection" style="display:none;">
-      <!-- AI 코멘트 스티키 노트 -->
-      <div id="aiCommentSection" class="panel" style="display:none;">
-        <h2>🤖 AI 코멘트 (진척 현황 및 동료 비교)</h2>
-        <div id="aiCommentBox"></div>
-      </div>
-
-      <!-- 개인 KPI -->
-      <div class="panel">
-        <h2>내 이달 TA 지표</h2>
-        <div class="kpi-grid">
-          <div class="kpi-card"><div class="label">진행중 TA</div><div class="value" id="cKpiPipeAmt">0원</div><div class="sub" id="cKpiPipeCnt">0건</div></div>
-          <div class="kpi-card"><div class="label">이달 수주 TA</div><div class="value" id="cKpiWonAmt">0원</div><div class="sub" id="cKpiWonCnt">0건</div></div>
-          <div class="kpi-card"><div class="label">수주 달성율</div><div class="value" id="cKpiAchieveRate">-</div><div class="sub" id="cKpiAchieveSub"></div></div>
-          <div class="kpi-card"><div class="label">보유 TA율</div><div class="value" id="cKpiHoldRate">-</div><div class="sub" id="cKpiHoldSub"></div></div>
-        </div>
-      </div>
-
-      <!-- TA 신규 등록/수정 폼 -->
-      <div class="panel" id="formPanel">
-        <h2 id="formTitle">신규 TA 등록</h2>
-        <form id="leadForm">
-          <input type="hidden" id="formLeadId">
-          <div class="form-grid">
-            <div class="form-group"><label>서비스제공처명 *</label><input type="text" id="fCompany" required placeholder="현장 정식 명칭"></div>
-            <div class="form-group"><label>고객담당자</label><input type="text" id="fContact" placeholder="담당자 성명/연락처"></div>
-            <div class="form-group"><label>금액 (원) *</label><input type="text" inputmode="numeric" id="fAmount" required placeholder="숫자만 입력"></div>
-            <div class="form-group"><label>상품종류 *</label>
-              <select id="fProductType">
-                <option value="알람">알람</option>
-                <option value="휴엔">휴엔</option>
-                <option value="정보보안">정보보안</option>
-                <option value="블루스캔">블루스캔</option>
-                <option value="유지보수">유지보수</option>
-                <option value="안전상품">안전상품</option>
-              </select>
-            </div>
-            <div class="form-group"><label>영업동기 *</label>
-              <select id="fMotive">
-                <option value="개척">개척</option>
-                <option value="콜센터">콜센터</option>
-                <option value="사내소개">사내소개</option>
-                <option value="고객소개">고객소개</option>
-                <option value="대리점">대리점</option>
-                <option value="관내이전">관내이전</option>
-                <option value="관외이전">관외이전</option>
-                <option value="기타">기타</option>
-              </select>
-            </div>
-            <div class="form-group"><label>영업단계 *</label>
-              <select id="fStage">
-                <option value="진행중">진행중</option>
-                <option value="수주完">수주完</option>
-                <option value="실패">실패</option>
-              </select>
-            </div>
-            <div class="form-group"><label>수주확도 *</label>
-              <select id="fConfidence">
-                <option value="A">A (상)</option>
-                <option value="B" selected>B (중)</option>
-                <option value="C">C (하)</option>
-              </select>
-            </div>
-            <div class="form-group"><label>계약예정일 *</label><input type="date" id="fExpectedDate" required></div>
-            <div class="form-group"><label>기산일 (수주完 시)</label><input type="date" id="fBaseDate"></div>
-          </div>
-          <div class="form-group"><label>메모/특이사항</label><input type="text" id="fMemo" placeholder="메모"></div>
-          <div style="display:flex; gap:10px; margin-top:8px;">
-            <button type="submit" class="btn-primary" id="btnSubmitForm">TA 등록</button>
-            <button type="button" class="btn-secondary" id="btnCancelEdit" style="display:none;">수정 취소</button>
-          </div>
-        </form>
-      </div>
     </div>
 
     <!-- ==================== 전체/내 TA 목록 (공통) ==================== -->
@@ -473,35 +357,28 @@
         <button type="button" class="filter-chip" data-stage="실패">실패</button>
       </div>
       
-      <!-- PC 뷰: 테이블 -->
+      <!-- PC 테이블 뷰 -->
       <div class="desktop-table-view table-scroll">
         <table class="data-table">
           <thead>
             <tr>
-              <th>컨설턴트</th><th>서비스제공처명</th><th>고객담당자</th><th>금액</th><th>단계</th><th>확도</th><th>상품</th><th>예정일</th><th>기산일</th><th>메모</th><th>관리</th>
+              <th>컨설턴트</th><th>서비스제공처명</th><th>고객담당자</th><th>금액</th><th>단계</th><th>확도</th><th>상품</th><th>예정일</th><th>기산일</th><th>메모</th>
             </tr>
           </thead>
           <tbody id="leadTableTbody"></tbody>
         </table>
       </div>
 
-      <!-- 모바일 뷰: 카드 리스트 -->
+      <!-- 모바일 카드 뷰 -->
       <div class="lead-card-list" id="leadCardList"></div>
     </div>
   </main>
-
-  <!-- 모바일 하단 탭바 -->
-  <nav class="m-tabbar" id="mobileTabbar">
-    <button type="button" class="m-tab-btn active" data-tab="home"><span class="m-tab-icon">🏠</span><span>홈</span></button>
-    <button type="button" class="m-tab-btn" data-tab="list"><span class="m-tab-icon">📋</span><span>목록</span></button>
-    <button type="button" class="m-tab-btn" data-tab="form"><span class="m-tab-icon">✏️</span><span>등록</span></button>
-  </nav>
 </div>
 
-<!-- 상세/공지 팝업 모달 -->
+<!-- 상세 팝업 모달 -->
 <div class="modal-overlay" id="commonModal">
   <div class="modal-box">
-    <h3 id="modalTitle">상세 안내</h3>
+    <h3 id="modalTitle">금일 수주 예정 상세</h3>
     <div id="modalContent" style="margin-top:12px; font-size:13.5px; line-height:1.6;"></div>
     <div style="margin-top:20px; text-align:right;">
       <button type="button" class="btn-secondary" id="btnModalClose">닫기</button>
@@ -510,44 +387,24 @@
 </div>
 
 <script>
-
-(function() {
-  
+// ==========================================
+// Supabase 설정 및 초기화
+// ==========================================
 const SUPABASE_URL = 'https://gpqlximhoqdybcewdfde.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_xUnGxyLCc5TB5nv4keVQVw__grqGJkP';
-const _client = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-Object.assign(window.supabase, _client);
+
+window.supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 const db = window.supabase;
 
-// ==========================================
-// 1. Supabase 설정 (본인의 Project Settings > API 키 사용)
-// ==========================================
-
-// 브라우저용 public anon key를 설정하세요.
-
-
-
-
-// 앱 상태
-let currentUser = null; // { name, role: 'consultant' | 'master', phone }
+// 앱 전역 상태
+let currentUser = null;
 let allLeads = [];
 let allTargets = {};
-let activeCategory = '일반알람';
+let activeCategory = 'all';
 let activeStage = 'all';
 
-// 대한민국 공휴일 (2026년)
-const KR_HOLIDAYS_2026 = new Set([
-  '2026-01-01','2026-02-16','2026-02-17','2026-02-18','2026-03-01','2026-03-02',
-  '2026-05-05','2026-05-24','2026-05-25','2026-06-06','2026-08-15','2026-08-17',
-  '2026-09-24','2026-09-25','2026-09-26','2026-09-27','2026-10-03','2026-10-05',
-  '2026-10-09','2026-12-25'
-]);
-
-function isHoliday(dateStr) {
-  if (KR_HOLIDAYS_2026.has(dateStr)) return true;
-  const d = new Date(dateStr + 'T00:00:00');
-  const w = d.getDay();
-  return w === 0 || w === 6;
+function formatCurrency(n) {
+  return (Number(n) || 0).toLocaleString('ko-KR') + '원';
 }
 
 function getTodayStr() {
@@ -558,7 +415,6 @@ function getTodayStr() {
 function getCurrentMonthStr() {
   return getTodayStr().slice(0, 7);
 }
-
 
 function productCategory(productType) {
   if (productType === '정보보안') return '디지털(정보보안)';
@@ -573,10 +429,6 @@ function getFilteredLeads() {
   });
 }
 
-function formatCurrency(n) {
-  return (Number(n) || 0).toLocaleString('ko-KR') + '원';
-}
-
 // SHA-256 비밀번호 해시 계산
 async function sha256(str) {
   const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(str));
@@ -584,9 +436,8 @@ async function sha256(str) {
 }
 
 // ==========================================
-// 2. 인증 및 로그인 로직 (app_users 테이블)
+// 로그인 이벤트 및 인증
 // ==========================================
-
 document.getElementById('loginPhone').addEventListener('keydown', (e) => { if (e.key === 'Enter') doLogin(); });
 document.getElementById('loginPw').addEventListener('keydown', (e) => { if (e.key === 'Enter') doLogin(); });
 document.getElementById('btnLogin').addEventListener('click', doLogin);
@@ -606,7 +457,7 @@ async function doLogin() {
 
   try {
     const pwHash = await sha256(pw);
-    const { data: users, error } = await supabase
+    const { data: users, error } = await db
       .from('app_users')
       .select('name, job, hash, phone')
       .eq('phone', phone)
@@ -624,7 +475,6 @@ async function doLogin() {
       return;
     }
 
-    // 직무 권한 분기
     currentUser = {
       name: user.name,
       phone: user.phone,
@@ -644,7 +494,7 @@ document.getElementById('btnLogout').addEventListener('click', () => {
 });
 
 // ==========================================
-// 3. 데이터 로드 및 초기화
+// 데이터 로드 및 렌더링
 // ==========================================
 async function initApp() {
   document.getElementById('loginOverlay').style.display = 'none';
@@ -657,18 +507,14 @@ async function initApp() {
   if (currentUser.role === 'master') {
     document.getElementById('masterSection').style.display = 'block';
     document.getElementById('btnCopyToday').style.display = 'inline-block';
-  } else {
-    document.getElementById('consultantSection').style.display = 'block';
-    document.getElementById('fExpectedDate').value = getTodayStr();
   }
 
-  await Promise.all([loadLeads(), loadTargets(), loadNotice()]);
+  await Promise.all([loadLeads(), loadTargets()]);
   render();
 }
 
 async function loadLeads() {
   const query = db.from('ta_leads').select('*').order('created_at', { ascending: false });
-  // 컨설턴트는 본인 데이터만 CRUD, 지사장은 전체 데이터
   if (currentUser.role === 'consultant') {
     query.eq('consultant', currentUser.name);
   }
@@ -685,20 +531,6 @@ async function loadTargets() {
   }
 }
 
-async function loadNotice() {
-  const { data } = await db.from('notices').select('*').eq('active', true).order('updated_at', { ascending: false }).limit(1);
-  if (data && data.length > 0) {
-    document.getElementById('noticeCurrentText').textContent = '현재 등록 공지: ' + data[0].content;
-    // 컨설턴트 접속 시 팝업 안내
-    if (currentUser.role === 'consultant') {
-      showModal('📢 지사 공지사항', data[0].content);
-    }
-  }
-}
-
-// ==========================================
-// 4. 화면 렌더링 (KPI, 리스트, 랭킹)
-// ==========================================
 function render() {
   renderTodayBanner();
   renderKPI();
@@ -708,7 +540,6 @@ function render() {
   }
 }
 
-
 function renderTodayBanner() {
   const today = getTodayStr();
   const leads = getFilteredLeads();
@@ -716,7 +547,6 @@ function renderTodayBanner() {
   const totalAmt = todayLeads.reduce((s, l) => s + Number(l.amount || 0), 0);
   document.getElementById('todayExpectedAmount').textContent = `${formatCurrency(totalAmt)} (${todayLeads.length}건)`;
 }
-
 
 function renderKPI() {
   const month = getCurrentMonthStr();
@@ -755,43 +585,26 @@ function renderKPI() {
     Object.values(allTargets).forEach(v => { totalTarget += Number(v || 0); });
 
     // 수주 달성율
-    const achieveRate = totalTarget > 0 ? Math.round(wonAmt / totalTarget * 1000) / 10 : null;
-    document.getElementById('mKpiAchieveRate').textContent = achieveRate !== null ? achieveRate + '%' : '목표 미설정';
-    document.getElementById('mKpiAchieveSub').textContent = totalTarget > 0 ? '목표 ' + formatCurrency(totalTarget) : '아래 목표 설정란에서 입력';
+    const achieveRate = totalTarget > 0 ? (Math.round(wonAmt / totalTarget * 1000) / 10) + '%' : '목표 미설정';
+    document.getElementById('mKpiAchieveRate').textContent = achieveRate;
+    document.getElementById('mKpiAchieveSub').textContent = totalTarget > 0 ? '목표 ' + formatCurrency(totalTarget) : '아래 목표란에서 입력';
 
     // 보유 TA율
-    const holdRate = totalTarget > 0 ? Math.round(monthPipeAmt / totalTarget * 1000) / 10 : null;
-    document.getElementById('mKpiHoldRate').textContent = holdRate !== null ? holdRate + '%' : '-';
+    const holdRate = totalTarget > 0 ? (Math.round(monthPipeAmt / totalTarget * 1000) / 10) + '%' : '-';
+    document.getElementById('mKpiHoldRate').textContent = holdRate;
     document.getElementById('mKpiHoldSub').textContent = totalTarget > 0 ? '이달 예정 ' + formatCurrency(monthPipeAmt) + ' (' + monthPipeLeads.length + '건)' : '';
 
     // TA 수주율
-    const winRate = totalAmt > 0 ? Math.round(wonAllAmt / totalAmt * 1000) / 10 : null;
-    document.getElementById('mKpiWinRate').textContent = winRate !== null ? winRate + '%' : '-';
-    document.getElementById('mKpiWinSub').textContent = '수주 ' + formatCurrency(wonAllAmt);
+    const winRate = totalAmt > 0 ? (Math.round(wonAllAmt / totalAmt * 1000) / 10) + '%' : '-';
+    document.getElementById('mKpiWinRate').textContent = winRate;
+    document.getElementById('mKpiWinSub').textContent = '누적 수주 ' + formatCurrency(wonAllAmt);
 
     // 수주 실패율
-    const failRate = totalAmt > 0 ? Math.round(failAmt / totalAmt * 1000) / 10 : null;
-    document.getElementById('mKpiFailRate').textContent = failRate !== null ? failRate + '%' : '-';
+    const failRate = totalAmt > 0 ? (Math.round(failAmt / totalAmt * 1000) / 10) + '%' : '-';
+    document.getElementById('mKpiFailRate').textContent = failRate;
     document.getElementById('mKpiFailSub').textContent = '실패 ' + formatCurrency(failAmt);
-
-  } else {
-    // 컨설턴트 개인 지표
-    document.getElementById('cKpiPipeAmt').textContent = formatCurrency(pipeAmt);
-    document.getElementById('cKpiPipeCnt').textContent = pipeLeads.length + '건';
-    document.getElementById('cKpiWonAmt').textContent = formatCurrency(wonAmt);
-    document.getElementById('cKpiWonCnt').textContent = wonLeads.length + '건';
-
-    const myTarget = allTargets[currentUser.name] || 0;
-    const achieveRate = myTarget > 0 ? Math.round(wonAmt / myTarget * 1000) / 10 : null;
-    document.getElementById('cKpiAchieveRate').textContent = achieveRate !== null ? achieveRate + '%' : '목표 미설정';
-    document.getElementById('cKpiAchieveSub').textContent = myTarget > 0 ? '목표 ' + formatCurrency(myTarget) : '';
-
-    const holdRate = myTarget > 0 ? Math.round(monthPipeAmt / myTarget * 1000) / 10 : null;
-    document.getElementById('cKpiHoldRate').textContent = holdRate !== null ? holdRate + '%' : '-';
-    document.getElementById('cKpiHoldSub').textContent = myTarget > 0 ? '이달 예정 ' + formatCurrency(monthPipeAmt) : '';
   }
 }
-
 
 function renderLeadList() {
   let list = getFilteredLeads().filter(l => {
@@ -813,16 +626,12 @@ function renderLeadList() {
       <td>${l.expected_date || '-'}</td>
       <td>${l.base_date || '-'}</td>
       <td>${l.memo || ''}</td>
-      <td>
-        ${currentUser.name === l.consultant || currentUser.role === 'master' ? 
-          `<button type="button" class="btn-secondary" onclick="editLead('${l.id}')">수정</button>` : ''}
-      </td>
     </tr>
   `).join('');
 
   const cardContainer = document.getElementById('leadCardList');
   cardContainer.innerHTML = list.map(l => `
-    <div class="m-lead-card ${l.stage==='수주完'?'won':(l.stage==='실패'?'lost':'')}" onclick="editLead('${l.id}')">
+    <div class="m-lead-card ${l.stage==='수주完'?'won':(l.stage==='실패'?'lost':'')}">
       <div class="m-lead-top">
         <div class="m-lead-company">${l.company}</div>
         <div class="m-lead-amount">${formatCurrency(l.amount)}</div>
@@ -837,25 +646,6 @@ function renderLeadList() {
   `).join('');
 }
 
-
-document.querySelectorAll('#categoryFilterRow .filter-chip').forEach(btn => {
-  btn.addEventListener('click', function() {
-    document.querySelectorAll('#categoryFilterRow .filter-chip').forEach(b => b.classList.remove('active'));
-    this.classList.add('active');
-    activeCategory = this.getAttribute('data-category');
-    render();
-  });
-});
-
-document.querySelectorAll('#stageFilterRow .filter-chip').forEach(btn => {
-  btn.addEventListener('click', function() {
-    document.querySelectorAll('#stageFilterRow .filter-chip').forEach(b => b.classList.remove('active'));
-    this.classList.add('active');
-    activeStage = this.getAttribute('data-stage');
-    renderLeadList();
-  });
-});
-
 function renderMasterTargets() {
   const consultants = ['최영국', '박광춘', '이수열', '정문재', '임영민'];
   const month = getCurrentMonthStr();
@@ -866,7 +656,7 @@ function renderMasterTargets() {
     const wonAmt = leads.filter(l => l.stage === '수주完' && (l.contract_date||'').slice(0,7) === month).reduce((s,l)=>s+Number(l.amount||0), 0);
     const pipeAmt = leads.filter(l => l.stage === '진행중').reduce((s,l)=>s+Number(l.amount||0), 0);
     const target = allTargets[name] || 0;
-    const rate = target > 0 ? Math.round(wonAmt / target * 100) : '-';
+    const rate = target > 0 ? (Math.round(wonAmt / target * 1000) / 10) + '%' : '-';
 
     return `
       <tr>
@@ -874,7 +664,7 @@ function renderMasterTargets() {
         <td style="font-weight:700;">${name}</td>
         <td>${formatCurrency(wonAmt)}</td>
         <td>${formatCurrency(pipeAmt)}</td>
-        <td style="font-weight:700;">${rate}%</td>
+        <td style="font-weight:700;">${rate}</td>
         <td><input type="number" id="targetInput_${name}" value="${target}" style="width:130px; padding:6px 8px; border:1px solid var(--border); border-radius:6px;"></td>
         <td><button type="button" class="btn-primary" onclick="saveTarget('${name}')" style="padding:6px 12px; font-size:12px;">저장</button></td>
       </tr>
@@ -900,14 +690,38 @@ async function saveTarget(name) {
   }
 }
 
-// ==========================================
-// 5. 모달 및 유틸
-// ==========================================
-function showModal(title, content) {
-  document.getElementById('modalTitle').textContent = title;
+// 필터 이벤트 리스너
+document.querySelectorAll('#categoryFilterRow .filter-chip').forEach(btn => {
+  btn.addEventListener('click', function() {
+    document.querySelectorAll('#categoryFilterRow .filter-chip').forEach(b => b.classList.remove('active'));
+    this.classList.add('active');
+    activeCategory = this.getAttribute('data-category');
+    render();
+  });
+});
+
+document.querySelectorAll('#stageFilterRow .filter-chip').forEach(btn => {
+  btn.addEventListener('click', function() {
+    document.querySelectorAll('#stageFilterRow .filter-chip').forEach(b => b.classList.remove('active'));
+    this.classList.add('active');
+    activeStage = this.getAttribute('data-stage');
+    renderLeadList();
+  });
+});
+
+// 모달 안내
+document.getElementById('btnTodayDetail').addEventListener('click', () => {
+  const today = getTodayStr();
+  const todayLeads = getFilteredLeads().filter(l => l.expected_date === today);
+  const content = todayLeads.length === 0 ? '금일 수주 예정인 TA가 없습니다.' : todayLeads.map(l => `
+    <div style="border-bottom:1px solid #eee; padding:8px 0;">
+      <strong>${l.consultant}</strong> · ${l.company} · <strong>${formatCurrency(l.amount)}</strong> (확도 ${l.confidence})
+    </div>
+  `).join('');
   document.getElementById('modalContent').innerHTML = content;
   document.getElementById('commonModal').classList.add('show');
-}
+});
+
 document.getElementById('btnModalClose').addEventListener('click', () => {
   document.getElementById('commonModal').classList.remove('show');
 });
@@ -920,6 +734,6 @@ window.addEventListener('DOMContentLoaded', () => {
     initApp();
   }
 });
-})();
 </script>
-</body></html>
+</body>
+</html>
