@@ -613,7 +613,7 @@ async function doLogin() {
     msgEl.textContent = '로그인 오류: ' + err.message;
     msgEl.style.color = 'var(--red)';
   }
-});
+}
 
 document.getElementById('btnLogout').addEventListener('click', () => {
   sessionStorage.removeItem('s1_user');
