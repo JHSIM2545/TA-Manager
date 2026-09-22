@@ -1110,96 +1110,52 @@ async function refreshActivityLog() {
 // ==========================================
 // Knox Teams 및 Excel 완벽 호환 "테이블 보기" 복사
 // ==========================================
-async function copyTodayTableToClipboard() {
+async // ==========================================
+// 금일 수주 예정 외부 공지용 텍스트 복사 (원본 100% 복원)
+// ==========================================
+function buildTodayShareText() {
   const leads = todayLeadsAll();
   const today = todayStr();
   const total = leads.reduce((s, l) => s + Number(l.amount || 0), 0);
-
-  // Knox Teams / Excel이 "테이블 보기" 카드로 인식하는 표준 Excel HTML 규격 (StartFragment 포함)
-  let tableHtml = `<table style="border-collapse:collapse;border:1px solid #d0d7de;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Malgun Gothic',sans-serif;font-size:12px;width:100%;color:#202124;">
-    <thead>
-      <tr style="background-color:#f6f8fa;font-weight:bold;color:#24292f;text-align:center;">
-        <th style="border:1px solid #d0d7de;padding:8px 10px;white-space:nowrap;">순번</th>
-        <th style="border:1px solid #d0d7de;padding:8px 12px;white-space:nowrap;">컨설턴트</th>
-        <th style="border:1px solid #d0d7de;padding:8px 14px;white-space:nowrap;">서비스제공처명</th>
-        <th style="border:1px solid #d0d7de;padding:8px 12px;white-space:nowrap;">고객담당자</th>
-        <th style="border:1px solid #d0d7de;padding:8px 12px;white-space:nowrap;">금액</th>
-        <th style="border:1px solid #d0d7de;padding:8px 10px;white-space:nowrap;">확도</th>
-        <th style="border:1px solid #d0d7de;padding:8px 14px;white-space:nowrap;">메모</th>
-      </tr>
-    </thead>
-    <tbody>`;
-
+  const lines = [];
+  lines.push(`[에스원 북서울지사] 금일(${today}) 수주 예정 현황`);
+  lines.push('');
   if (leads.length === 0) {
-    tableHtml += `<tr><td colspan="7" style="border:1px solid #d0d7de;padding:14px;text-align:center;color:#6e7781;">금일 수주 예정인 TA가 없습니다.</td></tr>`;
+    lines.push('- 금일 계약예정일인 TA가 없습니다.');
   } else {
     leads.forEach((l, i) => {
-      const bg = (i % 2 === 0) ? '#ffffff' : '#fcfdfd';
-      tableHtml += `<tr style="background-color:${bg};">
-        <td style="border:1px solid #d0d7de;padding:6px 8px;text-align:center;">${i + 1}</td>
-        <td style="border:1px solid #d0d7de;padding:6px 10px;text-align:center;font-weight:bold;">${escapeHtml(l.consultant)}</td>
-        <td style="border:1px solid #d0d7de;padding:6px 12px;font-weight:bold;color:#0969da;">${escapeHtml(l.company)}</td>
-        <td style="border:1px solid #d0d7de;padding:6px 10px;text-align:center;">${escapeHtml(l.contact || '-')}</td>
-        <td style="border:1px solid #d0d7de;padding:6px 10px;text-align:right;font-weight:bold;">${formatCurrency(l.amount)}</td>
-        <td style="border:1px solid #d0d7de;padding:6px 8px;text-align:center;">${l.confidence || '-'}</td>
-        <td style="border:1px solid #d0d7de;padding:6px 10px;color:#57606a;">${escapeHtml(l.memo || '')}</td>
-      </tr>`;
+      lines.push(`${i + 1}. ${l.consultant} · ${l.company} · ${formatCurrency(l.amount)} (확도 ${l.confidence || '-'})`);
     });
-    tableHtml += `<tr style="background-color:#f6f8fa;font-weight:bold;">
-      <td colspan="4" style="border:1px solid #d0d7de;padding:8px 10px;text-align:center;">합계 (${leads.length}건)</td>
-      <td style="border:1px solid #d0d7de;padding:8px 10px;text-align:right;color:#cf222e;">${formatCurrency(total)}</td>
-      <td colspan="2" style="border:1px solid #d0d7de;padding:8px 10px;"></td>
-    </tr>`;
   }
-  tableHtml += `</tbody></table>`;
-
-  // Microsoft Excel / Teams 표준 프래그먼트 래핑
-  const fullHtml = `<html><head><meta charset="utf-8"></head><body><!--StartFragment-->${tableHtml}<!--EndFragment--></body></html>`;
-
-  // 엑셀 셀 복사용 TSV 텍스트
-  const tsvLines = ["순번	컨설턴트	서비스제공처명	고객담당자	금액	확도	메모"];
-  leads.forEach((l, i) => {
-    tsvLines.push(`${i + 1}	${l.consultant}	${l.company}	${l.contact || '-'}	${formatCurrency(l.amount)}	${l.confidence || '-'}	${l.memo || ''}`);
-  });
-  tsvLines.push(`합계 (${leads.length}건)				${formatCurrency(total)}		`);
-  const tsv = tsvLines.join(String.fromCharCode(10));
-
-  // 복사 핸들러 실행 (가장 강력한 다중 브라우저/앱 호환 방식)
-  let success = false;
-  try {
-    if (navigator.clipboard && window.ClipboardItem) {
-      const blobHtml = new Blob([fullHtml], { type: 'text/html' });
-      const blobText = new Blob([tsv], { type: 'text/plain' });
-      await navigator.clipboard.write([
-        new ClipboardItem({
-          'text/html': blobHtml,
-          'text/plain': blobText
-        })
-      ]);
-      success = true;
-    }
-  } catch (err) {
-    success = false;
-  }
-
-  // 폴백: 네이티브 copy 이벤트 오버라이드
-  if (!success) {
-    const listener = (e) => {
-      e.clipboardData.setData('text/html', fullHtml);
-      e.clipboardData.setData('text/plain', tsv);
-      e.preventDefault();
-    };
-    document.addEventListener('copy', listener);
-    document.execCommand('copy');
-    document.removeEventListener('copy', listener);
-  }
-
-  const btn = el('btnCopyToday');
-  const orig = btn.textContent;
-  btn.textContent = '테이블 복사됨 ✓';
-  btn.classList.add('copied');
-  setTimeout(() => { btn.textContent = orig; btn.classList.remove('copied'); }, 1800);
+  lines.push('');
+  lines.push(`합계: 총 ${leads.length}건 / ${formatCurrency(total)}`);
+  return lines.join(String.fromCharCode(10));
 }
+
+el('btnCopyToday').addEventListener('click', async () => {
+  const text = buildTodayShareText();
+  try {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      await navigator.clipboard.writeText(text);
+    } else {
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      ta.style.position = 'fixed';
+      ta.style.opacity = '0';
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      ta.remove();
+    }
+    const btn = el('btnCopyToday');
+    const orig = btn.textContent;
+    btn.textContent = '복사됨 ✓';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = orig; btn.classList.remove('copied'); }, 1600);
+  } catch (e) {
+    alert('복사에 실패했습니다.');
+  }
+});
 
 el('btnCopyToday').addEventListener('click', copyTodayTableToClipboard);
 
