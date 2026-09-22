@@ -1,0 +1,831 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#0b1f3f">
+<title>에스원 북서울지사 영업 TA 관리</title>
+<!-- Supabase JS Client v2 CDN -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  :root {
+    --navy: #0b1f3f;
+    --navy2: #132a52;
+    --navy3: #1c3a6e;
+    --blue: #2563eb;
+    --blue-light: #eaf1ff;
+    --green: #16a34a;
+    --red: #dc2626;
+    --amber: #d97706;
+    --border: #e3e8f0;
+    --card: #ffffff;
+    --bg: #f4f6fb;
+    --text: #1a2333;
+    --muted: #64748b;
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Malgun Gothic", "Segoe UI", Roboto, sans-serif;
+  }
+
+  /* ========== 공통 헤더 ========== */
+  header.topbar {
+    background: linear-gradient(135deg, var(--navy), var(--navy3));
+    color: #fff;
+    padding: 14px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    box-shadow: 0 2px 8px rgba(10,20,40,.15);
+  }
+  .brand-title { font-size: 17px; font-weight: 800; display: flex; align-items: center; gap: 8px; }
+  .user-badge { font-size: 11.5px; background: rgba(255,255,255,.18); padding: 4px 10px; border-radius: 999px; }
+  .top-right { display: flex; align-items: center; gap: 10px; }
+  .topbar-date-info { font-size: 12px; opacity: .9; text-align: right; }
+  .btn-logout { background: rgba(255,255,255,.15); border: none; color: #fff; padding: 5px 10px; border-radius: 6px; font-size: 11.5px; cursor: pointer; font-weight: 700; }
+
+  /* ========== 레이아웃 ========== */
+  main.app-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 18px 18px 80px;
+  }
+  .panel {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 20px;
+    margin-bottom: 18px;
+    box-shadow: 0 1px 3px rgba(10,20,40,.04);
+  }
+  .panel h2, .panel h3 { margin: 0 0 14px; font-size: 16px; color: var(--navy); }
+
+  /* KPI 그리드 */
+  .kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+  .kpi-card {
+    background: #f8fafc;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 16px;
+  }
+  .kpi-card .label { font-size: 12px; color: var(--muted); margin-bottom: 6px; }
+  .kpi-card .value { font-size: 18px; font-weight: 800; color: var(--navy); }
+  .kpi-card .sub { font-size: 11.5px; color: var(--muted); margin-top: 4px; }
+
+  /* 금일 수주예정 박스 */
+  .today-box {
+    background: linear-gradient(135deg, var(--navy), #123566);
+    color: #fff;
+    border-radius: 14px;
+    padding: 18px 20px;
+    margin-bottom: 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .today-box .val { font-size: 24px; font-weight: 900; color: #fde047; margin-top: 4px; }
+  .btn-today-detail {
+    background: var(--blue);
+    color: #fff;
+    border: none;
+    padding: 10px 18px;
+    border-radius: 8px;
+    font-size: 13.5px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+
+  /* 카테고리 / 단계 필터 칩 */
+  .filter-row { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; margin-bottom: 14px; }
+  .filter-chip {
+    flex: none;
+    padding: 7px 15px;
+    border-radius: 999px;
+    border: 1.5px solid var(--border);
+    background: #fff;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--muted);
+    cursor: pointer;
+  }
+  .filter-chip.active { background: var(--navy); border-color: var(--navy); color: #fff; }
+
+  /* 테이블 & 리스트 */
+  .table-scroll { max-height: 520px; overflow: auto; border: 1px solid var(--border); border-radius: 10px; }
+  table.data-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  table.data-table thead tr { background: var(--navy); color: #fff; }
+  table.data-table th { padding: 10px 8px; text-align: left; font-size: 12px; position: sticky; top: 0; z-index: 2; }
+  table.data-table td { padding: 9px 8px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+  table.data-table tbody tr:hover { background: #eef3fb; }
+  .badge { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 11px; font-weight: 700; }
+  .badge.prog { background: #dbeafe; color: #2563eb; }
+  .badge.won { background: #dcfce7; color: #16a34a; }
+  .badge.lost { background: #fee2e2; color: #dc2626; }
+  .amount-cell { font-weight: 700; color: var(--navy); white-space: nowrap; }
+
+  /* 모바일 카드 뷰 (모바일에서 테이블 대신 활성화) */
+  .lead-card-list { display: none; }
+  .m-lead-card {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--blue);
+    border-radius: 12px;
+    padding: 13px 14px;
+    margin-bottom: 10px;
+    cursor: pointer;
+  }
+  .m-lead-card.won { border-left-color: var(--green); }
+  .m-lead-card.lost { border-left-color: var(--red); }
+  .m-lead-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px; }
+  .m-lead-company { font-size: 14.5px; font-weight: 800; color: var(--navy); }
+  .m-lead-amount { font-size: 15px; font-weight: 800; color: var(--text); }
+  .m-lead-meta { font-size: 12px; color: var(--muted); display: flex; flex-wrap: wrap; gap: 6px; }
+
+  /* 폼 스타일 */
+  .form-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+  .form-group { margin-bottom: 12px; }
+  .form-group label { display: block; font-size: 12.5px; font-weight: 700; color: var(--navy); margin-bottom: 5px; }
+  .form-group input, .form-group select, .form-group textarea {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    font-size: 14px;
+    font-family: inherit;
+    background: #fafbfd;
+  }
+  .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+    outline: none;
+    border-color: var(--blue);
+    background: #fff;
+  }
+  button.btn-primary { background: var(--blue); color: #fff; border: none; padding: 12px 20px; border-radius: 8px; font-size: 14px; font-weight: 700; cursor: pointer; }
+  button.btn-secondary { background: #eef1f7; color: var(--navy); border: 1px solid var(--border); padding: 10px 16px; border-radius: 8px; font-size: 13px; font-weight: 700; cursor: pointer; }
+
+  /* AI 코멘트 스티키 노트 */
+  .ai-sticky {
+    background: #fff59d;
+    border-radius: 8px;
+    padding: 16px 18px;
+    box-shadow: 2px 4px 10px rgba(0,0,0,.1);
+    font-size: 13.5px;
+    line-height: 1.7;
+    color: #463f0a;
+    margin-bottom: 12px;
+  }
+  .ai-sticky-title { font-weight: 800; color: #7c4a03; margin-bottom: 8px; }
+
+  /* 모달 */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(10,20,40,.6);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 200;
+    padding: 16px;
+  }
+  .modal-overlay.show { display: flex; }
+  .modal-box {
+    background: #fff;
+    border-radius: 16px;
+    max-width: 650px;
+    width: 100%;
+    max-height: 85vh;
+    overflow-y: auto;
+    padding: 24px;
+    position: relative;
+  }
+
+  /* ========== 모바일 최적화 미디어 쿼리 (< 820px) ========== */
+  .m-tabbar { display: none; }
+  @media (max-width: 820px) {
+    main.app-container { padding: 12px 12px 85px; }
+    .kpi-grid { grid-template-columns: 1fr 1fr; gap: 8px; }
+    .today-box { flex-direction: column; align-items: stretch; gap: 12px; text-align: center; }
+    .form-grid { grid-template-columns: 1fr; gap: 0; }
+    .desktop-table-view { display: none; }
+    .lead-card-list { display: block; }
+    
+    /* 모바일 하단 탭바 */
+    .m-tabbar {
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      display: flex;
+      background: #fff;
+      border-top: 1px solid var(--border);
+      box-shadow: 0 -2px 10px rgba(10,20,40,.08);
+      z-index: 100;
+      padding-bottom: env(safe-area-inset-bottom);
+    }
+    .m-tab-btn {
+      flex: 1;
+      border: none;
+      background: none;
+      padding: 9px 4px 8px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .m-tab-btn.active { color: var(--navy); font-weight: 800; }
+    .m-tab-icon { font-size: 18px; line-height: 1; }
+    
+    /* 탭 페이지 전환 */
+    .tab-section { display: none; }
+    .tab-section.active { display: block; }
+  }
+
+  /* 로그인 화면 */
+  #loginOverlay {
+    position: fixed;
+    inset: 0;
+    background: #f4f6fb;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 300;
+    padding: 20px;
+  }
+  .login-card {
+    background: #fff;
+    border-radius: 16px;
+    padding: 34px 28px;
+    box-shadow: 0 4px 24px rgba(20,40,80,.12);
+    width: 100%;
+    max-width: 360px;
+  }
+  .login-card h1 { font-size: 19px; margin: 0 0 6px; color: var(--navy); text-align: center; }
+  .login-card p { font-size: 13px; color: var(--muted); margin: 0 0 22px; text-align: center; }
+</style>
+</head>
+<body>
+
+<!-- 1. 로그인 화면 (기존 Supabase app_users 테이블 연동) -->
+<div id="loginOverlay">
+  <div class="login-card">
+    <h1>S1 북서울지사 영업 TA</h1>
+    <p>전화번호와 비밀번호를 입력해주세요.</p>
+    <div class="form-group">
+      <label>전화번호</label>
+      <input id="loginPhone" type="tel" placeholder="01012345678" autocomplete="tel">
+    </div>
+    <div class="form-group">
+      <label>비밀번호</label>
+      <input id="loginPw" type="password" autocomplete="current-password">
+    </div>
+    <button type="button" id="btnLogin" class="btn-primary" style="width:100%; margin-top:10px;">로그인</button>
+    <div id="loginMsg" style="margin-top:12px; font-size:12.5px; text-align:center; min-height:16px;"></div>
+  </div>
+</div>
+
+<!-- 2. 메인 애플리케이션 -->
+<div id="appRoot" style="display:none;">
+  <header class="topbar">
+    <div class="brand-title">
+      <span>에스원 북서울지사</span>
+      <span class="user-badge" id="userBadge">로그인</span>
+    </div>
+    <div class="top-right">
+      <div class="topbar-date-info">
+        <div id="todayDateStr" style="font-weight:700;"></div>
+        <div id="workingDaysStr" style="opacity:.8;"></div>
+      </div>
+      <button type="button" class="btn-logout" id="btnLogout">로그아웃</button>
+    </div>
+  </header>
+
+  <main class="app-container">
+    <!-- 상단 대분류 필터 -->
+    <div class="filter-row" id="categoryFilterRow">
+      <button type="button" class="filter-chip active" data-category="일반알람">일반알람</button>
+      <button type="button" class="filter-chip" data-category="디지털(정보보안)">디지털(정보보안)</button>
+      <button type="button" class="filter-chip" data-category="안전상품">안전상품</button>
+      <button type="button" class="filter-chip" data-category="all">전체</button>
+    </div>
+
+    <!-- 금일 수주 예정 배너 -->
+    <div class="today-box">
+      <div>
+        <div style="font-size:13px; opacity:.9;" id="todayBoxTitle">금일 수주 예정 금액</div>
+        <div class="val" id="todayExpectedAmount">0원 (0건)</div>
+      </div>
+      <div style="display:flex; gap:8px;">
+        <button type="button" class="btn-today-detail" id="btnTodayDetail">상세리스트</button>
+        <button type="button" class="btn-today-detail" id="btnCopyToday" style="background:#16a34a; display:none;">공지 복사</button>
+      </div>
+    </div>
+
+    <!-- ==================== 지사장 전용 뷰 ==================== -->
+    <div id="masterSection" style="display:none;">
+      <!-- KPI -->
+      <div class="panel">
+        <h2>지사 전체 TA 종합 현황 <span id="currentMonthStr" style="font-size:12px; color:var(--muted); font-weight:normal;"></span></h2>
+        <div class="kpi-grid">
+          <div class="kpi-card"><div class="label">전체 TA</div><div class="value" id="mKpiTotalAmt">0원</div><div class="sub" id="mKpiTotalCnt">0건</div></div>
+          <div class="kpi-card"><div class="label">진행중 TA</div><div class="value" id="mKpiPipeAmt">0원</div><div class="sub" id="mKpiPipeCnt">0건</div></div>
+          <div class="kpi-card"><div class="label">이달 수주 TA</div><div class="value" id="mKpiWonAmt">0원</div><div class="sub" id="mKpiWonCnt">0건</div></div>
+          <div class="kpi-card"><div class="label">실패 TA</div><div class="value" id="mKpiFailAmt">0원</div><div class="sub" id="mKpiFailCnt">0건</div></div>
+          <div class="kpi-card"><div class="label">수주 달성율</div><div class="value" id="mKpiAchieveRate">-</div><div class="sub" id="mKpiAchieveSub"></div></div>
+          <div class="kpi-card"><div class="label">보유 TA율</div><div class="value" id="mKpiHoldRate">-</div><div class="sub" id="mKpiHoldSub"></div></div>
+          <div class="kpi-card"><div class="label">TA 수주율</div><div class="value" id="mKpiWinRate">-</div><div class="sub" id="mKpiWinSub"></div></div>
+          <div class="kpi-card"><div class="label">수주 실패율</div><div class="value" id="mKpiFailRate">-</div><div class="sub" id="mKpiFailSub"></div></div>
+        </div>
+      </div>
+
+      <!-- 컨설턴트별 목표 관리 & 실적 랭킹 -->
+      <div class="panel">
+        <h2>컨설턴트별 실적 랭킹 및 목표 관리</h2>
+        <div class="table-scroll">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>순위</th><th>컨설턴트</th><th>이달 수주</th><th>진행중 TA</th><th>수주 달성율</th><th>이달 목표 설정(원)</th><th>저장</th>
+              </tr>
+            </thead>
+            <tbody id="masterTargetTbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- 공지사항 관리 패널 -->
+      <div class="panel">
+        <h2>지사 공지사항 관리</h2>
+        <div style="display:flex; gap:10px;">
+          <input type="text" id="noticeInput" placeholder="전 컨설턴트에게 알릴 공지사항을 입력하세요" style="flex:1; padding:10px; border:1px solid var(--border); border-radius:8px;">
+          <button type="button" class="btn-primary" id="btnSaveNotice">공지 등록</button>
+          <button type="button" class="btn-secondary" id="btnDeleteNotice" style="color:var(--red);">삭제</button>
+        </div>
+        <div id="noticeCurrentText" style="margin-top:8px; font-size:12.5px; color:var(--muted);"></div>
+      </div>
+
+      <!-- 실시간 변경 이력 (Activity Log) -->
+      <div class="panel">
+        <h2>실시간 변경 이력 (Activity Log)</h2>
+        <div class="table-scroll" style="max-height:300px;">
+          <table class="data-table">
+            <thead><tr><th>시간</th><th>컨설턴트</th><th>구분</th><th>서비스제공처</th><th>내역</th></tr></thead>
+            <tbody id="activityLogTbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== 컨설턴트 전용 뷰 ==================== -->
+    <div id="consultantSection" style="display:none;">
+      <!-- AI 코멘트 스티키 노트 -->
+      <div id="aiCommentSection" class="panel" style="display:none;">
+        <h2>🤖 AI 코멘트 (진척 현황 및 동료 비교)</h2>
+        <div id="aiCommentBox"></div>
+      </div>
+
+      <!-- 개인 KPI -->
+      <div class="panel">
+        <h2>내 이달 TA 지표</h2>
+        <div class="kpi-grid">
+          <div class="kpi-card"><div class="label">진행중 TA</div><div class="value" id="cKpiPipeAmt">0원</div><div class="sub" id="cKpiPipeCnt">0건</div></div>
+          <div class="kpi-card"><div class="label">이달 수주 TA</div><div class="value" id="cKpiWonAmt">0원</div><div class="sub" id="cKpiWonCnt">0건</div></div>
+          <div class="kpi-card"><div class="label">수주 달성율</div><div class="value" id="cKpiAchieveRate">-</div><div class="sub" id="cKpiAchieveSub"></div></div>
+          <div class="kpi-card"><div class="label">보유 TA율</div><div class="value" id="cKpiHoldRate">-</div><div class="sub" id="cKpiHoldSub"></div></div>
+        </div>
+      </div>
+
+      <!-- TA 신규 등록/수정 폼 -->
+      <div class="panel" id="formPanel">
+        <h2 id="formTitle">신규 TA 등록</h2>
+        <form id="leadForm">
+          <input type="hidden" id="formLeadId">
+          <div class="form-grid">
+            <div class="form-group"><label>서비스제공처명 *</label><input type="text" id="fCompany" required placeholder="현장 정식 명칭"></div>
+            <div class="form-group"><label>고객담당자</label><input type="text" id="fContact" placeholder="담당자 성명/연락처"></div>
+            <div class="form-group"><label>금액 (원) *</label><input type="text" inputmode="numeric" id="fAmount" required placeholder="숫자만 입력"></div>
+            <div class="form-group"><label>상품종류 *</label>
+              <select id="fProductType">
+                <option value="알람">알람</option>
+                <option value="휴엔">휴엔</option>
+                <option value="정보보안">정보보안</option>
+                <option value="블루스캔">블루스캔</option>
+                <option value="유지보수">유지보수</option>
+                <option value="안전상품">안전상품</option>
+              </select>
+            </div>
+            <div class="form-group"><label>영업동기 *</label>
+              <select id="fMotive">
+                <option value="개척">개척</option>
+                <option value="콜센터">콜센터</option>
+                <option value="사내소개">사내소개</option>
+                <option value="고객소개">고객소개</option>
+                <option value="대리점">대리점</option>
+                <option value="관내이전">관내이전</option>
+                <option value="관외이전">관외이전</option>
+                <option value="기타">기타</option>
+              </select>
+            </div>
+            <div class="form-group"><label>영업단계 *</label>
+              <select id="fStage">
+                <option value="진행중">진행중</option>
+                <option value="수주完">수주完</option>
+                <option value="실패">실패</option>
+              </select>
+            </div>
+            <div class="form-group"><label>수주확도 *</label>
+              <select id="fConfidence">
+                <option value="A">A (상)</option>
+                <option value="B" selected>B (중)</option>
+                <option value="C">C (하)</option>
+              </select>
+            </div>
+            <div class="form-group"><label>계약예정일 *</label><input type="date" id="fExpectedDate" required></div>
+            <div class="form-group"><label>기산일 (수주完 시)</label><input type="date" id="fBaseDate"></div>
+          </div>
+          <div class="form-group"><label>메모/특이사항</label><input type="text" id="fMemo" placeholder="메모"></div>
+          <div style="display:flex; gap:10px; margin-top:8px;">
+            <button type="submit" class="btn-primary" id="btnSubmitForm">TA 등록</button>
+            <button type="button" class="btn-secondary" id="btnCancelEdit" style="display:none;">수정 취소</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- ==================== 전체/내 TA 목록 (공통) ==================== -->
+    <div class="panel">
+      <h2>TA 목록 (<span id="totalListCount">0</span>건)</h2>
+      <div class="filter-row" id="stageFilterRow">
+        <button type="button" class="filter-chip active" data-stage="all">전체 단계</button>
+        <button type="button" class="filter-chip" data-stage="진행중">진행중</button>
+        <button type="button" class="filter-chip" data-stage="수주完">수주完</button>
+        <button type="button" class="filter-chip" data-stage="실패">실패</button>
+      </div>
+      
+      <!-- PC 뷰: 테이블 -->
+      <div class="desktop-table-view table-scroll">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>컨설턴트</th><th>서비스제공처명</th><th>고객담당자</th><th>금액</th><th>단계</th><th>확도</th><th>상품</th><th>예정일</th><th>기산일</th><th>메모</th><th>관리</th>
+            </tr>
+          </thead>
+          <tbody id="leadTableTbody"></tbody>
+        </table>
+      </div>
+
+      <!-- 모바일 뷰: 카드 리스트 -->
+      <div class="lead-card-list" id="leadCardList"></div>
+    </div>
+  </main>
+
+  <!-- 모바일 하단 탭바 -->
+  <nav class="m-tabbar" id="mobileTabbar">
+    <button type="button" class="m-tab-btn active" data-tab="home"><span class="m-tab-icon">🏠</span><span>홈</span></button>
+    <button type="button" class="m-tab-btn" data-tab="list"><span class="m-tab-icon">📋</span><span>목록</span></button>
+    <button type="button" class="m-tab-btn" data-tab="form"><span class="m-tab-icon">✏️</span><span>등록</span></button>
+  </nav>
+</div>
+
+<!-- 상세/공지 팝업 모달 -->
+<div class="modal-overlay" id="commonModal">
+  <div class="modal-box">
+    <h3 id="modalTitle">상세 안내</h3>
+    <div id="modalContent" style="margin-top:12px; font-size:13.5px; line-height:1.6;"></div>
+    <div style="margin-top:20px; text-align:right;">
+      <button type="button" class="btn-secondary" id="btnModalClose">닫기</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ==========================================
+// 1. Supabase 설정 (본인의 Project Settings > API 키 사용)
+// ==========================================
+const SUPABASE_URL = 'https://gpqlximhoqdybcewdfde.supabase.co';
+// 브라우저용 public anon key를 설정하세요.
+const SUPABASE_ANON_KEY = window.SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...';
+
+const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+// 앱 상태
+let currentUser = null; // { name, role: 'consultant' | 'master', phone }
+let allLeads = [];
+let allTargets = {};
+let activeCategory = '일반알람';
+let activeStage = 'all';
+
+// 대한민국 공휴일 (2026년)
+const KR_HOLIDAYS_2026 = new Set([
+  '2026-01-01','2026-02-16','2026-02-17','2026-02-18','2026-03-01','2026-03-02',
+  '2026-05-05','2026-05-24','2026-05-25','2026-06-06','2026-08-15','2026-08-17',
+  '2026-09-24','2026-09-25','2026-09-26','2026-09-27','2026-10-03','2026-10-05',
+  '2026-10-09','2026-12-25'
+]);
+
+function isHoliday(dateStr) {
+  if (KR_HOLIDAYS_2026.has(dateStr)) return true;
+  const d = new Date(dateStr + 'T00:00:00');
+  const w = d.getDay();
+  return w === 0 || w === 6;
+}
+
+function getTodayStr() {
+  const d = new Date();
+  return d.toISOString().slice(0, 10);
+}
+
+function getCurrentMonthStr() {
+  return getTodayStr().slice(0, 7);
+}
+
+function formatCurrency(n) {
+  return (Number(n) || 0).toLocaleString('ko-KR') + '원';
+}
+
+// SHA-256 비밀번호 해시 계산
+async function sha256(str) {
+  const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(str));
+  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+// ==========================================
+// 2. 인증 및 로그인 로직 (app_users 테이블)
+// ==========================================
+document.getElementById('btnLogin').addEventListener('click', async () => {
+  const phone = document.getElementById('loginPhone').value.replace(/[^0-9]/g, '');
+  const pw = document.getElementById('loginPw').value;
+  const msgEl = document.getElementById('loginMsg');
+  
+  if (!phone || !pw) {
+    msgEl.textContent = '전화번호와 비밀번호를 모두 입력하세요.';
+    msgEl.style.color = 'var(--red)';
+    return;
+  }
+  msgEl.textContent = '확인 중...';
+  msgEl.style.color = 'var(--navy)';
+
+  try {
+    const pwHash = await sha256(pw);
+    const { data: users, error } = await supabase
+      .from('app_users')
+      .select('name, job, hash, phone')
+      .eq('phone', phone)
+      .limit(1);
+
+    if (error || !users || users.length === 0) {
+      msgEl.textContent = '등록되지 않은 사용자입니다.';
+      msgEl.style.color = 'var(--red)';
+      return;
+    }
+    const user = users[0];
+    if (user.hash.toLowerCase() !== pwHash.toLowerCase()) {
+      msgEl.textContent = '비밀번호가 일치하지 않습니다.';
+      msgEl.style.color = 'var(--red)';
+      return;
+    }
+
+    // 직무 권한 분기
+    currentUser = {
+      name: user.name,
+      phone: user.phone,
+      role: (user.job === '지사관리자') ? 'master' : 'consultant'
+    };
+    sessionStorage.setItem('s1_user', JSON.stringify(currentUser));
+    initApp();
+  } catch (err) {
+    msgEl.textContent = '로그인 오류: ' + err.message;
+    msgEl.style.color = 'var(--red)';
+  }
+});
+
+document.getElementById('btnLogout').addEventListener('click', () => {
+  sessionStorage.removeItem('s1_user');
+  location.reload();
+});
+
+// ==========================================
+// 3. 데이터 로드 및 초기화
+// ==========================================
+async function initApp() {
+  document.getElementById('loginOverlay').style.display = 'none';
+  document.getElementById('appRoot').style.display = 'block';
+
+  document.getElementById('userBadge').textContent = `${currentUser.name} (${currentUser.role === 'master' ? '지사장' : '컨설턴트'})`;
+  document.getElementById('todayDateStr').textContent = getTodayStr();
+  document.getElementById('currentMonthStr').textContent = `(${getCurrentMonthStr()})`;
+
+  if (currentUser.role === 'master') {
+    document.getElementById('masterSection').style.display = 'block';
+    document.getElementById('btnCopyToday').style.display = 'inline-block';
+  } else {
+    document.getElementById('consultantSection').style.display = 'block';
+    document.getElementById('fExpectedDate').value = getTodayStr();
+  }
+
+  await Promise.all([loadLeads(), loadTargets(), loadNotice()]);
+  render();
+}
+
+async function loadLeads() {
+  const query = supabase.from('leads').select('*').order('created_at', { ascending: false });
+  // 컨설턴트는 본인 데이터만 CRUD, 지사장은 전체 데이터
+  if (currentUser.role === 'consultant') {
+    query.eq('consultant', currentUser.name);
+  }
+  const { data, error } = await query;
+  if (!error && data) allLeads = data;
+}
+
+async function loadTargets() {
+  const month = getCurrentMonthStr();
+  const { data, error } = await supabase.from('targets').select('*').eq('target_month', month);
+  if (!error && data) {
+    allTargets = {};
+    data.forEach(t => { allTargets[t.consultant] = Number(t.target_amount || 0); });
+  }
+}
+
+async function loadNotice() {
+  const { data } = await supabase.from('notices').select('*').eq('active', true).order('updated_at', { ascending: false }).limit(1);
+  if (data && data.length > 0) {
+    document.getElementById('noticeCurrentText').textContent = '현재 등록 공지: ' + data[0].content;
+    // 컨설턴트 접속 시 팝업 안내
+    if (currentUser.role === 'consultant') {
+      showModal('📢 지사 공지사항', data[0].content);
+    }
+  }
+}
+
+// ==========================================
+// 4. 화면 렌더링 (KPI, 리스트, 랭킹)
+// ==========================================
+function render() {
+  renderTodayBanner();
+  renderKPI();
+  renderLeadList();
+  if (currentUser.role === 'master') {
+    renderMasterTargets();
+  }
+}
+
+function renderTodayBanner() {
+  const today = getTodayStr();
+  const todayLeads = allLeads.filter(l => l.expected_date === today && l.stage === '진행중');
+  const totalAmt = todayLeads.reduce((s, l) => s + Number(l.amount || 0), 0);
+  document.getElementById('todayExpectedAmount').textContent = `${formatCurrency(totalAmt)} (${todayLeads.length}건)`;
+}
+
+function renderKPI() {
+  const month = getCurrentMonthStr();
+  const totalAmt = allLeads.reduce((s, l) => s + Number(l.amount || 0), 0);
+  const pipeLeads = allLeads.filter(l => l.stage === '진행중');
+  const wonLeads = allLeads.filter(l => l.stage === '수주完' && (l.contract_date || '').slice(0, 7) === month);
+  const failLeads = allLeads.filter(l => l.stage === '실패');
+
+  const pipeAmt = pipeLeads.reduce((s, l) => s + Number(l.amount || 0), 0);
+  const wonAmt = wonLeads.reduce((s, l) => s + Number(l.amount || 0), 0);
+  const failAmt = failLeads.reduce((s, l) => s + Number(l.amount || 0), 0);
+
+  if (currentUser.role === 'master') {
+    document.getElementById('mKpiTotalAmt').textContent = formatCurrency(totalAmt);
+    document.getElementById('mKpiTotalCnt').textContent = allLeads.length + '건';
+    document.getElementById('mKpiPipeAmt').textContent = formatCurrency(pipeAmt);
+    document.getElementById('mKpiPipeCnt').textContent = pipeLeads.length + '건';
+    document.getElementById('mKpiWonAmt').textContent = formatCurrency(wonAmt);
+    document.getElementById('mKpiWonCnt').textContent = wonLeads.length + '건';
+    document.getElementById('mKpiFailAmt').textContent = formatCurrency(failAmt);
+    document.getElementById('mKpiFailCnt').textContent = failLeads.length + '건';
+  } else {
+    document.getElementById('cKpiPipeAmt').textContent = formatCurrency(pipeAmt);
+    document.getElementById('cKpiPipeCnt').textContent = pipeLeads.length + '건';
+    document.getElementById('cKpiWonAmt').textContent = formatCurrency(wonAmt);
+    document.getElementById('cKpiWonCnt').textContent = wonLeads.length + '건';
+  }
+}
+
+function renderLeadList() {
+  let list = allLeads.filter(l => {
+    if (activeStage !== 'all' && l.stage !== activeStage) return false;
+    return true;
+  });
+  document.getElementById('totalListCount').textContent = list.length;
+
+  // PC 테이블
+  const tbody = document.getElementById('leadTableTbody');
+  tbody.innerHTML = list.map(l => `
+    <tr>
+      <td style="font-weight:700;">${l.consultant}</td>
+      <td style="font-weight:700;">${l.company}</td>
+      <td>${l.contact || '-'}</td>
+      <td class="amount-cell">${formatCurrency(l.amount)}</td>
+      <td><span class="badge ${l.stage==='진행중'?'prog':(l.stage==='수주完'?'won':'lost')}">${l.stage}</span></td>
+      <td>${l.confidence}</td>
+      <td>${l.product_type}</td>
+      <td>${l.expected_date || '-'}</td>
+      <td>${l.base_date || '-'}</td>
+      <td>${l.memo || ''}</td>
+      <td>
+        ${currentUser.name === l.consultant || currentUser.role === 'master' ? 
+          `<button type="button" class="btn-secondary" onclick="editLead('${l.id}')">수정</button>` : ''}
+      </td>
+    </tr>
+  `).join('');
+
+  // 모바일 카드 리스트
+  const cardContainer = document.getElementById('leadCardList');
+  cardContainer.innerHTML = list.map(l => `
+    <div class="m-lead-card ${l.stage==='수주完'?'won':(l.stage==='실패'?'lost':'')}" onclick="editLead('${l.id}')">
+      <div class="m-lead-top">
+        <div class="m-lead-company">${l.company}</div>
+        <div class="m-lead-amount">${formatCurrency(l.amount)}</div>
+      </div>
+      <div class="m-lead-meta">
+        <span class="badge ${l.stage==='진행중'?'prog':(l.stage==='수주完'?'won':'lost')}">${l.stage}</span>
+        <span>확도 ${l.confidence}</span>
+        <span>${l.product_type}</span>
+        <span>예정 ${l.expected_date || '-'}</span>
+      </div>
+    </div>
+  `).join('');
+}
+
+// 지사장: 컨설턴트별 목표 관리 행 렌더링
+function renderMasterTargets() {
+  const consultants = ['최영국', '박광춘', '이수열', '정문재', '임영민'];
+  const month = getCurrentMonthStr();
+  const tbody = document.getElementById('masterTargetTbody');
+
+  tbody.innerHTML = consultants.map((name, i) => {
+    const leads = allLeads.filter(l => l.consultant === name);
+    const wonAmt = leads.filter(l => l.stage === '수주完' && (l.contract_date||'').slice(0,7) === month).reduce((s,l)=>s+Number(l.amount||0), 0);
+    const pipeAmt = leads.filter(l => l.stage === '진행중').reduce((s,l)=>s+Number(l.amount||0), 0);
+    const target = allTargets[name] || 0;
+    const rate = target > 0 ? Math.round(wonAmt / target * 100) : '-';
+
+    return `
+      <tr>
+        <td>${i + 1}</td>
+        <td style="font-weight:700;">${name}</td>
+        <td>${formatCurrency(wonAmt)}</td>
+        <td>${formatCurrency(pipeAmt)}</td>
+        <td style="font-weight:700;">${rate}%</td>
+        <td><input type="number" id="targetInput_${name}" value="${target}" style="width:130px; padding:6px 8px; border:1px solid var(--border); border-radius:6px;"></td>
+        <td><button type="button" class="btn-primary" onclick="saveTarget('${name}')" style="padding:6px 12px; font-size:12px;">저장</button></td>
+      </tr>
+    `;
+  }).join('');
+}
+
+async function saveTarget(name) {
+  const val = Number(document.getElementById(`targetInput_${name}`).value) || 0;
+  const month = getCurrentMonthStr();
+  const { error } = await supabase.from('targets').upsert({
+    consultant: name,
+    target_month: month,
+    target_amount: val,
+    updated_at: new Date().toISOString()
+  }, { onConflict: 'consultant,target_month' });
+
+  if (error) alert('목표 저장 실패: ' + error.message);
+  else {
+    allTargets[name] = val;
+    alert(`${name} 컨설턴트 목표가 저장되었습니다.`);
+    render();
+  }
+}
+
+// ==========================================
+// 5. 모달 및 유틸
+// ==========================================
+function showModal(title, content) {
+  document.getElementById('modalTitle').textContent = title;
+  document.getElementById('modalContent').innerHTML = content;
+  document.getElementById('commonModal').classList.add('show');
+}
+document.getElementById('btnModalClose').addEventListener('click', () => {
+  document.getElementById('commonModal').classList.remove('show');
+});
+
+// 자동 세션 복구
+window.addEventListener('DOMContentLoaded', () => {
+  const saved = sessionStorage.getItem('s1_user');
+  if (saved) {
+    currentUser = JSON.parse(saved);
+    initApp();
+  }
+});
+</script>
+</body>
+</html>
