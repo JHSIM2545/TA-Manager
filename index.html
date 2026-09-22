@@ -510,14 +510,21 @@
 </div>
 
 <script>
+
+(function() {
+  const SUPABASE_URL = 'https://gpqlximhoqdybcewdfde.supabase.co';
+  const SUPABASE_ANON_KEY = 'sb_publishable_xUnGxyLCc5TB5nv4keVQVw__grqGJkP';
+  const db = (window.supabase && window.supabase.createClient) 
+             ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) 
+             : null;
 // ==========================================
 // 1. Supabase 설정 (본인의 Project Settings > API 키 사용)
 // ==========================================
-const SUPABASE_URL = 'https://gpqlximhoqdybcewdfde.supabase.co';
-// 브라우저용 public anon key를 설정하세요.
-const SUPABASE_ANON_KEY = window.SUPABASE_ANON_KEY || 'sb_publishable_xUnGxyLCc5TB5nv4keVQVw__grqGJkP';
 
-const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+// 브라우저용 public anon key를 설정하세요.
+
+
+
 
 // 앱 상태
 let currentUser = null; // { name, role: 'consultant' | 'master', phone }
@@ -831,6 +838,6 @@ window.addEventListener('DOMContentLoaded', () => {
     initApp();
   }
 });
+})();
 </script>
-</body>
-</html>
+</body></html>
