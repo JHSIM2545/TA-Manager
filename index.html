@@ -517,7 +517,7 @@ const SUPABASE_URL = 'https://gpqlximhoqdybcewdfde.supabase.co';
 // 브라우저용 public anon key를 설정하세요.
 const SUPABASE_ANON_KEY = window.SUPABASE_ANON_KEY || 'sb_publishable_xUnGxyLCc5TB5nv4keVQVw__grqGJkP';
 
-var supabase = (window.supabase && window.supabase.createClient) ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
+const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 // 앱 상태
 let currentUser = null; // { name, role: 'consultant' | 'master', phone }
@@ -644,7 +644,7 @@ async function initApp() {
 }
 
 async function loadLeads() {
-  const query = supabase.from('ta_leads').select('*').order('created_at', { ascending: false });
+  const query = db.from('ta_leads').select('*').order('created_at', { ascending: false });
   // 컨설턴트는 본인 데이터만 CRUD, 지사장은 전체 데이터
   if (currentUser.role === 'consultant') {
     query.eq('consultant', currentUser.name);
@@ -655,7 +655,7 @@ async function loadLeads() {
 
 async function loadTargets() {
   const month = getCurrentMonthStr();
-  const { data, error } = await supabase.from('targets').select('*').eq('target_month', month);
+  const { data, error } = await db.from('targets').select('*').eq('target_month', month);
   if (!error && data) {
     allTargets = {};
     data.forEach(t => { allTargets[t.consultant] = Number(t.target_amount || 0); });
@@ -663,7 +663,7 @@ async function loadTargets() {
 }
 
 async function loadNotice() {
-  const { data } = await supabase.from('notices').select('*').eq('active', true).order('updated_at', { ascending: false }).limit(1);
+  const { data } = await db.from('notices').select('*').eq('active', true).order('updated_at', { ascending: false }).limit(1);
   if (data && data.length > 0) {
     document.getElementById('noticeCurrentText').textContent = '현재 등록 공지: ' + data[0].content;
     // 컨설턴트 접속 시 팝업 안내
@@ -796,7 +796,7 @@ function renderMasterTargets() {
 async function saveTarget(name) {
   const val = Number(document.getElementById(`targetInput_${name}`).value) || 0;
   const month = getCurrentMonthStr();
-  const { error } = await supabase.from('targets').upsert({
+  const { error } = await db.from('targets').upsert({
     consultant: name,
     target_month: month,
     target_amount: val,
