@@ -515,7 +515,8 @@
   
 const SUPABASE_URL = 'https://gpqlximhoqdybcewdfde.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_xUnGxyLCc5TB5nv4keVQVw__grqGJkP';
-window.supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const _client = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+Object.assign(window.supabase, _client);
 const db = window.supabase;
 
 // ==========================================
@@ -556,6 +557,20 @@ function getTodayStr() {
 
 function getCurrentMonthStr() {
   return getTodayStr().slice(0, 7);
+}
+
+
+function productCategory(productType) {
+  if (productType === '정보보안') return '디지털(정보보안)';
+  if (productType === '안전상품') return '안전상품';
+  return '일반알람';
+}
+
+function getFilteredLeads() {
+  return allLeads.filter(l => {
+    if (activeCategory !== 'all' && productCategory(l.product_type) !== activeCategory) return false;
+    return true;
+  });
 }
 
 function formatCurrency(n) {
@@ -693,49 +708,98 @@ function render() {
   }
 }
 
+
 function renderTodayBanner() {
   const today = getTodayStr();
-  const todayLeads = allLeads.filter(l => l.expected_date === today && l.stage === '진행중');
+  const leads = getFilteredLeads();
+  const todayLeads = leads.filter(l => l.expected_date === today);
   const totalAmt = todayLeads.reduce((s, l) => s + Number(l.amount || 0), 0);
   document.getElementById('todayExpectedAmount').textContent = `${formatCurrency(totalAmt)} (${todayLeads.length}건)`;
 }
 
+
 function renderKPI() {
   const month = getCurrentMonthStr();
-  const totalAmt = allLeads.reduce((s, l) => s + Number(l.amount || 0), 0);
-  const pipeLeads = allLeads.filter(l => l.stage === '진행중');
-  const wonLeads = allLeads.filter(l => l.stage === '수주完' && (l.contract_date || '').slice(0, 7) === month);
-  const failLeads = allLeads.filter(l => l.stage === '실패');
+  const leads = getFilteredLeads();
+  
+  const totalAmt = leads.reduce((s, l) => s + Number(l.amount || 0), 0);
+  const pipeLeads = leads.filter(l => l.stage === '진행중');
+  const wonLeads = leads.filter(l => l.stage === '수주完' && (l.contract_date || '').slice(0, 7) === month);
+  const failLeads = leads.filter(l => l.stage === '실패');
 
   const pipeAmt = pipeLeads.reduce((s, l) => s + Number(l.amount || 0), 0);
   const wonAmt = wonLeads.reduce((s, l) => s + Number(l.amount || 0), 0);
   const failAmt = failLeads.reduce((s, l) => s + Number(l.amount || 0), 0);
 
+  // 누적 수주 금액
+  const wonAllLeads = leads.filter(l => l.stage === '수주完');
+  const wonAllAmt = wonAllLeads.reduce((s, l) => s + Number(l.amount || 0), 0);
+
+  // 이달 수주 예정인 진행중 건
+  const monthPipeLeads = pipeLeads.filter(l => (l.expected_date || '').slice(0, 7) === month);
+  const monthPipeAmt = monthPipeLeads.reduce((s, l) => s + Number(l.amount || 0), 0);
+
   if (currentUser.role === 'master') {
+    // 1. 기본 건수 및 금액
     document.getElementById('mKpiTotalAmt').textContent = formatCurrency(totalAmt);
-    document.getElementById('mKpiTotalCnt').textContent = allLeads.length + '건';
+    document.getElementById('mKpiTotalCnt').textContent = leads.length + '건';
     document.getElementById('mKpiPipeAmt').textContent = formatCurrency(pipeAmt);
     document.getElementById('mKpiPipeCnt').textContent = pipeLeads.length + '건';
     document.getElementById('mKpiWonAmt').textContent = formatCurrency(wonAmt);
     document.getElementById('mKpiWonCnt').textContent = wonLeads.length + '건';
     document.getElementById('mKpiFailAmt').textContent = formatCurrency(failAmt);
     document.getElementById('mKpiFailCnt').textContent = failLeads.length + '건';
+
+    // 2. 전체 목표 합산
+    let totalTarget = 0;
+    Object.values(allTargets).forEach(v => { totalTarget += Number(v || 0); });
+
+    // 수주 달성율
+    const achieveRate = totalTarget > 0 ? Math.round(wonAmt / totalTarget * 1000) / 10 : null;
+    document.getElementById('mKpiAchieveRate').textContent = achieveRate !== null ? achieveRate + '%' : '목표 미설정';
+    document.getElementById('mKpiAchieveSub').textContent = totalTarget > 0 ? '목표 ' + formatCurrency(totalTarget) : '아래 목표 설정란에서 입력';
+
+    // 보유 TA율
+    const holdRate = totalTarget > 0 ? Math.round(monthPipeAmt / totalTarget * 1000) / 10 : null;
+    document.getElementById('mKpiHoldRate').textContent = holdRate !== null ? holdRate + '%' : '-';
+    document.getElementById('mKpiHoldSub').textContent = totalTarget > 0 ? '이달 예정 ' + formatCurrency(monthPipeAmt) + ' (' + monthPipeLeads.length + '건)' : '';
+
+    // TA 수주율
+    const winRate = totalAmt > 0 ? Math.round(wonAllAmt / totalAmt * 1000) / 10 : null;
+    document.getElementById('mKpiWinRate').textContent = winRate !== null ? winRate + '%' : '-';
+    document.getElementById('mKpiWinSub').textContent = '수주 ' + formatCurrency(wonAllAmt);
+
+    // 수주 실패율
+    const failRate = totalAmt > 0 ? Math.round(failAmt / totalAmt * 1000) / 10 : null;
+    document.getElementById('mKpiFailRate').textContent = failRate !== null ? failRate + '%' : '-';
+    document.getElementById('mKpiFailSub').textContent = '실패 ' + formatCurrency(failAmt);
+
   } else {
+    // 컨설턴트 개인 지표
     document.getElementById('cKpiPipeAmt').textContent = formatCurrency(pipeAmt);
     document.getElementById('cKpiPipeCnt').textContent = pipeLeads.length + '건';
     document.getElementById('cKpiWonAmt').textContent = formatCurrency(wonAmt);
     document.getElementById('cKpiWonCnt').textContent = wonLeads.length + '건';
+
+    const myTarget = allTargets[currentUser.name] || 0;
+    const achieveRate = myTarget > 0 ? Math.round(wonAmt / myTarget * 1000) / 10 : null;
+    document.getElementById('cKpiAchieveRate').textContent = achieveRate !== null ? achieveRate + '%' : '목표 미설정';
+    document.getElementById('cKpiAchieveSub').textContent = myTarget > 0 ? '목표 ' + formatCurrency(myTarget) : '';
+
+    const holdRate = myTarget > 0 ? Math.round(monthPipeAmt / myTarget * 1000) / 10 : null;
+    document.getElementById('cKpiHoldRate').textContent = holdRate !== null ? holdRate + '%' : '-';
+    document.getElementById('cKpiHoldSub').textContent = myTarget > 0 ? '이달 예정 ' + formatCurrency(monthPipeAmt) : '';
   }
 }
 
+
 function renderLeadList() {
-  let list = allLeads.filter(l => {
+  let list = getFilteredLeads().filter(l => {
     if (activeStage !== 'all' && l.stage !== activeStage) return false;
     return true;
   });
   document.getElementById('totalListCount').textContent = list.length;
 
-  // PC 테이블
   const tbody = document.getElementById('leadTableTbody');
   tbody.innerHTML = list.map(l => `
     <tr>
@@ -756,7 +820,6 @@ function renderLeadList() {
     </tr>
   `).join('');
 
-  // 모바일 카드 리스트
   const cardContainer = document.getElementById('leadCardList');
   cardContainer.innerHTML = list.map(l => `
     <div class="m-lead-card ${l.stage==='수주完'?'won':(l.stage==='실패'?'lost':'')}" onclick="editLead('${l.id}')">
@@ -774,7 +837,25 @@ function renderLeadList() {
   `).join('');
 }
 
-// 지사장: 컨설턴트별 목표 관리 행 렌더링
+
+document.querySelectorAll('#categoryFilterRow .filter-chip').forEach(btn => {
+  btn.addEventListener('click', function() {
+    document.querySelectorAll('#categoryFilterRow .filter-chip').forEach(b => b.classList.remove('active'));
+    this.classList.add('active');
+    activeCategory = this.getAttribute('data-category');
+    render();
+  });
+});
+
+document.querySelectorAll('#stageFilterRow .filter-chip').forEach(btn => {
+  btn.addEventListener('click', function() {
+    document.querySelectorAll('#stageFilterRow .filter-chip').forEach(b => b.classList.remove('active'));
+    this.classList.add('active');
+    activeStage = this.getAttribute('data-stage');
+    renderLeadList();
+  });
+});
+
 function renderMasterTargets() {
   const consultants = ['최영국', '박광춘', '이수열', '정문재', '임영민'];
   const month = getCurrentMonthStr();
