@@ -515,9 +515,7 @@
   
 const SUPABASE_URL = 'https://gpqlximhoqdybcewdfde.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_xUnGxyLCc5TB5nv4keVQVw__grqGJkP';
-const _client = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-Object.assign(window.supabase, _client);
-const db = window.supabase;
+window.supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 // ==========================================
 // 1. Supabase 설정 (본인의 Project Settings > API 키 사용)
