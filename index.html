@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>에스원 북서울지사 | 영업 통합관리 대시보드</title>
+<title>에스원 북서울지사 | 영업 TA 통합관리 포털</title>
 <!-- Supabase JS Client v2 CDN -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
@@ -11,36 +11,58 @@
     --navy:#0a1730; --navy2:#132a52; --navy3:#1c3a6e; --blue:#2563eb; --blue-light:#eaf1ff;
     --green:#16a34a; --red:#dc2626; --amber:#d97706; --gray:#9ca3af;
     --bg:#0d1c38; --panel:#ffffff; --border:#e3e8f0; --text:#1a2333; --muted:#697386;
+    --agent-bg:#f4f6fb;
   }
   *{box-sizing:border-box;}
   body{margin:0;font-family:'Malgun Gothic','Apple SD Gothic Neo',-apple-system,sans-serif;background:var(--bg);color:#fff;}
-  header.topbar{background:linear-gradient(120deg,var(--navy),var(--navy3));padding:22px 30px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;border-bottom:1px solid rgba(255,255,255,.08);}
-  header.topbar .brand{font-size:12.5px;opacity:.65;letter-spacing:1px;text-transform:uppercase;}
-  header.topbar .page-title{font-size:22px;font-weight:800;margin-top:4px;}
-  header.topbar .conn-status{display:inline-block;font-size:12px;padding:6px 14px;border-radius:999px;background:rgba(255,255,255,.12);}
-  header.topbar .conn-status.on{background:#16a34a;}
-  header.topbar .conn-status.warn{background:#d97706;}
-  header.topbar .conn-status.fail{background:#dc2626;cursor:pointer;}
-  header.topbar .conn-status{cursor:default;}
+  
+  /* ========== 상단 통합 탑바 ========== */
+  header.topbar{
+    background:linear-gradient(120deg,var(--navy),var(--navy3));
+    padding:16px 28px;
+    display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;
+    border-bottom:1px solid rgba(255,255,255,.1);
+    position:sticky;top:0;z-index:100;
+  }
+  header.topbar .brand{font-size:12px;opacity:.7;letter-spacing:1px;text-transform:uppercase;}
+  header.topbar .page-title{font-size:21px;font-weight:800;margin-top:2px;}
+  
+  /* 컨설턴트 전환 버튼 그룹 (상단 탑바) */
+  .view-switch-group{display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+  .switch-btn{
+    padding:7px 13px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;
+    border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.08);color:#dce6f7;
+    transition:all .15s ease;
+  }
+  .switch-btn:hover{background:rgba(255,255,255,.2);color:#fff;}
+  .switch-btn.active{background:var(--blue);border-color:var(--blue);color:#fff;box-shadow:0 0 10px rgba(37,99,235,.5);}
+  .switch-btn.master{background:#a9761e;border-color:#c8902b;color:#fff;}
+  .switch-btn.master.active{background:#d97706;border-color:#f59e0b;}
 
-  main{max-width:1280px;margin:0 auto;padding:22px 22px 70px;}
+  .topbar-right{display:flex;align-items:center;gap:10px;text-align:right;}
+  .conn-status{display:inline-block;font-size:12px;padding:5px 12px;border-radius:999px;background:rgba(255,255,255,.12);}
+  .conn-status.on{background:#16a34a;}
 
+  main{max-width:1320px;margin:0 auto;padding:20px 20px 70px;}
+
+  /* 날짜 배너 */
   #dateBanner {
-    max-width: 1280px; margin: 16px auto 0; padding: 16px 26px;
+    max-width: 1320px; margin: 14px auto 0; padding: 14px 24px;
     display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;
     background: #ffffff; border: 1px solid #e3e8f0; border-radius: 12px; box-shadow: 0 1px 3px rgba(10,20,40,.08);
   }
-  #dateBanner .date-text { font-size: 28px; font-weight: 800; color: #0b1f3f; letter-spacing: .3px; }
-  #dateBanner .workdays-badge { font-size: 15px; font-weight: 700; color: #2563eb; background: #eaf1ff; padding: 9px 18px; border-radius: 999px; white-space: nowrap; }
+  #dateBanner .date-text { font-size: 26px; font-weight: 800; color: #0b1f3f; letter-spacing: .3px; }
+  #dateBanner .workdays-badge { font-size: 14.5px; font-weight: 700; color: #2563eb; background: #eaf1ff; padding: 8px 16px; border-radius: 999px; white-space: nowrap; }
 
-  button, .file-btn{cursor:pointer;border:none;border-radius:8px;padding:10px 18px;font-size:14px;font-weight:600;background:var(--blue);color:#fff;transition:.15s;}
-  button:hover, .file-btn:hover{filter:brightness(1.1);}
+  button, .file-btn{cursor:pointer;border:none;border-radius:8px;padding:9px 16px;font-size:13.5px;font-weight:600;background:var(--blue);color:#fff;transition:.15s;}
+  button:hover{filter:brightness(1.1);}
   button.secondary{background:rgba(255,255,255,.1);color:#fff;border:1px solid rgba(255,255,255,.3);}
-  button.small{padding:6px 12px;font-size:12.5px;}
+  button.small{padding:5px 11px;font-size:12px;}
+  button.danger{background:#fff;color:var(--red);border:1px solid var(--red);padding:5px 10px;font-size:12px;}
+  button.danger:hover{background:#fee2e2;}
 
-  #mainApp{display:none;}
-
-  .kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px;}
+  /* ========== 대시보드 뷰 스타일 ========== */
+  .kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:18px;}
   .kpi-card{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:16px 18px;}
   .kpi-card .label{font-size:12px;color:#9fb0cf;margin-bottom:8px;}
   .kpi-card .value{font-size:20px;font-weight:800;}
@@ -115,7 +137,30 @@
   .cal-cell:hover{background:#eef3fb;}
   .cal-count{font-size:10px;color:var(--muted);margin-right:4px;}
 
-  .modal-overlay{position:fixed;inset:0;background:rgba(10,20,40,.55);display:none;align-items:center;justify-content:center;z-index:100;padding:20px;}
+  /* ========== 컨설턴트 개별 화면 뷰 전용 스타일 ========== */
+  .agent-view-container{display:none;}
+  .agent-header-card{
+    background:#ffffff;color:var(--text);border-radius:14px;padding:20px 24px;margin-bottom:18px;
+    display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:14px;
+    border-left:6px solid var(--blue);box-shadow:0 2px 10px rgba(0,0,0,.08);
+  }
+  .agent-name-title{font-size:22px;font-weight:800;color:var(--navy);}
+  .agent-target-badge{font-size:14px;background:#eef4ff;color:var(--blue);padding:6px 14px;border-radius:8px;font-weight:700;}
+  
+  .agent-form-card{background:#f8fbff;border:2px solid var(--blue);border-radius:14px;padding:22px;margin-bottom:20px;color:var(--text);}
+  .agent-form-card h2{margin:0 0 16px;color:var(--navy);font-size:17px;}
+  .form-grid{display:grid;grid-template-columns:repeat(3, 1fr);gap:14px;}
+  .form-group{margin-bottom:12px;}
+  .form-group label{display:block;font-size:12.5px;font-weight:700;color:var(--navy);margin-bottom:5px;}
+  .form-group input, .form-group select, .form-group textarea{
+    width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:14px;font-family:inherit;background:#fff;
+  }
+  .form-group input:focus, .form-group select:focus, .form-group textarea:focus{
+    outline:none;border-color:var(--blue);box-shadow:0 0 0 3px rgba(37,99,235,.15);
+  }
+
+  /* 모달 */
+  .modal-overlay{position:fixed;inset:0;background:rgba(10,20,40,.55);display:none;align-items:center;justify-content:center;z-index:200;padding:20px;}
   .modal-overlay.show{display:flex;}
   .modal-card{background:#fff;color:var(--text);border-radius:14px;max-width:780px;width:100%;max-height:82vh;overflow:auto;padding:26px;position:relative;}
   .modal-card h3{margin:0 0 4px;font-size:18px;color:var(--navy);}
@@ -139,7 +184,7 @@
 </head>
 <body>
 
-<!-- 로그인 오버레이 (app_users 인증) -->
+<!-- 1. 로그인 오버레이 -->
 <div id="loginOverlay">
   <div class="login-card">
     <h1>S1 북서울지사 영업 TA</h1>
@@ -157,154 +202,271 @@
   </div>
 </div>
 
-<!-- 메인 앱 (원본 dashboard_pc 레이아웃 100% 일치) -->
-<div id="mainApp">
+<!-- 2. 메인 애플리케이션 -->
+<div id="mainApp" style="display:none;">
   <header class="topbar">
     <div>
-      <div class="brand">에스원 북서울지사</div>
-      <div class="page-title">영업 TA 통합관리 대시보드</div>
+      <div class="brand">에스원 북서울지사 (노원·강북·도봉)</div>
+      <div class="page-title" id="topbarHeaderTitle">영업 TA 통합관리 대시보드</div>
     </div>
-    <div style="text-align:right;">
-      <button type="button" id="btnNoticeManage" class="small" style="margin-bottom:8px;">공지사항 관리</button>
-      <button type="button" id="btnLogout" class="small secondary" style="margin-bottom:8px;margin-left:6px;">로그아웃</button>
-      <br>
+
+    <!-- 타이틀바 컨설턴트별 개별화면 전환 버튼 그룹 -->
+    <div class="view-switch-group">
+      <button type="button" class="switch-btn master active" id="btnViewMaster" onclick="switchView('master')">📊 통합 대시보드</button>
+      <button type="button" class="switch-btn" data-agent="최영국" onclick="switchView('최영국')">최영국</button>
+      <button type="button" class="switch-btn" data-agent="박광춘" onclick="switchView('박광춘')">박광춘</button>
+      <button type="button" class="switch-btn" data-agent="이수열" onclick="switchView('이수열')">이수열</button>
+      <button type="button" class="switch-btn" data-agent="정문재" onclick="switchView('정문재')">정문재</button>
+      <button type="button" class="switch-btn" data-agent="임영민" onclick="switchView('임영민')">임영민</button>
+    </div>
+
+    <div class="topbar-right">
+      <button type="button" id="btnNoticeManage" class="small">공지사항 관리</button>
+      <button type="button" id="btnLogout" class="small secondary">로그아웃</button>
       <div id="connStatus" class="conn-status on">온라인 연결됨</div>
     </div>
   </header>
 
+  <!-- 날짜 배너 -->
   <div id="dateBanner">
     <div class="date-text" id="topbarDateValue"></div>
     <div class="workdays-badge" id="topbarWorkdays"></div>
   </div>
 
   <main>
-    <div class="filters" id="categoryFilters">
-      <button type="button" data-category="일반알람" class="active">일반알람</button>
-      <button type="button" data-category="디지털(정보보안)">디지털(정보보안)</button>
-      <button type="button" data-category="안전상품">안전상품</button>
-      <button type="button" data-category="all">전체</button>
-    </div>
-
-    <!-- 8개 KPI 카드 그리드 -->
-    <section class="kpi-grid">
-      <div class="kpi-card"><div class="label">전체 TA</div><div class="value" id="kpiTotalAmount">0원</div><div class="sub" id="kpiTotalCount">0건</div></div>
-      <div class="kpi-card"><div class="label">진행중 TA</div><div class="value" id="kpiPipelineAmount">0원</div><div class="sub" id="kpiPipelineCount">0건</div></div>
-      <div class="kpi-card"><div class="label">이달 수주 TA</div><div class="value" id="kpiMonthWonAmount">0원</div><div class="sub" id="kpiMonthWonCount">0건</div></div>
-      <div class="kpi-card"><div class="label">실패 TA</div><div class="value" id="kpiFailedAmount">0원</div><div class="sub" id="kpiFailedCount">0건</div></div>
-      <div class="kpi-card"><div class="label">수주 달성율</div><div class="value" id="kpiAchieveRate">-</div><div class="sub" id="kpiAchieveSub"></div></div>
-      <div class="kpi-card"><div class="label">보유 TA율</div><div class="value" id="kpiHoldRate">-</div><div class="sub" id="kpiHoldSub"></div></div>
-      <div class="kpi-card"><div class="label">TA 수주율</div><div class="value" id="kpiWinRate">-</div><div class="sub" id="kpiWinSub"></div></div>
-      <div class="kpi-card"><div class="label">수주 실패율</div><div class="value" id="kpiFailRate">-</div><div class="sub" id="kpiFailSub"></div></div>
-    </section>
-
-    <!-- 금일 수주 예정 전체 리스트 -->
-    <div class="panel">
-      <div class="panel-toolbar today-list-toolbar">
-        <h2>금일 수주 예정 전체 리스트 <span class="count-tag" id="todayListCount"></span></h2>
-        <button type="button" class="small copy-btn" id="btnCopyToday">복사하기 (외부 공지용)</button>
+    <!-- ========================================== -->
+    <!-- VIEW A: 지사장 통합관제 대시보드 뷰          -->
+    <!-- ========================================== -->
+    <div id="viewMaster">
+      <!-- 상단 카테고리 필터 (전체 TA 조회 테이블과도 100% 동기화) -->
+      <div class="filters" id="categoryFilters">
+        <button type="button" data-category="일반알람" class="active">일반알람</button>
+        <button type="button" data-category="디지털(정보보안)">디지털(정보보안)</button>
+        <button type="button" data-category="안전상품">안전상품</button>
+        <button type="button" data-category="all">전체</button>
       </div>
-      <div class="table-scroll" style="max-height:320px;">
-        <table class="lead-table">
-          <thead><tr><th>컨설턴트</th><th style="min-width:170px;">서비스제공처명</th><th>고객담당자</th><th>금액</th><th>확도</th><th>메모</th></tr></thead>
-          <tbody id="todayListTbody"></tbody>
-        </table>
-      </div>
-    </div>
 
-    <!-- 변경 이력 -->
-    <div class="panel">
-      <div class="panel-toolbar">
-        <h2>변경 이력 <span class="count-tag" id="activityLogCount"></span></h2>
-        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
-          <input type="date" id="activityLogDate" style="padding:8px 10px;border:1px solid var(--border);border-radius:8px;font-size:13.5px;font-family:inherit;">
-          <button type="button" class="small secondary" id="btnActivityToday" style="background:#eef1f7;color:#1a2333;">오늘</button>
-          <button type="button" class="small" id="btnActivityRefresh">새로고침</button>
+      <!-- 8개 종합 KPI 지표 카드 -->
+      <section class="kpi-grid">
+        <div class="kpi-card"><div class="label">전체 TA</div><div class="value" id="kpiTotalAmount">0원</div><div class="sub" id="kpiTotalCount">0건</div></div>
+        <div class="kpi-card"><div class="label">진행중 TA</div><div class="value" id="kpiPipelineAmount">0원</div><div class="sub" id="kpiPipelineCount">0건</div></div>
+        <div class="kpi-card"><div class="label">이달 수주 TA</div><div class="value" id="kpiMonthWonAmount">0원</div><div class="sub" id="kpiMonthWonCount">0건</div></div>
+        <div class="kpi-card"><div class="label">실패 TA</div><div class="value" id="kpiFailedAmount">0원</div><div class="sub" id="kpiFailedCount">0건</div></div>
+        <div class="kpi-card"><div class="label">수주 달성율</div><div class="value" id="kpiAchieveRate">-</div><div class="sub" id="kpiAchieveSub"></div></div>
+        <div class="kpi-card"><div class="label">보유 TA율</div><div class="value" id="kpiHoldRate">-</div><div class="sub" id="kpiHoldSub"></div></div>
+        <div class="kpi-card"><div class="label">TA 수주율</div><div class="value" id="kpiWinRate">-</div><div class="sub" id="kpiWinSub"></div></div>
+        <div class="kpi-card"><div class="label">수주 실패율</div><div class="value" id="kpiFailRate">-</div><div class="sub" id="kpiFailSub"></div></div>
+      </section>
+
+      <!-- 금일 수주 예정 전체 리스트 -->
+      <div class="panel">
+        <div class="panel-toolbar today-list-toolbar">
+          <h2>금일 수주 예정 전체 리스트 <span class="count-tag" id="todayListCount"></span></h2>
+          <button type="button" class="small copy-btn" id="btnCopyToday">복사하기 (외부 공지용)</button>
+        </div>
+        <div class="table-scroll" style="max-height:320px;">
+          <table class="lead-table">
+            <thead><tr><th>컨설턴트</th><th style="min-width:170px;">서비스제공처명</th><th>고객담당자</th><th>금액</th><th>확도</th><th>메모</th></tr></thead>
+            <tbody id="todayListTbody"></tbody>
+          </table>
         </div>
       </div>
-      <p style="font-size:12px;color:var(--muted);margin:-6px 0 12px;">컨설턴트가 TA를 신규 등록/수정/삭제할 때마다 자동으로 기록됩니다. 하루치만 표시되며, 30초마다 자동 갱신됩니다.</p>
-      <div class="table-scroll" style="max-height:420px;">
-        <table class="lead-table">
-          <thead><tr><th>시간</th><th>컨설턴트</th><th>구분</th><th style="min-width:170px;">서비스제공처명</th><th>변경 내용</th></tr></thead>
-          <tbody id="activityLogTbody"></tbody>
-        </table>
-      </div>
-    </div>
 
-    <!-- 차트 영역: 바차트 & 도넛차트 -->
-    <div class="panel">
-      <div class="charts-grid">
-        <div>
-          <h2>컨설턴트별 진행 TA 금액</h2>
-          <div id="barChart"></div>
+      <!-- 변경 이력 (Activity Log) -->
+      <div class="panel">
+        <div class="panel-toolbar">
+          <h2>변경 이력 <span class="count-tag" id="activityLogCount"></span></h2>
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+            <input type="date" id="activityLogDate" style="padding:8px 10px;border:1px solid var(--border);border-radius:8px;font-size:13.5px;font-family:inherit;">
+            <button type="button" class="small secondary" id="btnActivityToday" style="background:#eef1f7;color:#1a2333;">오늘</button>
+            <button type="button" class="small" id="btnActivityRefresh">새로고침</button>
+          </div>
         </div>
-        <div>
-          <h2>영업단계별 금액 분포</h2>
-          <div class="donut-wrap">
-            <div class="donut" id="donutChart"></div>
-            <div class="legend" id="donutLegend"></div>
+        <p style="font-size:12px;color:var(--muted);margin:-6px 0 12px;">컨설턴트가 TA를 신규 등록/수정/삭제할 때마다 자동으로 기록됩니다. 하루치만 표시되며, 30초마다 자동 갱신됩니다.</p>
+        <div class="table-scroll" style="max-height:420px;">
+          <table class="lead-table">
+            <thead><tr><th>시간</th><th>컨설턴트</th><th>구분</th><th style="min-width:170px;">서비스제공처명</th><th>변경 내용</th></tr></thead>
+            <tbody id="activityLogTbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- 차트: 바차트 & 도넛차트 -->
+      <div class="panel">
+        <div class="charts-grid">
+          <div>
+            <h2>컨설턴트별 진행 TA 금액</h2>
+            <div id="barChart"></div>
+          </div>
+          <div>
+            <h2>영업단계별 금액 분포</h2>
+            <div class="donut-wrap">
+              <div class="donut" id="donutChart"></div>
+              <div class="legend" id="donutLegend"></div>
+            </div>
           </div>
         </div>
       </div>
-    </div>
 
-    <!-- 컨설턴트별 달성현황 & 목표 관리 -->
-    <div class="panel">
-      <h2>컨설턴트별 달성현황 <span class="count-tag" id="targetMonthLabel"></span></h2>
-      <table class="target-table">
-        <thead><tr>
-          <th>컨설턴트</th><th>이달 수주</th><th>수주 달성율</th>
-          <th>진행중 TA</th><th>보유 TA율</th><th>TA 수주율</th><th>수주 실패율</th>
-          <th>이달 개인목표(원)</th><th></th>
-        </tr></thead>
-        <tbody id="targetTbody"></tbody>
-      </table>
-    </div>
-
-    <!-- 이달 캘린더 — 컨설턴트별 수주예상 금액 그리드 -->
-    <div class="panel">
-      <h2>이달 캘린더 — 컨설턴트별 수주예상 금액 <span class="count-tag" id="calendarMonthLabel"></span></h2>
-      <div class="table-scroll" style="max-height:560px;">
-        <table class="calendar-table">
-          <thead><tr id="calendarHeadRow"><th>일자</th></tr></thead>
-          <tbody id="calendarTbody"></tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- 전체 TA 조회 (다중 필터 테이블) -->
-    <div class="panel">
-      <h2>전체 TA 조회 <span class="count-tag" id="leadCountTag"></span></h2>
-      <div class="filters-bar">
-        <select id="fConsultant"><option value="all">전체 컨설턴트</option></select>
-        <select id="fStage">
-          <option value="all">전체 단계</option>
-          <option value="진행중">진행중</option>
-          <option value="수주完">수주完</option>
-          <option value="실패">실패</option>
-        </select>
-        <select id="fConfidence">
-          <option value="all">전체 확도</option>
-          <option value="A">A (상)</option>
-          <option value="B">B (중)</option>
-          <option value="C">C (하)</option>
-        </select>
-        <input type="month" id="fMonth" title="계약예정월 필터">
-        <input type="text" id="fSearch" placeholder="서비스제공처명 검색">
-        <button type="button" class="small secondary" id="btnResetFilter" style="background:#eef1f7;color:#1a2333;">필터 초기화</button>
-      </div>
-      <div class="table-scroll">
-        <table class="lead-table">
+      <!-- 컨설턴트별 달성현황 & 목표 관리 -->
+      <div class="panel">
+        <h2>컨설턴트별 달성현황 <span class="count-tag" id="targetMonthLabel"></span></h2>
+        <table class="target-table">
           <thead><tr>
-            <th>컨설턴트</th><th style="min-width:170px;">서비스제공처명</th><th>고객담당자</th><th>금액</th><th>단계</th><th>확도</th><th>상품종류</th><th>영업동기</th><th>일정</th><th>메모</th>
+            <th>컨설턴트</th><th>이달 수주</th><th>수주 달성율</th>
+            <th>진행중 TA</th><th>보유 TA율</th><th>TA 수주율</th><th>수주 실패율</th>
+            <th>이달 개인목표(원)</th><th></th>
           </tr></thead>
-          <tbody id="leadTbody"></tbody>
+          <tbody id="targetTbody"></tbody>
         </table>
+      </div>
+
+      <!-- 이달 캘린더 — 컨설턴트별 수주예상 금액 그리드 -->
+      <div class="panel">
+        <h2>이달 캘린더 — 컨설턴트별 수주예상 금액 <span class="count-tag" id="calendarMonthLabel"></span></h2>
+        <div class="table-scroll" style="max-height:560px;">
+          <table class="calendar-table">
+            <thead><tr id="calendarHeadRow"><th>일자</th></tr></thead>
+            <tbody id="calendarTbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- 전체 TA 조회 (상품 카테고리 필터 연동 + 관리자 전용 삭제 기능 지원) -->
+      <div class="panel">
+        <h2>전체 TA 조회 <span class="count-tag" id="leadCountTag"></span></h2>
+        <div class="filters-bar">
+          <select id="fConsultant"><option value="all">전체 컨설턴트</option></select>
+          <select id="fStage">
+            <option value="all">전체 단계</option>
+            <option value="진행중">진행중</option>
+            <option value="수주完">수주完</option>
+            <option value="실패">실패</option>
+          </select>
+          <select id="fConfidence">
+            <option value="all">전체 확도</option>
+            <option value="A">A (상)</option>
+            <option value="B">B (중)</option>
+            <option value="C">C (하)</option>
+          </select>
+          <input type="month" id="fMonth" title="계약예정월 필터">
+          <input type="text" id="fSearch" placeholder="서비스제공처명 검색">
+          <button type="button" class="small secondary" id="btnResetFilter" style="background:#eef1f7;color:#1a2333;">필터 초기화</button>
+        </div>
+        <div class="table-scroll">
+          <table class="lead-table">
+            <thead><tr>
+              <th>컨설턴트</th><th style="min-width:170px;">서비스제공처명</th><th>고객담당자</th><th>금액</th><th>단계</th><th>확도</th><th>상품종류</th><th>영업동기</th><th>일정</th><th>메모</th><th>관리</th>
+            </tr></thead>
+            <tbody id="leadTbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- VIEW B: 컨설턴트 개별 작업 화면 (pc_agent)   -->
+    <!-- ========================================== -->
+    <div id="viewAgent" class="agent-view-container">
+      <div class="agent-header-card">
+        <div>
+          <div class="agent-name-title"><span id="agentActiveName">최영국</span> 컨설턴트 영업 화면</div>
+          <div style="font-size:12.5px;color:var(--muted);margin-top:4px;">※ 본 화면에서 안건을 등록/수정/삭제하면 해당 컨설턴트의 실적으로 즉시 저장됩니다.</div>
+        </div>
+        <div style="display:flex;gap:10px;align-items:center;">
+          <div class="agent-target-badge" id="agentPersonalTargetBadge">이달 목표: 0원</div>
+          <button type="button" class="small secondary" style="background:#0b1f3f;color:#fff;" onclick="switchView('master')">🔙 지사장 대시보드로 돌아가기</button>
+        </div>
+      </div>
+
+      <!-- 신규 TA 등록 / 수정 폼 -->
+      <div class="agent-form-card">
+        <h2 id="agentFormTitle">신규 TA 등록</h2>
+        <form id="agentLeadForm">
+          <input type="hidden" id="agentEditingId">
+          <div class="form-grid">
+            <div class="form-group"><label>서비스제공처명 *</label><input type="text" id="afCompany" required placeholder="현장 정식 명칭"></div>
+            <div class="form-group"><label>고객담당자</label><input type="text" id="afContact" placeholder="담당자 성명"></div>
+            <div class="form-group"><label>금액 (원) *</label><input type="text" inputmode="numeric" id="afAmount" required placeholder="예: 50,000,000"></div>
+            <div class="form-group"><label>상품종류 *</label>
+              <select id="afProductType">
+                <option value="알람">알람</option>
+                <option value="휴엔">휴엔</option>
+                <option value="정보보안">정보보안</option>
+                <option value="블루스캔">블루스캔</option>
+                <option value="유지보수">유지보수</option>
+                <option value="안전상품">안전상품</option>
+              </select>
+            </div>
+            <div class="form-group"><label>영업동기 *</label>
+              <select id="afMotive">
+                <option value="개척">개척</option>
+                <option value="콜센터">콜센터</option>
+                <option value="사내소개">사내소개</option>
+                <option value="고객소개">고객소개</option>
+                <option value="대리점">대리점</option>
+                <option value="관내이전">관내이전</option>
+                <option value="관외이전">관외이전</option>
+                <option value="기타">기타</option>
+              </select>
+            </div>
+            <div class="form-group"><label>영업단계 *</label>
+              <select id="afStage">
+                <option value="진행중">진행중</option>
+                <option value="수주完">수주完</option>
+                <option value="실패">실패</option>
+              </select>
+            </div>
+            <div class="form-group"><label>수주확도 *</label>
+              <select id="afConfidence">
+                <option value="A">A (상)</option>
+                <option value="B" selected>B (중)</option>
+                <option value="C">C (하)</option>
+              </select>
+            </div>
+            <div class="form-group"><label>등록일</label><input type="date" id="afRegisteredDate"></div>
+            <div class="form-group"><label>계약예정일 *</label><input type="date" id="afExpectedDate" required></div>
+            <div class="form-group" id="afContractDateGroup" style="display:none;"><label>계약일 (수주完 시)</label><input type="date" id="afContractDate"></div>
+            <div class="form-group" id="afBaseDateGroup" style="display:none;"><label>기산일 *</label><input type="date" id="afBaseDate"></div>
+            <div class="form-group" id="afVehicleGroup" style="display:none;"><label>차량번호</label>
+              <select id="afVehicleNumber">
+                <option value="없음">없음</option>
+                <option value="26호">26호</option>
+                <option value="27호">27호</option>
+                <option value="28호">28호</option>
+                <option value="127호">127호</option>
+                <option value="160호">160호</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group"><label>메모/비고</label><input type="text" id="afMemo" placeholder="특이사항 및 메모"></div>
+          <div style="display:flex;gap:10px;margin-top:10px;">
+            <button type="submit" id="afSubmitBtn" style="flex:1;">TA 등록</button>
+            <button type="button" id="afCancelBtn" class="secondary" style="display:none;background:#f1f3f4;color:#1a2333;" onclick="cancelAgentEdit()">수정 취소</button>
+          </div>
+        </form>
+      </div>
+
+      <!-- 본인 안건 리스트 (삭제 권한: 당일 건만 삭제 가능, 1일 경과 건은 삭제 불가) -->
+      <div class="panel">
+        <h2>내 담당 TA 목록 (<span id="agentLeadCount">0</span>건)</h2>
+        <div style="font-size:12.5px;color:var(--muted);margin:-8px 0 14px;">
+          ※ 본인 등록 안건 중 <strong>신규 등록 당일 건만 직접 삭제</strong>할 수 있습니다. (만 1일이 경과한 안건은 지사장님만 대시보드에서 삭제 가능합니다.)
+        </div>
+        <div class="table-scroll">
+          <table class="lead-table">
+            <thead><tr>
+              <th style="min-width:170px;">서비스제공처명</th><th>고객담당자</th><th>금액</th><th>단계</th><th>확도</th><th>상품종류</th><th>영업동기</th><th>일정</th><th>메모</th><th>관리</th>
+            </tr></thead>
+            <tbody id="agentLeadTbody"></tbody>
+          </table>
+        </div>
       </div>
     </div>
   </main>
 </div>
 
-<!-- 캘린더 상세 모달 -->
+<!-- 캘린더 일자 상세 모달 -->
 <div class="modal-overlay" id="calendarModalOverlay">
   <div class="modal-card">
     <button type="button" class="modal-close" id="calendarModalClose">&times;</button>
@@ -336,7 +498,7 @@
 
 <script>
 // ==========================================
-// 1. Supabase 클라이언트 초기화 (오류 원천 방지)
+// 1. Supabase 연동 설정
 // ==========================================
 const SUPABASE_URL = 'https://gpqlximhoqdybcewdfde.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_xUnGxyLCc5TB5nv4keVQVw__grqGJkP';
@@ -434,12 +596,22 @@ function productCategory(productType) {
   return '일반알람';
 }
 
+// 당일 등록 안건 판별 (등록일이 오늘과 동일한지 여부)
+function isCreatedToday(lead) {
+  const t = todayStr();
+  if (lead.registeredDate === t) return true;
+  if (lead.createdAt && lead.createdAt.slice(0, 10) === t) return true;
+  return false;
+}
+
 // ==========================================
-// 2. 앱 전역 데이터
+// 2. 앱 전역 상태
 // ==========================================
-let ALL = {};        // { '최영국': { leads: [] }, ... }
+let ALL = {};
 let TARGETS = { targets: {} };
 let activeDashboardCategory = '일반알람';
+let currentViewMode = 'master'; // 'master' | '최영국' | '박광춘' | '이수열' | '정문재' | '임영민'
+let currentUser = null; // { name, role: 'master' | 'consultant' }
 const el = id => document.getElementById(id);
 
 function allLeads() {
@@ -454,7 +626,6 @@ function consultantLeads(name) {
   return leads.filter(l => productCategory(l.productType) === activeDashboardCategory);
 }
 
-// KPI 연산 로직 (기존 s1_common.js 와 100% 동일)
 function computeMetrics(leads, target, month) {
   leads = leads || [];
   target = Number(target) || 0;
@@ -500,10 +671,33 @@ function computeMetrics(leads, target, month) {
 }
 
 // ==========================================
-// 3. Supabase 데이터 로드 & 저장
+// 3. 뷰 전환: 대시보드 ↔ 컨설턴트 개별화면
+// ==========================================
+function switchView(mode) {
+  currentViewMode = mode;
+  document.querySelectorAll('.switch-btn').forEach(btn => {
+    if (mode === 'master' && btn.id === 'btnViewMaster') btn.classList.add('active');
+    else if (btn.getAttribute('data-agent') === mode) btn.classList.add('active');
+    else btn.classList.remove('active');
+  });
+
+  if (mode === 'master') {
+    el('viewMaster').style.display = 'block';
+    el('viewAgent').style.display = 'none';
+    el('topbarHeaderTitle').textContent = '영업 TA 통합관리 대시보드';
+    render();
+  } else {
+    el('viewMaster').style.display = 'none';
+    el('viewAgent').style.display = 'block';
+    el('topbarHeaderTitle').textContent = `${mode} 컨설턴트 영업 화면`;
+    initAgentView(mode);
+  }
+}
+
+// ==========================================
+// 4. Supabase 데이터 로드 & 이력 기록
 // ==========================================
 async function loadAllFromSupabase() {
-  // 1. ta_leads 로드 및 컨설턴트별 분류
   const { data: rows, error: lErr } = await db.from('ta_leads').select('*').order('created_at', { ascending: false });
   ALL = {};
   CONSULTANTS.forEach(name => { ALL[name] = { consultant: name, leads: [] }; });
@@ -535,7 +729,6 @@ async function loadAllFromSupabase() {
     });
   }
 
-  // 2. targets 로드
   const month = currentMonthStr();
   const { data: tRows } = await db.from('targets').select('*').eq('target_month', month);
   TARGETS = { targets: {} };
@@ -547,8 +740,24 @@ async function loadAllFromSupabase() {
   }
 }
 
+// 변경 이력(activity_logs) 자동 기록 함수
+async function logActivity(consultant, action, company, leadId, changes) {
+  try {
+    await db.from('activity_logs').insert([{
+      consultant: consultant,
+      action: action,
+      company: company,
+      lead_id: leadId,
+      changes: changes || [],
+      created_at: new Date().toISOString()
+    }]);
+  } catch (e) {
+    console.error('이력 기록 실패:', e);
+  }
+}
+
 // ==========================================
-// 4. 화면 렌더링 (원본 dashboard_pc 와 100% 동일)
+// 5. 대시보드 뷰 렌더링
 // ==========================================
 function render() {
   renderKPI();
@@ -796,6 +1005,7 @@ function openCalendarModal(dateStr, name) {
 }
 el('calendarModalClose').addEventListener('click', () => el('calendarModalOverlay').classList.remove('show'));
 
+// 전체 TA 조회 (상단 카테고리 필터와 완벽 연동 + 관리자 전용 삭제 권한)
 function renderLeadTable() {
   const cf = el('fConsultant').value;
   const sf = el('fStage').value;
@@ -803,6 +1013,7 @@ function renderLeadTable() {
   const mf = el('fMonth').value;
   const qf = el('fSearch').value.trim().toLowerCase();
 
+  // allLeads()는 이미 상단 카테고리 필터(일반알람/디지털/안전/전체)가 반영된 결과임
   let leads = allLeads();
   if (cf !== 'all') leads = leads.filter(l => l.consultant === cf);
   if (sf !== 'all') leads = leads.filter(l => l.stage === sf);
@@ -815,7 +1026,7 @@ function renderLeadTable() {
 
   const tbody = el('leadTbody');
   if (leads.length === 0) {
-    tbody.innerHTML = '<tr class="empty-row"><td colspan="10">조건에 맞는 TA가 없습니다.</td></tr>';
+    tbody.innerHTML = '<tr class="empty-row"><td colspan="11">조건에 맞는 TA가 없습니다.</td></tr>';
     return;
   }
   tbody.innerHTML = leads.map(l => `
@@ -830,8 +1041,31 @@ function renderLeadTable() {
       <td>${escapeHtml(l.motive) || '-'}</td>
       <td class="sched-cell">${scheduleLabel(l)}</td>
       <td style="max-width:180px;color:var(--muted);font-size:12px;">${escapeHtml(l.memo) || ''}</td>
+      <td>
+        <!-- 지사장은 대시보드에서 일수 무관 언제든 삭제 가능 -->
+        <button type="button" class="danger" onclick="deleteLeadMaster('${l.id}', '${escapeHtml(l.company)}', '${l.consultant}')">삭제</button>
+      </td>
     </tr>
   `).join('');
+}
+
+// 지사장 전용 안건 삭제 함수
+async function deleteLeadMaster(id, company, consultant) {
+  if (!confirm(`[지사장 관리자 삭제]\n'${company}' (${consultant}) 안건을 영구 삭제하시겠습니까?`)) return;
+  try {
+    const { error } = await db.from('ta_leads').delete().eq('id', id);
+    if (!error) {
+      await logActivity('지사장', '삭제', company, id, ['지사장 대시보드에서 영구 삭제']);
+      alert('안건이 삭제되었습니다.');
+      await loadAllFromSupabase();
+      render();
+      refreshActivityLog();
+    } else {
+      alert('삭제 실패: ' + error.message);
+    }
+  } catch (e) {
+    alert('삭제 오류: ' + e.message);
+  }
 }
 
 // 변경 이력
@@ -873,7 +1107,7 @@ async function refreshActivityLog() {
   }
 }
 
-// 외부 공지 복사 기능
+// 외부 공지 복사
 function buildTodayShareText() {
   const leads = todayLeadsAll();
   const today = todayStr();
@@ -959,13 +1193,220 @@ el('btnNoticeDelete').addEventListener('click', async () => {
   }
 });
 
-// 이벤트 리스너 연결
+// ==========================================
+// 6. 컨설턴트 개별화면 전용 로직 (pc_agent)
+// ==========================================
+function initAgentView(agentName) {
+  el('agentActiveName').textContent = agentName;
+  const month = currentMonthStr();
+  const target = ((TARGETS.targets[agentName] || {})[month]) || 0;
+  el('agentPersonalTargetBadge').textContent = `이달 목표: ${target > 0 ? formatCurrency(target) : '미설정'}`;
+  
+  el('afRegisteredDate').value = todayStr();
+  el('afExpectedDate').value = todayStr();
+  cancelAgentEdit();
+  renderAgentLeadTable(agentName);
+}
+
+// 영업단계에 따른 추가 필드 노출
+el('afStage').addEventListener('change', function() {
+  const stage = this.value;
+  el('afContractDateGroup').style.display = stage === '수주完' ? 'block' : 'none';
+  el('afBaseDateGroup').style.display = stage === '수주完' ? 'block' : 'none';
+  el('afVehicleGroup').style.display = stage === '수주完' ? 'block' : 'none';
+  if (stage === '수주完') {
+    el('afContractDate').value = todayStr();
+    el('afConfidence').value = 'A';
+  }
+});
+
+// 컨설턴트 화면 내 TA 목록 렌더링 & 삭제 권한 제어
+function renderAgentLeadTable(agentName) {
+  const leads = (ALL[agentName] && ALL[agentName].leads) || [];
+  leads.sort((a, b) => (b.updatedAt || '').localeCompare(a.updatedAt || ''));
+  el('agentLeadCount').textContent = leads.length;
+
+  const tbody = el('agentLeadTbody');
+  if (leads.length === 0) {
+    tbody.innerHTML = '<tr class="empty-row"><td colspan="10">등록된 TA가 없습니다.</td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = leads.map(l => {
+    const isToday = isCreatedToday(l);
+    return `
+      <tr>
+        <td style="min-width:170px;word-break:break-word;font-weight:700;">${escapeHtml(l.company)}</td>
+        <td>${escapeHtml(l.contact) || '-'}</td>
+        <td class="amount-cell">${formatCurrency(l.amount)}</td>
+        <td><span class="badge" style="background:${STAGE_BG[l.stage]};color:${STAGE_COLOR[l.stage]};">${l.stage}</span></td>
+        <td><span class="dot" style="background:${CONF_COLOR[l.confidence] || '#ccc'};"></span>${l.confidence || '-'}</td>
+        <td>${escapeHtml(l.productType) || '-'}</td>
+        <td>${escapeHtml(l.motive) || '-'}</td>
+        <td class="sched-cell">${scheduleLabel(l)}</td>
+        <td style="max-width:180px;color:var(--muted);font-size:12px;">${escapeHtml(l.memo) || ''}</td>
+        <td style="white-space:nowrap;">
+          <button type="button" class="small secondary" style="background:#eef1f7;color:#1a2333;margin-right:4px;" onclick="editAgentLead('${l.id}')">수정</button>
+          ${isToday 
+            ? `<button type="button" class="danger" onclick="deleteAgentLead('${l.id}', '${escapeHtml(l.company)}')">삭제</button>` 
+            : `<button type="button" class="small secondary" style="opacity:.45;cursor:not-allowed;" title="등록 당일이 지난 안건은 관리자(지사장)만 삭제 가능합니다" onclick="alert('등록 당일이 지난 안건은 관리자(지사장)만 대시보드에서 삭제할 수 있습니다.')">삭제불가</button>`}
+        </td>
+      </tr>
+    `;
+  }).join('');
+}
+
+// 수정 모드 진입
+function editAgentLead(id) {
+  const agentName = currentViewMode;
+  const lead = (ALL[agentName] && ALL[agentName].leads || []).find(l => l.id === id);
+  if (!lead) return;
+
+  el('agentEditingId').value = id;
+  el('afCompany').value = lead.company;
+  el('afContact').value = lead.contact || '';
+  el('afAmount').value = lead.amount ? lead.amount.toLocaleString('ko-KR') : '';
+  el('afProductType').value = lead.productType || '알람';
+  el('afMotive').value = lead.motive || '개척';
+  el('afStage').value = lead.stage;
+  el('afConfidence').value = lead.confidence;
+  el('afRegisteredDate').value = lead.registeredDate || todayStr();
+  el('afExpectedDate').value = lead.expectedDate || '';
+  el('afContractDate').value = lead.contractDate || '';
+  el('afBaseDate').value = lead.baseDate || '';
+  el('afVehicleNumber').value = lead.vehicleNumber || '없음';
+  el('afMemo').value = lead.memo || '';
+
+  const isWon = lead.stage === '수주完';
+  el('afContractDateGroup').style.display = isWon ? 'block' : 'none';
+  el('afBaseDateGroup').style.display = isWon ? 'block' : 'none';
+  el('afVehicleGroup').style.display = isWon ? 'block' : 'none';
+
+  el('agentFormTitle').textContent = `TA 수정 (${lead.company})`;
+  el('afSubmitBtn').textContent = '수정 저장';
+  el('afCancelBtn').style.display = 'inline-block';
+  window.scrollTo({ top: 120, behavior: 'smooth' });
+}
+
+function cancelAgentEdit() {
+  el('agentEditingId').value = '';
+  el('agentLeadForm').reset();
+  el('afRegisteredDate').value = todayStr();
+  el('afExpectedDate').value = todayStr();
+  el('afContractDateGroup').style.display = 'none';
+  el('afBaseDateGroup').style.display = 'none';
+  el('afVehicleGroup').style.display = 'none';
+  el('agentFormTitle').textContent = '신규 TA 등록';
+  el('afSubmitBtn').textContent = 'TA 등록';
+  el('afCancelBtn').style.display = 'none';
+}
+
+// 컨설턴트 화면 안건 삭제 (당일 건만 가능)
+async function deleteAgentLead(id, company) {
+  const agentName = currentViewMode;
+  if (!confirm(`'${company}' 안건을 삭제하시겠습니까?\n(등록 당일이므로 삭제 가능합니다)`)) return;
+
+  try {
+    const { error } = await db.from('ta_leads').delete().eq('id', id);
+    if (!error) {
+      await logActivity(agentName, '삭제', company, id, ['컨설턴트가 등록 당일 직접 삭제']);
+      alert('안건이 삭제되었습니다.');
+      await loadAllFromSupabase();
+      renderAgentLeadTable(agentName);
+    } else {
+      alert('삭제 실패: ' + error.message);
+    }
+  } catch (e) {
+    alert('삭제 오류: ' + e.message);
+  }
+}
+
+// 컨설턴트 화면 폼 제출 (신규 등록 또는 수정)
+el('agentLeadForm').addEventListener('submit', async function(e) {
+  e.preventDefault();
+  const agentName = currentViewMode;
+  const editingId = el('agentEditingId').value;
+  const amountNum = Number(el('afAmount').value.replace(/[^0-9]/g, '')) || 0;
+  const stage = el('afStage').value;
+
+  if (stage === '수주完' && !el('afBaseDate').value) {
+    alert('기산일을 입력해주세요.');
+    return;
+  }
+
+  const payload = {
+    consultant: agentName,
+    company: el('afCompany').value.trim(),
+    contact: el('afContact').value.trim(),
+    amount: amountNum,
+    product_type: el('afProductType').value,
+    motive: el('afMotive').value,
+    stage: stage,
+    confidence: stage === '수주完' ? 'A' : el('afConfidence').value,
+    registered_date: el('afRegisteredDate').value || todayStr(),
+    expected_date: el('afExpectedDate').value || null,
+    contract_date: stage === '수주完' ? (el('afContractDate').value || todayStr()) : null,
+    base_date: stage === '수주完' ? el('afBaseDate').value : null,
+    vehicle_number: stage === '수주完' ? el('afVehicleNumber').value : '없음',
+    memo: el('afMemo').value.trim(),
+    updated_at: new Date().toISOString()
+  };
+
+  const btn = el('afSubmitBtn');
+  btn.disabled = true;
+  btn.textContent = '저장 중...';
+
+  try {
+    if (editingId) {
+      // 수정
+      const { error } = await db.from('ta_leads').update(payload).eq('id', editingId);
+      if (error) throw error;
+      await logActivity(agentName, '수정', payload.company, editingId, [
+        `금액: ${formatCurrency(payload.amount)}`,
+        `영업단계: ${payload.stage}`,
+        `확도: ${payload.confidence}`
+      ]);
+      alert('✅ 안건이 성공적으로 수정되었습니다.');
+    } else {
+      // 신규 등록
+      payload.created_at = new Date().toISOString();
+      const { data, error } = await db.from('ta_leads').insert([payload]).select();
+      if (error) throw error;
+      const newId = (data && data[0]) ? data[0].id : null;
+      await logActivity(agentName, '신규 등록', payload.company, newId, [
+        `금액: ${formatCurrency(payload.amount)}`,
+        `영업단계: ${payload.stage}`,
+        `상품: ${payload.product_type}`
+      ]);
+      alert('🎉 신규 TA가 성공적으로 등록되었습니다.');
+    }
+
+    cancelAgentEdit();
+    await loadAllFromSupabase();
+    renderAgentLeadTable(agentName);
+  } catch (err) {
+    alert('저장 실패: ' + err.message);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = editingId ? '수정 저장' : 'TA 등록';
+  }
+});
+
+// 금액 입력창 자동 콤마
+el('afAmount').addEventListener('input', function() {
+  const digits = this.value.replace(/[^0-9]/g, '');
+  this.value = digits ? Number(digits).toLocaleString('ko-KR') : '';
+});
+
+// ==========================================
+// 7. 이벤트 바인딩 & 초기화
+// ==========================================
 el('categoryFilters').addEventListener('click', (e) => {
   const btn = e.target.closest('button[data-category]');
   if (!btn) return;
   activeDashboardCategory = btn.dataset.category;
   [...el('categoryFilters').children].forEach(b => b.classList.toggle('active', b === btn));
-  render();
+  render(); // 상단 KPI 뿐 아니라 전체 TA 조회 테이블까지 실시간 동기화
 });
 
 ['fConsultant', 'fStage', 'fConfidence', 'fMonth', 'fSearch'].forEach(id => {
@@ -989,9 +1430,7 @@ el('btnActivityToday').addEventListener('click', () => {
   refreshActivityLog();
 });
 
-// ==========================================
-// 5. 로그인 & 앱 시작
-// ==========================================
+// 로그인
 async function sha256(str) {
   const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(str));
   return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
@@ -1028,8 +1467,15 @@ async function doLogin() {
       return;
     }
 
-    sessionStorage.setItem('s1_user', JSON.stringify({ name: user.name, phone: user.phone, role: user.job }));
-    initDashboard();
+    currentUser = { name: user.name, phone: user.phone, role: user.job };
+    sessionStorage.setItem('s1_user', JSON.stringify(currentUser));
+    
+    // 지사관리자는 대시보드로, 컨설턴트는 본인 화면으로 자동 진입
+    if (user.job === '컨설턴트' && CONSULTANTS.includes(user.name)) {
+      initApp(user.name);
+    } else {
+      initApp('master');
+    }
   } catch (err) {
     msgEl.textContent = '로그인 오류: ' + err.message;
     msgEl.style.color = 'var(--red)';
@@ -1041,7 +1487,7 @@ document.getElementById('btnLogout').addEventListener('click', () => {
   location.reload();
 });
 
-async function initDashboard() {
+async function initApp(initialMode) {
   document.getElementById('loginOverlay').style.display = 'none';
   document.getElementById('mainApp').style.display = 'block';
 
@@ -1051,14 +1497,16 @@ async function initDashboard() {
   el('activityLogDate').value = todayStr();
 
   await loadAllFromSupabase();
-  render();
+  switchView(initialMode || 'master');
   refreshActivityLog();
 }
 
 window.addEventListener('DOMContentLoaded', () => {
   const saved = sessionStorage.getItem('s1_user');
   if (saved) {
-    initDashboard();
+    const u = JSON.parse(saved);
+    currentUser = u;
+    initApp((u.role === '컨설턴트' && CONSULTANTS.includes(u.name)) ? u.name : 'master');
   }
 });
 </script>
