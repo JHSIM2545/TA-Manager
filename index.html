@@ -212,7 +212,7 @@
     </div>
 
     <!-- 타이틀바 컨설턴트별 개별화면 전환 버튼 그룹 -->
-    <div class="view-switch-group">
+    <div class="view-switch-group" id="topbarViewSwitchGroup">
       <button type="button" class="switch-btn master active" id="btnViewMaster" onclick="switchView('master')">📊 통합 대시보드</button>
       <button type="button" class="switch-btn" data-agent="최영국" onclick="switchView('최영국')">최영국</button>
       <button type="button" class="switch-btn" data-agent="박광춘" onclick="switchView('박광춘')">박광춘</button>
@@ -222,6 +222,7 @@
     </div>
 
     <div class="topbar-right">
+      <button type="button" id="btnTopbarTarget" class="small" onclick="openTargetModal()" style="background:#2563eb;color:#fff;display:none;">🎯 목표 설정</button>
       <button type="button" id="btnNoticeManage" class="small">공지사항 관리</button>
       <button type="button" id="btnLogout" class="small secondary">로그아웃</button>
       <div id="connStatus" class="conn-status on">온라인 연결됨</div>
@@ -311,15 +312,22 @@
 
       <!-- 컨설턴트별 달성현황 & 목표 관리 -->
       <div class="panel">
-        <h2>컨설턴트별 달성현황 <span class="count-tag" id="targetMonthLabel"></span></h2>
-        <table class="target-table">
-          <thead><tr>
-            <th>컨설턴트</th><th>이달 수주</th><th>수주 달성율</th>
-            <th>진행중 TA</th><th>보유 TA율</th><th>TA 수주율</th><th>수주 실패율</th>
-            <th>이달 개인목표(원)</th><th></th>
-          </tr></thead>
-          <tbody id="targetTbody"></tbody>
-        </table>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px;">
+          <h2>컨설턴트별 달성현황 <span class="count-tag" id="targetMonthLabel"></span> <span class="count-tag" id="targetCategoryLabel" style="background:#e0e7ff;color:#3730a3;"></span></h2>
+          <button type="button" class="small" id="btnOpenTargetModal" onclick="openTargetModal()" style="background:var(--blue);color:#fff;font-weight:700;display:inline-flex;align-items:center;gap:6px;">
+            🎯 월간 목표 설정 / 배분
+          </button>
+        </div>
+        <div class="table-scroll">
+          <table class="target-table">
+            <thead><tr>
+              <th>컨설턴트</th><th>이달 수주</th><th>수주 달성율</th>
+              <th>진행중 TA</th><th>보유 TA율</th><th>TA 수주율</th><th>수주 실패율</th>
+              <th>이달 확정목표(원)</th>
+            </tr></thead>
+            <tbody id="targetTbody"></tbody>
+          </table>
+        </div>
       </div>
 
       <!-- 이달 캘린더 — 컨설턴트별 수주예상 금액 그리드 -->
@@ -376,7 +384,7 @@
         </div>
         <div style="display:flex;gap:10px;align-items:center;">
           <div class="agent-target-badge" id="agentPersonalTargetBadge">이달 목표: 0원</div>
-          <button type="button" class="small secondary" style="background:#0b1f3f;color:#fff;" onclick="switchView('master')">🔙 지사장 대시보드로 돌아가기</button>
+          <button type="button" class="small secondary" id="btnBackToMaster" style="background:#0b1f3f;color:#fff;display:none;" onclick="switchView('master')">🔙 지사장 대시보드로 돌아가기</button>
         </div>
       </div>
 
@@ -478,6 +486,91 @@
       <thead><tr><th>컨설턴트</th><th class="company-cell">서비스제공처명</th><th>고객담당자</th><th>금액</th><th>확도</th><th>메모</th></tr></thead>
       <tbody id="calendarModalTbody"></tbody>
     </table>
+    </div>
+  </div>
+</div>
+
+<!-- 월간 목표 설정 및 배분 모달 (지사장 전용) -->
+<div class="modal-overlay" id="targetModalOverlay" style="display:none;">
+  <div class="modal-card" style="max-width:760px;width:95%;">
+    <button type="button" class="modal-close" id="targetModalClose" onclick="closeTargetModal()">&times;</button>
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px;">
+      <h3 style="margin:0;font-size:18px;">🎯 월간 목표 설정 및 배분</h3>
+      <span class="count-tag" style="background:#e0e7ff;color:#3730a3;font-weight:700;">지사장 전용</span>
+    </div>
+    <div class="modal-sub" style="margin-bottom:14px;color:var(--muted);font-size:13px;">
+      월별 지사 전체 목표와 상품별 컨설턴트 배분률(100%)을 설정하면, 천원 단위로 자동 반올림 배분되어 DB에 확정 저장됩니다.
+    </div>
+
+    <!-- 월 선택 & 종합 요약 바 -->
+    <div style="background:#f8fafc;border:1px solid var(--border);border-radius:12px;padding:12px 16px;margin-bottom:14px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
+        <div style="display:flex;align-items:center;gap:8px;">
+          <label style="font-weight:700;font-size:13.5px;color:var(--navy);">대상 월 선택:</label>
+          <input type="month" id="targetModalMonth" style="padding:6px 10px;border:1.5px solid var(--border);border-radius:8px;font-size:14px;font-weight:700;color:var(--navy);outline:none;">
+          <button type="button" class="small secondary" id="btnTargetModalReload" style="padding:6px 10px;">불러오기</button>
+        </div>
+        <div style="display:flex;gap:12px;font-size:13px;align-items:center;">
+          <div>지사 전체 총 목표: <strong id="modalSummaryTotal" style="color:var(--blue);font-size:15px;">0원</strong></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 상품 카테고리 탭 네비게이션 -->
+    <div class="tab-group" style="display:flex;gap:6px;margin-bottom:14px;background:#f1f5f9;padding:4px;border-radius:10px;">
+      <button type="button" class="tab-btn active" data-target-tab="일반알람" onclick="switchTargetModalTab('일반알람')" style="flex:1;padding:8px;font-weight:700;border:none;border-radius:8px;cursor:pointer;background:#fff;color:var(--navy);box-shadow:0 1px 3px rgba(0,0,0,0.1);">일반알람</button>
+      <button type="button" class="tab-btn" data-target-tab="디지털(정보보안)" onclick="switchTargetModalTab('디지털(정보보안)')" style="flex:1;padding:8px;font-weight:700;border:none;border-radius:8px;cursor:pointer;background:transparent;color:var(--muted);">디지털(정보보안)</button>
+      <button type="button" class="tab-btn" data-target-tab="안전상품" onclick="switchTargetModalTab('안전상품')" style="flex:1;padding:8px;font-weight:700;border:none;border-radius:8px;cursor:pointer;background:transparent;color:var(--muted);">안전상품</button>
+    </div>
+
+    <!-- 지사 목표 입력 & 균등배분 버튼 영역 -->
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:10px;">
+      <div style="display:flex;align-items:center;gap:8px;">
+        <label style="font-weight:700;font-size:13.5px;"><span id="modalActiveCategoryLabel">일반알람</span> 지사 전체 목표:</label>
+        <div style="position:relative;">
+          <input type="text" id="modalCategoryTotalInput" inputmode="numeric" placeholder="예: 3,500,000" oninput="onModalBranchTotalChange()" style="padding:7px 30px 7px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:15px;font-weight:700;width:150px;text-align:right;">
+          <span style="position:absolute;right:10px;top:8px;font-size:13px;color:var(--muted);">원</span>
+        </div>
+      </div>
+      <div style="display:flex;gap:6px;">
+        <button type="button" class="small secondary" id="btnDistributeEqual" onclick="distributeEqualRates()" style="font-size:12px;">⚖️ 1/N 균등 배분 (각 20%)</button>
+      </div>
+    </div>
+
+    <!-- 컨설턴트별 배분 테이블 -->
+    <div style="overflow-x:auto;margin-bottom:12px;border:1px solid var(--border);border-radius:10px;">
+      <table class="target-table" style="margin:0;width:100%;">
+        <thead style="background:#f8fafc;">
+          <tr>
+            <th style="padding:10px 12px;">컨설턴트</th>
+            <th style="padding:10px 12px;text-align:right;width:120px;">배분률 (%)</th>
+            <th style="padding:10px 12px;text-align:right;width:170px;">계산 목표 금액 (원)</th>
+            <th style="padding:10px 12px;width:160px;">배분 비율</th>
+          </tr>
+        </thead>
+        <tbody id="modalTargetTbody">
+        </tbody>
+        <tfoot style="background:#f1f5f9;font-weight:700;">
+          <tr>
+            <td style="padding:10px 12px;">합계</td>
+            <td style="padding:10px 12px;text-align:right;" id="modalRateSumCell">100.0%</td>
+            <td style="padding:10px 12px;text-align:right;" id="modalAmountSumCell">0원</td>
+            <td style="padding:10px 12px;font-size:12px;color:var(--muted);" id="modalDiffCell">지사목표 일치</td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+
+    <div style="font-size:12px;color:var(--muted);margin-bottom:16px;line-height:1.5;">
+      💡 <strong>배분 안내</strong>: 배분률(%) 또는 지사 전체 목표를 수정하면 <strong>천원 단위로 자동 반올림</strong>되어 계산됩니다. 상품별로 배분률을 다르게 적용할 수 있습니다.
+    </div>
+
+    <!-- 하단 액션 버튼 -->
+    <div style="display:flex;justify-content:space-between;align-items:center;border-top:1px solid var(--border);padding-top:14px;">
+      <button type="button" class="secondary" id="targetModalCancel" onclick="closeTargetModal()" style="padding:9px 16px;">닫기</button>
+      <button type="button" id="btnSaveAllTargets" onclick="saveAllTargets()" style="padding:9px 22px;background:var(--blue);color:#fff;font-weight:700;border:none;border-radius:8px;cursor:pointer;">
+        💾 <span id="modalSaveMonthLabel">2026년 09월</span> 목표 확정 저장
+      </button>
     </div>
   </div>
 </div>
@@ -637,7 +730,78 @@ function buildTodayShareText() {
 // 3. 앱 상태 및 데이터 연산
 // ==========================================
 let ALL = {};
-let TARGETS = { targets: {} };
+const PRODUCT_CATEGORIES = ['일반알람', '디지털(정보보안)', '안전상품'];
+let TARGETS = { targets: {}, rates: {} };
+
+function roundToThousand(val) {
+  const n = Number(val) || 0;
+  return Math.round(n / 1000) * 1000;
+}
+
+function parseFormattedNumber(val) {
+  if (typeof val === 'number') return val;
+  return Number(String(val || '').replace(/[^0-9.-]/g, '')) || 0;
+}
+
+function getConsultantTarget(consultant, month, category) {
+  if (!TARGETS.targets[consultant] || !TARGETS.targets[consultant][month]) return 0;
+  const mData = TARGETS.targets[consultant][month];
+  if (!category || category === 'all') {
+    let sum = 0;
+    PRODUCT_CATEGORIES.forEach(cat => {
+      sum += Number(mData[cat] || 0);
+    });
+    if (sum === 0 && mData['일반알람'] === undefined) {
+      const vals = Object.values(mData);
+      if (vals.length > 0) return vals.reduce((a, b) => a + Number(b || 0), 0);
+    }
+    return sum;
+  }
+  return Number(mData[category] || 0);
+}
+
+function getTotalTarget(month, category) {
+  let sum = 0;
+  CONSULTANTS.forEach(n => {
+    sum += getConsultantTarget(n, month, category);
+  });
+  return sum;
+}
+
+function getConsultantRate(consultant, month, category) {
+  if (!TARGETS.rates[consultant] || !TARGETS.rates[consultant][month]) return 0;
+  return Number(TARGETS.rates[consultant][month][category] || 0);
+}
+
+function isMasterUser() {
+  if (!currentUser) return false;
+  return currentUser.role === 'master' || currentUser.name === '심정환' || (currentUser.job && currentUser.job.includes('관리자'));
+}
+
+function updateUIVisibilityByRole() {
+  const master = isMasterUser();
+
+  // 1. 타이틀바 화면 전환 버튼 그룹 (지사장은 전체 전환 가능, 개별 컨설턴트는 비노출)
+  if (el('topbarViewSwitchGroup')) {
+    el('topbarViewSwitchGroup').style.display = master ? 'flex' : 'none';
+  }
+
+  // 2. 관리자 전용 버튼들 (공지사항 관리, 목표 설정 버튼)
+  if (el('btnNoticeManage')) {
+    el('btnNoticeManage').style.display = master ? 'inline-block' : 'none';
+  }
+  if (el('btnTopbarTarget')) {
+    el('btnTopbarTarget').style.display = master ? 'inline-block' : 'none';
+  }
+  if (el('btnOpenTargetModal')) {
+    el('btnOpenTargetModal').style.display = master ? 'inline-flex' : 'none';
+  }
+
+  // 3. 개별 컨설턴트 화면의 "지사장 대시보드로 돌아가기" 버튼 (개별 컨설턴트에게는 절대 미노출)
+  if (el('btnBackToMaster')) {
+    el('btnBackToMaster').style.display = master ? 'inline-flex' : 'none';
+  }
+}
 let activeDashboardCategory = '일반알람';
 let currentViewMode = 'master';
 let currentUser = null;
@@ -713,7 +877,7 @@ async function loadAllFromSupabase() {
     console.error('Supabase ta_leads select error:', lErr);
     if (banner) {
       banner.style.display = 'block';
-      banner.innerHTML = '⚠️ <strong>DB 조회 오류 발생:</strong> ' + escapeHtml(lErr.message || JSON.stringify(lErr)) + '<br><span style="font-weight:400;font-size:12px;">Supabase SQL Editor에서 <code>NOTIFY pgrst, reload schema;</code> 를 실행해 주세요.</span>';
+      banner.innerHTML = '⚠️ <strong>DB 조회 오류 발생:</strong> ' + escapeHtml(lErr.message || JSON.stringify(lErr)) + '<br><span style="font-weight:400;font-size:12px;">Supabase SQL Editor에서 <code>NOTIFY pgrst, &apos;reload schema&apos;;</code> 를 실행해 주세요.</span>';
     }
   } else if (banner) {
     banner.style.display = 'none';
@@ -748,14 +912,36 @@ async function loadAllFromSupabase() {
     });
   }
 
-  const month = currentMonthStr();
-  const { data: tRows } = await db.from('targets').select('*').eq('target_month', month);
-  TARGETS = { targets: {} };
-  if (tRows) {
-    tRows.forEach(t => {
-      if (!TARGETS.targets[t.consultant]) TARGETS.targets[t.consultant] = {};
-      TARGETS.targets[t.consultant][t.target_month] = Number(t.target_amount || 0);
-    });
+  await loadTargetsFromSupabase(currentMonthStr());
+}
+
+async function loadTargetsFromSupabase(month) {
+  month = month || currentMonthStr();
+  try {
+    const { data: tRows, error } = await db.from('targets').select('*').eq('target_month', month);
+    if (error) {
+      console.warn('targets 테이블 조회 주의:', error);
+    }
+    TARGETS = { targets: {}, rates: {} };
+    if (tRows && tRows.length > 0) {
+      tRows.forEach(t => {
+        const c = t.consultant;
+        const m = t.target_month;
+        const cat = t.category || '일반알람';
+        const amt = Number(t.target_amount || 0);
+        const rate = Number(t.allocation_rate || 0);
+
+        if (!TARGETS.targets[c]) TARGETS.targets[c] = {};
+        if (!TARGETS.targets[c][m]) TARGETS.targets[c][m] = {};
+        TARGETS.targets[c][m][cat] = amt;
+
+        if (!TARGETS.rates[c]) TARGETS.rates[c] = {};
+        if (!TARGETS.rates[c][m]) TARGETS.rates[c][m] = {};
+        TARGETS.rates[c][m][cat] = rate;
+      });
+    }
+  } catch (err) {
+    console.error('목표 데이터 로드 예외:', err);
   }
 }
 
@@ -790,8 +976,7 @@ function render() {
 function renderKPI() {
   const leads = allLeads();
   const month = currentMonthStr();
-  let totalTarget = 0;
-  CONSULTANTS.forEach(n => { totalTarget += ((TARGETS.targets[n] || {})[month]) || 0; });
+  const totalTarget = getTotalTarget(month, activeDashboardCategory);
   const m = computeMetrics(leads, totalTarget, month);
 
   el('kpiTotalAmount').textContent = formatCurrency(m.totalAmount);
@@ -804,7 +989,10 @@ function renderKPI() {
   el('kpiFailedCount').textContent = m.failedCount + '건';
 
   el('kpiAchieveRate').textContent = m.achievementRate === null ? '목표 미설정' : m.achievementRate + '%';
-  el('kpiAchieveSub').textContent = totalTarget > 0 ? '목표 ' + formatCurrency(totalTarget) : '아래에서 목표 설정 가능';
+  el('kpiAchieveSub').textContent = totalTarget > 0 ? '목표 ' + formatCurrency(totalTarget) : '목표 미설정';
+  if (el('targetCategoryLabel')) {
+    el('targetCategoryLabel').textContent = activeDashboardCategory === 'all' ? '전체 상품 합계' : activeDashboardCategory;
+  }
 
   el('kpiHoldRate').textContent = m.holdingRate === null ? '-' : m.holdingRate + '%';
   el('kpiHoldSub').textContent = totalTarget > 0 ? '이달 수주예정 ' + formatCurrency(m.monthPipelineAmount) + ' (' + m.monthPipelineCount + '건)' : '';
@@ -882,8 +1070,12 @@ function renderDonut() {
 
 function renderTargets() {
   const month = currentMonthStr();
+  el('targetMonthLabel').textContent = '(' + month + ')';
+  if (el('targetCategoryLabel')) {
+    el('targetCategoryLabel').textContent = activeDashboardCategory === 'all' ? '전체 상품 합계' : activeDashboardCategory;
+  }
   el('targetTbody').innerHTML = CONSULTANTS.map(name => {
-    const target = ((TARGETS.targets[name] || {})[month]) || 0;
+    const target = getConsultantTarget(name, month, activeDashboardCategory);
     const leads = consultantLeads(name);
     const m = computeMetrics(leads, target, month);
     const rate = m.achievementRate === null ? 0 : m.achievementRate;
@@ -900,30 +1092,291 @@ function renderTargets() {
         <td>${m.holdingRate === null ? '-' : m.holdingRate + '%'}</td>
         <td>${m.winRate === null ? '-' : m.winRate + '%'}</td>
         <td>${m.failRate === null ? '-' : m.failRate + '%'}</td>
-        <td><input type="number" value="${target || ''}" id="targetInput_${name}" placeholder="목표 입력"></td>
-        <td><button type="button" class="small" onclick="saveConsultantTarget('${name}')">저장</button></td>
+        <td style="font-weight:700;color:var(--navy);font-size:14px;">${target > 0 ? formatCurrency(target) : '<span style="color:var(--muted);font-weight:normal;">미설정</span>'}</td>
       </tr>
     `;
   }).join('');
 }
 
-async function saveConsultantTarget(name) {
-  const val = Number(document.getElementById(`targetInput_${name}`).value) || 0;
-  const month = currentMonthStr();
-  const { error } = await db.from('targets').upsert({
-    consultant: name,
-    target_month: month,
-    target_amount: val,
-    updated_at: new Date().toISOString()
-  }, { onConflict: 'consultant,target_month' });
+// ==========================================
+// 5-1. 지사장 전용 월간 목표 설정 및 배분 모달 로직
+// ==========================================
+let targetModalData = {
+  month: '',
+  activeTab: '일반알람',
+  categories: {}
+};
 
-  if (error) {
-    alert('목표 저장 실패: ' + error.message);
+function initTargetModalState(month) {
+  month = month || currentMonthStr();
+  targetModalData.month = month;
+  targetModalData.activeTab = '일반알람';
+  targetModalData.categories = {};
+
+  PRODUCT_CATEGORIES.forEach(cat => {
+    const consultantsData = {};
+    let totalAmt = 0;
+
+    CONSULTANTS.forEach(name => {
+      const amt = getConsultantTarget(name, month, cat);
+      let rate = getConsultantRate(name, month, cat);
+      consultantsData[name] = { amount: amt, rate: rate };
+      totalAmt += amt;
+    });
+
+    if (totalAmt > 0) {
+      let rateSum = 0;
+      CONSULTANTS.forEach(name => {
+        rateSum += consultantsData[name].rate;
+      });
+      if (Math.abs(rateSum - 100) > 1) {
+        CONSULTANTS.forEach(name => {
+          consultantsData[name].rate = Math.round((consultantsData[name].amount / totalAmt * 100) * 10) / 10;
+        });
+      }
+    } else {
+      CONSULTANTS.forEach(name => {
+        consultantsData[name].rate = 20.0;
+        consultantsData[name].amount = 0;
+      });
+    }
+
+    targetModalData.categories[cat] = {
+      total: totalAmt,
+      consultants: consultantsData
+    };
+  });
+}
+
+async function openTargetModal() {
+  if (!isMasterUser()) {
+    alert('지사장(관리자)만 목표를 설정할 수 있습니다.');
+    return;
+  }
+  const curMonth = currentMonthStr();
+  await loadTargetsFromSupabase(curMonth);
+  initTargetModalState(curMonth);
+  el('targetModalMonth').value = curMonth;
+  el('targetModalOverlay').style.display = 'flex';
+  renderTargetModalUI();
+}
+
+function closeTargetModal() {
+  el('targetModalOverlay').style.display = 'none';
+}
+
+function switchTargetModalTab(cat) {
+  targetModalData.activeTab = cat;
+  document.querySelectorAll('[data-target-tab]').forEach(btn => {
+    const isActive = btn.dataset.targetTab === cat;
+    btn.classList.toggle('active', isActive);
+    btn.style.background = isActive ? '#fff' : 'transparent';
+    btn.style.color = isActive ? 'var(--navy)' : 'var(--muted)';
+    btn.style.boxShadow = isActive ? '0 1px 3px rgba(0,0,0,0.1)' : 'none';
+  });
+  renderTargetModalUI();
+}
+
+function renderTargetModalUI() {
+  const cat = targetModalData.activeTab;
+  const cData = targetModalData.categories[cat];
+  if (!cData) return;
+
+  el('modalActiveCategoryLabel').textContent = cat;
+  el('modalCategoryTotalInput').value = cData.total > 0 ? cData.total.toLocaleString('ko-KR') : '';
+  el('modalSaveMonthLabel').textContent = `${targetModalData.month.replace('-', '년 ')}월`;
+
+  let rateSum = 0;
+  let amountSum = 0;
+
+  el('modalTargetTbody').innerHTML = CONSULTANTS.map(name => {
+    const item = cData.consultants[name] || { rate: 20, amount: 0 };
+    rateSum += Number(item.rate || 0);
+    amountSum += Number(item.amount || 0);
+    const pctOfBranch = cData.total > 0 ? Math.min(100, Math.round((item.amount / cData.total) * 100)) : 0;
+
+    return `
+      <tr>
+        <td style="padding:10px 12px;font-weight:700;color:${CONSULTANT_COLOR[name] || 'var(--navy)'};">
+          <span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:${CONSULTANT_COLOR[name] || '#2563eb'};margin-right:6px;"></span>
+          ${name}
+        </td>
+        <td style="padding:10px 12px;text-align:right;">
+          <div style="display:flex;align-items:center;justify-content:flex-end;gap:4px;">
+            <input type="number" step="0.1" min="0" max="100" class="modal-rate-input"
+              value="${item.rate != null ? item.rate : 20}"
+              onchange="onModalRateChange('${name}', this.value)"
+              style="width:75px;padding:6px 8px;text-align:right;border:1px solid var(--border);border-radius:6px;font-size:13.5px;font-weight:700;">
+            <span style="font-size:12.5px;color:var(--muted);">%</span>
+          </div>
+        </td>
+        <td style="padding:10px 12px;text-align:right;">
+          <div style="display:flex;align-items:center;justify-content:flex-end;gap:4px;">
+            <input type="text" inputmode="numeric" class="modal-amount-input"
+              value="${item.amount ? item.amount.toLocaleString('ko-KR') : '0'}"
+              onchange="onModalAmountChange('${name}', this.value)"
+              style="width:130px;padding:6px 8px;text-align:right;border:1px solid var(--border);border-radius:6px;font-size:13.5px;font-weight:700;color:var(--navy);">
+            <span style="font-size:12.5px;color:var(--muted);">원</span>
+          </div>
+        </td>
+        <td style="padding:10px 12px;">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <span class="progress-track" style="width:90px;height:10px;margin:0;">
+              <span class="progress-fill" style="width:${pctOfBranch}%;background:${CONSULTANT_COLOR[name] || 'var(--blue)'};"></span>
+            </span>
+            <span style="font-size:12px;color:var(--muted);">${pctOfBranch}%</span>
+          </div>
+        </td>
+      </tr>
+    `;
+  }).join('');
+
+  rateSum = Math.round(rateSum * 10) / 10;
+  const isRate100 = Math.abs(rateSum - 100) < 0.1;
+  const rateSumEl = el('modalRateSumCell');
+  rateSumEl.innerHTML = `<span style="color:${isRate100 ? '#16a34a' : '#dc2626'};">${rateSum}% ${isRate100 ? '✅' : '⚠️(100%요망)'}</span>`;
+
+  el('modalAmountSumCell').textContent = formatCurrency(amountSum);
+
+  const diff = amountSum - cData.total;
+  const diffEl = el('modalDiffCell');
+  if (cData.total === 0 && amountSum === 0) {
+    diffEl.textContent = '지사 목표 미입력';
+    diffEl.style.color = 'var(--muted)';
+  } else if (diff === 0) {
+    diffEl.textContent = '지사목표와 100% 일치';
+    diffEl.style.color = '#16a34a';
   } else {
-    if (!TARGETS.targets[name]) TARGETS.targets[name] = {};
-    TARGETS.targets[name][month] = val;
-    alert(`${name} 컨설턴트 목표가 저장되었습니다.`);
+    diffEl.textContent = `차이: ${diff > 0 ? '+' : ''}${diff.toLocaleString('ko-KR')}원 (반올림 차이)`;
+    diffEl.style.color = '#d97706';
+  }
+
+  let grandTotal = 0;
+  PRODUCT_CATEGORIES.forEach(pCat => {
+    const catObj = targetModalData.categories[pCat];
+    if (catObj) grandTotal += Number(catObj.total || 0);
+  });
+  el('modalSummaryTotal').textContent = formatCurrency(grandTotal);
+}
+
+function onModalBranchTotalChange() {
+  const cat = targetModalData.activeTab;
+  const cData = targetModalData.categories[cat];
+  if (!cData) return;
+
+  const rawVal = parseFormattedNumber(el('modalCategoryTotalInput').value);
+  cData.total = rawVal;
+
+  CONSULTANTS.forEach(name => {
+    const rate = cData.consultants[name].rate || 0;
+    cData.consultants[name].amount = roundToThousand(rawVal * (rate / 100));
+  });
+
+  renderTargetModalUI();
+}
+
+function onModalRateChange(name, newRateVal) {
+  const cat = targetModalData.activeTab;
+  const cData = targetModalData.categories[cat];
+  if (!cData) return;
+
+  const rate = Math.max(0, Math.min(100, Number(newRateVal) || 0));
+  cData.consultants[name].rate = rate;
+
+  if (cData.total > 0) {
+    cData.consultants[name].amount = roundToThousand(cData.total * (rate / 100));
+  }
+  renderTargetModalUI();
+}
+
+function onModalAmountChange(name, newAmountVal) {
+  const cat = targetModalData.activeTab;
+  const cData = targetModalData.categories[cat];
+  if (!cData) return;
+
+  const amount = roundToThousand(parseFormattedNumber(newAmountVal));
+  cData.consultants[name].amount = amount;
+
+  if (cData.total > 0) {
+    cData.consultants[name].rate = Math.round((amount / cData.total * 100) * 10) / 10;
+  }
+  renderTargetModalUI();
+}
+
+function distributeEqualRates() {
+  const cat = targetModalData.activeTab;
+  const cData = targetModalData.categories[cat];
+  if (!cData) return;
+
+  CONSULTANTS.forEach(name => {
+    cData.consultants[name].rate = 20.0;
+    cData.consultants[name].amount = roundToThousand(cData.total * 0.20);
+  });
+  renderTargetModalUI();
+}
+
+async function saveAllTargets() {
+  if (!isMasterUser()) {
+    alert('지사장만 목표를 저장할 수 있습니다.');
+    return;
+  }
+  const month = targetModalData.month;
+  if (!month) {
+    alert('대상 월이 지정되지 않았습니다.');
+    return;
+  }
+
+  const rowsToSave = [];
+  PRODUCT_CATEGORIES.forEach(cat => {
+    const cData = targetModalData.categories[cat];
+    CONSULTANTS.forEach(name => {
+      const item = (cData && cData.consultants[name]) || { rate: 20, amount: 0 };
+      rowsToSave.push({
+        consultant: name,
+        target_month: month,
+        category: cat,
+        target_amount: Number(item.amount || 0),
+        allocation_rate: Number(item.rate || 0),
+        updated_at: new Date().toISOString()
+      });
+    });
+  });
+
+  const saveBtn = el('btnSaveAllTargets');
+  saveBtn.disabled = true;
+  saveBtn.textContent = '저장 중...';
+
+  try {
+    const { error } = await db.from('targets').upsert(rowsToSave, {
+      onConflict: 'consultant,target_month,category'
+    });
+
+    if (error) {
+      alert('목표 저장 실패: ' + (error.message || JSON.stringify(error)));
+      console.error('Target save error:', error);
+      saveBtn.disabled = false;
+      saveBtn.textContent = `💾 ${month.replace('-', '년 ')}월 목표 확정 저장`;
+      return;
+    }
+
+    await logActivity('지사장', '목표확정', `${month} 상품별 월간 목표 설정 완료`, null, [
+      `일반알람: ${formatCurrency(targetModalData.categories['일반알람'].total)}`,
+      `디지털(정보보안): ${formatCurrency(targetModalData.categories['디지털(정보보안)'].total)}`,
+      `안전상품: ${formatCurrency(targetModalData.categories['안전상품'].total)}`
+    ]);
+
+    alert(`✅ [${month}] 전 상품 월간 목표가 확정 저장되었습니다.
+대시보드 실적 달성률에 즉시 반영됩니다.`);
+    closeTargetModal();
+
+    await loadAllFromSupabase();
     render();
+  } catch (err) {
+    alert('목표 저장 중 시스템 오류: ' + err.message);
+    console.error('saveAllTargets exception:', err);
+  } finally {
+    saveBtn.disabled = false;
+    saveBtn.textContent = `💾 ${month.replace('-', '년 ')}월 목표 확정 저장`;
   }
 }
 
@@ -1126,6 +1579,16 @@ async function openNoticeModal() {
 // 6. 컨설턴트 개별화면 전용 로직
 // ==========================================
 function switchView(mode) {
+  // 개별 컨설턴트 보안 제어: 지사장 대시보드 및 타인 화면 접근 차단
+  if (mode === 'master' && !isMasterUser()) {
+    console.warn('지사장 대시보드 접근 권한이 없습니다.');
+    return;
+  }
+  if (mode !== 'master' && !isMasterUser() && currentUser && currentUser.name !== mode) {
+    console.warn('타 컨설턴트 화면 접근 불가');
+    return;
+  }
+
   currentViewMode = mode;
   document.querySelectorAll('.switch-btn').forEach(btn => {
     if (mode === 'master' && btn.id === 'btnViewMaster') btn.classList.add('active');
@@ -1144,14 +1607,28 @@ function switchView(mode) {
     el('topbarHeaderTitle').textContent = `${mode} 컨설턴트 영업 화면`;
     initAgentView(mode);
   }
+
+  updateUIVisibilityByRole();
 }
 
 function initAgentView(agentName) {
   el('agentActiveName').textContent = agentName;
   const month = currentMonthStr();
-  const target = ((TARGETS.targets[agentName] || {})[month]) || 0;
-  el('agentPersonalTargetBadge').textContent = `이달 목표: ${target > 0 ? formatCurrency(target) : '미설정'}`;
+  const totalTarget = getConsultantTarget(agentName, month, 'all');
+  const alarmTarget = getConsultantTarget(agentName, month, '일반알람');
+  const digiTarget = getConsultantTarget(agentName, month, '디지털(정보보안)');
+  const safeTarget = getConsultantTarget(agentName, month, '안전상품');
+
+  let badgeText = `이달 목표: ${totalTarget > 0 ? formatCurrency(totalTarget) : '미설정'}`;
+  if (totalTarget > 0) {
+    badgeText += ` (알람 ${formatCurrency(alarmTarget)} · 디지털 ${formatCurrency(digiTarget)} · 안전 ${formatCurrency(safeTarget)})`;
+  }
+  el('agentPersonalTargetBadge').textContent = badgeText;
   
+  if (el('btnBackToMaster')) {
+    el('btnBackToMaster').style.display = isMasterUser() ? 'inline-flex' : 'none';
+  }
+
   el('afRegisteredDate').value = todayStr();
   el('afExpectedDate').value = todayStr();
   cancelAgentEdit();
@@ -1445,9 +1922,15 @@ document.getElementById('btnLogin').addEventListener('click', doLogin);
 
 
 function quickLogin(name, role) {
-  currentUser = { name: name, phone: '01000000000', role: role };
+  const isMaster = role === '지사관리자' || role === 'master' || name === '심정환';
+  currentUser = {
+    name: name,
+    phone: '01000000000',
+    job: isMaster ? '지사관리자' : '컨설턴트',
+    role: isMaster ? 'master' : 'user'
+  };
   sessionStorage.setItem('s1_user', JSON.stringify(currentUser));
-  initApp((role === '컨설턴트' && CONSULTANTS.includes(name)) ? name : 'master');
+  initApp((!isMaster && CONSULTANTS.includes(name)) ? name : 'master');
 }
 
 async function doLogin() {
@@ -1463,6 +1946,7 @@ async function doLogin() {
   msgEl.style.color = 'var(--navy)';
 
   try {
+    const pwHash = await sha256(pw);
     const { data: users, error } = await db.from('app_users').select('*').eq('phone', phone).limit(1);
     if (error) {
       msgEl.textContent = 'DB 접근 오류: ' + (error.message || JSON.stringify(error));
@@ -1476,23 +1960,18 @@ async function doLogin() {
       return;
     }
     const user = users[0];
-    const dbHash = String(user.hash || '').trim().toLowerCase();
-    
-    // 북서울지사 해시 호환 검증: 1) 전화번호+비밀번호(구글시트 공식), 2) 비밀번호 단독
-    const normPhone = phone.startsWith('010') ? phone : ('0' + phone);
-    const shortPhone = phone.startsWith('010') ? phone.slice(1) : phone;
-    const h1 = await sha256(normPhone + ':' + pw);
-    const h2 = await sha256(shortPhone + ':' + pw);
-    const h3 = await sha256(pw);
-    
-    const isPwValid = (h1.toLowerCase() === dbHash || h2.toLowerCase() === dbHash || h3.toLowerCase() === dbHash);
-    if (!isPwValid) {
+    if (user.hash.toLowerCase() !== pwHash.toLowerCase()) {
       msgEl.textContent = '비밀번호가 일치하지 않습니다.';
       msgEl.style.color = 'var(--red)';
       return;
     }
 
-    currentUser = { name: user.name, phone: user.phone, role: user.job };
+    currentUser = {
+      name: user.name,
+      phone: user.phone,
+      job: user.job,
+      role: user.role || (user.job.includes('관리자') ? 'master' : 'user')
+    };
     sessionStorage.setItem('s1_user', JSON.stringify(currentUser));
     
     if (user.job === '컨설턴트' && CONSULTANTS.includes(user.name)) {
@@ -1520,8 +1999,32 @@ async function initApp(initialMode) {
   el('fConsultant').innerHTML = '<option value="all">전체 컨설턴트</option>' + CONSULTANTS.map(n => `<option value="${n}">${n}</option>`).join('');
   el('activityLogDate').value = todayStr();
 
+  // 이벤트 리스너: 목표 모달 월 변경 및 새로고침
+  if (el('targetModalMonth') && !el('targetModalMonth').dataset.bound) {
+    el('targetModalMonth').dataset.bound = 'true';
+    el('targetModalMonth').addEventListener('change', async (e) => {
+      const newMonth = e.target.value;
+      if (!newMonth) return;
+      await loadTargetsFromSupabase(newMonth);
+      initTargetModalState(newMonth);
+      renderTargetModalUI();
+    });
+  }
+  if (el('btnTargetModalReload') && !el('btnTargetModalReload').dataset.bound) {
+    el('btnTargetModalReload').dataset.bound = 'true';
+    el('btnTargetModalReload').addEventListener('click', async () => {
+      const m = el('targetModalMonth').value || currentMonthStr();
+      await loadTargetsFromSupabase(m);
+      initTargetModalState(m);
+      renderTargetModalUI();
+    });
+  }
+
+  // 권한별 UI 제어 적용
+  updateUIVisibilityByRole();
+
   await loadAllFromSupabase();
-  switchView(initialMode || 'master');
+  switchView(initialMode || (isMasterUser() ? 'master' : (currentUser ? currentUser.name : 'master')));
   refreshActivityLog();
 }
 
@@ -1530,7 +2033,8 @@ window.addEventListener('DOMContentLoaded', () => {
   if (saved) {
     const u = JSON.parse(saved);
     currentUser = u;
-    initApp((u.role === '컨설턴트' && CONSULTANTS.includes(u.name)) ? u.name : 'master');
+    const isMaster = isMasterUser();
+    initApp((!isMaster && CONSULTANTS.includes(u.name)) ? u.name : 'master');
   }
 });
 
