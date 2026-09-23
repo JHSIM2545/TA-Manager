@@ -43,11 +43,11 @@
   .conn-status{display:inline-block;font-size:12px;padding:5px 12px;border-radius:999px;background:rgba(255,255,255,.12);}
   .conn-status.on{background:#16a34a;}
 
-  main{max-width:1320px;margin:0 auto;padding:20px 20px 70px;}
+  main{max-width:98%;width:98%;margin:0 auto;padding:14px 8px 70px;box-sizing:border-box;}
 
   /* 날짜 배너 */
   #dateBanner {
-    max-width: 1320px; margin: 14px auto 0; padding: 14px 24px;
+    max-width: 98%; width: 98%; margin: 12px auto 0; padding: 12px 20px; box-sizing: border-box;
     display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;
     background: #ffffff; border: 1px solid #e3e8f0; border-radius: 12px; box-shadow: 0 1px 3px rgba(10,20,40,.08);
   }
@@ -104,8 +104,8 @@
 
   table.lead-table{width:100%;border-collapse:collapse;font-size:13px;}
   table.lead-table thead tr{background:var(--navy);}
-  table.lead-table th{color:#fff;font-size:11.5px;font-weight:700;padding:10px 8px;position:sticky;top:0;text-align:left;}
-  table.lead-table td{padding:9px 7px;border-bottom:1px solid var(--border);text-align:left;}
+  table.lead-table th{color:#fff;font-size:12px;font-weight:700;padding:10px 8px;position:sticky;top:0;text-align:left;white-space:nowrap;}
+  table.lead-table td{padding:9px 8px;border-bottom:1px solid var(--border);text-align:left;}
   table.lead-table tbody tr:nth-child(even){background:#f7f9fc;}
   table.lead-table tbody tr:hover{background:#eef3fb;}
   .badge{display:inline-block;padding:3px 10px;border-radius:999px;font-size:11.5px;font-weight:700;}
@@ -321,9 +321,14 @@
         <div class="table-scroll">
           <table class="target-table">
             <thead><tr>
-              <th>컨설턴트</th><th>이달 수주</th><th>수주 달성율</th>
-              <th>진행중 TA</th><th>보유 TA율</th><th>TA 수주율</th><th>수주 실패율</th>
-              <th>이달 확정목표(원)</th>
+              <th style="white-space:nowrap;width:80px;">컨설턴트</th>
+              <th style="white-space:nowrap;width:130px;">이달 수주</th>
+              <th style="white-space:nowrap;min-width:210px;">수주 달성율 (차트)</th>
+              <th style="white-space:nowrap;width:130px;">진행중 TA</th>
+              <th style="white-space:nowrap;width:95px;">보유 TA율</th>
+              <th style="white-space:nowrap;width:90px;">TA 수주율</th>
+              <th style="white-space:nowrap;width:90px;">수주 실패율</th>
+              <th style="white-space:nowrap;width:130px;">이달 확정목표(원)</th>
             </tr></thead>
             <tbody id="targetTbody"></tbody>
           </table>
@@ -358,7 +363,11 @@
             <option value="B">B (중)</option>
             <option value="C">C (하)</option>
           </select>
-          <input type="month" id="fMonth" title="계약예정월 필터">
+          <div style="display:inline-flex;align-items:center;gap:4px;">
+            <input type="month" id="fMonth" title="계약예정월 필터 (기본: 이달)">
+            <button type="button" class="small secondary" id="btnThisMonthFilter" style="background:#eef1f7;color:var(--navy);font-weight:700;padding:7px 10px;">이달</button>
+            <button type="button" class="small secondary" id="btnAllPeriodFilter" style="background:#eef1f7;color:var(--muted);padding:7px 10px;">전체</button>
+          </div>
           <input type="text" id="fSearch" placeholder="서비스제공처명 검색">
           <button type="button" class="small secondary" id="btnResetFilter" style="background:#eef1f7;color:#1a2333;">필터 초기화</button>
         </div>
@@ -614,6 +623,104 @@ const CONSULTANT_COLOR = {
   '정문재': '#6d28d9',
   '임영민': '#c2410c'
 };
+
+
+// ==========================================
+// 컨설턴트별 고유 테마 배경색 정의 및 적용
+// ==========================================
+const CONSULTANT_THEMES = {
+  '최영국': {
+    primary: '#1d4ed8',
+    bodyBg: 'linear-gradient(180deg, #091a36 0%, #102750 100%)',
+    headerBg: 'linear-gradient(120deg, #0b1f3f, #1e3a8a)',
+    headerBorder: '#2563eb',
+    cardBg: '#f0f7ff',
+    cardBorder: '#2563eb',
+    badgeBg: '#1e40af',
+    badgeText: '#ffffff'
+  },
+  '박광춘': {
+    primary: '#b45309',
+    bodyBg: 'linear-gradient(180deg, #241408 0%, #381e0c 100%)',
+    headerBg: 'linear-gradient(120deg, #1b0e05, #78350f)',
+    headerBorder: '#d97706',
+    cardBg: '#fffbeb',
+    cardBorder: '#d97706',
+    badgeBg: '#b45309',
+    badgeText: '#ffffff'
+  },
+  '이수열': {
+    primary: '#15803d',
+    bodyBg: 'linear-gradient(180deg, #082414 0%, #0f361f 100%)',
+    headerBg: 'linear-gradient(120deg, #081d11, #14532d)',
+    headerBorder: '#16a34a',
+    cardBg: '#f0fdf4',
+    cardBorder: '#16a34a',
+    badgeBg: '#15803d',
+    badgeText: '#ffffff'
+  },
+  '정문재': {
+    primary: '#7e22ce',
+    bodyBg: 'linear-gradient(180deg, #1d0933 0%, #2c104d 100%)',
+    headerBg: 'linear-gradient(120deg, #140724, #6d28d9)',
+    headerBorder: '#9333ea',
+    cardBg: '#faf5ff',
+    cardBorder: '#9333ea',
+    badgeBg: '#7e22ce',
+    badgeText: '#ffffff'
+  },
+  '임영민': {
+    primary: '#c2410c',
+    bodyBg: 'linear-gradient(180deg, #2b0e05 0%, #3f1508 100%)',
+    headerBg: 'linear-gradient(120deg, #1f0b04, #9a3412)',
+    headerBorder: '#ea580c',
+    cardBg: '#fff7ed',
+    cardBorder: '#ea580c',
+    badgeBg: '#c2410c',
+    badgeText: '#ffffff'
+  }
+};
+
+function applyConsultantTheme(agentName) {
+  const theme = CONSULTANT_THEMES[agentName];
+  const topbar = document.querySelector('header.topbar');
+  const agentHeaderCard = document.querySelector('.agent-header-card');
+  const agentFormCard = document.querySelector('.agent-form-card');
+  const agentBadge = el('agentPersonalTargetBadge');
+
+  if (theme) {
+    document.body.style.background = theme.bodyBg;
+    if (topbar) {
+      topbar.style.background = theme.headerBg;
+      topbar.style.borderBottom = `2px solid ${theme.headerBorder}`;
+    }
+    if (agentHeaderCard) {
+      agentHeaderCard.style.borderLeft = `8px solid ${theme.primary}`;
+      agentHeaderCard.style.boxShadow = `0 4px 16px rgba(0,0,0,0.12)`;
+    }
+    if (agentFormCard) {
+      agentFormCard.style.background = theme.cardBg;
+      agentFormCard.style.border = `2px solid ${theme.cardBorder}`;
+    }
+    if (agentBadge) {
+      agentBadge.style.background = theme.badgeBg;
+      agentBadge.style.color = theme.badgeText;
+    }
+  } else {
+    document.body.style.background = 'var(--bg)';
+    if (topbar) {
+      topbar.style.background = 'linear-gradient(120deg, var(--navy), var(--navy3))';
+      topbar.style.borderBottom = '1px solid rgba(255,255,255,.1)';
+    }
+    if (agentHeaderCard) {
+      agentHeaderCard.style.borderLeft = `6px solid var(--blue)`;
+    }
+    if (agentFormCard) {
+      agentFormCard.style.background = '#f8fbff';
+      agentFormCard.style.border = '2px solid var(--blue)';
+    }
+  }
+}
 
 const KR_HOLIDAYS = new Set([
   '2026-01-01','2026-02-16','2026-02-17','2026-02-18','2026-03-01','2026-03-02',
@@ -1080,19 +1187,27 @@ function renderTargets() {
     const m = computeMetrics(leads, target, month);
     const rate = m.achievementRate === null ? 0 : m.achievementRate;
     const barClass = rate >= 100 ? 'over' : (rate >= 60 ? '' : 'warn');
+    const barColor = rate >= 100 ? 'var(--blue)' : (rate >= 60 ? 'var(--green)' : 'var(--amber)');
     return `
       <tr>
-        <td style="font-weight:700;color:${CONSULTANT_COLOR[name] || 'inherit'};">${name}</td>
-        <td>${formatCurrency(m.monthWonAmount)} <span class="count-tag">(${m.monthWonCount}건)</span></td>
-        <td>
-          <span class="progress-track"><span class="progress-fill ${barClass}" style="width:${Math.min(100, rate)}%"></span></span>
-          ${m.achievementRate === null ? '-' : m.achievementRate + '%'}
+        <td style="font-weight:700;color:${CONSULTANT_COLOR[name] || 'inherit'};white-space:nowrap;">
+          <span style="display:inline-block;width:9px;height:9px;border-radius:50%;background:${CONSULTANT_COLOR[name] || '#2563eb'};margin-right:6px;"></span>${name}
         </td>
-        <td>${formatCurrency(m.pipelineAmount)} <span class="count-tag">(${m.pipelineCount}건)</span></td>
-        <td>${m.holdingRate === null ? '-' : m.holdingRate + '%'}</td>
-        <td>${m.winRate === null ? '-' : m.winRate + '%'}</td>
-        <td>${m.failRate === null ? '-' : m.failRate + '%'}</td>
-        <td style="font-weight:700;color:var(--navy);font-size:14px;">${target > 0 ? formatCurrency(target) : '<span style="color:var(--muted);font-weight:normal;">미설정</span>'}</td>
+        <td style="white-space:nowrap;">${formatCurrency(m.monthWonAmount)} <span class="count-tag">(${m.monthWonCount}건)</span></td>
+        <td style="white-space:nowrap;">
+          <div style="display:inline-flex;align-items:center;gap:10px;">
+            <!-- 수주달성률 백분율 앞에 차트(프로그레스 바) 표시 -->
+            <div style="width:130px;height:14px;background:#e2e8f0;border-radius:999px;overflow:hidden;box-shadow:inset 0 1px 2px rgba(0,0,0,0.1);display:inline-block;vertical-align:middle;">
+              <div class="progress-fill ${barClass}" style="width:${Math.min(100, Math.max(0, rate))}%;height:100%;border-radius:999px;background:${barColor};transition:width 0.3s ease;"></div>
+            </div>
+            <strong style="min-width:50px;font-size:13px;color:${barColor};">${m.achievementRate === null ? '-' : m.achievementRate + '%'}</strong>
+          </div>
+        </td>
+        <td style="white-space:nowrap;">${formatCurrency(m.pipelineAmount)} <span class="count-tag">(${m.pipelineCount}건)</span></td>
+        <td style="white-space:nowrap;">${m.holdingRate === null ? '-' : m.holdingRate + '%'}</td>
+        <td style="white-space:nowrap;">${m.winRate === null ? '-' : m.winRate + '%'}</td>
+        <td style="white-space:nowrap;">${m.failRate === null ? '-' : m.failRate + '%'}</td>
+        <td style="font-weight:700;color:var(--navy);font-size:14px;white-space:nowrap;">${target > 0 ? formatCurrency(target) : '<span style="color:var(--muted);font-weight:normal;">미설정</span>'}</td>
       </tr>
     `;
   }).join('');
@@ -1600,11 +1715,13 @@ function switchView(mode) {
     el('viewMaster').style.display = 'block';
     el('viewAgent').style.display = 'none';
     el('topbarHeaderTitle').textContent = '영업 TA 통합관리 대시보드';
+    applyConsultantTheme(null);
     render();
   } else {
     el('viewMaster').style.display = 'none';
     el('viewAgent').style.display = 'block';
     el('topbarHeaderTitle').textContent = `${mode} 컨설턴트 영업 화면`;
+    applyConsultantTheme(mode);
     initAgentView(mode);
   }
 
@@ -1812,7 +1929,7 @@ el('btnResetFilter').addEventListener('click', () => {
   el('fConsultant').value = 'all';
   el('fStage').value = 'all';
   el('fConfidence').value = 'all';
-  el('fMonth').value = '';
+  el('fMonth').value = currentMonthStr();
   el('fSearch').value = '';
   renderLeadTable();
 });
@@ -1998,6 +2115,24 @@ async function initApp(initialMode) {
   el('topbarWorkdays').textContent = '이번달 잔여 영업일 : ' + workingDaysLeftInMonth() + '일 (오늘 포함)';
   el('fConsultant').innerHTML = '<option value="all">전체 컨설턴트</option>' + CONSULTANTS.map(n => `<option value="${n}">${n}</option>`).join('');
   el('activityLogDate').value = todayStr();
+
+  // 현재 TA 조회의 기본값을 이달(당월)로 설정
+  el('fMonth').value = currentMonthStr();
+
+  if (el('btnThisMonthFilter') && !el('btnThisMonthFilter').dataset.bound) {
+    el('btnThisMonthFilter').dataset.bound = 'true';
+    el('btnThisMonthFilter').addEventListener('click', () => {
+      el('fMonth').value = currentMonthStr();
+      renderLeadTable();
+    });
+  }
+  if (el('btnAllPeriodFilter') && !el('btnAllPeriodFilter').dataset.bound) {
+    el('btnAllPeriodFilter').dataset.bound = 'true';
+    el('btnAllPeriodFilter').addEventListener('click', () => {
+      el('fMonth').value = '';
+      renderLeadTable();
+    });
+  }
 
   // 이벤트 리스너: 목표 모달 월 변경 및 새로고침
   if (el('targetModalMonth') && !el('targetModalMonth').dataset.bound) {
