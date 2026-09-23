@@ -713,7 +713,7 @@ async function loadAllFromSupabase() {
     console.error('Supabase ta_leads select error:', lErr);
     if (banner) {
       banner.style.display = 'block';
-      banner.innerHTML = '⚠️ <strong>DB 조회 오류 발생:</strong> ' + escapeHtml(lErr.message || JSON.stringify(lErr)) + '<br><span style="font-weight:400;font-size:12px;">Supabase SQL Editor에서 <code>NOTIFY pgrst, 'reload schema';</code> 를 실행해 주세요.</span>';
+      banner.innerHTML = '⚠️ <strong>DB 조회 오류 발생:</strong> ' + escapeHtml(lErr.message || JSON.stringify(lErr)) + '<br><span style="font-weight:400;font-size:12px;">Supabase SQL Editor에서 <code>NOTIFY pgrst, reload schema;</code> 를 실행해 주세요.</span>';
     }
   } else if (banner) {
     banner.style.display = 'none';
