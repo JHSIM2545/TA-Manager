@@ -611,6 +611,87 @@ const db = window.supabase;
 
 const el = id => document.getElementById(id);
 
+// ==========================================
+// 시스템 메시지 대화상자 (브라우저 기본 alert/confirm 대체)
+// 팝업 타이틀: "북서울지사 TA 관리 포털" (jssim2545... 표시 차단)
+// ==========================================
+function showPortalAlert(msg, title) {
+  const overlay = el('portalAlertOverlay');
+  const titleEl = el('portalAlertTitle');
+  const msgEl = el('portalAlertMessage');
+  const confirmBtn = el('portalAlertConfirmBtn');
+  const cancelBtn = el('portalAlertCancelBtn');
+
+  if (!overlay || !msgEl || !confirmBtn) {
+    if (window.nativeAlert) window.nativeAlert(msg);
+    return;
+  }
+
+  titleEl.textContent = title || '북서울지사 TA 관리 포털';
+  msgEl.textContent = String(msg || '');
+  cancelBtn.style.display = 'none';
+  overlay.style.display = 'flex';
+  confirmBtn.focus();
+
+  confirmBtn.onclick = function() {
+    overlay.style.display = 'none';
+  };
+}
+
+function showPortalConfirm(msg, title) {
+  return new Promise(resolve => {
+    const overlay = el('portalAlertOverlay');
+    const titleEl = el('portalAlertTitle');
+    const msgEl = el('portalAlertMessage');
+    const confirmBtn = el('portalAlertConfirmBtn');
+    const cancelBtn = el('portalAlertCancelBtn');
+
+    if (!overlay || !msgEl || !confirmBtn) {
+      const ok = window.nativeConfirm ? window.nativeConfirm(msg) : true;
+      return resolve(ok);
+    }
+
+    titleEl.textContent = title || '북서울지사 TA 관리 포털';
+    msgEl.textContent = String(msg || '');
+    cancelBtn.style.display = 'inline-block';
+    overlay.style.display = 'flex';
+    confirmBtn.focus();
+
+    confirmBtn.onclick = function() {
+      overlay.style.display = 'none';
+      resolve(true);
+    };
+    cancelBtn.onclick = function() {
+      overlay.style.display = 'none';
+      resolve(false);
+    };
+  });
+}
+
+// 브라우저 기본 alert 가로채기 (jssim2545... 주소 표시 방지)
+if (!window.nativeAlert) {
+  window.nativeAlert = window.alert;
+  window.alert = function(msg) {
+    showPortalAlert(msg);
+  };
+}
+if (!window.nativeConfirm) {
+  window.nativeConfirm = window.confirm;
+}
+
+document.addEventListener('keydown', (e) => {
+  const overlay = el('portalAlertOverlay');
+  if (overlay && overlay.style.display === 'flex') {
+    if (e.key === 'Escape' || e.key === 'Enter') {
+      const cancelBtn = el('portalAlertCancelBtn');
+      if (!cancelBtn || cancelBtn.style.display === 'none') {
+        overlay.style.display = 'none';
+      }
+    }
+  }
+});
+
+
 const CONSULTANTS = ['최영국', '박광춘', '이수열', '정문재', '임영민'];
 const STAGES = ['진행중', '수주完', '실패'];
 const STAGE_COLOR = { '진행중': '#2563eb', '수주完': '#16a34a', '실패': '#dc2626' };
@@ -1621,7 +1702,7 @@ function renderLeadTable() {
 }
 
 async function deleteLeadMaster(id, company, consultant) {
-  if (!confirm(`[지사장 관리자 삭제]\n'${company}' (${consultant}) 안건을 영구 삭제하시겠습니까?`)) return;
+  const ok = await showPortalConfirm(`[지사장 관리자 삭제]\n'${company}' (${consultant}) 안건을 영구 삭제하시겠습니까?`); if (!ok) return;
   try {
     const { error } = await db.from('ta_leads').delete().eq('id', id);
     if (!error) {
@@ -1833,7 +1914,7 @@ function cancelAgentEdit() {
 
 async function deleteAgentLead(id, company) {
   const agentName = currentViewMode;
-  if (!confirm(`'${company}' 안건을 삭제하시겠습니까?\n(등록 당일이므로 삭제 가능합니다)`)) return;
+  const ok = await showPortalConfirm(`'${company}' 안건을 삭제하시겠습니까?\n(등록 당일이므로 삭제 가능합니다)`); if (!ok) return;
 
   try {
     const { error } = await db.from('ta_leads').delete().eq('id', id);
@@ -1901,7 +1982,7 @@ el('btnNoticeSave').addEventListener('click', async () => {
 });
 
 el('btnNoticeDelete').addEventListener('click', async () => {
-  if (!confirm('공지사항을 삭제할까요?')) return;
+  const ok = await showPortalConfirm('공지사항을 삭제할까요?'); if (!ok) return;
   const { error } = await db.from('notices').update({ active: false }).eq('active', true);
   if (!error) {
     el('noticeTextarea').value = '';
@@ -2002,10 +2083,11 @@ el('agentLeadForm').addEventListener('submit', async function(e) {
       ]);
       alert('✅ 안건이 성공적으로 수정되었습니다.');
     } else {
+      payload.id = (window.crypto && crypto.randomUUID) ? crypto.randomUUID() : ('ld-' + Date.now() + '-' + Math.random().toString(36).substring(2, 9));
       payload.created_at = new Date().toISOString();
       const { data, error } = await db.from('ta_leads').insert([payload]).select();
       if (error) throw error;
-      const newId = (data && data[0]) ? data[0].id : null;
+      const newId = (data && data[0]) ? data[0].id : payload.id;
       await logActivity(agentName, '신규 등록', payload.company, newId, [
         `금액: ${formatCurrency(payload.amount)}`,
         `영업단계: ${payload.stage}`,
@@ -2174,5 +2256,23 @@ window.addEventListener('DOMContentLoaded', () => {
 });
 
 </script>
+
+<!-- ========================================== -->
+<!-- 시스템 전용 알림/확인 대화상자 (북서울지사 TA 관리 포털) -->
+<!-- ========================================== -->
+<div class="modal-overlay" id="portalAlertOverlay" style="display:none;z-index:99999;">
+  <div class="modal-card" style="max-width:420px;width:90%;padding:26px 22px;border-radius:16px;box-shadow:0 12px 40px rgba(0,0,0,0.35);text-align:center;background:#fff;color:var(--text);border:1px solid var(--border);">
+    <div style="display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:12px;">
+      <span style="font-size:22px;">🛡️</span>
+      <h3 style="margin:0;font-size:18px;color:var(--navy);font-weight:800;" id="portalAlertTitle">북서울지사 TA 관리 포털</h3>
+    </div>
+    <div id="portalAlertMessage" style="font-size:14.5px;color:#334155;margin-bottom:22px;line-height:1.6;white-space:pre-wrap;word-break:keep-all;"></div>
+    <div id="portalAlertBtnGroup" style="display:flex;gap:10px;justify-content:center;">
+      <button type="button" id="portalAlertConfirmBtn" style="padding:10px 24px;font-size:14px;font-weight:700;border-radius:10px;background:var(--blue);color:#fff;border:none;cursor:pointer;min-width:90px;">확인</button>
+      <button type="button" id="portalAlertCancelBtn" class="secondary" style="display:none;padding:10px 20px;font-size:14px;font-weight:700;border-radius:10px;min-width:80px;background:#f1f5f9;color:var(--navy);border:1px solid var(--border);cursor:pointer;">취소</button>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>
