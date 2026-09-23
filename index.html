@@ -1463,7 +1463,6 @@ async function doLogin() {
   msgEl.style.color = 'var(--navy)';
 
   try {
-    const pwHash = await sha256(pw);
     const { data: users, error } = await db.from('app_users').select('*').eq('phone', phone).limit(1);
     if (error) {
       msgEl.textContent = 'DB 접근 오류: ' + (error.message || JSON.stringify(error));
@@ -1477,7 +1476,17 @@ async function doLogin() {
       return;
     }
     const user = users[0];
-    if (user.hash.toLowerCase() !== pwHash.toLowerCase()) {
+    const dbHash = String(user.hash || '').trim().toLowerCase();
+    
+    // 북서울지사 해시 호환 검증: 1) 전화번호+비밀번호(구글시트 공식), 2) 비밀번호 단독
+    const normPhone = phone.startsWith('010') ? phone : ('0' + phone);
+    const shortPhone = phone.startsWith('010') ? phone.slice(1) : phone;
+    const h1 = await sha256(normPhone + ':' + pw);
+    const h2 = await sha256(shortPhone + ':' + pw);
+    const h3 = await sha256(pw);
+    
+    const isPwValid = (h1.toLowerCase() === dbHash || h2.toLowerCase() === dbHash || h3.toLowerCase() === dbHash);
+    if (!isPwValid) {
       msgEl.textContent = '비밀번호가 일치하지 않습니다.';
       msgEl.style.color = 'var(--red)';
       return;
