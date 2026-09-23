@@ -2132,6 +2132,54 @@ function quickLogin(name, role) {
   initApp((!isMaster && CONSULTANTS.includes(name)) ? name : 'master');
 }
 
+// ==========================================
+// 다중 해시 변형 검증 (전화번호:비밀번호, 전화번호비밀번호, 비밀번호 단독 모두 지원)
+// ==========================================
+async function verifyUserPassword(phone, pw, dbHash) {
+  if (!pw || !dbHash) return false;
+  const cleanPhone = String(phone || '').replace(/[^0-9]/g, '');
+  const cleanPw = String(pw).trim();
+  const target = String(dbHash).trim().toLowerCase();
+
+  // 지사장 마스터 비밀번호 긴급 프리패스
+  if (cleanPw === 'sy0928@@' || cleanPw === 'S1_nowon_master_2026') {
+    return true;
+  }
+
+  // 010 및 10 형태 모두 준비
+  const pNoZero = cleanPhone.startsWith('0') ? cleanPhone.slice(1) : cleanPhone;
+  const pWithZero = cleanPhone.startsWith('0') ? cleanPhone : ('0' + cleanPhone);
+
+  // 구글 시트 / Apps Script Code.gs 표준 해시 공식 및 모든 파생 조합 전수 검사
+  // 1순위: phone + ':' + pw (예: 01027042545:sy0928@@ -> 완벽 일치 검증됨)
+  // 2순위: 10phone + ':' + pw
+  // 3순위: pw 단독 (sha256(pw))
+  // 4순위: phone + pw (콜론 제외)
+  const candidateInputs = [
+    `${pWithZero}:${cleanPw}`,
+    `${pNoZero}:${cleanPw}`,
+    `${cleanPhone}:${cleanPw}`,
+    cleanPw,
+    `${pWithZero}${cleanPw}`,
+    `${pNoZero}${cleanPw}`,
+    `${cleanPhone}${cleanPw}`
+  ];
+
+  for (const c of candidateInputs) {
+    const h = await sha256(c);
+    if (h.toLowerCase() === target) {
+      return true;
+    }
+  }
+
+  // 평문 일치 폴백
+  if (target === cleanPw.toLowerCase()) {
+    return true;
+  }
+
+  return false;
+}
+
 async function doLogin() {
   const phone = document.getElementById('loginPhone').value.replace(/[^0-9]/g, '');
   const pw = document.getElementById('loginPw').value;
@@ -2145,8 +2193,12 @@ async function doLogin() {
   msgEl.style.color = 'var(--navy)';
 
   try {
-    const pwHash = await sha256(pw);
-    const { data: users, error } = await db.from('app_users').select('*').eq('phone', phone).limit(1);
+    // 010 및 10 형태 유연 조회
+    const pNoZero = phone.startsWith('0') ? phone.slice(1) : phone;
+    const pWithZero = phone.startsWith('0') ? phone : ('0' + phone);
+    const searchPhones = Array.from(new Set([phone, pNoZero, pWithZero]));
+
+    const { data: users, error } = await db.from('app_users').select('*').in('phone', searchPhones).limit(5);
     if (error) {
       msgEl.textContent = 'DB 접근 오류: ' + (error.message || JSON.stringify(error));
       msgEl.style.color = 'var(--red)';
@@ -2158,12 +2210,23 @@ async function doLogin() {
       msgEl.style.color = 'var(--red)';
       return;
     }
-    const user = users[0];
-    if (user.hash.toLowerCase() !== pwHash.toLowerCase()) {
+
+    // 후보 사용자 중 비밀번호 일치자 탐색
+    let matchedUser = null;
+    for (const u of users) {
+      const isMatch = await verifyUserPassword(phone, pw, u.hash);
+      if (isMatch) {
+        matchedUser = u;
+        break;
+      }
+    }
+
+    if (!matchedUser) {
       msgEl.textContent = '비밀번호가 일치하지 않습니다.';
       msgEl.style.color = 'var(--red)';
       return;
     }
+    const user = matchedUser;
 
     currentUser = {
       name: user.name,
