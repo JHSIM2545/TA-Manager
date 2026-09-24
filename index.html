@@ -529,6 +529,47 @@
     border-color: #ca8a04 !important;
     box-shadow: 0 0 12px rgba(234, 179, 8, 0.65) !important;
   }
+
+  /* 컨설턴트 이름 우측 상품 선택 바 */
+  .agent-header-product-picker {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    background: #f1f5f9;
+    padding: 3px 5px;
+    border-radius: 8px;
+    border: 1px solid #cbd5e1;
+    margin-left: 6px;
+  }
+  .header-prod-btn {
+    padding: 5px 12px;
+    font-size: 12px;
+    font-weight: 700;
+    border-radius: 6px;
+    border: none;
+    background: transparent;
+    color: #475569;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    white-space: nowrap;
+  }
+  .header-prod-btn:hover {
+    background: #e2e8f0;
+    color: var(--navy);
+  }
+  .header-prod-btn.active {
+    background: #0f172a;
+    color: #ffffff;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.18);
+  }
+  @media (max-width: 768px) {
+    .agent-header-product-picker {
+      margin-left: 0 !important;
+      width: 100%;
+      justify-content: space-between;
+      overflow-x: auto;
+    }
+  }
 </style>
  </head>
  <body>
@@ -779,13 +820,20 @@
          컨설턴트 개별 영업 화면 (viewAgent) - 1번~5번 캡처 100% 매칭
          ========================================== -->
     <div id="viewAgent" class="agent-view-container">
-     <!-- 1. 간결 헤더 (중복 제거 & 순위 표시 & 신규등록 버튼) -->
+     <!-- 1. 간결 헤더 (중복 제거 & 순위 표시 & 상품 선택 & 신규등록 버튼) -->
      <div class="agent-header-card">
-      <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
        <div class="agent-name-title">
         <span id="agentActiveName">최영국</span> 컨설턴트
        </div>
-       <div class="agent-rank-badge" id="agentRankBadge">지사 1위 (수주 달성률 100%)</div>
+       <div class="agent-rank-badge" id="agentRankBadge">지사 1위 (알람 달성률 100%)</div>
+       <!-- 컨설턴트 이름 우측 상품 선택 기능 (디폴트: 일반알람) -->
+       <div class="agent-header-product-picker" id="agentHeaderProductPicker">
+        <button type="button" class="header-prod-btn active" data-prod="일반알람" onclick="setAgentGlobalProduct('일반알람')">일반알람</button>
+        <button type="button" class="header-prod-btn" data-prod="디지털(정보보안)" onclick="setAgentGlobalProduct('디지털(정보보안)')">디지털(정보보안)</button>
+        <button type="button" class="header-prod-btn" data-prod="안전상품" onclick="setAgentGlobalProduct('안전상품')">안전상품</button>
+        <button type="button" class="header-prod-btn" data-prod="all" onclick="setAgentGlobalProduct('all')">전체</button>
+       </div>
       </div>
       <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
        <button type="button" class="btn-primary" onclick="openNewAgentLeadModal()" style="display:inline-flex;align-items:center;gap:6px;padding:8px 18px;font-size:14px;font-weight:700;background:var(--blue);color:#fff;border-radius:8px;border:none;cursor:pointer;">➕ 신규 TA 등록</button>
@@ -2425,22 +2473,27 @@ function switchView(mode) {
 }
 
 
+
+
 // ==========================================================================
-// 컨설턴트 영업 화면 전용 상태 및 로직 (요구사항 1번~13번 완벽 지원)
+// 1. 상품 선택 및 화면 일괄 세팅 로직 (디폴트: 일반알람)
 // ==========================================================================
-let agentStatusCatFilter = 'all'; // 'all' | '일반알람' | '디지털(정보보안)' | '안전상품'
+let agentGlobalProduct = '일반알람'; // 디폴트는 알람으로 설정!
+let agentStatusCatFilter = '일반알람';
 let agentListFilter = {
   stage: 'all',                // 'all' | '진행중' | '수주完' | '실패'
-  product: 'all',              // 'all' | '일반알람' | '디지털(정보보안)' | '안전상품'
+  product: '일반알람',          // 디폴트: 일반알람
   month: 'current_and_future'  // 'current_and_future' | 'all' | 'YYYY-MM'
 };
 
-// 1. 컨설턴트 순위 계산 (수주 달성률 기준)
-function getConsultantRankInfo(agentName, month) {
+// 컨설턴트 순위 계산 (선택된 상품 종류 기준 수주 달성률)
+function getConsultantRankInfo(agentName, month, cat) {
   month = month || currentMonthStr();
+  cat = cat || agentGlobalProduct || '일반알람';
+
   const ranks = CONSULTANTS.map(name => {
-    const target = getConsultantTarget(name, month, 'all');
-    const leads = consultantLeads(name);
+    const target = getConsultantTarget(name, month, cat);
+    const leads = consultantLeads(name).filter(l => cat === 'all' || productCategory(l.productType) === cat);
     const m = computeMetrics(leads, target, month);
     const rate = m.achievementRate !== null ? m.achievementRate : 0;
     return { name, target, wonAmt: m.monthWonAmount, rate };
@@ -2453,50 +2506,113 @@ function getConsultantRankInfo(agentName, month) {
   if (idx === -1) return { rank: '-', rate: 0, text: '지사 -위' };
   const rank = idx + 1;
   const myData = ranks[idx];
+  const catLabel = cat === 'all' ? '전체' : (cat === '일반알람' ? '알람' : (cat === '디지털(정보보안)' ? '디지털' : '안전'));
   return {
     rank: rank,
     rate: myData.rate,
-    text: `지사 ${rank}위 (수주 달성률 ${myData.rate}%)`
+    text: `지사 ${rank}위 (${catLabel} 달성률 ${myData.rate}%)`
   };
 }
+
+// 이달 목표 뱃지 갱신 (선택된 해당 상품만 표시)
+function updateAgentTargetBadge(agentName, month, prod) {
+  month = month || currentMonthStr();
+  prod = prod || agentGlobalProduct || '일반알람';
+  const badgeEl = el('agentStatusTargetBadge');
+  if (!badgeEl) return;
+
+  if (prod === '일반알람') {
+    const target = getConsultantTarget(agentName, month, '일반알람');
+    badgeEl.textContent = `이달 목표: 일반알람 ${formatCurrency(target)}`;
+  } else if (prod === '디지털(정보보안)') {
+    const target = getConsultantTarget(agentName, month, '디지털(정보보안)');
+    badgeEl.textContent = `이달 목표: 디지털(정보보안) ${formatCurrency(target)}`;
+  } else if (prod === '안전상품') {
+    const target = getConsultantTarget(agentName, month, '안전상품');
+    badgeEl.textContent = `이달 목표: 안전상품 ${formatCurrency(target)}`;
+  } else {
+    // 'all' 전체
+    const alarmTarget = getConsultantTarget(agentName, month, '일반알람');
+    const digiTarget = getConsultantTarget(agentName, month, '디지털(정보보안)');
+    const safeTarget = getConsultantTarget(agentName, month, '안전상품');
+    badgeEl.textContent = `이달 목표 (알람 ${formatCurrency(alarmTarget)} · 디지털 ${formatCurrency(digiTarget)} · 안전상품 ${formatCurrency(safeTarget)})`;
+  }
+}
+
+// 컨설턴트 이름 우측에서 상품 선택 시 -> TA현황, 달성현황, 내 TA목록, 이달 목표 일괄 세팅
+function setAgentGlobalProduct(prod) {
+  agentGlobalProduct = prod;
+  activeDashboardCategory = prod;
+
+  // 1) 헤더 상품 선택 버튼 활성화 동기화
+  document.querySelectorAll('#agentHeaderProductPicker .header-prod-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.prod === prod);
+  });
+
+  // 2) TA 현황 헤더의 상품 필터 탭 동기화
+  agentStatusCatFilter = prod;
+  document.querySelectorAll('#agentStatusCatFilters .cat-pill').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.cat === prod);
+  });
+
+  // 3) 내 TA 목록의 상품 필터 동기화
+  agentListFilter.product = prod;
+  document.querySelectorAll('#agentFilterProductRow .filter-pill').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.product === prod);
+  });
+
+  const agentName = currentViewMode;
+  const month = currentMonthStr();
+
+  // 4) 이달 목표 갱신 (선택된 해당 상품만 표시!)
+  updateAgentTargetBadge(agentName, month, prod);
+
+  // 5) 순위 뱃지 갱신 (선택된 해당 상품 기준 순위 및 달성률)
+  const rankInfo = getConsultantRankInfo(agentName, month, prod);
+  el('agentRankBadge').textContent = rankInfo.text;
+
+  // 6) TA 현황 6개 지표 카드 렌더링
+  renderAgentStatus(agentName);
+
+  // 7) 달성현황 프로그레스 & 도넛 차트 렌더링
+  renderAgentAchievement(agentName);
+
+  // 8) 내 TA 목록 테이블 렌더링
+  renderAgentLeadTable(agentName);
+}
+window.setAgentGlobalProduct = setAgentGlobalProduct;
+
+// 호환성 브릿지 함수 (TA현황 헤더 및 목록 필터 클릭 시에도 일괄 연동)
+function setAgentStatusCat(cat) {
+  setAgentGlobalProduct(cat);
+}
+window.setAgentStatusCat = setAgentStatusCat;
+
+function setAgentFilterProduct(prod) {
+  setAgentGlobalProduct(prod);
+}
+window.setAgentFilterProduct = setAgentFilterProduct;
 
 // 2. 컨설턴트 화면 진입 초기화 (initAgentView)
 function initAgentView(agentName) {
   currentViewMode = agentName;
   el('agentActiveName').textContent = agentName;
-  const month = currentMonthStr();
-
-  // 순위 뱃지 설정
-  const rankInfo = getConsultantRankInfo(agentName, month);
-  el('agentRankBadge').textContent = rankInfo.text;
-
-  // 이달 목표 (합산하지 않고 알람/디지털/안전상품 개별 표기)
-  const alarmTarget = getConsultantTarget(agentName, month, '일반알람');
-  const digiTarget = getConsultantTarget(agentName, month, '디지털(정보보안)');
-  const safeTarget = getConsultantTarget(agentName, month, '안전상품');
-
-  const targetBadgeText = `이달 목표 (알람 ${formatCurrency(alarmTarget)} · 디지털 ${formatCurrency(digiTarget)} · 안전상품 ${formatCurrency(safeTarget)})`;
-  el('agentStatusTargetBadge').textContent = targetBadgeText;
 
   // 지사장 대시보드로 돌아가기 버튼 노출 여부
   if (el('btnBackToMaster')) {
     el('btnBackToMaster').style.display = isMasterUser() ? 'inline-flex' : 'none';
   }
 
-  // 1) 로그인 공지사항 팝업 확인
-  checkAndShowAgentNotice();
+  // 로그인 상태인 경우 공지사항 팝업 확인
+  if (currentUser) {
+    checkAndShowAgentNotice();
+  }
 
-  // 2) 상단 TA 현황 카드 렌더링
-  renderAgentStatus(agentName);
-
-  // 3) 달성현황 프로그레스 & 도넛 렌더링
-  renderAgentAchievement(agentName);
-
-  // 4) 월별 필터 셀렉트박스 채우기
+  // 월별 필터 셀렉트박스 채우기
   populateAgentMonthFilter(agentName);
 
-  // 5) 내 TA 목록 테이블 렌더링
-  renderAgentLeadTable(agentName);
+  // 디폴트는 알람으로 일괄 세팅! (요구사항: 디폴트는 알람으로 해주고)
+  setAgentGlobalProduct('일반알람');
 }
 
 // 3. 지사장 공지사항 팝업 표시 (로그인 시 1회 실행)
@@ -2575,7 +2691,7 @@ function setAgentStatusCat(cat) {
 }
 
 function renderAgentStatus(agentName) {
-  let leads = consultantLeads(agentName);
+  let leads = (ALL[agentName] && ALL[agentName].leads) || [];
   if (agentStatusCatFilter !== 'all') {
     leads = leads.filter(l => matchProductCategory(l.productType) === agentStatusCatFilter);
   }
@@ -2635,7 +2751,7 @@ function renderAgentStatus(agentName) {
 function openTodayExpectedModal() {
   const agentName = currentViewMode;
   const today = todayStr();
-  let leads = consultantLeads(agentName).filter(l => l.stage === '진행중' && l.expectedDate === today);
+  let leads = ((ALL[agentName] && ALL[agentName].leads) || []).filter(l => l.stage === '진행중' && l.expectedDate === today);
   if (agentStatusCatFilter !== 'all') {
     leads = leads.filter(l => matchProductCategory(l.productType) === agentStatusCatFilter);
   }
@@ -2673,7 +2789,7 @@ function closeTodayExpectedModal() {
 function renderAgentAchievement(agentName) {
   const month = currentMonthStr();
   const target = getConsultantTarget(agentName, month, agentStatusCatFilter);
-  let leads = consultantLeads(agentName);
+  let leads = (ALL[agentName] && ALL[agentName].leads) || [];
   if (agentStatusCatFilter !== 'all') {
     leads = leads.filter(l => matchProductCategory(l.productType) === agentStatusCatFilter);
   }
@@ -2787,7 +2903,7 @@ function populateAgentMonthFilter(agentName) {
 }
 
 function renderAgentLeadTable(agentName) {
-  let leads = consultantLeads(agentName);
+  let leads = (ALL[agentName] && ALL[agentName].leads) || [];
   leads.sort((a, b) => (b.updatedAt || '').localeCompare(a.updatedAt || ''));
 
   // 1) 단계 필터
@@ -3429,4 +3545,4 @@ window.addEventListener('DOMContentLoaded', () => {
    </div>
   </div>
  </body>
-</html>
+       </html>
