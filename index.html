@@ -230,9 +230,11 @@
     border: 1px solid var(--border);
     overflow: hidden;
     margin-bottom: 16px;
+    transition: border-color 0.25s ease;
   }
   .agent-status-header {
-    background: #0b1f3f; /* 다크 네이비 */
+    background: var(--agent-banner-bg, #0b1f3f);
+    border-bottom: var(--agent-banner-border, none);
     color: #ffffff;
     padding: 14px 20px;
     display: flex;
@@ -240,6 +242,15 @@
     align-items: center;
     flex-wrap: wrap;
     gap: 12px;
+    transition: background 0.25s ease, border-bottom 0.25s ease;
+  }
+  .agent-target-badge-clean {
+    font-size: 13px;
+    color: #cbd5e1;
+    font-weight: 600;
+    padding: 4px 12px;
+    border-radius: 6px;
+    transition: all 0.2s ease;
   }
   .agent-status-cat-filters {
     display: flex;
@@ -261,9 +272,9 @@
     background: rgba(255,255,255,0.25);
   }
   .agent-status-cat-filters .cat-pill.active {
-    background: #2563eb;
+    background: var(--agent-active-pill-bg, #2563eb);
     color: #ffffff;
-    border-color: #3b82f6;
+    border-color: var(--agent-active-pill-border, #3b82f6);
     font-weight: 700;
   }
 
@@ -300,7 +311,7 @@
     color: var(--navy);
   }
   .agent-m-card .m-val.highlight-blue {
-    color: #0284c7;
+    color: var(--agent-highlight-color, #0284c7);
   }
   .agent-m-card .m-cnt {
     font-size: 11.5px;
@@ -313,7 +324,8 @@
   .today-expected-box {
     width: 220px;
     min-width: 200px;
-    background: #081a36;
+    background: var(--agent-today-box-bg, #081a36);
+    border: var(--agent-today-box-border, 1px solid rgba(255, 255, 255, 0.08));
     border-radius: 10px;
     padding: 20px 16px;
     display: flex;
@@ -321,33 +333,37 @@
     align-items: center;
     justify-content: center;
     text-align: center;
+    box-shadow: var(--agent-today-box-shadow, 0 4px 14px rgba(0,0,0,0.15));
+    transition: background 0.25s ease, border 0.25s ease, box-shadow 0.25s ease;
   }
   .today-expected-box .te-title {
-    color: #fde047;
+    color: var(--agent-today-title-color, #fde047);
     font-size: 13.5px;
     font-weight: 700;
     margin-bottom: 8px;
+    transition: color 0.25s ease;
   }
   .today-expected-box .te-val {
-    color: #fde047;
+    color: var(--agent-today-val-color, #ffffff);
     font-size: 28px;
     font-weight: 800;
     margin-bottom: 14px;
+    transition: color 0.25s ease;
   }
   .today-expected-box .te-btn {
     width: 100%;
     padding: 9px 0;
-    background: #2563eb;
-    color: #ffffff;
+    background: var(--agent-today-btn-bg, #2563eb);
+    color: var(--agent-today-btn-color, #ffffff);
     border: none;
     border-radius: 6px;
     font-size: 13.5px;
     font-weight: 700;
     cursor: pointer;
-    transition: background 0.15s ease;
+    transition: background 0.15s ease, transform 0.1s ease;
   }
   .today-expected-box .te-btn:hover {
-    background: #1d4ed8;
+    background: var(--agent-today-btn-hover, #1d4ed8) !important;
   }
 
   /* 달성현황 (캡처1.PNG) */
@@ -1327,8 +1343,20 @@ const CONSULTANT_THEMES = {
     headerBorder: '#2563eb',
     cardBg: '#f0f7ff',
     cardBorder: '#2563eb',
-    badgeBg: '#1e40af',
-    badgeText: '#ffffff'
+    badgeBg: 'rgba(37, 99, 235, 0.35)',
+    badgeText: '#ffffff',
+    badgeBorder: '1px solid rgba(96, 165, 250, 0.45)',
+    bannerBg: 'linear-gradient(120deg, #0b1f3f 0%, #1e3a8a 100%)',
+    bannerBorder: '2px solid #2563eb',
+    panelBorder: '#bfdbfe',
+    todayBoxBg: 'linear-gradient(145deg, #091a36 0%, #132f5d 100%)',
+    todayBoxBorder: '1px solid rgba(59, 130, 246, 0.4)',
+    todayBoxShadow: '0 4px 16px rgba(11, 31, 63, 0.4)',
+    todayTitle: '#93c5fd',
+    todayVal: '#ffffff',
+    todayBtnBg: '#2563eb',
+    todayBtnHover: '#1d4ed8',
+    todayBtnColor: '#ffffff'
   },
   '박광춘': {
     primary: '#b45309',
@@ -1337,8 +1365,20 @@ const CONSULTANT_THEMES = {
     headerBorder: '#d97706',
     cardBg: '#fffbeb',
     cardBorder: '#d97706',
-    badgeBg: '#b45309',
-    badgeText: '#ffffff'
+    badgeBg: 'rgba(217, 119, 6, 0.35)',
+    badgeText: '#ffffff',
+    badgeBorder: '1px solid rgba(245, 158, 11, 0.5)',
+    bannerBg: 'linear-gradient(120deg, #1b0e05 0%, #692e07 100%)',
+    bannerBorder: '2px solid #d97706',
+    panelBorder: '#fde68a',
+    todayBoxBg: 'linear-gradient(145deg, #221206 0%, #421e08 100%)',
+    todayBoxBorder: '1px solid rgba(217, 119, 6, 0.45)',
+    todayBoxShadow: '0 4px 16px rgba(36, 20, 8, 0.4)',
+    todayTitle: '#fed7aa',
+    todayVal: '#ffffff',
+    todayBtnBg: '#d97706',
+    todayBtnHover: '#b45309',
+    todayBtnColor: '#ffffff'
   },
   '이수열': {
     primary: '#15803d',
@@ -1347,8 +1387,20 @@ const CONSULTANT_THEMES = {
     headerBorder: '#16a34a',
     cardBg: '#f0fdf4',
     cardBorder: '#16a34a',
-    badgeBg: '#15803d',
-    badgeText: '#ffffff'
+    badgeBg: 'rgba(22, 163, 74, 0.35)',
+    badgeText: '#ffffff',
+    badgeBorder: '1px solid rgba(74, 222, 128, 0.5)',
+    bannerBg: 'linear-gradient(120deg, #081d11 0%, #14532d 100%)',
+    bannerBorder: '2px solid #16a34a',
+    panelBorder: '#bbf7d0',
+    todayBoxBg: 'linear-gradient(145deg, #071f12 0%, #0f3820 100%)',
+    todayBoxBorder: '1px solid rgba(22, 163, 74, 0.45)',
+    todayBoxShadow: '0 4px 16px rgba(8, 36, 20, 0.4)',
+    todayTitle: '#bbf7d0',
+    todayVal: '#ffffff',
+    todayBtnBg: '#16a34a',
+    todayBtnHover: '#15803d',
+    todayBtnColor: '#ffffff'
   },
   '정문재': {
     primary: '#7e22ce',
@@ -1357,8 +1409,20 @@ const CONSULTANT_THEMES = {
     headerBorder: '#9333ea',
     cardBg: '#faf5ff',
     cardBorder: '#9333ea',
-    badgeBg: '#7e22ce',
-    badgeText: '#ffffff'
+    badgeBg: 'rgba(147, 51, 234, 0.35)',
+    badgeText: '#ffffff',
+    badgeBorder: '1px solid rgba(192, 132, 252, 0.5)',
+    bannerBg: 'linear-gradient(120deg, #140724 0%, #5e1fa6 100%)',
+    bannerBorder: '2px solid #9333ea',
+    panelBorder: '#e9d5ff',
+    todayBoxBg: 'linear-gradient(145deg, #19082a 0%, #351357 100%)',
+    todayBoxBorder: '1px solid rgba(147, 51, 234, 0.45)',
+    todayBoxShadow: '0 4px 16px rgba(29, 9, 51, 0.4)',
+    todayTitle: '#e9d5ff',
+    todayVal: '#ffffff',
+    todayBtnBg: '#9333ea',
+    todayBtnHover: '#7e22ce',
+    todayBtnColor: '#ffffff'
   },
   '임영민': {
     primary: '#eab308',
@@ -1367,20 +1431,42 @@ const CONSULTANT_THEMES = {
     headerBorder: '#eab308',
     cardBg: '#fefce8',
     cardBorder: '#facc15',
-    badgeBg: '#ca8a04',
-    badgeText: '#ffffff'
+    badgeBg: 'rgba(234, 179, 8, 0.3)',
+    badgeText: '#ffffff',
+    badgeBorder: '1px solid rgba(250, 204, 21, 0.5)',
+    bannerBg: 'linear-gradient(120deg, #181302 0%, #684a05 100%)',
+    bannerBorder: '2px solid #eab308',
+    panelBorder: '#fef08a',
+    todayBoxBg: 'linear-gradient(145deg, #1c1603 0%, #382905 100%)',
+    todayBoxBorder: '1px solid rgba(234, 179, 8, 0.5)',
+    todayBoxShadow: '0 4px 16px rgba(28, 23, 3, 0.4)',
+    todayTitle: '#fef08a',
+    todayVal: '#ffffff',
+    todayBtnBg: '#ca8a04',
+    todayBtnHover: '#a16207',
+    todayBtnColor: '#ffffff'
   }
 };
 
 function applyConsultantTheme(agentName) {
   const theme = CONSULTANT_THEMES[agentName];
-  const topbar = document.querySelector('header.topbar');
-  const agentHeaderCard = document.querySelector('.agent-header-card');
-  const agentFormCard = document.querySelector('.agent-form-card');
-  const agentBadge = el('agentStatusTargetBadge');
+  if (typeof document === 'undefined') return;
+  const q = function(sel) {
+    return (typeof document.querySelector === 'function') ? document.querySelector(sel) : null;
+  };
+  const topbar = q('header.topbar');
+  const agentHeaderCard = q('.agent-header-card');
+  const agentFormCard = q('.agent-form-card');
+  const agentBadge = typeof el === 'function' ? el('agentStatusTargetBadge') : null;
+  const statusHeader = q('.agent-status-header');
+  const statusPanel = q('.agent-status-panel');
+  const todayBox = q('.today-expected-box');
+  const todayTitle = q('.today-expected-box .te-title');
+  const todayVal = q('.today-expected-box .te-val');
+  const todayBtn = q('.today-expected-box .te-btn');
 
   if (theme) {
-    document.body.style.background = theme.bodyBg;
+    if (document.body) document.body.style.background = theme.bodyBg;
     if (topbar) {
       topbar.style.background = theme.headerBg;
       topbar.style.borderBottom = `2px solid ${theme.headerBorder}`;
@@ -1396,22 +1482,115 @@ function applyConsultantTheme(agentName) {
     if (agentBadge) {
       agentBadge.style.background = theme.badgeBg;
       agentBadge.style.color = theme.badgeText;
+      if (theme.badgeBorder) agentBadge.style.border = theme.badgeBorder;
+    }
+
+    // 1) TA 현황 배너 색상 및 테두리 반영
+    if (statusHeader) {
+      statusHeader.style.background = theme.bannerBg;
+      statusHeader.style.borderBottom = theme.bannerBorder;
+    }
+    if (statusPanel && theme.panelBorder) {
+      statusPanel.style.borderColor = theme.panelBorder;
+    }
+
+    // 2) 금일 수주 예정 금액 창 색상, 타이틀, 금액, 버튼 반영
+    if (todayBox) {
+      todayBox.style.background = theme.todayBoxBg;
+      todayBox.style.border = theme.todayBoxBorder;
+      todayBox.style.boxShadow = theme.todayBoxShadow;
+    }
+    if (todayTitle) {
+      todayTitle.style.color = theme.todayTitle;
+    }
+    if (todayVal) {
+      todayVal.style.color = theme.todayVal;
+    }
+    if (todayBtn) {
+      todayBtn.style.background = theme.todayBtnBg;
+      todayBtn.style.color = theme.todayBtnColor;
+      todayBtn.onmouseenter = function() { this.style.background = theme.todayBtnHover; };
+      todayBtn.onmouseleave = function() { this.style.background = theme.todayBtnBg; };
+    }
+
+    // CSS Custom Properties 전파
+    if (document.documentElement && document.documentElement.style && typeof document.documentElement.style.setProperty === 'function') {
+      document.documentElement.style.setProperty('--agent-banner-bg', theme.bannerBg);
+      document.documentElement.style.setProperty('--agent-banner-border', theme.bannerBorder);
+      document.documentElement.style.setProperty('--agent-today-box-bg', theme.todayBoxBg);
+      document.documentElement.style.setProperty('--agent-today-box-border', theme.todayBoxBorder);
+      document.documentElement.style.setProperty('--agent-today-box-shadow', theme.todayBoxShadow);
+      document.documentElement.style.setProperty('--agent-today-title-color', theme.todayTitle);
+      document.documentElement.style.setProperty('--agent-today-val-color', theme.todayVal);
+      document.documentElement.style.setProperty('--agent-today-btn-bg', theme.todayBtnBg);
+      document.documentElement.style.setProperty('--agent-today-btn-hover', theme.todayBtnHover);
+      document.documentElement.style.setProperty('--agent-today-btn-color', theme.todayBtnColor);
+      document.documentElement.style.setProperty('--agent-highlight-color', theme.primary);
     }
   } else {
-    document.body.style.background = 'var(--bg)';
+    if (document.body) document.body.style.background = 'var(--bg)';
     if (topbar) {
       topbar.style.background = 'linear-gradient(120deg, var(--navy), var(--navy3))';
       topbar.style.borderBottom = '1px solid rgba(255,255,255,.1)';
     }
     if (agentHeaderCard) {
       agentHeaderCard.style.borderLeft = `6px solid var(--blue)`;
+      agentHeaderCard.style.boxShadow = '';
     }
     if (agentFormCard) {
       agentFormCard.style.background = '#f8fbff';
       agentFormCard.style.border = '2px solid var(--blue)';
     }
+
+    // TA 현황 배너 기본 복원
+    if (statusHeader) {
+      statusHeader.style.background = '#0b1f3f';
+      statusHeader.style.borderBottom = 'none';
+    }
+    if (statusPanel) {
+      statusPanel.style.borderColor = 'var(--border)';
+    }
+    if (agentBadge) {
+      agentBadge.style.background = 'transparent';
+      agentBadge.style.color = '#cbd5e1';
+      agentBadge.style.border = 'none';
+    }
+
+    // 금일 수주 예정 금액 창 기본 복원
+    if (todayBox) {
+      todayBox.style.background = '#081a36';
+      todayBox.style.border = '1px solid rgba(255, 255, 255, 0.08)';
+      todayBox.style.boxShadow = 'none';
+    }
+    if (todayTitle) {
+      todayTitle.style.color = '#fde047';
+    }
+    if (todayVal) {
+      todayVal.style.color = '#fde047';
+    }
+    if (todayBtn) {
+      todayBtn.style.background = '#2563eb';
+      todayBtn.style.color = '#ffffff';
+      todayBtn.onmouseenter = function() { this.style.background = '#1d4ed8'; };
+      todayBtn.onmouseleave = function() { this.style.background = '#2563eb'; };
+    }
+
+    if (document.documentElement && document.documentElement.style && typeof document.documentElement.style.removeProperty === 'function') {
+      document.documentElement.style.removeProperty('--agent-banner-bg');
+      document.documentElement.style.removeProperty('--agent-banner-border');
+      document.documentElement.style.removeProperty('--agent-today-box-bg');
+      document.documentElement.style.removeProperty('--agent-today-box-border');
+      document.documentElement.style.removeProperty('--agent-today-box-shadow');
+      document.documentElement.style.removeProperty('--agent-today-title-color');
+      document.documentElement.style.removeProperty('--agent-today-val-color');
+      document.documentElement.style.removeProperty('--agent-today-btn-bg');
+      document.documentElement.style.removeProperty('--agent-today-btn-hover');
+      document.documentElement.style.removeProperty('--agent-today-btn-color');
+      document.documentElement.style.removeProperty('--agent-highlight-color');
+    }
   }
 }
+window.applyConsultantTheme = applyConsultantTheme;
 
 const KR_HOLIDAYS = new Set([
   '2026-01-01','2026-02-16','2026-02-17','2026-02-18','2026-03-01','2026-03-02',
@@ -2572,6 +2751,7 @@ window.setAgentFilterProduct = setAgentFilterProduct;
 
 // 2. 컨설턴트 화면 진입 초기화 (initAgentView)
 function initAgentView(agentName) {
+  applyConsultantTheme(agentName);
   currentViewMode = agentName;
   el('agentActiveName').textContent = agentName;
 
@@ -2669,8 +2849,9 @@ function setAgentStatusCat(cat) {
 
 function renderAgentStatus(agentName) {
   let leads = (ALL[agentName] && ALL[agentName].leads) || [];
-  if (agentStatusCatFilter !== 'all') {
-    leads = leads.filter(l => matchProductCategory(l.productType) === agentStatusCatFilter);
+  const activeProd = agentGlobalProduct || '일반알람';
+  if (activeProd !== 'all') {
+    leads = leads.filter(l => productCategory(l.productType) === activeProd);
   }
 
   const curMonth = currentMonthStr();
@@ -2728,9 +2909,10 @@ function renderAgentStatus(agentName) {
 function openTodayExpectedModal() {
   const agentName = currentViewMode;
   const today = todayStr();
+  const activeProd = agentGlobalProduct || '일반알람';
   let leads = ((ALL[agentName] && ALL[agentName].leads) || []).filter(l => l.stage === '진행중' && l.expectedDate === today);
-  if (agentStatusCatFilter !== 'all') {
-    leads = leads.filter(l => matchProductCategory(l.productType) === agentStatusCatFilter);
+  if (activeProd !== 'all') {
+    leads = leads.filter(l => productCategory(l.productType) === activeProd);
   }
 
   el('todayExpectedModalDateTag').textContent = '기준일: ' + today;
@@ -2765,10 +2947,11 @@ function closeTodayExpectedModal() {
 // 6. 달성현황 렌더링 (2번 그림 캡처1.PNG 매칭)
 function renderAgentAchievement(agentName) {
   const month = currentMonthStr();
-  const target = getConsultantTarget(agentName, month, agentStatusCatFilter);
+  const activeProd = agentGlobalProduct || '일반알람';
+  const target = getConsultantTarget(agentName, month, activeProd);
   let leads = (ALL[agentName] && ALL[agentName].leads) || [];
-  if (agentStatusCatFilter !== 'all') {
-    leads = leads.filter(l => matchProductCategory(l.productType) === agentStatusCatFilter);
+  if (activeProd !== 'all') {
+    leads = leads.filter(l => productCategory(l.productType) === activeProd);
   }
 
   const m = computeMetrics(leads, target, month);
@@ -2836,13 +3019,8 @@ function setAgentFilterStage(st) {
   renderAgentLeadTable(currentViewMode);
 }
 
-function setAgentFilterProduct(prod) {
-  agentListFilter.product = prod;
-  document.querySelectorAll('#agentFilterProductRow .filter-pill').forEach(btn => {
-    btn.classList.toggle('active', btn.dataset.product === prod);
-  });
-  renderAgentLeadTable(currentViewMode);
-}
+// setAgentFilterProduct deprecated - controlled exclusively by setAgentGlobalProduct
+
 
 function setAgentFilterMonth(m) {
   agentListFilter.month = m;
@@ -2888,9 +3066,10 @@ function renderAgentLeadTable(agentName) {
     leads = leads.filter(l => l.stage === agentListFilter.stage);
   }
 
-  // 2) 상품 필터
-  if (agentListFilter.product !== 'all') {
-    leads = leads.filter(l => matchProductCategory(l.productType) === agentListFilter.product);
+  // 2) 상단에서 일괄 선택된 상품(agentGlobalProduct)으로 강제 동기화 필터링
+  const activeProd = agentGlobalProduct || '일반알람';
+  if (activeProd !== 'all') {
+    leads = leads.filter(l => productCategory(l.productType) === activeProd);
   }
 
   // 3) 월별 필터
@@ -3522,4 +3701,4 @@ window.addEventListener('DOMContentLoaded', () => {
    </div>
   </div>
  </body>
- </html>
+        </html>
