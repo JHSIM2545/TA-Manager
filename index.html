@@ -846,13 +846,6 @@
        <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
         <span style="font-size:17px;font-weight:800;color:#fff;">TA 현황</span> <span class="agent-target-badge-clean" id="agentStatusTargetBadge"> 이달 목표 (알람 0원 · 디지털 0원 · 안전상품 0원) </span>
        </div>
-       <!-- 상품별 필터 탭 -->
-       <div class="agent-status-cat-filters" id="agentStatusCatFilters">
-        <button type="button" class="cat-pill active" data-cat="all" onclick="setAgentStatusCat('all')">전체</button>
-        <button type="button" class="cat-pill" data-cat="일반알람" onclick="setAgentStatusCat('일반알람')">일반알람</button>
-        <button type="button" class="cat-pill" data-cat="디지털(정보보안)" onclick="setAgentStatusCat('디지털(정보보안)')">디지털(정보보안)</button>
-        <button type="button" class="cat-pill" data-cat="안전상품" onclick="setAgentStatusCat('안전상품')">안전상품</button>
-       </div>
       </div>
       <div class="agent-status-body">
        <!-- 6개 메트릭 카드 (2x3) -->
@@ -959,14 +952,6 @@
         <button type="button" class="filter-pill" data-stage="진행중" onclick="setAgentFilterStage('진행중')">진행중</button>
         <button type="button" class="filter-pill" data-stage="수주完" onclick="setAgentFilterStage('수주完')">수주完</button>
         <button type="button" class="filter-pill" data-stage="실패" onclick="setAgentFilterStage('실패')">실패</button>
-       </div>
-       <!-- 2행: 상품 필터 -->
-       <div class="filter-pills-row" id="agentFilterProductRow">
-        <span class="filter-label">상품:</span>
-        <button type="button" class="filter-pill active" data-product="all" onclick="setAgentFilterProduct('all')">전체</button>
-        <button type="button" class="filter-pill" data-product="일반알람" onclick="setAgentFilterProduct('일반알람')">일반알람</button>
-        <button type="button" class="filter-pill" data-product="디지털(정보보안)" onclick="setAgentFilterProduct('디지털(정보보안)')">디지털(정보보안)</button>
-        <button type="button" class="filter-pill" data-product="안전상품" onclick="setAgentFilterProduct('안전상품')">안전상품</button>
        </div>
        <!-- 3행: 월별 필터 (수주예정일 이달+이후 기본, 년월 선택, 전체) -->
        <div class="filter-pills-row" id="agentFilterMonthRow">
@@ -2549,17 +2534,9 @@ function setAgentGlobalProduct(prod) {
     btn.classList.toggle('active', btn.dataset.prod === prod);
   });
 
-  // 2) TA 현황 헤더의 상품 필터 탭 동기화
+  // TA 현황 및 내 TA 목록의 필터 기준을 상단 선택 상품으로 일괄 적용
   agentStatusCatFilter = prod;
-  document.querySelectorAll('#agentStatusCatFilters .cat-pill').forEach(btn => {
-    btn.classList.toggle('active', btn.dataset.cat === prod);
-  });
-
-  // 3) 내 TA 목록의 상품 필터 동기화
   agentListFilter.product = prod;
-  document.querySelectorAll('#agentFilterProductRow .filter-pill').forEach(btn => {
-    btn.classList.toggle('active', btn.dataset.product === prod);
-  });
 
   const agentName = currentViewMode;
   const month = currentMonthStr();
@@ -3545,4 +3522,4 @@ window.addEventListener('DOMContentLoaded', () => {
    </div>
   </div>
  </body>
-       </html>
+ </html>
