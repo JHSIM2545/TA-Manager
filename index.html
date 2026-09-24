@@ -18,7 +18,7 @@
     </div>
 
     <form id="agentModalLeadForm" onsubmit="handleAgentModalSubmit(event)" class="agent-compact-form">
-      <input type="hidden" id="afEditingId">
+      <input type="hidden" id="afEditingId" name="editingId"><input type="hidden" id="agentEditingId">
       
       <!-- 1행: 기본 인적/영업 정보 7개 필드 가로 정렬 -->
       <div class="compact-form-row1">
@@ -1256,7 +1256,7 @@ function showPortalAlert(msg, title) {
   msgEl.textContent = String(msg || '');
   cancelBtn.style.display = 'none';
   overlay.style.display = 'flex';
-  confirmBtn.focus();
+  if (confirmBtn && typeof confirmBtn.focus === "function") confirmBtn.focus();
 
   confirmBtn.onclick = function() {
     overlay.style.display = 'none';
@@ -1280,7 +1280,7 @@ function showPortalConfirm(msg, title) {
     msgEl.textContent = String(msg || '');
     cancelBtn.style.display = 'inline-block';
     overlay.style.display = 'flex';
-    confirmBtn.focus();
+    if (confirmBtn && typeof confirmBtn.focus === "function") confirmBtn.focus();
 
     confirmBtn.onclick = function() {
       overlay.style.display = 'none';
@@ -1392,7 +1392,7 @@ function applyConsultantTheme(agentName) {
   const topbar = document.querySelector('header.topbar');
   const agentHeaderCard = document.querySelector('.agent-header-card');
   const agentFormCard = document.querySelector('.agent-form-card');
-  const agentBadge = el('agentPersonalTargetBadge');
+  const agentBadge = el('agentStatusTargetBadge');
 
   if (theme) {
     document.body.style.background = theme.bodyBg;
@@ -1497,6 +1497,11 @@ function scheduleLabel(lead) {
 
 function escapeHtml(s) {
   return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+
+function matchProductCategory(productType) {
+  return productCategory(productType);
 }
 
 function productCategory(productType) {
@@ -1774,6 +1779,28 @@ async function logActivity(consultant, action, company, leadId, changes) {
 }
 
 // ==========================================
+
+// ==========================================
+// 공통 데이터 파싱 & 이력 변경점 빌더 헬퍼
+// ==========================================
+function parseCurrency(val) {
+  return Number(String(val || '').replace(/[^0-9]/g, '')) || 0;
+}
+
+const recordActivityLog = logActivity;
+
+function buildLeadChanges(oldLead, newPayload) {
+  const changes = [];
+  if (!oldLead) return changes;
+  if (oldLead.company !== newPayload.company) changes.push(`서비스제공처명: ${oldLead.company} → ${newPayload.company}`);
+  if (Number(oldLead.amount) !== Number(newPayload.amount)) changes.push(`용역료: ${formatCurrency(oldLead.amount)} → ${formatCurrency(newPayload.amount)}`);
+  if (oldLead.stage !== newPayload.stage) changes.push(`영업단계: ${oldLead.stage} → ${newPayload.stage}`);
+  if (oldLead.confidence !== newPayload.confidence) changes.push(`수주확도: ${oldLead.confidence || '-'} → ${newPayload.confidence}`);
+  if ((oldLead.expectedDate || '') !== (newPayload.expectedDate || '')) changes.push(`계약예정일: ${oldLead.expectedDate || '(없음)'} → ${newPayload.expectedDate || '(없음)'}`);
+  if ((oldLead.contractDate || '') !== (newPayload.contractDate || '')) changes.push(`계약일: ${oldLead.contractDate || '(없음)'} → ${newPayload.contractDate || '(없음)'}`);
+  return changes;
+}
+
 // 5. 대시보드 뷰 렌더링
 // ==========================================
 function render() {
@@ -2844,7 +2871,7 @@ function renderAgentLeadTable(agentName) {
 
 // 8. 신규 TA 등록 모달 열기 (3번 그림 캡처2.PNG 매칭, 실패 제외)
 function openNewAgentLeadModal() {
-  el('agentEditingId').value = '';
+  el('afEditingId').value = '';
   el('agentModalTitle').textContent = '신규 TA 등록';
   el('afCompany').value = '';
   el('afContact').value = '';
@@ -2888,7 +2915,7 @@ function editAgentLead(id) {
   const lead = (ALL[agentName] && ALL[agentName].leads || []).find(l => l.id === id);
   if (!lead) return;
 
-  el('agentEditingId').value = id;
+  el('afEditingId').value = id;
   el('agentModalTitle').textContent = 'TA 안건 수정';
   el('afCompany').value = lead.company;
   el('afContact').value = lead.contact || '';
