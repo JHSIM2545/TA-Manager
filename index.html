@@ -25,7 +25,7 @@
     position:sticky;top:0;z-index:100;
   }
   header.topbar .brand{font-size:12px;opacity:.7;letter-spacing:1px;text-transform:uppercase;}
-  header.topbar .page-title{font-size:21px;font-weight:800;margin-top:2px;}
+  header.topbar .page-title{font-size:21px;font-weight:800;margin-top:2px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
   
   /* 컨설턴트 전환 버튼 그룹 (상단 탑바) */
   .view-switch-group{display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
@@ -208,13 +208,15 @@
   .agent-rank-badge {
     display: inline-flex;
     align-items: center;
-    padding: 4px 12px;
+    padding: 3px 12px;
     border-radius: 20px;
     font-size: 13px;
     font-weight: 700;
-    background: #eff6ff;
-    color: #1d4ed8;
-    border: 1px solid #bfdbfe;
+    background: rgba(255, 255, 255, 0.2);
+    color: #ffffff;
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
+    backdrop-filter: blur(4px);
   }
   .agent-target-badge-clean {
     font-size: 13px;
@@ -555,7 +557,7 @@
     padding: 3px 5px;
     border-radius: 8px;
     border: 1px solid #cbd5e1;
-    margin-left: 6px;
+    margin-left: 0;
   }
   .header-prod-btn {
     padding: 5px 12px;
@@ -609,8 +611,10 @@
    <div id="dbErrorBanner" style="display:none;background:#fee2e2;border:1px solid #ef4444;color:#991b1b;padding:12px 16px;border-radius:8px;margin:12px 16px;font-size:14px;font-weight:600;"></div>
    <header class="topbar">
     <div>
-     <div class="brand">에스원 북서울지사 (노원·강북·도봉)</div>
-     <div class="page-title" id="topbarHeaderTitle">영업 TA 통합관리 대시보드</div>
+     <div class="brand">에스원 북서울지사</div>
+     <div class="page-title">
+      <span id="topbarHeaderTitle">영업 TA 통합관리 대시보드</span> <span class="agent-rank-badge" id="agentRankBadge" style="display:none;"></span>
+     </div>
     </div>
     <!-- 타이틀바 컨설턴트별 개별화면 전환 버튼 그룹 -->
     <div class="view-switch-group" id="topbarViewSwitchGroup">
@@ -625,7 +629,7 @@
      <button type="button" id="btnTopbarTarget" class="small" onclick="openTargetModal()" style="background:#2563eb;color:#fff;display:none;">🎯 목표 설정</button>
      <button type="button" id="btnNoticeManage" class="small">공지사항 관리</button>
      <button type="button" id="btnLogout" class="small secondary">로그아웃</button>
-     <div id="connStatus" class="conn-status on">온라인 연결됨</div>
+     <div id="connStatus" style="display:none;"></div>
     </div>
    </header>
    <!-- 날짜 배너 -->
@@ -839,17 +843,14 @@
      <!-- 1. 간결 헤더 (중복 제거 & 순위 표시 & 상품 선택 & 신규등록 버튼) -->
      <div class="agent-header-card">
       <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
-       <div class="agent-name-title">
-        <span id="agentActiveName">최영국</span> 컨설턴트
-       </div>
-       <div class="agent-rank-badge" id="agentRankBadge">지사 1위 (알람 달성률 100%)</div>
-       <!-- 컨설턴트 이름 우측 상품 선택 기능 (디폴트: 일반알람) -->
-       <div class="agent-header-product-picker" id="agentHeaderProductPicker">
+       <!-- 상품 종류 선택 기능 (컨설턴트 이름 삭제, 상품 선택만 유지) -->
+       <div class="agent-header-product-picker" id="agentHeaderProductPicker" style="margin-left:0;">
         <button type="button" class="header-prod-btn active" data-prod="일반알람" onclick="setAgentGlobalProduct('일반알람')">일반알람</button>
         <button type="button" class="header-prod-btn" data-prod="디지털(정보보안)" onclick="setAgentGlobalProduct('디지털(정보보안)')">디지털(정보보안)</button>
         <button type="button" class="header-prod-btn" data-prod="안전상품" onclick="setAgentGlobalProduct('안전상품')">안전상품</button>
         <button type="button" class="header-prod-btn" data-prod="all" onclick="setAgentGlobalProduct('all')">전체</button>
        </div>
+       <span id="agentActiveName" style="display:none;"></span>
       </div>
       <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
        <button type="button" class="btn-primary" onclick="openNewAgentLeadModal()" style="display:inline-flex;align-items:center;gap:6px;padding:8px 18px;font-size:14px;font-weight:700;background:var(--blue);color:#fff;border-radius:8px;border:none;cursor:pointer;">➕ 신규 TA 등록</button>
@@ -2623,12 +2624,14 @@ function switchView(mode) {
     el('viewMaster').style.display = 'block';
     el('viewAgent').style.display = 'none';
     el('topbarHeaderTitle').textContent = '영업 TA 통합관리 대시보드';
+    if (el('agentRankBadge')) el('agentRankBadge').style.display = 'none';
     applyConsultantTheme(null);
     render();
   } else {
     el('viewMaster').style.display = 'none';
     el('viewAgent').style.display = 'block';
-    el('topbarHeaderTitle').textContent = `에스원 북서울지사 영업 TA 포털`;
+    el('topbarHeaderTitle').textContent = `${mode}컨설턴트 TA`;
+    if (el('agentRankBadge')) el('agentRankBadge').style.display = 'inline-flex';
     applyConsultantTheme(mode);
     initAgentView(mode);
   }
@@ -2754,6 +2757,8 @@ function initAgentView(agentName) {
   applyConsultantTheme(agentName);
   currentViewMode = agentName;
   el('agentActiveName').textContent = agentName;
+  if (el('topbarHeaderTitle')) el('topbarHeaderTitle').textContent = `${agentName}컨설턴트 TA`;
+  if (el('agentRankBadge')) el('agentRankBadge').style.display = 'inline-flex';
 
   // 지사장 대시보드로 돌아가기 버튼 노출 여부
   if (el('btnBackToMaster')) {
@@ -3701,4 +3706,4 @@ window.addEventListener('DOMContentLoaded', () => {
    </div>
   </div>
  </body>
-        </html>
+      </html>
