@@ -107,7 +107,7 @@
         </div>
         <div class="form-group" style="margin:0;">
           <label style="font-size:12px;font-weight:700;">계약예정일 *</label>
-          <input type="date" id="afExpectedDate" required>
+          <input type="date" id="afExpectedDate" required onchange="onAgentExpectedDateChange(this.value)">
         </div>
         <div class="form-group" style="margin:0;">
           <label style="font-size:12px;font-weight:700;">메모</label>
@@ -2904,10 +2904,30 @@ function closeAgentLeadModal() {
 function onAgentStageChange(val) {
   el('afWonExtraRow').style.display = val === '수주完' ? 'grid' : 'none';
   if (val === '수주完') {
-    if (!el('afContractDate').value) el('afContractDate').value = todayStr();
-    if (!el('afBaseDate').value) el('afBaseDate').value = todayStr();
+    // 요구사항: 영업단계를 수주완료로 바꾸면 계약예정일자는 계약일자로 자동 변경
+    const expectedDate = el('afExpectedDate') ? el('afExpectedDate').value : '';
+    if (expectedDate && el('afContractDate')) {
+      el('afContractDate').value = expectedDate;
+    } else if (el('afContractDate') && !el('afContractDate').value) {
+      el('afContractDate').value = todayStr();
+    }
+    if (el('afBaseDate') && !el('afBaseDate').value) {
+      el('afBaseDate').value = (el('afContractDate') && el('afContractDate').value) || todayStr();
+    }
+    if (el('afConfidence')) {
+      el('afConfidence').value = 'A';
+    }
   }
 }
+window.onAgentStageChange = onAgentStageChange;
+
+function onAgentExpectedDateChange(val) {
+  if (el('afStage') && el('afStage').value === '수주完') {
+    if (el('afContractDate')) el('afContractDate').value = val;
+    if (el('afBaseDate') && !el('afBaseDate').value) el('afBaseDate').value = val;
+  }
+}
+window.onAgentExpectedDateChange = onAgentExpectedDateChange;
 
 // 9. 안건 수정 모달 열기 (기존 editAgentLead 개선)
 function editAgentLead(id) {
@@ -2948,8 +2968,21 @@ function editAgentLead(id) {
 async function handleAgentModalSubmit(e) {
   e.preventDefault();
   const agentName = currentViewMode;
-  const id = el('afEditingId').value;
+  const id = (el('afEditingId') && el('afEditingId').value) || (el('agentEditingId') && el('agentEditingId').value) || '';
   const amount = parseCurrency(el('afAmount').value);
+  const stage = el('afStage').value;
+  const expectedDate = el('afExpectedDate').value;
+
+  // 수주완료인 경우 계약일자/기산일자/차량번호 확정 (계약예정일 자동 동기화)
+  let contractDate = null;
+  let baseDate = null;
+  let vehicleNumber = null;
+
+  if (stage === '수주完') {
+    contractDate = (el('afContractDate') && el('afContractDate').value) || expectedDate || todayStr();
+    baseDate = (el('afBaseDate') && el('afBaseDate').value) || contractDate;
+    vehicleNumber = (el('afVehicleNumber') && el('afVehicleNumber').value) || '없음';
+  }
 
   const payload = {
     company: el('afCompany').value.trim(),
@@ -2957,13 +2990,13 @@ async function handleAgentModalSubmit(e) {
     amount: amount,
     productType: el('afProductType').value,
     motive: el('afMotive').value,
-    stage: el('afStage').value,
+    stage: stage,
     confidence: el('afConfidence').value,
     registeredDate: el('afRegisteredDate').value,
-    expectedDate: el('afExpectedDate').value,
-    contractDate: el('afStage').value === '수주完' ? (el('afContractDate').value || null) : null,
-    baseDate: el('afStage').value === '수주完' ? (el('afBaseDate').value || null) : null,
-    vehicleNumber: el('afStage').value === '수주完' ? (el('afVehicleNumber').value || '없음') : null,
+    expectedDate: expectedDate,
+    contractDate: contractDate,
+    baseDate: baseDate,
+    vehicleNumber: vehicleNumber,
     memo: el('afMemo').value.trim()
   };
 
@@ -2975,28 +3008,6 @@ async function handleAgentModalSubmit(e) {
     alert('계약예정일을 선택해주세요.');
     return;
   }
-
-async function deleteAgentLead(id, company) {
-  const ok = confirm(`'${company}' 안건을 정말 삭제하시겠습니까?`);
-  if (!ok) return;
-
-  const agentName = currentViewMode;
-  try {
-    const { error } = await db.from('ta_leads').delete().eq('id', id);
-    if (error) throw error;
-
-    if (ALL[agentName] && ALL[agentName].leads) {
-      ALL[agentName].leads = ALL[agentName].leads.filter(l => l.id !== id);
-    }
-    await recordActivityLog(agentName, '삭제', company, id, [`서비스제공처명: ${company}`]);
-    showPortalAlert('안건이 삭제되었습니다.');
-    initAgentView(agentName);
-  } catch (e) {
-    alert('삭제 실패: ' + e.message);
-  }
-}
-
-
 
   el('afSubmitBtn').disabled = true;
   el('afSubmitBtn').textContent = '저장 중...';
@@ -3032,7 +3043,7 @@ async function deleteAgentLead(id, company) {
       }
       showPortalAlert('안건이 수정되었습니다.');
     } else {
-      // 신규 등록 (id Not-Null 방지용 UUID 생성)
+      // 신규 등록 (UUID 자동 발급)
       payload.id = crypto.randomUUID();
       payload.createdAt = new Date().toISOString();
       payload.updatedAt = payload.createdAt;
@@ -3078,11 +3089,31 @@ async function deleteAgentLead(id, company) {
     el('afSubmitBtn').textContent = id ? '수정 완료' : 'TA 등록';
   }
 }
+window.handleAgentModalSubmit = handleAgentModalSubmit;
+
+// 11. 안건 삭제 (전역 윈도우 스코프 등록 보장)
+async function deleteAgentLead(id, company) {
+  const ok = confirm(`'${company}' 안건을 정말 삭제하시겠습니까?`);
+  if (!ok) return;
+
+  const agentName = currentViewMode;
+  try {
+    const { error } = await db.from('ta_leads').delete().eq('id', id);
+    if (error) throw error;
+
+    if (ALL[agentName] && ALL[agentName].leads) {
+      ALL[agentName].leads = ALL[agentName].leads.filter(l => l.id !== id);
+    }
+    await recordActivityLog(agentName, '삭제', company, id, [`서비스제공처명: ${company}`]);
+    showPortalAlert('안건이 삭제되었습니다.');
+    initAgentView(agentName);
+  } catch (e) {
+    alert('삭제 실패: ' + e.message);
+  }
+}
+window.deleteAgentLead = deleteAgentLead;
 
 
-
-
-// ==========================================
 // 7. 이벤트 바인딩 & 초기화
 // 안전한 이벤트 리스너 등록 헬퍼 (요소 부재 시 Null 에러 원천 방지)
 function safeAddListener(idOrEl, event, handler) {
