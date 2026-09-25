@@ -588,6 +588,72 @@
       overflow-x: auto;
     }
   }
+
+  /* ==========================================
+     사용자 관리 모달 스타일 (소개영업 앱 100% 동일 구현)
+     ========================================== */
+  .user-table-wrapper {
+    overflow-x: auto;
+    max-height: 55vh;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    margin-bottom: 12px;
+  }
+  .user-data-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+    text-align: left;
+  }
+  .user-data-table th {
+    background: #f8f9fa;
+    padding: 10px 12px;
+    font-weight: 700;
+    color: #3c4043;
+    border-bottom: 2px solid #e8eaed;
+    white-space: nowrap;
+    position: sticky;
+    top: 0;
+    z-index: 5;
+  }
+  .user-data-table td {
+    padding: 10px 12px;
+    border-bottom: 1px solid #f1f3f4;
+    vertical-align: middle;
+  }
+  .btn-user-edit {
+    padding: 5px 10px;
+    background: #e8f0fe;
+    color: #1a73e8;
+    border: 1px solid #aecbfa;
+    border-radius: 4px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+  .btn-user-edit:hover { background: #d2e3fc; }
+  .btn-user-del {
+    padding: 5px 10px;
+    background: #fce8e6;
+    color: #d93025;
+    border: 1px solid #fad2cf;
+    border-radius: 4px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    cursor: pointer;
+    margin-left: 4px;
+    transition: all 0.15s ease;
+  }
+  .btn-user-del:hover { background: #fad2cf; }
+  .user-edit-box {
+    background: #f8fbff;
+    border: 1px solid #aecbfa;
+    border-radius: 8px;
+    padding: 14px;
+    margin-top: 12px;
+    display: none;
+  }
 </style>
  </head>
  <body>
@@ -626,6 +692,7 @@
      <button type="button" class="switch-btn" data-agent="임영민" onclick="switchView('임영민')">임영민</button>
     </div>
     <div class="topbar-right">
+     <button type="button" id="btnUserManage" class="small" onclick="openUserManageModal()" style="background:#e6f4ea;color:#137333;border:1px solid #ceead6;font-weight:700;display:none;">👥 사용자 관리</button>
      <button type="button" id="btnTopbarTarget" class="small" onclick="openTargetModal()" style="background:#2563eb;color:#fff;display:none;">🎯 목표 설정</button>
      <button type="button" id="btnNoticeManage" class="small">공지사항 관리</button>
      <button type="button" id="btnLogout" class="small secondary">로그아웃</button>
@@ -1022,6 +1089,62 @@
       </thead>
       <tbody id="calendarModalTbody"></tbody>
      </table>
+    </div>
+   </div>
+  </div>
+  <!-- ==========================================================================
+     관리자 전용 사용자 관리 모달 (소개영업 앱 100% 동일 구현)
+     ========================================================================== -->
+  <div class="modal-overlay" id="userManageModalOverlay" style="display:none;">
+   <div class="modal-card" style="max-width:680px;width:95%;max-height:85vh;overflow-y:auto;">
+    <button type="button" class="modal-close" onclick="closeUserManageModal()">×</button>
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
+     <h3 style="margin:0;font-size:18px;font-weight:800;color:var(--navy);">👥 사용자 관리</h3>
+    </div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+     <span style="font-size:0.86rem;color:#5f6368;font-weight:600;">총 사용자: <strong id="totalUserCount" style="color:#1a73e8;font-size:1rem;">0</strong>명</span>
+     <button type="button" class="small secondary" id="btnRefreshUsers" onclick="loadAllUsers()" style="background:#e8f0fe;color:#1a73e8;border:1px solid #aecbfa;border-radius:6px;padding:5px 12px;font-size:0.8rem;font-weight:700;cursor:pointer;">🔄 새로고침</button>
+    </div>
+    <div class="user-table-wrapper">
+     <table class="user-data-table">
+      <thead>
+       <tr>
+        <th>이름</th>
+        <th>전화번호(아이디)</th>
+        <th>직무</th>
+        <th style="text-align:center;">관리</th>
+       </tr>
+      </thead>
+      <tbody id="userTableBody">
+       <tr>
+        <td colspan="4" style="text-align:center;padding:20px;color:#9aa0a6;">사용자 목록 로딩 중...</td>
+       </tr>
+      </tbody>
+     </table>
+    </div>
+    <!-- 사용자 정보 수정 폼 -->
+    <div class="user-edit-box" id="userEditBox">
+     <h4 style="margin:0 0 10px 0;font-size:0.9rem;color:#1a73e8;font-weight:800;">✏️ 사용자 정보 수정</h4>
+     <input type="hidden" id="editUserTargetPhone">
+     <div style="display:flex;gap:10px;margin-bottom:12px;flex-wrap:wrap;">
+      <div style="flex:1;min-width:140px;">
+       <label style="display:block;font-size:0.82rem;font-weight:700;color:#3c4043;margin-bottom:5px;">이름</label> <input type="text" id="editUserNameInput" style="width:100%;padding:8px 10px;border:1.5px solid #dadce0;border-radius:6px;font-size:14px;box-sizing:border-box;">
+      </div>
+      <div style="flex:1;min-width:140px;">
+       <label style="display:block;font-size:0.82rem;font-weight:700;color:#3c4043;margin-bottom:5px;">직무</label> <select id="editUserJobSelect" style="width:100%;padding:8px 10px;border:1.5px solid #dadce0;border-radius:6px;font-size:14px;background:#fff;box-sizing:border-box;"> <option value="CS근무자">CS근무자</option> <option value="CS관리자">CS관리자</option> <option value="컨설턴트">컨설턴트</option> <option value="기술사원">기술사원</option> <option value="지사관리자">지사관리자</option> <option value="본사관리자">본사관리자</option> </select>
+      </div>
+     </div>
+     <div style="margin-bottom:12px;">
+      <label style="display:block;font-size:0.82rem;font-weight:700;color:#3c4043;margin-bottom:5px;">비밀번호 변경 <span style="font-weight:normal;color:#5f6368;font-size:0.75rem;">(변경 시에만 8~10자 입력)</span></label>
+      <div style="position:relative;width:100%;">
+       <input type="password" id="editUserNewPwdInput" placeholder="변경하지 않으려면 공란으로 두세요" maxlength="10" style="width:100%;padding:8px 45px 8px 10px;border:1.5px solid #dadce0;border-radius:6px;font-size:14px;box-sizing:border-box;">
+       <button type="button" onclick="togglePasswordVisibility('editUserNewPwdInput', this)" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;font-size:1.15rem;cursor:pointer;padding:4px 6px;line-height:1;color:#5f6368;" title="비밀번호 보기/숨기기">👁️</button>
+      </div>
+     </div>
+     <div style="display:flex;gap:8px;">
+      <button type="button" class="btn-save-status" id="btnSaveUserEdit" onclick="saveUserEdit()" style="margin-top:0;padding:9px 18px;background:#1a73e8;color:#fff;border:none;border-radius:6px;font-size:0.88rem;font-weight:700;cursor:pointer;">수정 저장</button>
+      <button type="button" id="btnCancelUserEdit" onclick="cancelUserEdit()" style="padding:9px 14px;background:#f1f3f4;border:none;border-radius:6px;font-weight:700;color:#3c4043;cursor:pointer;">취소</button>
+     </div>
     </div>
    </div>
   </div>
@@ -1770,6 +1893,9 @@ function updateUIVisibilityByRole() {
   }
 
   // 2. 관리자 전용 버튼들 (공지사항 관리, 목표 설정 버튼)
+  if (el('btnUserManage')) {
+    el('btnUserManage').style.display = master ? 'inline-block' : 'none';
+  }
   if (el('btnNoticeManage')) {
     el('btnNoticeManage').style.display = master ? 'inline-block' : 'none';
   }
@@ -3688,6 +3814,275 @@ window.addEventListener('DOMContentLoaded', () => {
   }
 });
 
+
+// ==========================================
+// 사용자 관리 (소개영업 앱 100% 동일 로직)
+// ==========================================
+function formatPhone(phone) {
+  var s = String(phone || "").replace(/[^0-9]/g, "");
+  if (!s) return "";
+  if (s.indexOf("02") === 0) {
+    if (s.length === 9) return s.replace(/(\d{2})(\d{3})(\d{4})/, "$1-$2-$3");
+    if (s.length === 10) return s.replace(/(\d{2})(\d{4})(\d{4})/, "$1-$2-$3");
+    return s;
+  }
+  if (s.length === 10) {
+    if (s.startsWith('10')) s = '0' + s;
+    return s.replace(/(\d{3})(\d{3,4})(\d{4})/, "$1-$2-$3");
+  }
+  if (s.length === 11) return s.replace(/(\d{3})(\d{4})(\d{4})/, "$1-$2-$3");
+  return s;
+}
+
+function renderJobBadge(j) {
+  var bg = "#e8f0fe", col = "#1a73e8", border = "#aecbfa";
+  if (j === "본사관리자") {
+    bg = "#f3e8fd"; col = "#7627bb"; border = "#d7bdfb";
+  } else if (j === "지사관리자") {
+    bg = "#fef7e0"; col = "#b06000"; border = "#fce8b2";
+  } else if (j === "컨설턴트") {
+    bg = "#e8f0fe"; col = "#1a73e8"; border = "#aecbfa";
+  } else if (j === "기술사원") {
+    bg = "#e6f4ea"; col = "#137333"; border = "#ceead6";
+  } else if (j === "CS근무자") {
+    bg = "#fce8e6"; col = "#d93025"; border = "#fad2cf";
+  } else if (j === "CS관리자") {
+    bg = "#fce4ec"; col = "#c2185b"; border = "#f8bbd0";
+  }
+  return '<span style="background:' + bg + '; color:' + col + '; border:1px solid ' + border + '; padding:2px 8px; border-radius:5px; font-weight:700; font-size:0.75rem; white-space:nowrap;">' + (j || "미지정") + '</span>';
+}
+
+function validatePassword(pwd) {
+  if (!pwd || pwd.length < 8 || pwd.length > 10) {
+    return "비밀번호는 8자 이상 10자 이하로 입력해주세요.";
+  }
+  var hasLetter = /[a-zA-Z]/.test(pwd);
+  var hasNumber = /[0-9]/.test(pwd);
+  var hasSpecial = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(pwd);
+
+  if (!hasLetter || !hasNumber || !hasSpecial) {
+    return "비밀번호는 영문, 숫자, 특수문자를 모두 포함해야 합니다.";
+  }
+  return null;
+}
+
+function togglePasswordVisibility(inputId, btn) {
+  var inp = el(inputId);
+  if (!inp) return;
+  if (inp.type === 'password') {
+    inp.type = 'text';
+    if (btn) btn.textContent = '🙈';
+  } else {
+    inp.type = 'password';
+    if (btn) btn.textContent = '👁️';
+  }
+}
+
+function openUserManageModal() {
+  var modal = el('userManageModalOverlay');
+  if (modal) {
+    modal.style.display = 'flex';
+    modal.classList.add('show');
+  }
+  var editBox = el('userEditBox');
+  if (editBox) editBox.style.display = 'none';
+  loadAllUsers();
+}
+
+function closeUserManageModal() {
+  var modal = el('userManageModalOverlay');
+  if (modal) {
+    modal.style.display = 'none';
+    modal.classList.remove('show');
+  }
+  var editBox = el('userEditBox');
+  if (editBox) editBox.style.display = 'none';
+}
+
+async function loadAllUsers() {
+  var tbody = el('userTableBody');
+  var countEl = el('totalUserCount');
+  if (!tbody || !db) return;
+
+  tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:20px; color:#9aa0a6;">사용자 목록 불러오는 중...</td></tr>';
+
+  try {
+    var res = await db.from('app_users').select('*').order('name', { ascending: true });
+    if (res.error) throw res.error;
+
+    var rawUsers = res.data || [];
+
+    // 전화번호 기준 중복 정리 (010 및 10 형태 중복 방지)
+    var userMap = new Map();
+    rawUsers.forEach(function(u) {
+      var normPhone = String(u.phone || '').replace(/[^0-9]/g, '');
+      if (normPhone.startsWith('10')) normPhone = '0' + normPhone;
+      var key = u.name ? (u.name + '_' + normPhone) : normPhone;
+      if (!userMap.has(key) || (u.phone && u.phone.startsWith('010'))) {
+        userMap.set(key, u);
+      }
+    });
+    var users = Array.from(userMap.values());
+    users.sort(function(a, b) { return (a.name || '').localeCompare(b.name || ''); });
+
+    if (countEl) countEl.innerText = users.length;
+
+    if (users.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:20px; color:#9aa0a6;">등록된 사용자가 없습니다.</td></tr>';
+      return;
+    }
+
+    var html = '';
+    users.forEach(function(u) {
+      var phoneFmt = formatPhone(u.phone);
+      html += '<tr>'
+        + '<td><strong>' + escapeHtml(u.name || '-') + '</strong></td>'
+        + '<td>' + escapeHtml(phoneFmt) + '</td>'
+        + '<td>' + renderJobBadge(u.job) + '</td>'
+        + '<td style="text-align:center; white-space:nowrap;">'
+        + '<button type="button" class="btn-user-edit" data-phone="' + escapeHtml(u.phone) + '" data-name="' + escapeHtml(u.name || '') + '" data-job="' + escapeHtml(u.job || 'CS근무자') + '">수정</button>'
+        + '<button type="button" class="btn-user-del" data-phone="' + escapeHtml(u.phone) + '" data-name="' + escapeHtml(u.name || '') + '">삭제</button>'
+        + '</td>'
+        + '</tr>';
+    });
+
+    tbody.innerHTML = html;
+
+    tbody.querySelectorAll('.btn-user-edit').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        var p = this.getAttribute('data-phone');
+        var n = this.getAttribute('data-name');
+        var j = this.getAttribute('data-job');
+        openUserEditForm(p, n, j);
+      });
+    });
+
+    tbody.querySelectorAll('.btn-user-del').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        var p = this.getAttribute('data-phone');
+        var n = this.getAttribute('data-name');
+        deleteUserAccount(p, n);
+      });
+    });
+
+  } catch (err) {
+    console.error('사용자 로드 실패:', err);
+    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:20px; color:#d93025;">사용자 목록 로드 오류: ' + escapeHtml(err.message || String(err)) + '</td></tr>';
+  }
+}
+
+function openUserEditForm(phone, name, job) {
+  var box = el('userEditBox');
+  if (!box) return;
+  el('editUserTargetPhone').value = phone;
+  el('editUserNameInput').value = name;
+
+  var normalizedJob = job || 'CS근무자';
+  if (normalizedJob.indexOf('본사') !== -1) normalizedJob = '본사관리자';
+  else if (normalizedJob.indexOf('영업') !== -1 || normalizedJob.indexOf('컨설턴트') !== -1) normalizedJob = '컨설턴트';
+  else if (normalizedJob.indexOf('기술') !== -1 || normalizedJob.indexOf('엔지니어') !== -1) normalizedJob = '기술사원';
+  else if (normalizedJob.indexOf('서비스') !== -1 || normalizedJob.indexOf('CS근무자') !== -1) normalizedJob = 'CS근무자';
+  else if (normalizedJob.indexOf('Staff') !== -1 || normalizedJob.indexOf('지원') !== -1 || normalizedJob.indexOf('CS관리자') !== -1) normalizedJob = 'CS관리자';
+  else if (normalizedJob.indexOf('관리자') !== -1 || normalizedJob.indexOf('지사') !== -1) normalizedJob = '지사관리자';
+
+  el('editUserJobSelect').value = normalizedJob;
+  el('editUserNewPwdInput').value = '';
+  box.style.display = 'block';
+  box.scrollIntoView({ behavior: 'smooth' });
+}
+
+function cancelUserEdit() {
+  var box = el('userEditBox');
+  if (box) box.style.display = 'none';
+}
+
+async function saveUserEdit() {
+  var phone = el('editUserTargetPhone').value;
+  var name = el('editUserNameInput').value.trim();
+  var job = el('editUserJobSelect').value;
+  var newPwd = el('editUserNewPwdInput').value.trim();
+
+  if (!phone || !name || !job) {
+    alert('이름과 직무를 모두 입력해주세요.');
+    return;
+  }
+
+  var btn = el('btnSaveUserEdit');
+  if (btn) { btn.disabled = true; btn.innerText = '저장 중...'; }
+
+  var userRole = (job === '본사관리자' || job === '지사관리자') ? 'master' : 'user';
+  var updateData = {
+    name: name,
+    job: job,
+    role: userRole
+  };
+
+  if (newPwd) {
+    var valErr = validatePassword(newPwd);
+    if (valErr) {
+      alert(valErr);
+      if (btn) { btn.disabled = false; btn.innerText = '수정 저장'; }
+      return;
+    }
+    // 표준 해시 생성 공식 적용: SHA-256(phone + ":" + newPwd)
+    var cleanP = String(phone || '').replace(/[^0-9]/g, '');
+    var hashed = await sha256(cleanP + ':' + newPwd);
+    updateData.hash = hashed;
+  }
+
+  try {
+    var cleanPhone = String(phone || '').replace(/[^0-9]/g, '');
+    var pNoZero = cleanPhone.startsWith('0') ? cleanPhone.slice(1) : cleanPhone;
+    var pWithZero = cleanPhone.startsWith('0') ? cleanPhone : ('0' + cleanPhone);
+    var searchPhones = Array.from(new Set([phone, cleanPhone, pNoZero, pWithZero]));
+
+    var res = await db.from('app_users').update(updateData).in('phone', searchPhones);
+    if (res.error) throw res.error;
+
+    showPortalAlert('사용자 정보가 성공적으로 수정되었습니다.');
+    var box = el('userEditBox');
+    if (box) box.style.display = 'none';
+    await loadAllUsers();
+  } catch (e) {
+    alert('수정 실패: ' + e.message);
+  } finally {
+    if (btn) { btn.disabled = false; btn.innerText = '수정 저장'; }
+  }
+}
+
+async function deleteUserAccount(phone, name) {
+  if (!confirm('정말로 [' + name + ' / ' + formatPhone(phone) + '] 사용자를 영구 삭제하시겠습니까?\n삭제 후 해당 계정으로 로그인할 수 없습니다.')) {
+    return;
+  }
+
+  try {
+    var cleanPhone = String(phone || '').replace(/[^0-9]/g, '');
+    var pNoZero = cleanPhone.startsWith('0') ? cleanPhone.slice(1) : cleanPhone;
+    var pWithZero = cleanPhone.startsWith('0') ? cleanPhone : ('0' + cleanPhone);
+    var searchPhones = Array.from(new Set([phone, cleanPhone, pNoZero, pWithZero]));
+
+    var res = await db.from('app_users').delete().in('phone', searchPhones);
+    if (res.error) throw res.error;
+
+    showPortalAlert('사용자가 삭제되었습니다.');
+    await loadAllUsers();
+  } catch (e) {
+    alert('삭제 실패: ' + e.message);
+  }
+}
+
+window.formatPhone = formatPhone;
+window.renderJobBadge = renderJobBadge;
+window.validatePassword = validatePassword;
+window.togglePasswordVisibility = togglePasswordVisibility;
+window.openUserManageModal = openUserManageModal;
+window.closeUserManageModal = closeUserManageModal;
+window.loadAllUsers = loadAllUsers;
+window.openUserEditForm = openUserEditForm;
+window.cancelUserEdit = cancelUserEdit;
+window.saveUserEdit = saveUserEdit;
+window.deleteUserAccount = deleteUserAccount;
+
 </script>
   <!-- ========================================== -->
   <!-- 시스템 전용 알림/확인 대화상자 (북서울지사 TA 관리 포털) -->
@@ -3706,4 +4101,4 @@ window.addEventListener('DOMContentLoaded', () => {
    </div>
   </div>
  </body>
-      </html>
+ </html>
