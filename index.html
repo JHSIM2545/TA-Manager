@@ -1,12 +1,15 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ko">
- <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>에스원 북서울지사 | 영업 TA 통합관리 포털</title>
-  <!-- Supabase JS Client v2 CDN -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <style>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>에스원 북서울지사 | 영업 TA 통합관리 포털</title>
+<!-- Supabase JS Client v2 CDN -->
+
+
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
   :root{
     --navy:#0a1730; --navy2:#132a52; --navy3:#1c3a6e; --blue:#2563eb; --blue-light:#eaf1ff;
     --green:#16a34a; --red:#dc2626; --amber:#d97706; --gray:#9ca3af;
@@ -655,754 +658,846 @@
     display: none;
   }
 </style>
- </head>
- <body>
-  <!-- 1. 로그인 오버레이 -->
-  <div id="loginOverlay">
-   <div class="login-card" style="max-width:390px;width:95%;padding:32px 26px;">
+</head>
+<body>
+
+<!-- 1. 로그인 오버레이 -->
+<div id="loginOverlay">
+  <div class="login-card" style="max-width:390px;width:95%;padding:32px 26px;">
     <!-- 상단 제목: 작은글자 '에스원 북서울지사', 큰제목 '영업 TA 관리 포털' -->
     <div style="text-align:center;margin-bottom:22px;">
-     <div style="font-size:13.5px;font-weight:700;color:var(--muted,#64748b);letter-spacing:1px;margin-bottom:5px;">에스원 북서울지사</div>
-     <h1 style="margin:0;font-size:23px;font-weight:800;color:var(--navy,#0a1730);letter-spacing:-0.5px;">영업 TA 관리 포털</h1>
+      <div style="font-size:13.5px;font-weight:700;color:var(--muted,#64748b);letter-spacing:1px;margin-bottom:5px;">에스원 북서울지사</div>
+      <h1 style="margin:0;font-size:23px;font-weight:800;color:var(--navy,#0a1730);letter-spacing:-0.5px;">영업 TA 관리 포털</h1>
     </div>
+
     <!-- 1. 기본 로그인 폼 -->
     <div id="loginFormMain" style="display:block;">
-     <form action="javascript:void(0);" onsubmit="doLogin()">
-      <div class="login-field">
-       <label>전화번호</label> <input id="loginPhone" type="tel" placeholder="01012345678" autocomplete="tel">
-      </div>
-      <div class="login-field">
-       <label>비밀번호</label>
-       <div style="position:relative;width:100%;">
-        <input id="loginPw" type="password" autocomplete="current-password" style="width:100%;padding-right:42px;box-sizing:border-box;">
-        <button type="button" onclick="togglePasswordVisibility('loginPw', this)" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;font-size:1.15rem;cursor:pointer;padding:4px 6px;line-height:1;color:#64748b;" title="비밀번호 보기/숨기기">👁️</button>
-       </div>
-      </div>
-      <button type="submit" id="btnLogin" style="width:100%;margin-top:10px;padding:12px;font-size:15px;font-weight:700;">로그인</button>
-      <div id="loginMsg" style="margin-top:12px;font-size:12.5px;text-align:center;min-height:16px;"></div>
-      <!-- 하단 신규 회원가입 영역 (첨부 이미지 매칭) -->
-      <div class="signup-toggle-box" style="margin-top:22px;text-align:center;font-size:14.5px;color:#475569;border-top:1px dashed #cbd5e1;padding-top:16px;">
-       아직 계정이 없으신가요?
-       <br>
-       <button type="button" class="signup-toggle-btn" id="btnGoSignup" onclick="toggleLoginSignup('signup')" style="margin-top:6px;background:none;border:none;color:#2563eb;font-weight:700;font-size:15px;cursor:pointer;text-decoration:underline;">신규 회원가입</button>
-      </div>
-     </form>
+      <form action="javascript:void(0);" onsubmit="doLogin()">
+        <div class="login-field">
+          <label>전화번호</label>
+          <input id="loginPhone" type="tel" placeholder="01012345678" autocomplete="tel">
+        </div>
+        <div class="login-field">
+          <label>비밀번호</label>
+          <div style="position:relative;width:100%;">
+            <input id="loginPw" type="password" autocomplete="current-password" style="width:100%;padding-right:42px;box-sizing:border-box;">
+            <button type="button" onclick="togglePasswordVisibility('loginPw', this)" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;font-size:1.15rem;cursor:pointer;padding:4px 6px;line-height:1;color:#64748b;" title="비밀번호 보기/숨기기">👁️</button>
+          </div>
+        </div>
+        <button type="submit" id="btnLogin" style="width:100%;margin-top:10px;padding:12px;font-size:15px;font-weight:700;">로그인</button>
+        <div id="loginMsg" style="margin-top:12px;font-size:12.5px;text-align:center;min-height:16px;"></div>
+
+        <!-- 하단 신규 회원가입 영역 (첨부 이미지 매칭) -->
+        <div class="signup-toggle-box" style="margin-top:22px;text-align:center;font-size:14.5px;color:#475569;border-top:1px dashed #cbd5e1;padding-top:16px;">
+          아직 계정이 없으신가요?<br>
+          <button type="button" class="signup-toggle-btn" id="btnGoSignup" onclick="toggleLoginSignup('signup')" style="margin-top:6px;background:none;border:none;color:#2563eb;font-weight:700;font-size:15px;cursor:pointer;text-decoration:underline;">신규 회원가입</button>
+        </div>
+      </form>
     </div>
+
     <!-- 2. 신규 회원가입 폼 -->
     <div id="loginFormSignup" style="display:none;">
-     <div style="background:#e6f4ea;color:#137333;font-size:0.88rem;font-weight:700;padding:9px 12px;border-radius:8px;margin-bottom:16px;text-align:center;border:1px solid #ceead6;">📝 신규 직원 회원가입</div>
-     <form action="javascript:void(0);" onsubmit="doSignup()">
-      <div class="login-field">
-       <label>아이디 (휴대전화번호) <span style="color:#dc2626;">*</span></label> <input id="regPhone" type="tel" placeholder="01012345678 (숫자만)" autocomplete="tel" required>
-      </div>
-      <div class="login-field">
-       <label>이름 (실명) <span style="color:#dc2626;">*</span></label> <input id="regName" type="text" placeholder="예: 홍길동" required>
-      </div>
-      <div class="login-field">
-       <label>직무 구분 선택 <span style="color:#dc2626;">*</span></label> <select id="regJob" required style="width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:14px;background:#fff;box-sizing:border-box;"> <option value="">직무를 선택해주세요</option> <option value="CS근무자">CS근무자</option> <option value="CS관리자">CS관리자</option> <option value="컨설턴트">컨설턴트</option> <option value="기술사원">기술사원</option> <option value="지사관리자">지사관리자</option> <option value="본사관리자">본사관리자</option> </select>
-      </div>
-      <div class="login-field">
-       <label>비밀번호 <span style="color:#dc2626;">*</span> <span style="font-size:11.5px;color:#64748b;font-weight:normal;">(영문+숫자+특수문자 8~10자)</span></label>
-       <div style="position:relative;width:100%;">
-        <input id="regPwd" type="password" placeholder="영문, 숫자, 특수문자 조합 8~10자" maxlength="10" autocomplete="new-password" required style="width:100%;padding-right:42px;box-sizing:border-box;">
-        <button type="button" onclick="togglePasswordVisibility('regPwd', this)" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;font-size:1.15rem;cursor:pointer;padding:4px 6px;line-height:1;color:#64748b;" title="비밀번호 보기/숨기기">👁️</button>
-       </div>
-      </div>
-      <div class="login-field">
-       <label>비밀번호 확인 <span style="color:#dc2626;">*</span></label>
-       <div style="position:relative;width:100%;">
-        <input id="regPwdConfirm" type="password" placeholder="비밀번호 재입력" maxlength="10" autocomplete="new-password" required style="width:100%;padding-right:42px;box-sizing:border-box;">
-        <button type="button" onclick="togglePasswordVisibility('regPwdConfirm', this)" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;font-size:1.15rem;cursor:pointer;padding:4px 6px;line-height:1;color:#64748b;" title="비밀번호 보기/숨기기">👁️</button>
-       </div>
-      </div>
-      <button type="submit" id="btnDoSignup" style="width:100%;margin-top:10px;background:#16a34a;color:#fff;font-weight:700;padding:12px;border:none;border-radius:8px;font-size:15px;cursor:pointer;">가입 완료 및 로그인</button>
-      <div id="signupMsg" style="margin-top:12px;font-size:12.5px;text-align:center;min-height:16px;"></div>
-      <div class="signup-toggle-box" style="margin-top:18px;text-align:center;font-size:14px;color:#64748b;border-top:1px dashed #cbd5e1;padding-top:14px;">
-       이미 계정이 있으신가요?
-       <button type="button" class="signup-toggle-btn" id="btnBackToLogin" onclick="toggleLoginSignup('login')" style="background:none;border:none;color:#2563eb;font-weight:700;font-size:14px;cursor:pointer;text-decoration:underline;">로그인 화면으로</button>
-      </div>
-     </form>
+      <div style="background:#e6f4ea;color:#137333;font-size:0.88rem;font-weight:700;padding:9px 12px;border-radius:8px;margin-bottom:16px;text-align:center;border:1px solid #ceead6;">📝 신규 직원 회원가입</div>
+      <form action="javascript:void(0);" onsubmit="doSignup()">
+        <div class="login-field">
+          <label>아이디 (휴대전화번호) <span style="color:#dc2626;">*</span></label>
+          <input id="regPhone" type="tel" placeholder="01012345678 (숫자만)" autocomplete="tel" required>
+        </div>
+        <div class="login-field">
+          <label>이름 (실명) <span style="color:#dc2626;">*</span></label>
+          <input id="regName" type="text" placeholder="예: 홍길동" required>
+        </div>
+        <div class="login-field">
+          <label>직무 구분 선택 <span style="color:#dc2626;">*</span></label>
+          <select id="regJob" required style="width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:14px;background:#fff;box-sizing:border-box;">
+            <option value="">직무를 선택해주세요</option>
+            <option value="CS근무자">CS근무자</option>
+            <option value="CS관리자">CS관리자</option>
+            <option value="컨설턴트">컨설턴트</option>
+            <option value="기술사원">기술사원</option>
+            <option value="지사관리자">지사관리자</option>
+            <option value="본사관리자">본사관리자</option>
+          </select>
+        </div>
+        <div class="login-field">
+          <label>비밀번호 <span style="color:#dc2626;">*</span> <span style="font-size:11.5px;color:#64748b;font-weight:normal;">(영문+숫자+특수문자 8~10자)</span></label>
+          <div style="position:relative;width:100%;">
+            <input id="regPwd" type="password" placeholder="영문, 숫자, 특수문자 조합 8~10자" maxlength="10" autocomplete="new-password" required style="width:100%;padding-right:42px;box-sizing:border-box;">
+            <button type="button" onclick="togglePasswordVisibility('regPwd', this)" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;font-size:1.15rem;cursor:pointer;padding:4px 6px;line-height:1;color:#64748b;" title="비밀번호 보기/숨기기">👁️</button>
+          </div>
+        </div>
+        <div class="login-field">
+          <label>비밀번호 확인 <span style="color:#dc2626;">*</span></label>
+          <div style="position:relative;width:100%;">
+            <input id="regPwdConfirm" type="password" placeholder="비밀번호 재입력" maxlength="10" autocomplete="new-password" required style="width:100%;padding-right:42px;box-sizing:border-box;">
+            <button type="button" onclick="togglePasswordVisibility('regPwdConfirm', this)" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;font-size:1.15rem;cursor:pointer;padding:4px 6px;line-height:1;color:#64748b;" title="비밀번호 보기/숨기기">👁️</button>
+          </div>
+        </div>
+        <button type="submit" id="btnDoSignup" style="width:100%;margin-top:10px;background:#16a34a;color:#fff;font-weight:700;padding:12px;border:none;border-radius:8px;font-size:15px;cursor:pointer;">가입 완료 및 로그인</button>
+        <div id="signupMsg" style="margin-top:12px;font-size:12.5px;text-align:center;min-height:16px;"></div>
+
+        <div class="signup-toggle-box" style="margin-top:18px;text-align:center;font-size:14px;color:#64748b;border-top:1px dashed #cbd5e1;padding-top:14px;">
+          이미 계정이 있으신가요? 
+          <button type="button" class="signup-toggle-btn" id="btnBackToLogin" onclick="toggleLoginSignup('login')" style="background:none;border:none;color:#2563eb;font-weight:700;font-size:14px;cursor:pointer;text-decoration:underline;">로그인 화면으로</button>
+        </div>
+      </form>
     </div>
-   </div>
   </div>
-  <!-- 2. 메인 애플리케이션 -->
-  <div id="mainApp" style="display:none;">
-   <div id="dbErrorBanner" style="display:none;background:#fee2e2;border:1px solid #ef4444;color:#991b1b;padding:12px 16px;border-radius:8px;margin:12px 16px;font-size:14px;font-weight:600;"></div>
-   <header class="topbar">
+</div></div>
+</div>
+
+<!-- 2. 메인 애플리케이션 -->
+<div id="mainApp" style="display:none;">
+  <div id="dbErrorBanner" style="display:none;background:#fee2e2;border:1px solid #ef4444;color:#991b1b;padding:12px 16px;border-radius:8px;margin:12px 16px;font-size:14px;font-weight:600;"></div>
+  <header class="topbar">
     <div>
-     <div class="brand">에스원 북서울지사</div>
-     <div class="page-title">
-      <span id="topbarHeaderTitle">영업 TA 통합관리 대시보드</span> <span class="agent-rank-badge" id="agentRankBadge" style="display:none;"></span>
-     </div>
+      <div class="brand">에스원 북서울지사</div>
+      <div class="page-title">
+        <span id="topbarHeaderTitle">영업 TA 통합관리 대시보드</span>
+        <span class="agent-rank-badge" id="agentRankBadge" style="display:none;"></span>
+      </div>
     </div>
+
     <!-- 타이틀바 컨설턴트별 개별화면 전환 버튼 그룹 -->
     <div class="view-switch-group" id="topbarViewSwitchGroup">
-     <button type="button" class="switch-btn master active" id="btnViewMaster" onclick="switchView('master')">📊 통합 대시보드</button>
-     <button type="button" class="switch-btn" data-agent="최영국" onclick="switchView('최영국')">최영국</button>
-     <button type="button" class="switch-btn" data-agent="박광춘" onclick="switchView('박광춘')">박광춘</button>
-     <button type="button" class="switch-btn" data-agent="이수열" onclick="switchView('이수열')">이수열</button>
-     <button type="button" class="switch-btn" data-agent="정문재" onclick="switchView('정문재')">정문재</button>
-     <button type="button" class="switch-btn" data-agent="임영민" onclick="switchView('임영민')">임영민</button>
+      <button type="button" class="switch-btn master active" id="btnViewMaster" onclick="switchView('master')">📊 통합 대시보드</button>
+      <button type="button" class="switch-btn" data-agent="최영국" onclick="switchView('최영국')">최영국</button>
+      <button type="button" class="switch-btn" data-agent="박광춘" onclick="switchView('박광춘')">박광춘</button>
+      <button type="button" class="switch-btn" data-agent="이수열" onclick="switchView('이수열')">이수열</button>
+      <button type="button" class="switch-btn" data-agent="정문재" onclick="switchView('정문재')">정문재</button>
+      <button type="button" class="switch-btn" data-agent="임영민" onclick="switchView('임영민')">임영민</button>
     </div>
+
     <div class="topbar-right">
-     <button type="button" id="btnUserManage" class="small" onclick="openUserManageModal()" style="background:#e6f4ea;color:#137333;border:1px solid #ceead6;font-weight:700;display:none;">👥 사용자 관리</button>
-     <button type="button" id="btnTopbarTarget" class="small" onclick="openTargetModal()" style="background:#2563eb;color:#fff;display:none;">🎯 목표 설정</button>
-     <button type="button" id="btnNoticeManage" class="small">공지사항 관리</button>
-     <button type="button" id="btnLogout" class="small secondary">로그아웃</button>
-     <div id="connStatus" style="display:none;"></div>
+      <button type="button" id="btnUserManage" class="small" onclick="openUserManageModal()" style="background:#e6f4ea;color:#137333;border:1px solid #ceead6;font-weight:700;display:none;">👥 사용자 관리</button>
+      <button type="button" id="btnTopbarTarget" class="small" onclick="openTargetModal()" style="background:#2563eb;color:#fff;display:none;">🎯 목표 설정</button>
+      <button type="button" id="btnNoticeManage" class="small">공지사항 관리</button>
+      <button type="button" id="btnLogout" class="small secondary">로그아웃</button>
+      <div id="connStatus" style="display:none;"></div>
     </div>
-   </header>
-   <!-- 날짜 배너 -->
-   <div id="dateBanner">
+  </header>
+
+  <!-- 날짜 배너 -->
+  <div id="dateBanner">
     <div class="date-text" id="topbarDateValue"></div>
     <div class="workdays-badge" id="topbarWorkdays"></div>
-   </div>
-   <main>
+  </div>
+
+  <main>
     <!-- ========================================== -->
     <!-- VIEW A: 지사장 통합관제 대시보드 뷰          -->
     <!-- ========================================== -->
     <div id="viewMaster">
-     <!-- 지사 전체 이달 목표 (사 전체 목표) -->
-     <div id="masterMonthlyTargetBadge" style="margin-bottom:12px;font-size:13.5px;font-weight:700;color:#1e3a8a;background:#eff6ff;padding:8px 16px;border-radius:8px;border:1px solid #bfdbfe;display:flex;align-items:center;gap:8px;">
-      🎯 <strong>사 전체 이달 목표 (일반알람)</strong>: 2,500,000원 <span style="font-size:12px;font-weight:normal;color:#475569;">(사 전체 총 목표: 3,739,000원)</span>
-     </div>
-     <!-- 상단 카테고리 필터 (전체 TA 조회 테이블과도 100% 동기화) -->
-     <div class="filters" id="categoryFilters">
-      <button type="button" data-category="일반알람" class="active">일반알람</button>
-      <button type="button" data-category="디지털(정보보안)">디지털(정보보안)</button>
-      <button type="button" data-category="안전상품">안전상품</button>
-      <button type="button" data-category="all">전체</button>
-     </div>
-     <!-- 8개 종합 KPI 지표 카드 -->
-     <section class="kpi-grid">
-      <div class="kpi-card">
-       <div class="label">전체 TA</div>
-       <div class="value" id="kpiTotalAmount">0원</div>
-       <div class="sub" id="kpiTotalCount">0건</div>
+      <!-- 지사 전체 이달 목표 (사 전체 목표) -->
+      <div id="masterMonthlyTargetBadge" style="margin-bottom:12px;font-size:13.5px;font-weight:700;color:#1e3a8a;background:#eff6ff;padding:8px 16px;border-radius:8px;border:1px solid #bfdbfe;display:flex;align-items:center;gap:8px;">
+        🎯 <strong>사 전체 이달 목표 (일반알람)</strong>: 2,500,000원 <span style="font-size:12px;font-weight:normal;color:#475569;">(사 전체 총 목표: 3,739,000원)</span>
       </div>
-      <div class="kpi-card">
-       <div class="label">진행중 TA</div>
-       <div class="value" id="kpiPipelineAmount">0원</div>
-       <div class="sub" id="kpiPipelineCount">0건</div>
+      <!-- 상단 카테고리 필터 (전체 TA 조회 테이블과도 100% 동기화) -->
+      <div class="filters" id="categoryFilters">
+        <button type="button" data-category="일반알람" class="active">일반알람</button>
+        <button type="button" data-category="디지털(정보보안)">디지털(정보보안)</button>
+        <button type="button" data-category="안전상품">안전상품</button>
+        <button type="button" data-category="all">전체</button>
       </div>
-      <div class="kpi-card">
-       <div class="label">이달 수주 TA</div>
-       <div class="value" id="kpiMonthWonAmount">0원</div>
-       <div class="sub" id="kpiMonthWonCount">0건</div>
-      </div>
-      <div class="kpi-card">
-       <div class="label">실패 TA</div>
-       <div class="value" id="kpiFailedAmount">0원</div>
-       <div class="sub" id="kpiFailedCount">0건</div>
-      </div>
-      <div class="kpi-card">
-       <div class="label">수주 달성율 (사 전체)</div>
-       <div class="value" id="kpiAchieveRate">-</div>
-       <div class="sub" id="kpiAchieveSub"></div>
-      </div>
-      <div class="kpi-card">
-       <div class="label">보유 TA율 (사 전체)</div>
-       <div class="value" id="kpiHoldRate">-</div>
-       <div class="sub" id="kpiHoldSub"></div>
-      </div>
-      <div class="kpi-card">
-       <div class="label">TA 수주율</div>
-       <div class="value" id="kpiWinRate">-</div>
-       <div class="sub" id="kpiWinSub"></div>
-      </div>
-      <div class="kpi-card">
-       <div class="label">수주 실패율</div>
-       <div class="value" id="kpiFailRate">-</div>
-       <div class="sub" id="kpiFailSub"></div>
-      </div>
-     </section>
-     <!-- 금일 수주 예정 전체 리스트 -->
-     <div class="panel">
-      <div class="panel-toolbar today-list-toolbar">
-       <h2>금일 수주 예정 전체 리스트 <span class="count-tag" id="todayListCount"></span></h2>
-       <button type="button" class="small copy-btn" id="btnCopyToday">복사하기 (외부 공지용)</button>
-      </div>
-      <div class="table-scroll" style="max-height:320px;">
-       <table class="lead-table">
-        <thead>
-         <tr>
-          <th>컨설턴트</th>
-          <th style="min-width:170px;">서비스제공처명</th>
-          <th>고객담당자</th>
-          <th>금액</th>
-          <th>확도</th>
-          <th>메모</th>
-         </tr>
-        </thead>
-        <tbody id="todayListTbody"></tbody>
-       </table>
-      </div>
-     </div>
-     <!-- 변경 이력 (Activity Log) -->
-     <div class="panel">
-      <div class="panel-toolbar">
-       <h2>변경 이력 <span class="count-tag" id="activityLogCount"></span></h2>
-       <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
-        <input type="date" id="activityLogDate" style="padding:8px 10px;border:1px solid var(--border);border-radius:8px;font-size:13.5px;font-family:inherit;">
-        <button type="button" class="small secondary" id="btnActivityToday" style="background:#eef1f7;color:#1a2333;">오늘</button>
-        <button type="button" class="small" id="btnActivityRefresh">새로고침</button>
-       </div>
-      </div>
-      <p style="font-size:12px;color:var(--muted);margin:-6px 0 12px;">컨설턴트가 TA를 신규 등록/수정/삭제할 때마다 자동으로 기록됩니다. 하루치만 표시되며, 30초마다 자동 갱신됩니다.</p>
-      <div class="table-scroll" style="max-height:420px;">
-       <table class="lead-table">
-        <thead>
-         <tr>
-          <th>시간</th>
-          <th>컨설턴트</th>
-          <th>구분</th>
-          <th style="min-width:170px;">서비스제공처명</th>
-          <th>변경 내용</th>
-         </tr>
-        </thead>
-        <tbody id="activityLogTbody"></tbody>
-       </table>
-      </div>
-     </div>
-     <!-- 차트: 바차트 & 도넛차트 -->
-     <div class="panel">
-      <div class="charts-grid">
-       <div>
-        <h2>컨설턴트별 진행 TA 금액</h2>
-        <div id="barChart"></div>
-       </div>
-       <div>
-        <h2>영업단계별 금액 분포</h2>
-        <div class="donut-wrap">
-         <div class="donut" id="donutChart"></div>
-         <div class="legend" id="donutLegend"></div>
+
+      <!-- 8개 종합 KPI 지표 카드 -->
+      <section class="kpi-grid">
+        <div class="kpi-card"><div class="label">전체 TA</div><div class="value" id="kpiTotalAmount">0원</div><div class="sub" id="kpiTotalCount">0건</div></div>
+        <div class="kpi-card"><div class="label">진행중 TA</div><div class="value" id="kpiPipelineAmount">0원</div><div class="sub" id="kpiPipelineCount">0건</div></div>
+        <div class="kpi-card"><div class="label">이달 수주 TA</div><div class="value" id="kpiMonthWonAmount">0원</div><div class="sub" id="kpiMonthWonCount">0건</div></div>
+        <div class="kpi-card"><div class="label">실패 TA</div><div class="value" id="kpiFailedAmount">0원</div><div class="sub" id="kpiFailedCount">0건</div></div>
+        <div class="kpi-card"><div class="label">수주 달성율 (사 전체)</div><div class="value" id="kpiAchieveRate">-</div><div class="sub" id="kpiAchieveSub"></div></div>
+        <div class="kpi-card"><div class="label">보유 TA율 (사 전체)</div><div class="value" id="kpiHoldRate">-</div><div class="sub" id="kpiHoldSub"></div></div>
+        <div class="kpi-card"><div class="label">TA 수주율</div><div class="value" id="kpiWinRate">-</div><div class="sub" id="kpiWinSub"></div></div>
+        <div class="kpi-card"><div class="label">수주 실패율</div><div class="value" id="kpiFailRate">-</div><div class="sub" id="kpiFailSub"></div></div>
+      </section>
+
+      <!-- 금일 수주 예정 전체 리스트 -->
+      <div class="panel">
+        <div class="panel-toolbar today-list-toolbar">
+          <h2>금일 수주 예정 전체 리스트 <span class="count-tag" id="todayListCount"></span></h2>
+          <button type="button" class="small copy-btn" id="btnCopyToday">복사하기 (외부 공지용)</button>
         </div>
-       </div>
+        <div class="table-scroll" style="max-height:320px;">
+          <table class="lead-table">
+            <thead><tr><th>컨설턴트</th><th style="min-width:170px;">서비스제공처명</th><th>고객담당자</th><th>금액</th><th>확도</th><th>메모</th></tr></thead>
+            <tbody id="todayListTbody"></tbody>
+          </table>
+        </div>
       </div>
-     </div>
-     <!-- 컨설턴트별 달성현황 & 목표 관리 -->
-     <div class="panel">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px;">
-       <h2>컨설턴트별 달성현황 <span class="count-tag" id="targetMonthLabel"></span> <span class="count-tag" id="targetCategoryLabel" style="background:#e0e7ff;color:#3730a3;"></span></h2>
-       <button type="button" class="small" id="btnOpenTargetModal" onclick="openTargetModal()" style="background:var(--blue);color:#fff;font-weight:700;display:inline-flex;align-items:center;gap:6px;">🎯 월간 목표 설정 / 배분</button>
+
+      <!-- 변경 이력 (Activity Log) -->
+      <div class="panel">
+        <div class="panel-toolbar">
+          <h2>변경 이력 <span class="count-tag" id="activityLogCount"></span></h2>
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+            <input type="date" id="activityLogDate" style="padding:8px 10px;border:1px solid var(--border);border-radius:8px;font-size:13.5px;font-family:inherit;">
+            <button type="button" class="small secondary" id="btnActivityToday" style="background:#eef1f7;color:#1a2333;">오늘</button>
+            <button type="button" class="small" id="btnActivityRefresh">새로고침</button>
+          </div>
+        </div>
+        <p style="font-size:12px;color:var(--muted);margin:-6px 0 12px;">컨설턴트가 TA를 신규 등록/수정/삭제할 때마다 자동으로 기록됩니다. 하루치만 표시되며, 30초마다 자동 갱신됩니다.</p>
+        <div class="table-scroll" style="max-height:420px;">
+          <table class="lead-table">
+            <thead><tr><th>시간</th><th>컨설턴트</th><th>구분</th><th style="min-width:170px;">서비스제공처명</th><th>변경 내용</th></tr></thead>
+            <tbody id="activityLogTbody"></tbody>
+          </table>
+        </div>
       </div>
-      <div class="table-scroll">
-       <table class="target-table">
-        <thead>
-         <tr>
-          <th style="white-space:nowrap;width:80px;">컨설턴트</th>
-          <th style="white-space:nowrap;width:130px;">이달 수주</th>
-          <th style="white-space:nowrap;min-width:210px;">수주 달성율 (차트)</th>
-          <th style="white-space:nowrap;width:130px;">진행중 TA</th>
-          <th style="white-space:nowrap;width:95px;">보유 TA율</th>
-          <th style="white-space:nowrap;width:90px;">TA 수주율</th>
-          <th style="white-space:nowrap;width:90px;">수주 실패율</th>
-          <th style="white-space:nowrap;width:130px;">이달 확정목표(원)</th>
-         </tr>
-        </thead>
-        <tbody id="targetTbody"></tbody>
-       </table>
+
+      <!-- 차트: 바차트 & 도넛차트 -->
+      <div class="panel">
+        <div class="charts-grid">
+          <div>
+            <h2>컨설턴트별 진행 TA 금액</h2>
+            <div id="barChart"></div>
+          </div>
+          <div>
+            <h2>영업단계별 금액 분포</h2>
+            <div class="donut-wrap">
+              <div class="donut" id="donutChart"></div>
+              <div class="legend" id="donutLegend"></div>
+            </div>
+          </div>
+        </div>
       </div>
-     </div>
-     <!-- 이달 캘린더 — 컨설턴트별 수주예상 금액 그리드 -->
-     <div class="panel">
-      <h2>이달 캘린더 — 컨설턴트별 수주예상 금액 <span class="count-tag" id="calendarMonthLabel"></span></h2>
-      <div class="table-scroll" style="max-height:560px;">
-       <table class="calendar-table">
-        <thead>
-         <tr id="calendarHeadRow">
-          <th>일자</th>
-         </tr>
-        </thead>
-        <tbody id="calendarTbody"></tbody>
-       </table>
+
+      <!-- 컨설턴트별 달성현황 & 목표 관리 -->
+      <div class="panel">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px;">
+          <h2>컨설턴트별 달성현황 <span class="count-tag" id="targetMonthLabel"></span> <span class="count-tag" id="targetCategoryLabel" style="background:#e0e7ff;color:#3730a3;"></span></h2>
+          <button type="button" class="small" id="btnOpenTargetModal" onclick="openTargetModal()" style="background:var(--blue);color:#fff;font-weight:700;display:inline-flex;align-items:center;gap:6px;">
+            🎯 월간 목표 설정 / 배분
+          </button>
+        </div>
+        <div class="table-scroll">
+          <table class="target-table">
+            <thead><tr>
+              <th style="white-space:nowrap;width:80px;">컨설턴트</th>
+              <th style="white-space:nowrap;width:130px;">이달 수주</th>
+              <th style="white-space:nowrap;min-width:210px;">수주 달성율 (차트)</th>
+              <th style="white-space:nowrap;width:130px;">진행중 TA</th>
+              <th style="white-space:nowrap;width:95px;">보유 TA율</th>
+              <th style="white-space:nowrap;width:90px;">TA 수주율</th>
+              <th style="white-space:nowrap;width:90px;">수주 실패율</th>
+              <th style="white-space:nowrap;width:130px;">이달 확정목표(원)</th>
+            </tr></thead>
+            <tbody id="targetTbody"></tbody>
+          </table>
+        </div>
       </div>
-     </div>
-     <!-- 전체 TA 조회 (상품 카테고리 필터 연동 + 관리자 전용 삭제 기능 지원) -->
-     <div class="panel">
-      <h2>전체 TA 조회 <span class="count-tag" id="leadCountTag"></span></h2>
-      <div class="filters-bar">
-       <select id="fConsultant"><option value="all">전체 컨설턴트</option></select> <select id="fStage"> <option value="all">전체 단계</option> <option value="진행중">진행중</option> <option value="수주完">수주完</option> <option value="실패">실패</option> </select> <select id="fConfidence"> <option value="all">전체 확도</option> <option value="A">A (상)</option> <option value="B">B (중)</option> <option value="C">C (하)</option> </select>
-       <div style="display:inline-flex;align-items:center;gap:4px;">
-        <input type="month" id="fMonth" title="계약예정월 필터 (기본: 이달)">
-        <button type="button" class="small secondary" id="btnThisMonthFilter" style="background:#eef1f7;color:var(--navy);font-weight:700;padding:7px 10px;">이달</button>
-        <button type="button" class="small secondary" id="btnAllPeriodFilter" style="background:#eef1f7;color:var(--muted);padding:7px 10px;">전체</button>
-       </div>
-       <input type="text" id="fSearch" placeholder="서비스제공처명 검색">
-       <button type="button" class="small secondary" id="btnResetFilter" style="background:#eef1f7;color:#1a2333;">필터 초기화</button>
+
+      <!-- 이달 캘린더 — 컨설턴트별 수주예상 금액 그리드 -->
+      <div class="panel">
+        <h2>이달 캘린더 — 컨설턴트별 수주예상 금액 <span class="count-tag" id="calendarMonthLabel"></span></h2>
+        <div class="table-scroll" style="max-height:560px;">
+          <table class="calendar-table">
+            <thead><tr id="calendarHeadRow"><th>일자</th></tr></thead>
+            <tbody id="calendarTbody"></tbody>
+          </table>
+        </div>
       </div>
-      <div class="table-scroll">
-       <table class="lead-table">
-        <thead>
-         <tr>
-          <th>컨설턴트</th>
-          <th style="min-width:170px;">서비스제공처명</th>
-          <th>고객담당자</th>
-          <th>금액</th>
-          <th>단계</th>
-          <th>확도</th>
-          <th>상품종류</th>
-          <th>영업동기</th>
-          <th>일정</th>
-          <th>메모</th>
-          <th>관리</th>
-         </tr>
-        </thead>
-        <tbody id="leadTbody"></tbody>
-       </table>
+
+      <!-- 전체 TA 조회 (상품 카테고리 필터 연동 + 관리자 전용 삭제 기능 지원) -->
+      <div class="panel">
+        <h2>전체 TA 조회 <span class="count-tag" id="leadCountTag"></span></h2>
+        <div class="filters-bar">
+          <select id="fConsultant"><option value="all">전체 컨설턴트</option></select>
+          <select id="fStage">
+            <option value="all">전체 단계</option>
+            <option value="진행중">진행중</option>
+            <option value="수주完">수주完</option>
+            <option value="실패">실패</option>
+          </select>
+          <select id="fConfidence">
+            <option value="all">전체 확도</option>
+            <option value="A">A (상)</option>
+            <option value="B">B (중)</option>
+            <option value="C">C (하)</option>
+          </select>
+          <div style="display:inline-flex;align-items:center;gap:4px;">
+            <input type="month" id="fMonth" title="계약예정월 필터 (기본: 이달)">
+            <button type="button" class="small secondary" id="btnThisMonthFilter" style="background:#eef1f7;color:var(--navy);font-weight:700;padding:7px 10px;">이달</button>
+            <button type="button" class="small secondary" id="btnAllPeriodFilter" style="background:#eef1f7;color:var(--muted);padding:7px 10px;">전체</button>
+          </div>
+          <input type="text" id="fSearch" placeholder="서비스제공처명 검색">
+          <button type="button" class="small secondary" id="btnResetFilter" style="background:#eef1f7;color:#1a2333;">필터 초기화</button>
+        </div>
+        <div class="table-scroll">
+          <table class="lead-table">
+            <thead><tr>
+              <th>컨설턴트</th><th style="min-width:170px;">서비스제공처명</th><th>고객담당자</th><th>금액</th><th>단계</th><th>확도</th><th>상품종류</th><th>영업동기</th><th>일정</th><th>메모</th><th>관리</th>
+            </tr></thead>
+            <tbody id="leadTbody"></tbody>
+          </table>
+        </div>
       </div>
-     </div>
     </div>
+
     <!-- ========================================== -->
     <!-- VIEW B: 컨설턴트 개별 작업 화면 (pc_agent)   -->
     <!-- ========================================== -->
-    <!-- ==========================================
+        <!-- ==========================================
          컨설턴트 개별 영업 화면 (viewAgent) - 1번~5번 캡처 100% 매칭
          ========================================== -->
     <div id="viewAgent" class="agent-view-container">
-     <!-- 1. 간결 헤더 (중복 제거 & 순위 표시 & 상품 선택 & 신규등록 버튼) -->
-     <div class="agent-header-card">
-      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
-       <!-- 상품 종류 선택 기능 (컨설턴트 이름 삭제, 상품 선택만 유지) -->
-       <div class="agent-header-product-picker" id="agentHeaderProductPicker" style="margin-left:0;">
-        <button type="button" class="header-prod-btn active" data-prod="일반알람" onclick="setAgentGlobalProduct('일반알람')">일반알람</button>
-        <button type="button" class="header-prod-btn" data-prod="디지털(정보보안)" onclick="setAgentGlobalProduct('디지털(정보보안)')">디지털(정보보안)</button>
-        <button type="button" class="header-prod-btn" data-prod="안전상품" onclick="setAgentGlobalProduct('안전상품')">안전상품</button>
-        <button type="button" class="header-prod-btn" data-prod="all" onclick="setAgentGlobalProduct('all')">전체</button>
-       </div>
-       <span id="agentActiveName" style="display:none;"></span>
+
+      <!-- 1. 간결 헤더 (중복 제거 & 순위 표시 & 상품 선택 & 신규등록 버튼) -->
+      <div class="agent-header-card">
+        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+          <!-- 상품 종류 선택 기능 (컨설턴트 이름 삭제, 상품 선택만 유지) -->
+          <div class="agent-header-product-picker" id="agentHeaderProductPicker" style="margin-left:0;">
+            <button type="button" class="header-prod-btn active" data-prod="일반알람" onclick="setAgentGlobalProduct('일반알람')">일반알람</button>
+            <button type="button" class="header-prod-btn" data-prod="디지털(정보보안)" onclick="setAgentGlobalProduct('디지털(정보보안)')">디지털(정보보안)</button>
+            <button type="button" class="header-prod-btn" data-prod="안전상품" onclick="setAgentGlobalProduct('안전상품')">안전상품</button>
+            <button type="button" class="header-prod-btn" data-prod="all" onclick="setAgentGlobalProduct('all')">전체</button>
+          </div>
+          <span id="agentActiveName" style="display:none;"></span>
+        </div>
+        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+          <button type="button" class="btn-primary" onclick="openNewAgentLeadModal()" style="display:inline-flex;align-items:center;gap:6px;padding:8px 18px;font-size:14px;font-weight:700;background:var(--blue);color:#fff;border-radius:8px;border:none;cursor:pointer;">
+            ➕ 신규 TA 등록
+          </button>
+          <button type="button" class="small secondary" id="btnBackToMaster" style="background:#0b1f3f;color:#fff;display:none;padding:8px 14px;border-radius:8px;border:none;cursor:pointer;" onclick="switchView('master')">
+            🔙 지사장 대시보드로 돌아가기
+          </button>
+        </div>
       </div>
-      <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
-       <button type="button" class="btn-primary" onclick="openNewAgentLeadModal()" style="display:inline-flex;align-items:center;gap:6px;padding:8px 18px;font-size:14px;font-weight:700;background:var(--blue);color:#fff;border-radius:8px;border:none;cursor:pointer;">➕ 신규 TA 등록</button>
-       <button type="button" class="small secondary" id="btnBackToMaster" style="background:#0b1f3f;color:#fff;display:none;padding:8px 14px;border-radius:8px;border:none;cursor:pointer;" onclick="switchView('master')">🔙 지사장 대시보드로 돌아가기</button>
+
+      <!-- 2. 상단 TA 현황 & 금일 수주예정 카드 (1번 그림 캡처.PNG) -->
+      <div class="agent-status-panel">
+        <div class="agent-status-header">
+          <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+            <span style="font-size:17px;font-weight:800;color:#fff;">TA 현황</span>
+            <span class="agent-target-badge-clean" id="agentStatusTargetBadge">
+              이달 목표 (알람 0원 · 디지털 0원 · 안전상품 0원)
+            </span>
+          </div>
+
+        </div>
+
+        <div class="agent-status-body">
+          <!-- 6개 메트릭 카드 (2x3) -->
+          <div class="agent-metrics-grid">
+            <div class="agent-m-card">
+              <div class="m-label">전체 TA</div>
+              <div class="m-val" id="agentMTotalAmt">0원</div>
+              <div class="m-cnt" id="agentMTotalCnt">0건</div>
+            </div>
+            <div class="agent-m-card">
+              <div class="m-label">진행중 TA</div>
+              <div class="m-val highlight-blue" id="agentMIngAmt">0원</div>
+              <div class="m-cnt" id="agentMIngCnt">0건</div>
+            </div>
+            <div class="agent-m-card">
+              <div class="m-label">이달 수주 TA</div>
+              <div class="m-val" id="agentMWonAmt">0원</div>
+              <div class="m-cnt" id="agentMWonCnt">0건</div>
+            </div>
+            <div class="agent-m-card">
+              <div class="m-label">실패 TA</div>
+              <div class="m-val" id="agentMFailAmt">0원</div>
+              <div class="m-cnt" id="agentMFailCnt">0건</div>
+            </div>
+            <div class="agent-m-card">
+              <div class="m-label">진행중 TA 평균단가</div>
+              <div class="m-val highlight-blue" id="agentMAvgIngAmt">0원</div>
+            </div>
+            <div class="agent-m-card">
+              <div class="m-label">이달 수주 단가</div>
+              <div class="m-val highlight-blue" id="agentMAvgWonAmt">0원</div>
+            </div>
+          </div>
+
+          <!-- 우측 금일 수주 예정 금액 카드 -->
+          <div class="today-expected-box">
+            <div class="te-title">금일 수주 예정 금액</div>
+            <div class="te-val" id="agentTodayExpAmt">0원</div>
+            <button type="button" class="te-btn" onclick="openTodayExpectedModal()">상세리스트</button>
+          </div>
+        </div>
       </div>
-     </div>
-     <!-- 2. 상단 TA 현황 & 금일 수주예정 카드 (1번 그림 캡처.PNG) -->
-     <div class="agent-status-panel">
-      <div class="agent-status-header">
-       <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
-        <span style="font-size:17px;font-weight:800;color:#fff;">TA 현황</span> <span class="agent-target-badge-clean" id="agentStatusTargetBadge"> 이달 목표 (알람 0원 · 디지털 0원 · 안전상품 0원) </span>
-       </div>
+
+      <!-- 3. 달성현황 (2번 그림 캡처1.PNG) -->
+      <div class="panel" style="margin-top:16px;">
+        <h2 style="font-size:17px;font-weight:800;color:var(--navy);margin:0 0 16px;">달성현황</h2>
+        <div class="agent-achieve-grid">
+          <!-- 좌측 프로그레스 바 4개 -->
+          <div class="achieve-bars">
+            <div class="achieve-bar-item">
+              <div class="bar-header">
+                <span class="bar-title">수주 달성율</span>
+                <span class="bar-pct" id="agentAchieveRateVal" style="color:var(--blue);">0%</span>
+              </div>
+              <div class="bar-track-wrap">
+                <div class="bar-fill-track" id="agentAchieveRateTrack" style="width:0%;background:var(--blue);"></div>
+              </div>
+              <div class="bar-sub" id="agentAchieveRateSub">목표 0원</div>
+            </div>
+
+            <div class="achieve-bar-item">
+              <div class="bar-header">
+                <span class="bar-title">보유 TA율</span>
+                <span class="bar-pct" id="agentHoldRateVal" style="color:#0284c7;">0%</span>
+              </div>
+              <div class="bar-track-wrap">
+                <div class="bar-fill-track" id="agentHoldRateTrack" style="width:0%;background:#0284c7;"></div>
+              </div>
+              <div class="bar-sub" id="agentHoldRateSub">이달 수주예정 0원 (0건)</div>
+            </div>
+
+            <div class="achieve-bar-item">
+              <div class="bar-header">
+                <span class="bar-title">TA 수주율</span>
+                <span class="bar-pct" id="agentWinRateVal" style="color:var(--green);">0%</span>
+              </div>
+              <div class="bar-track-wrap">
+                <div class="bar-fill-track" id="agentWinRateTrack" style="width:0%;background:var(--green);"></div>
+              </div>
+              <div class="bar-sub" id="agentWinRateSub">수주 0원</div>
+            </div>
+
+            <div class="achieve-bar-item">
+              <div class="bar-header">
+                <span class="bar-title">수주 실패율</span>
+                <span class="bar-pct" id="agentFailRateVal" style="color:var(--red);">0%</span>
+              </div>
+              <div class="bar-track-wrap">
+                <div class="bar-fill-track" id="agentFailRateTrack" style="width:0%;background:var(--red);"></div>
+              </div>
+              <div class="bar-sub" id="agentFailRateSub">실패 0원</div>
+            </div>
+          </div>
+
+          <!-- 우측 도넛 차트 & 범례 -->
+          <div class="achieve-donut-wrap">
+            <div class="donut" id="agentDonutChart"></div>
+            <div class="legend" id="agentDonutLegend"></div>
+          </div>
+        </div>
       </div>
-      <div class="agent-status-body">
-       <!-- 6개 메트릭 카드 (2x3) -->
-       <div class="agent-metrics-grid">
-        <div class="agent-m-card">
-         <div class="m-label">전체 TA</div>
-         <div class="m-val" id="agentMTotalAmt">0원</div>
-         <div class="m-cnt" id="agentMTotalCnt">0건</div>
+
+      <!-- 4. 내 담당 TA 목록 (4번 그림 캡처3.PNG) -->
+      <div class="panel" style="margin-top:16px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:10px;">
+          <h2 style="font-size:18px;font-weight:800;color:var(--navy);margin:0;">
+            내 TA 목록 (<span id="agentLeadCount">0</span>건)
+          </h2>
+          <button type="button" class="btn-primary" onclick="openNewAgentLeadModal()" style="display:inline-flex;align-items:center;gap:6px;padding:6px 14px;font-size:13px;font-weight:700;background:var(--blue);color:#fff;border-radius:6px;border:none;cursor:pointer;">
+            ➕ 신규 TA 등록
+          </button>
         </div>
-        <div class="agent-m-card">
-         <div class="m-label">진행중 TA</div>
-         <div class="m-val highlight-blue" id="agentMIngAmt">0원</div>
-         <div class="m-cnt" id="agentMIngCnt">0건</div>
+
+        <!-- 3단 필터 (단계별, 상품별, 월별) -->
+        <div class="agent-list-filters-box">
+          <!-- 1행: 단계 필터 -->
+          <div class="filter-pills-row" id="agentFilterStageRow">
+            <span class="filter-label">단계:</span>
+            <button type="button" class="filter-pill active" data-stage="all" onclick="setAgentFilterStage('all')">전체</button>
+            <button type="button" class="filter-pill" data-stage="진행중" onclick="setAgentFilterStage('진행중')">진행중</button>
+            <button type="button" class="filter-pill" data-stage="수주完" onclick="setAgentFilterStage('수주完')">수주完</button>
+            <button type="button" class="filter-pill" data-stage="실패" onclick="setAgentFilterStage('실패')">실패</button>
+          </div>
+
+
+
+          <!-- 3행: 월별 필터 (수주예정일 이달+이후 기본, 년월 선택, 전체) -->
+          <div class="filter-pills-row" id="agentFilterMonthRow">
+            <span class="filter-label">월별:</span>
+            <button type="button" class="filter-pill active" id="btnAgentMonthCurFuture" onclick="setAgentFilterMonth('current_and_future')">이달 및 이후 (기본)</button>
+            <select id="agentFilterMonthSelect" class="filter-month-select" onchange="onAgentMonthSelectChange(this.value)">
+              <option value="">년월 선택...</option>
+            </select>
+            <button type="button" class="filter-pill" id="btnAgentMonthAll" onclick="setAgentFilterMonth('all')">전체 기간</button>
+          </div>
         </div>
-        <div class="agent-m-card">
-         <div class="m-label">이달 수주 TA</div>
-         <div class="m-val" id="agentMWonAmt">0원</div>
-         <div class="m-cnt" id="agentMWonCnt">0건</div>
+
+        <!-- 안건 테이블 (용역료 우측정렬) -->
+        <div class="table-scroll" style="margin-top:14px;">
+          <table class="lead-table">
+            <thead>
+              <tr>
+                <th style="min-width:170px;">서비스제공처명</th>
+                <th>고객담당자</th>
+                <th style="text-align:right;white-space:nowrap;">용역료(원)</th>
+                <th>단계</th>
+                <th>확도</th>
+                <th>상품종류</th>
+                <th>영업동기</th>
+                <th>일정</th>
+                <th>메모</th>
+                <th>관리</th>
+              </tr>
+            </thead>
+            <tbody id="agentLeadTbody"></tbody>
+          </table>
         </div>
-        <div class="agent-m-card">
-         <div class="m-label">실패 TA</div>
-         <div class="m-val" id="agentMFailAmt">0원</div>
-         <div class="m-cnt" id="agentMFailCnt">0건</div>
-        </div>
-        <div class="agent-m-card">
-         <div class="m-label">진행중 TA 평균단가</div>
-         <div class="m-val highlight-blue" id="agentMAvgIngAmt">0원</div>
-        </div>
-        <div class="agent-m-card">
-         <div class="m-label">이달 수주 단가</div>
-         <div class="m-val highlight-blue" id="agentMAvgWonAmt">0원</div>
-        </div>
-       </div>
-       <!-- 우측 금일 수주 예정 금액 카드 -->
-       <div class="today-expected-box">
-        <div class="te-title">금일 수주 예정 금액</div>
-        <div class="te-val" id="agentTodayExpAmt">0원</div>
-        <button type="button" class="te-btn" onclick="openTodayExpectedModal()">상세리스트</button>
-       </div>
       </div>
-     </div>
-     <!-- 3. 달성현황 (2번 그림 캡처1.PNG) -->
-     <div class="panel" style="margin-top:16px;">
-      <h2 style="font-size:17px;font-weight:800;color:var(--navy);margin:0 0 16px;">달성현황</h2>
-      <div class="agent-achieve-grid">
-       <!-- 좌측 프로그레스 바 4개 -->
-       <div class="achieve-bars">
-        <div class="achieve-bar-item">
-         <div class="bar-header">
-          <span class="bar-title">수주 달성율</span> <span class="bar-pct" id="agentAchieveRateVal" style="color:var(--blue);">0%</span>
-         </div>
-         <div class="bar-track-wrap">
-          <div class="bar-fill-track" id="agentAchieveRateTrack" style="width:0%;background:var(--blue);"></div>
-         </div>
-         <div class="bar-sub" id="agentAchieveRateSub">목표 0원</div>
-        </div>
-        <div class="achieve-bar-item">
-         <div class="bar-header">
-          <span class="bar-title">보유 TA율</span> <span class="bar-pct" id="agentHoldRateVal" style="color:#0284c7;">0%</span>
-         </div>
-         <div class="bar-track-wrap">
-          <div class="bar-fill-track" id="agentHoldRateTrack" style="width:0%;background:#0284c7;"></div>
-         </div>
-         <div class="bar-sub" id="agentHoldRateSub">이달 수주예정 0원 (0건)</div>
-        </div>
-        <div class="achieve-bar-item">
-         <div class="bar-header">
-          <span class="bar-title">TA 수주율</span> <span class="bar-pct" id="agentWinRateVal" style="color:var(--green);">0%</span>
-         </div>
-         <div class="bar-track-wrap">
-          <div class="bar-fill-track" id="agentWinRateTrack" style="width:0%;background:var(--green);"></div>
-         </div>
-         <div class="bar-sub" id="agentWinRateSub">수주 0원</div>
-        </div>
-        <div class="achieve-bar-item">
-         <div class="bar-header">
-          <span class="bar-title">수주 실패율</span> <span class="bar-pct" id="agentFailRateVal" style="color:var(--red);">0%</span>
-         </div>
-         <div class="bar-track-wrap">
-          <div class="bar-fill-track" id="agentFailRateTrack" style="width:0%;background:var(--red);"></div>
-         </div>
-         <div class="bar-sub" id="agentFailRateSub">실패 0원</div>
-        </div>
-       </div>
-       <!-- 우측 도넛 차트 & 범례 -->
-       <div class="achieve-donut-wrap">
-        <div class="donut" id="agentDonutChart"></div>
-        <div class="legend" id="agentDonutLegend"></div>
-       </div>
-      </div>
-     </div>
-     <!-- 4. 내 담당 TA 목록 (4번 그림 캡처3.PNG) -->
-     <div class="panel" style="margin-top:16px;">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:10px;">
-       <h2 style="font-size:18px;font-weight:800;color:var(--navy);margin:0;">내 TA 목록 (<span id="agentLeadCount">0</span>건)</h2>
-       <button type="button" class="btn-primary" onclick="openNewAgentLeadModal()" style="display:inline-flex;align-items:center;gap:6px;padding:6px 14px;font-size:13px;font-weight:700;background:var(--blue);color:#fff;border-radius:6px;border:none;cursor:pointer;">➕ 신규 TA 등록</button>
-      </div>
-      <!-- 3단 필터 (단계별, 상품별, 월별) -->
-      <div class="agent-list-filters-box">
-       <!-- 1행: 단계 필터 -->
-       <div class="filter-pills-row" id="agentFilterStageRow">
-        <span class="filter-label">단계:</span>
-        <button type="button" class="filter-pill active" data-stage="all" onclick="setAgentFilterStage('all')">전체</button>
-        <button type="button" class="filter-pill" data-stage="진행중" onclick="setAgentFilterStage('진행중')">진행중</button>
-        <button type="button" class="filter-pill" data-stage="수주完" onclick="setAgentFilterStage('수주完')">수주完</button>
-        <button type="button" class="filter-pill" data-stage="실패" onclick="setAgentFilterStage('실패')">실패</button>
-       </div>
-       <!-- 3행: 월별 필터 (수주예정일 이달+이후 기본, 년월 선택, 전체) -->
-       <div class="filter-pills-row" id="agentFilterMonthRow">
-        <span class="filter-label">월별:</span>
-        <button type="button" class="filter-pill active" id="btnAgentMonthCurFuture" onclick="setAgentFilterMonth('current_and_future')">이달 및 이후 (기본)</button>
-        <select id="agentFilterMonthSelect" class="filter-month-select" onchange="onAgentMonthSelectChange(this.value)"> <option value="">년월 선택...</option> </select>
-        <button type="button" class="filter-pill" id="btnAgentMonthAll" onclick="setAgentFilterMonth('all')">전체 기간</button>
-       </div>
-      </div>
-      <!-- 안건 테이블 (용역료 우측정렬) -->
-      <div class="table-scroll" style="margin-top:14px;">
-       <table class="lead-table">
-        <thead>
-         <tr>
-          <th style="min-width:170px;">서비스제공처명</th>
-          <th>고객담당자</th>
-          <th style="text-align:right;white-space:nowrap;">용역료(원)</th>
-          <th>단계</th>
-          <th>확도</th>
-          <th>상품종류</th>
-          <th>영업동기</th>
-          <th>일정</th>
-          <th>메모</th>
-          <th>관리</th>
-         </tr>
-        </thead>
-        <tbody id="agentLeadTbody"></tbody>
-       </table>
-      </div>
-     </div>
     </div>
-   </main>
-  </div>
-  <!-- 캘린더 일자 상세 모달 -->
-  <div class="modal-overlay" id="calendarModalOverlay">
-   <div class="modal-card">
-    <button type="button" class="modal-close" id="calendarModalClose">×</button>
+  </main>
+</div>
+
+<!-- 캘린더 일자 상세 모달 -->
+<div class="modal-overlay" id="calendarModalOverlay">
+  <div class="modal-card">
+    <button type="button" class="modal-close" id="calendarModalClose">&times;</button>
     <h3 id="calendarModalTitle">수주예상 상세</h3>
     <div class="modal-sub" id="calendarModalSub"></div>
     <div style="overflow-x:auto;">
-     <table class="modal-table">
-      <thead>
-       <tr>
-        <th>컨설턴트</th>
-        <th class="company-cell">서비스제공처명</th>
-        <th>고객담당자</th>
-        <th>금액</th>
-        <th>확도</th>
-        <th>메모</th>
-       </tr>
-      </thead>
+    <table class="modal-table">
+      <thead><tr><th>컨설턴트</th><th class="company-cell">서비스제공처명</th><th>고객담당자</th><th>금액</th><th>확도</th><th>메모</th></tr></thead>
       <tbody id="calendarModalTbody"></tbody>
-     </table>
+    </table>
     </div>
-   </div>
   </div>
-  <!-- ==========================================================================
+</div>
+
+
+<!-- ==========================================================================
      관리자 전용 사용자 관리 모달 (소개영업 앱 100% 동일 구현)
      ========================================================================== -->
-  <div class="modal-overlay" id="userManageModalOverlay" style="display:none;">
-   <div class="modal-card" style="max-width:680px;width:95%;max-height:85vh;overflow-y:auto;">
-    <button type="button" class="modal-close" onclick="closeUserManageModal()">×</button>
+<div class="modal-overlay" id="userManageModalOverlay" style="display:none;">
+  <div class="modal-card" style="max-width:680px;width:95%;max-height:85vh;overflow-y:auto;">
+    <button type="button" class="modal-close" onclick="closeUserManageModal()">&times;</button>
     <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
-     <h3 style="margin:0;font-size:18px;font-weight:800;color:var(--navy);">👥 사용자 관리</h3>
+      <h3 style="margin:0;font-size:18px;font-weight:800;color:var(--navy);">👥 사용자 관리</h3>
     </div>
+
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
-     <span style="font-size:0.86rem;color:#5f6368;font-weight:600;">총 사용자: <strong id="totalUserCount" style="color:#1a73e8;font-size:1rem;">0</strong>명</span>
-     <button type="button" class="small secondary" id="btnRefreshUsers" onclick="loadAllUsers()" style="background:#e8f0fe;color:#1a73e8;border:1px solid #aecbfa;border-radius:6px;padding:5px 12px;font-size:0.8rem;font-weight:700;cursor:pointer;">🔄 새로고침</button>
+      <span style="font-size:0.86rem;color:#5f6368;font-weight:600;">총 사용자: <strong id="totalUserCount" style="color:#1a73e8;font-size:1rem;">0</strong>명</span>
+      <button type="button" class="small secondary" id="btnRefreshUsers" onclick="loadAllUsers()" style="background:#e8f0fe;color:#1a73e8;border:1px solid #aecbfa;border-radius:6px;padding:5px 12px;font-size:0.8rem;font-weight:700;cursor:pointer;">🔄 새로고침</button>
     </div>
+
     <div class="user-table-wrapper">
-     <table class="user-data-table">
-      <thead>
-       <tr>
-        <th>이름</th>
-        <th>전화번호(아이디)</th>
-        <th>직무</th>
-        <th style="text-align:center;">관리</th>
-       </tr>
-      </thead>
-      <tbody id="userTableBody">
-       <tr>
-        <td colspan="4" style="text-align:center;padding:20px;color:#9aa0a6;">사용자 목록 로딩 중...</td>
-       </tr>
-      </tbody>
-     </table>
+      <table class="user-data-table">
+        <thead>
+          <tr>
+            <th>이름</th>
+            <th>전화번호(아이디)</th>
+            <th>직무</th>
+            <th style="text-align:center;">관리</th>
+          </tr>
+        </thead>
+        <tbody id="userTableBody">
+          <tr><td colspan="4" style="text-align:center;padding:20px;color:#9aa0a6;">사용자 목록 로딩 중...</td></tr>
+        </tbody>
+      </table>
     </div>
+
     <!-- 사용자 정보 수정 폼 -->
     <div class="user-edit-box" id="userEditBox">
-     <h4 style="margin:0 0 10px 0;font-size:0.9rem;color:#1a73e8;font-weight:800;">✏️ 사용자 정보 수정</h4>
-     <input type="hidden" id="editUserTargetPhone">
-     <div style="display:flex;gap:10px;margin-bottom:12px;flex-wrap:wrap;">
-      <div style="flex:1;min-width:140px;">
-       <label style="display:block;font-size:0.82rem;font-weight:700;color:#3c4043;margin-bottom:5px;">이름</label> <input type="text" id="editUserNameInput" style="width:100%;padding:8px 10px;border:1.5px solid #dadce0;border-radius:6px;font-size:14px;box-sizing:border-box;">
+      <h4 style="margin:0 0 10px 0;font-size:0.9rem;color:#1a73e8;font-weight:800;">✏️ 사용자 정보 수정</h4>
+      <input type="hidden" id="editUserTargetPhone">
+      <div style="display:flex;gap:10px;margin-bottom:12px;flex-wrap:wrap;">
+        <div style="flex:1;min-width:140px;">
+          <label style="display:block;font-size:0.82rem;font-weight:700;color:#3c4043;margin-bottom:5px;">이름</label>
+          <input type="text" id="editUserNameInput" style="width:100%;padding:8px 10px;border:1.5px solid #dadce0;border-radius:6px;font-size:14px;box-sizing:border-box;">
+        </div>
+        <div style="flex:1;min-width:140px;">
+          <label style="display:block;font-size:0.82rem;font-weight:700;color:#3c4043;margin-bottom:5px;">직무</label>
+          <select id="editUserJobSelect" style="width:100%;padding:8px 10px;border:1.5px solid #dadce0;border-radius:6px;font-size:14px;background:#fff;box-sizing:border-box;">
+            <option value="CS근무자">CS근무자</option>
+            <option value="CS관리자">CS관리자</option>
+            <option value="컨설턴트">컨설턴트</option>
+            <option value="기술사원">기술사원</option>
+            <option value="지사관리자">지사관리자</option>
+            <option value="본사관리자">본사관리자</option>
+          </select>
+        </div>
       </div>
-      <div style="flex:1;min-width:140px;">
-       <label style="display:block;font-size:0.82rem;font-weight:700;color:#3c4043;margin-bottom:5px;">직무</label> <select id="editUserJobSelect" style="width:100%;padding:8px 10px;border:1.5px solid #dadce0;border-radius:6px;font-size:14px;background:#fff;box-sizing:border-box;"> <option value="CS근무자">CS근무자</option> <option value="CS관리자">CS관리자</option> <option value="컨설턴트">컨설턴트</option> <option value="기술사원">기술사원</option> <option value="지사관리자">지사관리자</option> <option value="본사관리자">본사관리자</option> </select>
+      <div style="margin-bottom:12px;">
+        <label style="display:block;font-size:0.82rem;font-weight:700;color:#3c4043;margin-bottom:5px;">비밀번호 변경 <span style="font-weight:normal;color:#5f6368;font-size:0.75rem;">(변경 시에만 8~10자 입력)</span></label>
+        <div style="position:relative;width:100%;">
+          <input type="password" id="editUserNewPwdInput" placeholder="변경하지 않으려면 공란으로 두세요" maxlength="10" style="width:100%;padding:8px 45px 8px 10px;border:1.5px solid #dadce0;border-radius:6px;font-size:14px;box-sizing:border-box;">
+          <button type="button" onclick="togglePasswordVisibility('editUserNewPwdInput', this)" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;font-size:1.15rem;cursor:pointer;padding:4px 6px;line-height:1;color:#5f6368;" title="비밀번호 보기/숨기기">👁️</button>
+        </div>
       </div>
-     </div>
-     <div style="margin-bottom:12px;">
-      <label style="display:block;font-size:0.82rem;font-weight:700;color:#3c4043;margin-bottom:5px;">비밀번호 변경 <span style="font-weight:normal;color:#5f6368;font-size:0.75rem;">(변경 시에만 8~10자 입력)</span></label>
-      <div style="position:relative;width:100%;">
-       <input type="password" id="editUserNewPwdInput" placeholder="변경하지 않으려면 공란으로 두세요" maxlength="10" style="width:100%;padding:8px 45px 8px 10px;border:1.5px solid #dadce0;border-radius:6px;font-size:14px;box-sizing:border-box;">
-       <button type="button" onclick="togglePasswordVisibility('editUserNewPwdInput', this)" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;font-size:1.15rem;cursor:pointer;padding:4px 6px;line-height:1;color:#5f6368;" title="비밀번호 보기/숨기기">👁️</button>
+      <div style="display:flex;gap:8px;">
+        <button type="button" class="btn-save-status" id="btnSaveUserEdit" onclick="saveUserEdit()" style="margin-top:0;padding:9px 18px;background:#1a73e8;color:#fff;border:none;border-radius:6px;font-size:0.88rem;font-weight:700;cursor:pointer;">수정 저장</button>
+        <button type="button" id="btnCancelUserEdit" onclick="cancelUserEdit()" style="padding:9px 14px;background:#f1f3f4;border:none;border-radius:6px;font-weight:700;color:#3c4043;cursor:pointer;">취소</button>
       </div>
-     </div>
-     <div style="display:flex;gap:8px;">
-      <button type="button" class="btn-save-status" id="btnSaveUserEdit" onclick="saveUserEdit()" style="margin-top:0;padding:9px 18px;background:#1a73e8;color:#fff;border:none;border-radius:6px;font-size:0.88rem;font-weight:700;cursor:pointer;">수정 저장</button>
-      <button type="button" id="btnCancelUserEdit" onclick="cancelUserEdit()" style="padding:9px 14px;background:#f1f3f4;border:none;border-radius:6px;font-weight:700;color:#3c4043;cursor:pointer;">취소</button>
-     </div>
     </div>
-   </div>
   </div>
-  <!-- 월간 목표 설정 및 배분 모달 (지사장 전용) -->
-  <div class="modal-overlay" id="targetModalOverlay" style="display:none;">
-   <div class="modal-card" style="max-width:760px;width:95%;">
-    <button type="button" class="modal-close" id="targetModalClose" onclick="closeTargetModal()">×</button>
+</div>
+
+
+<!-- 월간 목표 설정 및 배분 모달 (지사장 전용) -->
+<div class="modal-overlay" id="targetModalOverlay" style="display:none;">
+  <div class="modal-card" style="max-width:760px;width:95%;">
+    <button type="button" class="modal-close" id="targetModalClose" onclick="closeTargetModal()">&times;</button>
     <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px;">
-     <h3 style="margin:0;font-size:18px;">🎯 월간 목표 설정 및 배분</h3>
-     <span class="count-tag" style="background:#e0e7ff;color:#3730a3;font-weight:700;">지사장 전용</span>
+      <h3 style="margin:0;font-size:18px;">🎯 월간 목표 설정 및 배분</h3>
+      <span class="count-tag" style="background:#e0e7ff;color:#3730a3;font-weight:700;">지사장 전용</span>
     </div>
-    <div class="modal-sub" style="margin-bottom:14px;color:var(--muted);font-size:13px;">월별 지사 전체 목표와 상품별 컨설턴트 배분률(100%)을 설정하면, 천원 단위로 자동 반올림 배분되어 DB에 확정 저장됩니다.</div>
+    <div class="modal-sub" style="margin-bottom:14px;color:var(--muted);font-size:13px;">
+      월별 지사 전체 목표와 상품별 컨설턴트 배분률(100%)을 설정하면, 천원 단위로 자동 반올림 배분되어 DB에 확정 저장됩니다.
+    </div>
+
     <!-- 월 선택 & 종합 요약 바 -->
     <div style="background:#f8fafc;border:1px solid var(--border);border-radius:12px;padding:12px 16px;margin-bottom:14px;">
-     <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
-      <div style="display:flex;align-items:center;gap:8px;">
-       <label style="font-weight:700;font-size:13.5px;color:var(--navy);">대상 월 선택:</label> <input type="month" id="targetModalMonth" style="padding:6px 10px;border:1.5px solid var(--border);border-radius:8px;font-size:14px;font-weight:700;color:var(--navy);outline:none;">
-       <button type="button" class="small secondary" id="btnTargetModalReload" style="padding:6px 10px;">불러오기</button>
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
+        <div style="display:flex;align-items:center;gap:8px;">
+          <label style="font-weight:700;font-size:13.5px;color:var(--navy);">대상 월 선택:</label>
+          <input type="month" id="targetModalMonth" style="padding:6px 10px;border:1.5px solid var(--border);border-radius:8px;font-size:14px;font-weight:700;color:var(--navy);outline:none;">
+          <button type="button" class="small secondary" id="btnTargetModalReload" style="padding:6px 10px;">불러오기</button>
+        </div>
+        <div style="display:flex;gap:12px;font-size:13px;align-items:center;">
+          <div>지사 전체 총 목표: <strong id="modalSummaryTotal" style="color:var(--blue);font-size:15px;">0원</strong></div>
+        </div>
       </div>
-      <div style="display:flex;gap:12px;font-size:13px;align-items:center;">
-       <div>
-        지사 전체 총 목표: <strong id="modalSummaryTotal" style="color:var(--blue);font-size:15px;">0원</strong>
-       </div>
-      </div>
-     </div>
     </div>
+
     <!-- 상품 카테고리 탭 네비게이션 -->
     <div class="tab-group" style="display:flex;gap:6px;margin-bottom:14px;background:#f1f5f9;padding:4px;border-radius:10px;">
-     <button type="button" class="tab-btn active" data-target-tab="일반알람" onclick="switchTargetModalTab('일반알람')" style="flex:1;padding:8px;font-weight:700;border:none;border-radius:8px;cursor:pointer;background:#fff;color:var(--navy);box-shadow:0 1px 3px rgba(0,0,0,0.1);">일반알람</button>
-     <button type="button" class="tab-btn" data-target-tab="디지털(정보보안)" onclick="switchTargetModalTab('디지털(정보보안)')" style="flex:1;padding:8px;font-weight:700;border:none;border-radius:8px;cursor:pointer;background:transparent;color:var(--muted);">디지털(정보보안)</button>
-     <button type="button" class="tab-btn" data-target-tab="안전상품" onclick="switchTargetModalTab('안전상품')" style="flex:1;padding:8px;font-weight:700;border:none;border-radius:8px;cursor:pointer;background:transparent;color:var(--muted);">안전상품</button>
+      <button type="button" class="tab-btn active" data-target-tab="일반알람" onclick="switchTargetModalTab('일반알람')" style="flex:1;padding:8px;font-weight:700;border:none;border-radius:8px;cursor:pointer;background:#fff;color:var(--navy);box-shadow:0 1px 3px rgba(0,0,0,0.1);">일반알람</button>
+      <button type="button" class="tab-btn" data-target-tab="디지털(정보보안)" onclick="switchTargetModalTab('디지털(정보보안)')" style="flex:1;padding:8px;font-weight:700;border:none;border-radius:8px;cursor:pointer;background:transparent;color:var(--muted);">디지털(정보보안)</button>
+      <button type="button" class="tab-btn" data-target-tab="안전상품" onclick="switchTargetModalTab('안전상품')" style="flex:1;padding:8px;font-weight:700;border:none;border-radius:8px;cursor:pointer;background:transparent;color:var(--muted);">안전상품</button>
     </div>
+
     <!-- 지사 목표 입력 & 균등배분 버튼 영역 -->
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:10px;">
-     <div style="display:flex;align-items:center;gap:8px;">
-      <label style="font-weight:700;font-size:13.5px;"><span id="modalActiveCategoryLabel">일반알람</span> 지사 전체 목표:</label>
-      <div style="position:relative;">
-       <input type="text" id="modalCategoryTotalInput" inputmode="numeric" placeholder="예: 3,500,000" oninput="onModalBranchTotalChange()" style="padding:7px 30px 7px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:15px;font-weight:700;width:150px;text-align:right;"> <span style="position:absolute;right:10px;top:8px;font-size:13px;color:var(--muted);">원</span>
+      <div style="display:flex;align-items:center;gap:8px;">
+        <label style="font-weight:700;font-size:13.5px;"><span id="modalActiveCategoryLabel">일반알람</span> 지사 전체 목표:</label>
+        <div style="position:relative;">
+          <input type="text" id="modalCategoryTotalInput" inputmode="numeric" placeholder="예: 3,500,000" oninput="onModalBranchTotalChange()" style="padding:7px 30px 7px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:15px;font-weight:700;width:150px;text-align:right;">
+          <span style="position:absolute;right:10px;top:8px;font-size:13px;color:var(--muted);">원</span>
+        </div>
       </div>
-     </div>
-     <div style="display:flex;gap:6px;">
-      <button type="button" class="small secondary" id="btnDistributeEqual" onclick="distributeEqualRates()" style="font-size:12px;">⚖️ 1/N 균등 배분 (각 20%)</button>
-     </div>
+      <div style="display:flex;gap:6px;">
+        <button type="button" class="small secondary" id="btnDistributeEqual" onclick="distributeEqualRates()" style="font-size:12px;">⚖️ 1/N 균등 배분 (각 20%)</button>
+      </div>
     </div>
+
     <!-- 컨설턴트별 배분 테이블 -->
     <div style="overflow-x:auto;margin-bottom:12px;border:1px solid var(--border);border-radius:10px;">
-     <table class="target-table" style="margin:0;width:100%;">
-      <thead style="background:#f8fafc;">
-       <tr>
-        <th style="padding:10px 12px;">컨설턴트</th>
-        <th style="padding:10px 12px;text-align:right;width:120px;">배분률 (%)</th>
-        <th style="padding:10px 12px;text-align:right;width:170px;">계산 목표 금액 (원)</th>
-        <th style="padding:10px 12px;width:160px;">배분 비율</th>
-       </tr>
-      </thead>
-      <tbody id="modalTargetTbody"></tbody>
-      <tfoot style="background:#f1f5f9;font-weight:700;">
-       <tr>
-        <td style="padding:10px 12px;">합계</td>
-        <td style="padding:10px 12px;text-align:right;" id="modalRateSumCell">100.0%</td>
-        <td style="padding:10px 12px;text-align:right;" id="modalAmountSumCell">0원</td>
-        <td style="padding:10px 12px;font-size:12px;color:var(--muted);" id="modalDiffCell">지사목표 일치</td>
-       </tr>
-      </tfoot>
-     </table>
+      <table class="target-table" style="margin:0;width:100%;">
+        <thead style="background:#f8fafc;">
+          <tr>
+            <th style="padding:10px 12px;">컨설턴트</th>
+            <th style="padding:10px 12px;text-align:right;width:120px;">배분률 (%)</th>
+            <th style="padding:10px 12px;text-align:right;width:170px;">계산 목표 금액 (원)</th>
+            <th style="padding:10px 12px;width:160px;">배분 비율</th>
+          </tr>
+        </thead>
+        <tbody id="modalTargetTbody">
+        </tbody>
+        <tfoot style="background:#f1f5f9;font-weight:700;">
+          <tr>
+            <td style="padding:10px 12px;">합계</td>
+            <td style="padding:10px 12px;text-align:right;" id="modalRateSumCell">100.0%</td>
+            <td style="padding:10px 12px;text-align:right;" id="modalAmountSumCell">0원</td>
+            <td style="padding:10px 12px;font-size:12px;color:var(--muted);" id="modalDiffCell">지사목표 일치</td>
+          </tr>
+        </tfoot>
+      </table>
     </div>
+
     <div style="font-size:12px;color:var(--muted);margin-bottom:16px;line-height:1.5;">
-     💡 <strong>배분 안내</strong>: 배분률(%) 또는 지사 전체 목표를 수정하면 <strong>천원 단위로 자동 반올림</strong>되어 계산됩니다. 상품별로 배분률을 다르게 적용할 수 있습니다.
+      💡 <strong>배분 안내</strong>: 배분률(%) 또는 지사 전체 목표를 수정하면 <strong>천원 단위로 자동 반올림</strong>되어 계산됩니다. 상품별로 배분률을 다르게 적용할 수 있습니다.
     </div>
+
     <!-- 하단 액션 버튼 -->
     <div style="display:flex;justify-content:space-between;align-items:center;border-top:1px solid var(--border);padding-top:14px;">
-     <button type="button" class="secondary" id="targetModalCancel" onclick="closeTargetModal()" style="padding:9px 16px;">닫기</button>
-     <button type="button" id="btnSaveAllTargets" onclick="saveAllTargets()" style="padding:9px 22px;background:var(--blue);color:#fff;font-weight:700;border:none;border-radius:8px;cursor:pointer;">💾 <span id="modalSaveMonthLabel">2026년 09월</span> 목표 확정 저장</button>
+      <button type="button" class="secondary" id="targetModalCancel" onclick="closeTargetModal()" style="padding:9px 16px;">닫기</button>
+      <button type="button" id="btnSaveAllTargets" onclick="saveAllTargets()" style="padding:9px 22px;background:var(--blue);color:#fff;font-weight:700;border:none;border-radius:8px;cursor:pointer;">
+        💾 <span id="modalSaveMonthLabel">2026년 09월</span> 목표 확정 저장
+      </button>
     </div>
-   </div>
   </div>
-  <!-- 공지사항 관리 모달 -->
-  <div class="modal-overlay" id="noticeModalOverlay">
-   <div class="modal-card" style="max-width:560px;">
-    <button type="button" class="modal-close" id="noticeModalClose">×</button>
+</div>
+
+<!-- 공지사항 관리 모달 -->
+<div class="modal-overlay" id="noticeModalOverlay">
+  <div class="modal-card" style="max-width:560px;">
+    <button type="button" class="modal-close" id="noticeModalClose">&times;</button>
     <h3>공지사항 관리</h3>
     <div class="modal-sub">전 컨설턴트가 화면을 열 때마다 팝업으로 표시됩니다. 저장하면 즉시 반영되고, 삭제하면 더 이상 팝업이 뜨지 않습니다.</div>
     <textarea id="noticeTextarea" rows="6" placeholder="전달하실 공지 내용을 입력하세요." style="width:100%;box-sizing:border-box;border:1px solid var(--border);border-radius:10px;padding:12px 14px;font-size:14px;font-family:inherit;resize:vertical;margin-bottom:6px;"></textarea>
     <div id="noticeUpdatedAt" style="font-size:11.5px;color:var(--muted);margin-bottom:14px;"></div>
     <div style="display:flex;gap:10px;justify-content:flex-end;">
-     <button type="button" id="btnNoticeDelete" class="secondary" style="background:#f1f3f4;color:#dc2626;">공지 삭제</button>
-     <button type="button" id="btnNoticeSave">저장</button>
+      <button type="button" id="btnNoticeDelete" class="secondary" style="background:#f1f3f4;color:#dc2626;">공지 삭제</button>
+      <button type="button" id="btnNoticeSave">저장</button>
     </div>
-   </div>
   </div>
-  <!-- ==========================================================================
+</div>
+
+<!-- ==========================================================================
      컨설턴트 신규 TA 등록 / 수정 모달 (3번 그림 캡처2.PNG 매칭)
      ========================================================================== -->
-  <div class="modal-overlay" id="agentLeadModalOverlay" style="display:none;">
-   <div class="modal-card" style="max-width:960px;width:95%;">
-    <button type="button" class="modal-close" onclick="closeAgentLeadModal()">×</button>
+<div class="modal-overlay" id="agentLeadModalOverlay" style="display:none;">
+  <div class="modal-card" style="max-width:960px;width:95%;">
+    <button type="button" class="modal-close" onclick="closeAgentLeadModal()">&times;</button>
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
-     <h3 id="agentModalTitle" style="margin:0;font-size:18px;font-weight:800;color:var(--navy);">신규 TA 등록</h3>
-     <span class="count-tag" style="background:#eff6ff;color:#1d4ed8;font-weight:700;">컨설턴트 영업</span>
+      <h3 id="agentModalTitle" style="margin:0;font-size:18px;font-weight:800;color:var(--navy);">신규 TA 등록</h3>
+      <span class="count-tag" style="background:#eff6ff;color:#1d4ed8;font-weight:700;">컨설턴트 영업</span>
     </div>
+
     <form id="agentModalLeadForm" onsubmit="handleAgentModalSubmit(event)" class="agent-compact-form">
-     <input type="hidden" id="afEditingId" name="editingId"><input type="hidden" id="agentEditingId"> <!-- 1행: 기본 인적/영업 정보 7개 필드 가로 정렬 -->
-     <div class="compact-form-row1">
-      <div class="form-group" style="margin:0;">
-       <label style="font-size:12px;font-weight:700;">서비스제공처명 *</label> <input type="text" id="afCompany" required placeholder="현장 정식 명칭">
+      <input type="hidden" id="afEditingId" name="editingId"><input type="hidden" id="agentEditingId">
+      
+      <!-- 1행: 기본 인적/영업 정보 7개 필드 가로 정렬 -->
+      <div class="compact-form-row1">
+        <div class="form-group" style="margin:0;">
+          <label style="font-size:12px;font-weight:700;">서비스제공처명 *</label>
+          <input type="text" id="afCompany" required placeholder="현장 정식 명칭">
+        </div>
+        <div class="form-group" style="margin:0;">
+          <label style="font-size:12px;font-weight:700;">고객담당자</label>
+          <input type="text" id="afContact" placeholder="담당자 성명">
+        </div>
+        <div class="form-group" style="margin:0;">
+          <label style="font-size:12px;font-weight:700;">용역료(원) *</label>
+          <input type="text" inputmode="numeric" id="afAmount" required placeholder="예: 50,000,000">
+        </div>
+        <div class="form-group" style="margin:0;">
+          <label style="font-size:12px;font-weight:700;">상품종류 *</label>
+          <select id="afProductType">
+            <option value="알람">알람</option>
+            <option value="휴엔">휴엔</option>
+            <option value="정보보안">정보보안</option>
+            <option value="블루스캔">블루스캔</option>
+            <option value="유지보수">유지보수</option>
+            <option value="안전상품">안전상품</option>
+          </select>
+        </div>
+        <div class="form-group" style="margin:0;">
+          <label style="font-size:12px;font-weight:700;">영업동기 *</label>
+          <select id="afMotive">
+            <option value="개척">개척</option>
+            <option value="콜센터">콜센터</option>
+            <option value="사내소개">사내소개</option>
+            <option value="고객소개">고객소개</option>
+            <option value="대리점">대리점</option>
+            <option value="관내이전">관내이전</option>
+            <option value="관외이전">관외이전</option>
+            <option value="기타">기타</option>
+          </select>
+        </div>
+        <div class="form-group" style="margin:0;">
+          <label style="font-size:12px;font-weight:700;">영업단계 *</label>
+          <select id="afStage" onchange="onAgentStageChange(this.value)">
+            <option value="진행중">진행중</option>
+            <option value="수주完">수주完</option>
+            <!-- 수정 모드일 때만 실패 옵션 동적 추가 -->
+          </select>
+        </div>
+        <div class="form-group" style="margin:0;">
+          <label style="font-size:12px;font-weight:700;">수주확도 *</label>
+          <select id="afConfidence">
+            <option value="A">A (상)</option>
+            <option value="B" selected>B (중)</option>
+            <option value="C">C (하)</option>
+          </select>
+        </div>
       </div>
-      <div class="form-group" style="margin:0;">
-       <label style="font-size:12px;font-weight:700;">고객담당자</label> <input type="text" id="afContact" placeholder="담당자 성명">
+
+      <!-- 1.5행: 수주完 선택 시 추가 정보 (계약일, 기산일, 차량번호) -->
+      <div id="afWonExtraRow" class="compact-form-row-won" style="display:none;">
+        <div class="form-group" style="margin:0;">
+          <label style="font-size:12px;font-weight:700;color:#1e40af;">계약일 (수주完 시) *</label>
+          <input type="date" id="afContractDate">
+        </div>
+        <div class="form-group" style="margin:0;">
+          <label style="font-size:12px;font-weight:700;color:#1e40af;">기산일 *</label>
+          <input type="date" id="afBaseDate">
+        </div>
+        <div class="form-group" style="margin:0;">
+          <label style="font-size:12px;font-weight:700;color:#1e40af;">차량번호</label>
+          <select id="afVehicleNumber">
+            <option value="없음">없음</option>
+            <option value="26호">26호</option>
+            <option value="27호">27호</option>
+            <option value="28호">28호</option>
+            <option value="127호">127호</option>
+            <option value="160호">160호</option>
+          </select>
+        </div>
       </div>
-      <div class="form-group" style="margin:0;">
-       <label style="font-size:12px;font-weight:700;">용역료(원) *</label> <input type="text" inputmode="numeric" id="afAmount" required placeholder="예: 50,000,000">
+
+      <!-- 2행: 등록일, 계약예정일, 메모, 등록 버튼 -->
+      <div class="compact-form-row2" style="margin-top:6px;">
+        <div class="form-group" style="margin:0;">
+          <label style="font-size:12px;font-weight:700;">등록일</label>
+          <input type="date" id="afRegisteredDate">
+        </div>
+        <div class="form-group" style="margin:0;">
+          <label style="font-size:12px;font-weight:700;">계약예정일 *</label>
+          <input type="date" id="afExpectedDate" required onchange="onAgentExpectedDateChange(this.value)">
+        </div>
+        <div class="form-group" style="margin:0;">
+          <label style="font-size:12px;font-weight:700;">메모</label>
+          <input type="text" id="afMemo" placeholder="특이사항, 다음 액션 등">
+        </div>
+        <div>
+          <button type="submit" id="afSubmitBtn" style="padding:10px 24px;background:#2563eb;color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;white-space:nowrap;height:42px;">
+            TA 등록
+          </button>
+        </div>
       </div>
-      <div class="form-group" style="margin:0;">
-       <label style="font-size:12px;font-weight:700;">상품종류 *</label> <select id="afProductType"> <option value="알람">알람</option> <option value="휴엔">휴엔</option> <option value="정보보안">정보보안</option> <option value="블루스캔">블루스캔</option> <option value="유지보수">유지보수</option> <option value="안전상품">안전상품</option> </select>
-      </div>
-      <div class="form-group" style="margin:0;">
-       <label style="font-size:12px;font-weight:700;">영업동기 *</label> <select id="afMotive"> <option value="개척">개척</option> <option value="콜센터">콜센터</option> <option value="사내소개">사내소개</option> <option value="고객소개">고객소개</option> <option value="대리점">대리점</option> <option value="관내이전">관내이전</option> <option value="관외이전">관외이전</option> <option value="기타">기타</option> </select>
-      </div>
-      <div class="form-group" style="margin:0;">
-       <label style="font-size:12px;font-weight:700;">영업단계 *</label> <select id="afStage" onchange="onAgentStageChange(this.value)"> <option value="진행중">진행중</option> <option value="수주完">수주完</option> <!-- 수정 모드일 때만 실패 옵션 동적 추가 --> </select>
-      </div>
-      <div class="form-group" style="margin:0;">
-       <label style="font-size:12px;font-weight:700;">수주확도 *</label> <select id="afConfidence"> <option value="A">A (상)</option> <option value="B" selected>B (중)</option> <option value="C">C (하)</option> </select>
-      </div>
-     </div>
-     <!-- 1.5행: 수주完 선택 시 추가 정보 (계약일, 기산일, 차량번호) -->
-     <div id="afWonExtraRow" class="compact-form-row-won" style="display:none;">
-      <div class="form-group" style="margin:0;">
-       <label style="font-size:12px;font-weight:700;color:#1e40af;">계약일 (수주完 시) *</label> <input type="date" id="afContractDate">
-      </div>
-      <div class="form-group" style="margin:0;">
-       <label style="font-size:12px;font-weight:700;color:#1e40af;">기산일 *</label> <input type="date" id="afBaseDate">
-      </div>
-      <div class="form-group" style="margin:0;">
-       <label style="font-size:12px;font-weight:700;color:#1e40af;">차량번호</label> <select id="afVehicleNumber"> <option value="없음">없음</option> <option value="26호">26호</option> <option value="27호">27호</option> <option value="28호">28호</option> <option value="127호">127호</option> <option value="160호">160호</option> </select>
-      </div>
-     </div>
-     <!-- 2행: 등록일, 계약예정일, 메모, 등록 버튼 -->
-     <div class="compact-form-row2" style="margin-top:6px;">
-      <div class="form-group" style="margin:0;">
-       <label style="font-size:12px;font-weight:700;">등록일</label> <input type="date" id="afRegisteredDate">
-      </div>
-      <div class="form-group" style="margin:0;">
-       <label style="font-size:12px;font-weight:700;">계약예정일 *</label> <input type="date" id="afExpectedDate" required onchange="onAgentExpectedDateChange(this.value)">
-      </div>
-      <div class="form-group" style="margin:0;">
-       <label style="font-size:12px;font-weight:700;">메모</label> <input type="text" id="afMemo" placeholder="특이사항, 다음 액션 등">
-      </div>
-      <div>
-       <button type="submit" id="afSubmitBtn" style="padding:10px 24px;background:#2563eb;color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;white-space:nowrap;height:42px;">TA 등록</button>
-      </div>
-     </div>
     </form>
-   </div>
   </div>
-  <!-- ==========================================================================
+</div>
+
+<!-- ==========================================================================
      금일 수주 예정 금액 상세리스트 모달
      ========================================================================== -->
-  <div class="modal-overlay" id="todayExpectedModalOverlay" style="display:none;">
-   <div class="modal-card" style="max-width:850px;width:95%;">
-    <button type="button" class="modal-close" onclick="closeTodayExpectedModal()">×</button>
+<div class="modal-overlay" id="todayExpectedModalOverlay" style="display:none;">
+  <div class="modal-card" style="max-width:850px;width:95%;">
+    <button type="button" class="modal-close" onclick="closeTodayExpectedModal()">&times;</button>
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
-     <h3 style="margin:0;font-size:18px;font-weight:800;color:var(--navy);">📅 금일 수주 예정 TA 상세목록</h3>
-     <span class="count-tag" id="todayExpectedModalDateTag" style="background:#eff6ff;color:#1d4ed8;font-weight:700;"></span>
+      <h3 style="margin:0;font-size:18px;font-weight:800;color:var(--navy);">
+        📅 금일 수주 예정 TA 상세목록
+      </h3>
+      <span class="count-tag" id="todayExpectedModalDateTag" style="background:#eff6ff;color:#1d4ed8;font-weight:700;"></span>
     </div>
     <div style="overflow-x:auto;">
-     <table class="modal-table">
-      <thead>
-       <tr>
-        <th class="company-cell">서비스제공처명</th>
-        <th>고객담당자</th>
-        <th style="text-align:right;">용역료(원)</th>
-        <th>상품종류</th>
-        <th>영업동기</th>
-        <th>확도</th>
-        <th>메모</th>
-        <th>관리</th>
-       </tr>
-      </thead>
-      <tbody id="todayExpectedModalTbody"></tbody>
-     </table>
+      <table class="modal-table">
+        <thead>
+          <tr>
+            <th class="company-cell">서비스제공처명</th>
+            <th>고객담당자</th>
+            <th style="text-align:right;">용역료(원)</th>
+            <th>상품종류</th>
+            <th>영업동기</th>
+            <th>확도</th>
+            <th>메모</th>
+            <th>관리</th>
+          </tr>
+        </thead>
+        <tbody id="todayExpectedModalTbody"></tbody>
+      </table>
     </div>
-   </div>
   </div>
-  <!-- ==========================================================================
+</div>
+
+<!-- ==========================================================================
      컨설턴트 로그인 시 지사장 공지사항 팝업 모달
      ========================================================================== -->
-  <div class="modal-overlay" id="agentNoticeModalOverlay" style="display:none;position:fixed;inset:0;background:rgba(10,20,40,0.65);z-index:99999;align-items:center;justify-content:center;padding:20px;">
-   <div class="modal-card" style="max-width:550px;width:90%;border-top:5px solid var(--blue);">
-    <button type="button" class="modal-close" onclick="closeAgentNoticeModal()">×</button>
+<div class="modal-overlay" id="agentNoticeModalOverlay" style="display:none;position:fixed;inset:0;background:rgba(10,20,40,0.65);z-index:99999;align-items:center;justify-content:center;padding:20px;">
+  <div class="modal-card" style="max-width:550px;width:90%;border-top:5px solid var(--blue);">
+    <button type="button" class="modal-close" onclick="closeAgentNoticeModal()">&times;</button>
     <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
-     <span style="font-size:24px;">📢</span>
-     <div>
-      <h3 style="margin:0;font-size:18px;font-weight:800;color:var(--navy);">북서울지사 공지사항</h3>
-      <div id="agentNoticeDate" style="font-size:12px;color:var(--muted);margin-top:2px;"></div>
-     </div>
+      <span style="font-size:24px;">📢</span>
+      <div>
+        <h3 style="margin:0;font-size:18px;font-weight:800;color:var(--navy);">북서울지사 공지사항</h3>
+        <div id="agentNoticeDate" style="font-size:12px;color:var(--muted);margin-top:2px;"></div>
+      </div>
     </div>
     <div id="agentNoticeContent" style="background:#f8fafc;border:1px solid var(--border);border-radius:10px;padding:16px;font-size:14.5px;line-height:1.65;color:#1e293b;white-space:pre-wrap;max-height:360px;overflow-y:auto;margin-bottom:16px;"></div>
     <div style="display:flex;justify-content:space-between;align-items:center;">
-     <label style="font-size:13px;color:#64748b;cursor:pointer;display:flex;align-items:center;gap:6px;"> <input type="checkbox" id="chkNoticeDismissToday"> 오늘 하루 보지 않기 </label>
-     <button type="button" onclick="closeAgentNoticeModal()" style="padding:8px 24px;background:var(--blue);color:#fff;border:none;border-radius:6px;font-weight:700;cursor:pointer;">확인</button>
+      <label style="font-size:13px;color:#64748b;cursor:pointer;display:flex;align-items:center;gap:6px;">
+        <input type="checkbox" id="chkNoticeDismissToday"> 오늘 하루 보지 않기
+      </label>
+      <button type="button" onclick="closeAgentNoticeModal()" style="padding:8px 24px;background:var(--blue);color:#fff;border:none;border-radius:6px;font-weight:700;cursor:pointer;">
+        확인
+      </button>
     </div>
-   </div>
   </div>
-  <script>
+</div>
+
+
+
+<script>
 // ==========================================
 // 1. Supabase 연동 설정 & 기본 헬퍼
 // ==========================================
@@ -2899,7 +2994,7 @@ function switchView(mode) {
     return;
   }
 
-  currentViewMode = mode;
+  currentViewMode = mode; window.currentViewMode = mode;
   document.querySelectorAll('.switch-btn').forEach(btn => {
     if (mode === 'master' && btn.id === 'btnViewMaster') btn.classList.add('active');
     else if (btn.getAttribute('data-agent') === mode) btn.classList.add('active');
@@ -2923,6 +3018,9 @@ function switchView(mode) {
   }
 
   updateUIVisibilityByRole();
+  if (currentUser) {
+    saveUserSession(currentUser, mode);
+  }
 }
 
 
@@ -3420,6 +3518,7 @@ function renderAgentLeadTable(agentName) {
 
 // 8. 신규 TA 등록 모달 열기 (3번 그림 캡처2.PNG 매칭, 실패 제외)
 function openNewAgentLeadModal() {
+  if (currentUser) saveUserSession(currentUser, currentViewMode, 'newLead');
   el('afEditingId').value = '';
   el('agentModalTitle').textContent = '신규 TA 등록';
   el('afCompany').value = '';
@@ -3448,6 +3547,7 @@ function openNewAgentLeadModal() {
 
 function closeAgentLeadModal() {
   el('agentLeadModalOverlay').style.display = 'none';
+  if (currentUser) saveUserSession(currentUser, currentViewMode, null);
 }
 
 function onAgentStageChange(val) {
@@ -3782,8 +3882,9 @@ function quickLogin(name, role) {
     job: isMaster ? '지사관리자' : '컨설턴트',
     role: isMaster ? 'master' : 'user'
   };
-  sessionStorage.setItem('s1_user', JSON.stringify(currentUser));
-  initApp((!isMaster && CONSULTANTS.includes(name)) ? name : 'master');
+  const targetScreen = (!isMaster && CONSULTANTS.includes(name)) ? name : 'master';
+  saveUserSession(currentUser, targetScreen);
+  initApp(targetScreen);
 }
 
 // ==========================================
@@ -3888,7 +3989,8 @@ async function doLogin() {
       job: user.job,
       role: user.role || (user.job.includes('관리자') ? 'master' : 'user')
     };
-    sessionStorage.setItem('s1_user', JSON.stringify(currentUser));
+    const targetScreen = (user.job === '컨설턴트' && CONSULTANTS.includes(user.name)) ? user.name : 'master';
+    saveUserSession(currentUser, targetScreen);
     
     if (user.job === '컨설턴트' && CONSULTANTS.includes(user.name)) {
       initApp(user.name);
@@ -3902,10 +4004,7 @@ async function doLogin() {
   }
 }
 
-safeAddListener('btnLogout', 'click', () => {
-  sessionStorage.removeItem('s1_user');
-  location.reload();
-});
+safeAddListener('btnLogout', 'click', doLogout);
 
 async function initApp(initialMode) {
   document.getElementById('loginOverlay').style.display = 'none';
@@ -3963,16 +4062,170 @@ async function initApp(initialMode) {
   refreshActivityLog();
 }
 
-window.addEventListener('DOMContentLoaded', () => {
-  // 로그인 전에는 공지사항을 노출하지 않음
-  const saved = sessionStorage.getItem('s1_user');
-  if (saved) {
-    const u = JSON.parse(saved);
-    currentUser = u;
-    const isMaster = isMasterUser();
-    initApp((!isMaster && CONSULTANTS.includes(u.name)) ? u.name : 'master');
+// ==========================================
+// 세션 유지 및 복원 관리
+// - 화면 전환(다른 앱 전환, 멀티태스킹, 탭 전환) 및 세션 내 새로고침: 전 화면 및 상태 그대로 유지
+// - 앱을 완전히 빠져나간 뒤(브라우저 닫기/종료) 재접속: 재로그인 요구 (보안 강화)
+// ==========================================
+var SESSION_KEY = 'S1_TA_PORTAL_AUTH_SESSION';
+
+function saveUserSession(user, screen, modal) {
+  if (!user || !user.phone) return;
+  try {
+    var data = {
+      phone: user.phone,
+      name: user.name || '',
+      job: user.job || '컨설턴트',
+      role: user.role || (isMasterUser() ? 'master' : 'user'),
+      screen: screen || currentViewMode || 'master',
+      modal: modal || null,
+      savedAt: Date.now()
+    };
+    // 화면 전환 및 현재 세션 유지를 위해 sessionStorage에 보관 (앱/브라우저 완전 종료 시 자동 삭제)
+    sessionStorage.setItem(SESSION_KEY, JSON.stringify(data));
+    sessionStorage.setItem('s1_user', JSON.stringify(user));
+    // 다음 로그인 편의를 위해 아이디(전화번호)만 로컬스토리지에 보관
+    localStorage.setItem('S1_LAST_LOGIN_PHONE', user.phone);
+    // 이전 버전의 영구 세션이 남아있다면 삭제
+    localStorage.removeItem(SESSION_KEY);
+    localStorage.removeItem('S1_PORTAL_AUTH_SESSION');
+  } catch (e) {
+    console.warn('세션 저장 실패:', e);
+  }
+}
+
+function clearUserSession() {
+  try {
+    sessionStorage.removeItem(SESSION_KEY);
+    sessionStorage.removeItem('s1_user');
+    localStorage.removeItem(SESSION_KEY);
+    localStorage.removeItem('S1_PORTAL_AUTH_SESSION');
+  } catch (e) {}
+  currentUser = null;
+  window.currentUser = null;
+}
+
+function restoreUserSession() {
+  try {
+    // 앱을 완전히 닫고 나갔다 들어온 경우 sessionStorage가 비어있으므로 false 반환 -> 로그인 창 표시
+    var raw = sessionStorage.getItem(SESSION_KEY) || sessionStorage.getItem('s1_user');
+    if (!raw) return false;
+
+    var data = JSON.parse(raw);
+    if (!data || !data.phone || !data.name) return false;
+
+    var userRole = data.role || (
+      (data.job && (data.job.includes('관리자') || data.job === '지사관리자' || data.job === '본사관리자')) 
+      ? 'master' : 'user'
+    );
+
+    currentUser = {
+      phone: data.phone,
+      name: data.name,
+      job: data.job || '컨설턴트',
+      role: userRole
+    };
+    window.currentUser = currentUser;
+
+    sessionStorage.setItem('s1_user', JSON.stringify(currentUser));
+
+    // 보던 화면 그대로 복원 (화면 유지 기능)
+    var targetScreen = data.screen || 'master';
+    if (userRole !== 'master') {
+      if (CONSULTANTS.includes(currentUser.name)) {
+        targetScreen = currentUser.name;
+      } else {
+        targetScreen = 'master';
+      }
+    } else {
+      if (targetScreen !== 'master' && !CONSULTANTS.includes(targetScreen)) {
+        targetScreen = 'master';
+      }
+    }
+
+    initApp(targetScreen).then(function() {
+      if (userRole !== 'master' && CONSULTANTS.includes(currentUser.name)) {
+        setTimeout(function() { checkAndShowAgentNotice(); }, 350);
+      }
+      if (data.modal === 'newLead' && typeof openNewAgentLeadModal === 'function') {
+        setTimeout(function() { openNewAgentLeadModal(); }, 400);
+      }
+    });
+
+    return true;
+  } catch (e) {
+    console.warn('세션 복원 실패:', e);
+    return false;
+  }
+}
+
+function doLogout() {
+  clearUserSession();
+  var mainApp = el('mainApp');
+  var loginOverlay = el('loginOverlay');
+  if (mainApp) mainApp.style.display = 'none';
+  if (loginOverlay) {
+    loginOverlay.style.display = 'flex';
+    if (typeof toggleLoginSignup === 'function') {
+      toggleLoginSignup('login');
+    }
+  }
+  if (el('loginPw')) el('loginPw').value = '';
+  if (el('loginMsg')) el('loginMsg').textContent = '';
+}
+
+window.addEventListener('DOMContentLoaded', function() {
+  // 이전 버전의 영구 세션이 남아있을 경우 정리
+  try {
+    localStorage.removeItem(SESSION_KEY);
+    localStorage.removeItem('S1_PORTAL_AUTH_SESSION');
+  } catch (e) {}
+
+  // 이전에 로그인했던 전화번호가 있으면 편의를 위해 아이디(전화번호) 입력칸에 자동 입력
+  var lastPhone = localStorage.getItem('S1_LAST_LOGIN_PHONE');
+  if (lastPhone && el('loginPhone') && !el('loginPhone').value) {
+    el('loginPhone').value = lastPhone;
+  }
+
+  // 화면 전환 / 새로고침 중인 동일 세션인지 확인하여 화면 복원
+  var hasRestored = restoreUserSession();
+  if (!hasRestored) {
+    var loginOverlay = el('loginOverlay');
+    if (loginOverlay) loginOverlay.style.display = 'flex';
+    var mainApp = el('mainApp');
+    if (mainApp) mainApp.style.display = 'none';
   }
 });
+
+// 앱 전환 감지 이벤트 (visibilitychange) 추가:
+// 다른 앱으로 포커스가 넘어갔다가 다시 브라우저로 돌아오는 순간(화면 전환) 실시간 감지하여
+// 세션 끊김을 방지하고 보고 있던 화면을 유지하며 최신 안건 데이터를 백그라운드에서 자동 동기화
+document.addEventListener('visibilitychange', async function() {
+  if (document.visibilityState === 'visible') {
+    if (currentUser && currentUser.phone) {
+      try {
+        await loadAllFromSupabase();
+        if (currentViewMode === 'master') {
+          render();
+        } else if (currentViewMode) {
+          initAgentView(currentViewMode);
+        }
+        refreshActivityLog();
+      } catch (e) {
+        console.warn('백그라운드 동기화 중 오류:', e);
+      }
+    } else {
+      // 메모리 절전 등으로 인메모리 객체가 해제된 경우 sessionStorage에서 보던 화면 그대로 즉시 복원
+      restoreUserSession();
+    }
+  }
+});
+
+window.saveUserSession = saveUserSession;
+window.clearUserSession = clearUserSession;
+window.restoreUserSession = restoreUserSession;
+window.doLogout = doLogout;
+
 
 
 // ==========================================
@@ -4351,8 +4604,9 @@ async function doSignup() {
       job: job,
       role: userRole
     };
-    sessionStorage.setItem('s1_user', JSON.stringify(currentUser));
-    initApp((userRole !== 'master' && CONSULTANTS.includes(name)) ? name : 'master');
+    const targetScreen = (userRole !== 'master' && CONSULTANTS.includes(name)) ? name : 'master';
+    saveUserSession(currentUser, targetScreen);
+    initApp(targetScreen);
 
   } catch (err) {
     console.error('Signup error:', err);
@@ -4368,21 +4622,24 @@ window.toggleLoginSignup = toggleLoginSignup;
 window.doSignup = doSignup;
 
 </script>
-  <!-- ========================================== -->
-  <!-- 시스템 전용 알림/확인 대화상자 (북서울지사 TA 관리 포털) -->
-  <!-- ========================================== -->
-  <div class="modal-overlay" id="portalAlertOverlay" style="display:none;z-index:99999;">
-   <div class="modal-card" style="max-width:420px;width:90%;padding:26px 22px;border-radius:16px;box-shadow:0 12px 40px rgba(0,0,0,0.35);text-align:center;background:#fff;color:var(--text);border:1px solid var(--border);">
+
+<!-- ========================================== -->
+<!-- 시스템 전용 알림/확인 대화상자 (북서울지사 TA 관리 포털) -->
+<!-- ========================================== -->
+<div class="modal-overlay" id="portalAlertOverlay" style="display:none;z-index:99999;">
+  <div class="modal-card" style="max-width:420px;width:90%;padding:26px 22px;border-radius:16px;box-shadow:0 12px 40px rgba(0,0,0,0.35);text-align:center;background:#fff;color:var(--text);border:1px solid var(--border);">
     <div style="display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:12px;">
-     <span style="font-size:22px;">🛡️</span>
-     <h3 style="margin:0;font-size:18px;color:var(--navy);font-weight:800;" id="portalAlertTitle">북서울지사 TA 관리 포털</h3>
+      <span style="font-size:22px;">🛡️</span>
+      <h3 style="margin:0;font-size:18px;color:var(--navy);font-weight:800;" id="portalAlertTitle">북서울지사 TA 관리 포털</h3>
     </div>
     <div id="portalAlertMessage" style="font-size:14.5px;color:#334155;margin-bottom:22px;line-height:1.6;white-space:pre-wrap;word-break:keep-all;"></div>
     <div id="portalAlertBtnGroup" style="display:flex;gap:10px;justify-content:center;">
-     <button type="button" id="portalAlertConfirmBtn" style="padding:10px 24px;font-size:14px;font-weight:700;border-radius:10px;background:var(--blue);color:#fff;border:none;cursor:pointer;min-width:90px;">확인</button>
-     <button type="button" id="portalAlertCancelBtn" class="secondary" style="display:none;padding:10px 20px;font-size:14px;font-weight:700;border-radius:10px;min-width:80px;background:#f1f5f9;color:var(--navy);border:1px solid var(--border);cursor:pointer;">취소</button>
+      <button type="button" id="portalAlertConfirmBtn" style="padding:10px 24px;font-size:14px;font-weight:700;border-radius:10px;background:var(--blue);color:#fff;border:none;cursor:pointer;min-width:90px;">확인</button>
+      <button type="button" id="portalAlertCancelBtn" class="secondary" style="display:none;padding:10px 20px;font-size:14px;font-weight:700;border-radius:10px;min-width:80px;background:#f1f5f9;color:var(--navy);border:1px solid var(--border);cursor:pointer;">취소</button>
     </div>
-   </div>
   </div>
- </body>
-         </html>
+</div>
+
+
+</body>
+</html>
