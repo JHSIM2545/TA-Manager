@@ -659,17 +659,70 @@
  <body>
   <!-- 1. 로그인 오버레이 -->
   <div id="loginOverlay">
-   <div class="login-card">
-    <h1>S1 북서울지사 영업 TA</h1>
-    <p>전화번호와 비밀번호를 입력해주세요.</p>
-    <div class="login-field">
-     <label>전화번호</label> <input id="loginPhone" type="tel" placeholder="01012345678" autocomplete="tel">
+   <div class="login-card" style="max-width:390px;width:95%;padding:32px 26px;">
+    <!-- 상단 제목: 작은글자 '에스원 북서울지사', 큰제목 '영업 TA 관리 포털' -->
+    <div style="text-align:center;margin-bottom:22px;">
+     <div style="font-size:13.5px;font-weight:700;color:var(--muted,#64748b);letter-spacing:1px;margin-bottom:5px;">에스원 북서울지사</div>
+     <h1 style="margin:0;font-size:23px;font-weight:800;color:var(--navy,#0a1730);letter-spacing:-0.5px;">영업 TA 관리 포털</h1>
     </div>
-    <div class="login-field">
-     <label>비밀번호</label> <input id="loginPw" type="password" autocomplete="current-password">
+    <!-- 1. 기본 로그인 폼 -->
+    <div id="loginFormMain" style="display:block;">
+     <form action="javascript:void(0);" onsubmit="doLogin()">
+      <div class="login-field">
+       <label>전화번호</label> <input id="loginPhone" type="tel" placeholder="01012345678" autocomplete="tel">
+      </div>
+      <div class="login-field">
+       <label>비밀번호</label>
+       <div style="position:relative;width:100%;">
+        <input id="loginPw" type="password" autocomplete="current-password" style="width:100%;padding-right:42px;box-sizing:border-box;">
+        <button type="button" onclick="togglePasswordVisibility('loginPw', this)" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;font-size:1.15rem;cursor:pointer;padding:4px 6px;line-height:1;color:#64748b;" title="비밀번호 보기/숨기기">👁️</button>
+       </div>
+      </div>
+      <button type="submit" id="btnLogin" style="width:100%;margin-top:10px;padding:12px;font-size:15px;font-weight:700;">로그인</button>
+      <div id="loginMsg" style="margin-top:12px;font-size:12.5px;text-align:center;min-height:16px;"></div>
+      <!-- 하단 신규 회원가입 영역 (첨부 이미지 매칭) -->
+      <div class="signup-toggle-box" style="margin-top:22px;text-align:center;font-size:14.5px;color:#475569;border-top:1px dashed #cbd5e1;padding-top:16px;">
+       아직 계정이 없으신가요?
+       <br>
+       <button type="button" class="signup-toggle-btn" id="btnGoSignup" onclick="toggleLoginSignup('signup')" style="margin-top:6px;background:none;border:none;color:#2563eb;font-weight:700;font-size:15px;cursor:pointer;text-decoration:underline;">신규 회원가입</button>
+      </div>
+     </form>
     </div>
-    <button type="button" id="btnLogin" style="width:100%;margin-top:10px;">로그인</button>
-    <div id="loginMsg" style="margin-top:12px;font-size:12.5px;text-align:center;min-height:16px;"></div>
+    <!-- 2. 신규 회원가입 폼 -->
+    <div id="loginFormSignup" style="display:none;">
+     <div style="background:#e6f4ea;color:#137333;font-size:0.88rem;font-weight:700;padding:9px 12px;border-radius:8px;margin-bottom:16px;text-align:center;border:1px solid #ceead6;">📝 신규 직원 회원가입</div>
+     <form action="javascript:void(0);" onsubmit="doSignup()">
+      <div class="login-field">
+       <label>아이디 (휴대전화번호) <span style="color:#dc2626;">*</span></label> <input id="regPhone" type="tel" placeholder="01012345678 (숫자만)" autocomplete="tel" required>
+      </div>
+      <div class="login-field">
+       <label>이름 (실명) <span style="color:#dc2626;">*</span></label> <input id="regName" type="text" placeholder="예: 홍길동" required>
+      </div>
+      <div class="login-field">
+       <label>직무 구분 선택 <span style="color:#dc2626;">*</span></label> <select id="regJob" required style="width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:14px;background:#fff;box-sizing:border-box;"> <option value="">직무를 선택해주세요</option> <option value="CS근무자">CS근무자</option> <option value="CS관리자">CS관리자</option> <option value="컨설턴트">컨설턴트</option> <option value="기술사원">기술사원</option> <option value="지사관리자">지사관리자</option> <option value="본사관리자">본사관리자</option> </select>
+      </div>
+      <div class="login-field">
+       <label>비밀번호 <span style="color:#dc2626;">*</span> <span style="font-size:11.5px;color:#64748b;font-weight:normal;">(영문+숫자+특수문자 8~10자)</span></label>
+       <div style="position:relative;width:100%;">
+        <input id="regPwd" type="password" placeholder="영문, 숫자, 특수문자 조합 8~10자" maxlength="10" autocomplete="new-password" required style="width:100%;padding-right:42px;box-sizing:border-box;">
+        <button type="button" onclick="togglePasswordVisibility('regPwd', this)" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;font-size:1.15rem;cursor:pointer;padding:4px 6px;line-height:1;color:#64748b;" title="비밀번호 보기/숨기기">👁️</button>
+       </div>
+      </div>
+      <div class="login-field">
+       <label>비밀번호 확인 <span style="color:#dc2626;">*</span></label>
+       <div style="position:relative;width:100%;">
+        <input id="regPwdConfirm" type="password" placeholder="비밀번호 재입력" maxlength="10" autocomplete="new-password" required style="width:100%;padding-right:42px;box-sizing:border-box;">
+        <button type="button" onclick="togglePasswordVisibility('regPwdConfirm', this)" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;font-size:1.15rem;cursor:pointer;padding:4px 6px;line-height:1;color:#64748b;" title="비밀번호 보기/숨기기">👁️</button>
+       </div>
+      </div>
+      <button type="submit" id="btnDoSignup" style="width:100%;margin-top:10px;background:#16a34a;color:#fff;font-weight:700;padding:12px;border:none;border-radius:8px;font-size:15px;cursor:pointer;">가입 완료 및 로그인</button>
+      <div id="signupMsg" style="margin-top:12px;font-size:12.5px;text-align:center;min-height:16px;"></div>
+      <div class="signup-toggle-box" style="margin-top:18px;text-align:center;font-size:14px;color:#64748b;border-top:1px dashed #cbd5e1;padding-top:14px;">
+       이미 계정이 있으신가요?
+       <button type="button" class="signup-toggle-btn" id="btnBackToLogin" onclick="toggleLoginSignup('login')" style="background:none;border:none;color:#2563eb;font-weight:700;font-size:14px;cursor:pointer;text-decoration:underline;">로그인 화면으로</button>
+      </div>
+     </form>
+    </div>
    </div>
   </div>
   <!-- 2. 메인 애플리케이션 -->
@@ -3866,15 +3919,15 @@ async function initApp(initialMode) {
   // 현재 TA 조회의 기본값을 이달(당월)로 설정
   el('fMonth').value = currentMonthStr();
 
-  if (el('btnThisMonthFilter') && !el('btnThisMonthFilter').dataset.bound) {
-    el('btnThisMonthFilter').dataset.bound = 'true';
+  if (el('btnThisMonthFilter') && (!el('btnThisMonthFilter').dataset || !el('btnThisMonthFilter').dataset.bound)) {
+    if (el('btnThisMonthFilter').dataset) el('btnThisMonthFilter').dataset.bound = 'true';
     safeAddListener('btnThisMonthFilter', 'click', () => {
       el('fMonth').value = currentMonthStr();
       renderLeadTable();
     });
   }
-  if (el('btnAllPeriodFilter') && !el('btnAllPeriodFilter').dataset.bound) {
-    el('btnAllPeriodFilter').dataset.bound = 'true';
+  if (el('btnAllPeriodFilter') && (!el('btnAllPeriodFilter').dataset || !el('btnAllPeriodFilter').dataset.bound)) {
+    if (el('btnAllPeriodFilter').dataset) el('btnAllPeriodFilter').dataset.bound = 'true';
     safeAddListener('btnAllPeriodFilter', 'click', () => {
       el('fMonth').value = '';
       renderLeadTable();
@@ -3882,8 +3935,8 @@ async function initApp(initialMode) {
   }
 
   // 이벤트 리스너: 목표 모달 월 변경 및 새로고침
-  if (el('targetModalMonth') && !el('targetModalMonth').dataset.bound) {
-    el('targetModalMonth').dataset.bound = 'true';
+  if (el('targetModalMonth') && (!el('targetModalMonth').dataset || !el('targetModalMonth').dataset.bound)) {
+    if (el('targetModalMonth').dataset) el('targetModalMonth').dataset.bound = 'true';
     safeAddListener('targetModalMonth', 'change', async (e) => {
       const newMonth = e.target.value;
       if (!newMonth) return;
@@ -3892,8 +3945,8 @@ async function initApp(initialMode) {
       renderTargetModalUI();
     });
   }
-  if (el('btnTargetModalReload') && !el('btnTargetModalReload').dataset.bound) {
-    el('btnTargetModalReload').dataset.bound = 'true';
+  if (el('btnTargetModalReload') && (!el('btnTargetModalReload').dataset || !el('btnTargetModalReload').dataset.bound)) {
+    if (el('btnTargetModalReload').dataset) el('btnTargetModalReload').dataset.bound = 'true';
     safeAddListener('btnTargetModalReload', 'click', async () => {
       const m = el('targetModalMonth').value || currentMonthStr();
       await loadTargetsFromSupabase(m);
@@ -4198,6 +4251,122 @@ window.render = render;
 window.renderKPI = renderKPI;
 window.renderTargets = renderTargets;
 
+
+// ==========================================
+// 회원가입 및 로그인 화면 전환 로직
+// ==========================================
+function toggleLoginSignup(view) {
+  const formMain = el('loginFormMain');
+  const formSignup = el('loginFormSignup');
+  const loginMsg = el('loginMsg');
+  const signupMsg = el('signupMsg');
+  if (loginMsg) loginMsg.textContent = '';
+  if (signupMsg) signupMsg.textContent = '';
+
+  if (view === 'signup') {
+    if (formMain) formMain.style.display = 'none';
+    if (formSignup) formSignup.style.display = 'block';
+  } else {
+    if (formMain) formMain.style.display = 'block';
+    if (formSignup) formSignup.style.display = 'none';
+  }
+}
+
+async function doSignup() {
+  const phone = (el('regPhone').value || '').replace(/[^0-9]/g, '');
+  const name = (el('regName').value || '').trim();
+  const job = el('regJob').value;
+  const pwd = (el('regPwd').value || '').trim();
+  const pwdConfirm = (el('regPwdConfirm').value || '').trim();
+  const msgEl = el('signupMsg');
+  const btn = el('btnDoSignup');
+
+  if (!phone || phone.length < 10) {
+    msgEl.textContent = '올바른 휴대전화번호를 입력해주세요.';
+    msgEl.style.color = 'var(--red)';
+    return;
+  }
+  if (!name) {
+    msgEl.textContent = '이름을 입력해주세요.';
+    msgEl.style.color = 'var(--red)';
+    return;
+  }
+  if (!job) {
+    msgEl.textContent = '직무를 선택해주세요.';
+    msgEl.style.color = 'var(--red)';
+    return;
+  }
+
+  const pwdErr = validatePassword(pwd);
+  if (pwdErr) {
+    msgEl.textContent = pwdErr;
+    msgEl.style.color = 'var(--red)';
+    return;
+  }
+
+  if (pwd !== pwdConfirm) {
+    msgEl.textContent = '비밀번호 확인이 일치하지 않습니다.';
+    msgEl.style.color = 'var(--red)';
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = '가입 처리 중...';
+  msgEl.textContent = '확인 중...';
+  msgEl.style.color = 'var(--navy)';
+
+  try {
+    const pNoZero = phone.startsWith('0') ? phone.slice(1) : phone;
+    const pWithZero = phone.startsWith('0') ? phone : ('0' + phone);
+    const searchPhones = Array.from(new Set([phone, pNoZero, pWithZero]));
+
+    const { data: chk, error: chkErr } = await db.from('app_users').select('phone').in('phone', searchPhones);
+    if (chk && chk.length > 0) {
+      btn.disabled = false;
+      btn.textContent = '가입 완료 및 로그인';
+      msgEl.textContent = '이미 가입된 휴대전화번호입니다. 로그인해 주세요.';
+      msgEl.style.color = 'var(--red)';
+      return;
+    }
+
+    // 표준 해시 생성 공식 적용: SHA-256(phone + ":" + pwd)
+    const hashedPwd = await sha256(phone + ':' + pwd);
+    const userRole = (job === '본사관리자' || job === '지사관리자') ? 'master' : 'user';
+
+    const { error: insErr } = await db.from('app_users').insert([{
+      phone: phone,
+      name: name,
+      job: job,
+      role: userRole,
+      hash: hashedPwd
+    }]);
+
+    if (insErr) throw insErr;
+
+    alert('🎉 회원가입이 완료되었습니다!\n바로 시스템에 로그인 접속합니다.');
+
+    currentUser = {
+      name: name,
+      phone: phone,
+      job: job,
+      role: userRole
+    };
+    sessionStorage.setItem('s1_user', JSON.stringify(currentUser));
+    initApp((userRole !== 'master' && CONSULTANTS.includes(name)) ? name : 'master');
+
+  } catch (err) {
+    console.error('Signup error:', err);
+    msgEl.textContent = '가입 실패: ' + (err.message || String(err));
+    msgEl.style.color = 'var(--red)';
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '가입 완료 및 로그인';
+  }
+}
+
+window.toggleLoginSignup = toggleLoginSignup;
+window.doSignup = doSignup;
+
 </script>
   <!-- ========================================== -->
   <!-- 시스템 전용 알림/확인 대화상자 (북서울지사 TA 관리 포털) -->
@@ -4216,4 +4385,4 @@ window.renderTargets = renderTargets;
    </div>
   </div>
  </body>
- </html>
+         </html>
