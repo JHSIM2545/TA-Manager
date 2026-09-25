@@ -709,9 +709,9 @@
     <!-- VIEW A: 지사장 통합관제 대시보드 뷰          -->
     <!-- ========================================== -->
     <div id="viewMaster">
-     <!-- 지사 전체 이달 목표 (합산하지 않고 상품별 개별 표기) -->
+     <!-- 지사 전체 이달 목표 (사 전체 목표) -->
      <div id="masterMonthlyTargetBadge" style="margin-bottom:12px;font-size:13.5px;font-weight:700;color:#1e3a8a;background:#eff6ff;padding:8px 16px;border-radius:8px;border:1px solid #bfdbfe;display:flex;align-items:center;gap:8px;">
-      🎯 <strong>이달 목표</strong> (알람 0원 · 디지털 0원 · 안전상품 0원)
+      🎯 <strong>사 전체 이달 목표 (일반알람)</strong>: 2,500,000원 <span style="font-size:12px;font-weight:normal;color:#475569;">(사 전체 총 목표: 3,739,000원)</span>
      </div>
      <!-- 상단 카테고리 필터 (전체 TA 조회 테이블과도 100% 동기화) -->
      <div class="filters" id="categoryFilters">
@@ -743,12 +743,12 @@
        <div class="sub" id="kpiFailedCount">0건</div>
       </div>
       <div class="kpi-card">
-       <div class="label">수주 달성율</div>
+       <div class="label">수주 달성율 (사 전체)</div>
        <div class="value" id="kpiAchieveRate">-</div>
        <div class="sub" id="kpiAchieveSub"></div>
       </div>
       <div class="kpi-card">
-       <div class="label">보유 TA율</div>
+       <div class="label">보유 TA율 (사 전체)</div>
        <div class="value" id="kpiHoldRate">-</div>
        <div class="sub" id="kpiHoldSub"></div>
       </div>
@@ -1849,29 +1849,68 @@ function parseFormattedNumber(val) {
   return Number(String(val || '').replace(/[^0-9.-]/g, '')) || 0;
 }
 
+// 사 전체 및 컨설턴트별 기본 확정 목표 (2026-09 기준 초기값 / DB 미설정 시 폴백)
+const DEFAULT_TARGET_AMOUNTS = {
+  '일반알람': {
+    total: 2500000,
+    rates: { '최영국': 25, '박광춘': 20, '이수열': 25, '정문재': 15, '임영민': 15 },
+    amounts: { '최영국': 625000, '박광춘': 500000, '이수열': 625000, '정문재': 375000, '임영민': 375000 }
+  },
+  '디지털(정보보안)': {
+    total: 700000,
+    rates: { '최영국': 25, '박광춘': 20, '이수열': 25, '정문재': 15, '임영민': 15 },
+    amounts: { '최영국': 175000, '박광춘': 140000, '이수열': 175000, '정문재': 105000, '임영민': 105000 }
+  },
+  '안전상품': {
+    total: 539000,
+    rates: { '최영국': 25, '박광춘': 20, '이수열': 25, '정문재': 15, '임영민': 15 },
+    amounts: { '최영국': 135000, '박광춘': 108000, '이수열': 135000, '정문재': 81000, '임영민': 80000 }
+  }
+};
+
 function getConsultantTarget(consultant, month, category) {
-  if (!TARGETS.targets[consultant] || !TARGETS.targets[consultant][month]) return 0;
-  const mData = TARGETS.targets[consultant][month];
+  month = month || currentMonthStr();
+  if (TARGETS.targets && TARGETS.targets[consultant] && TARGETS.targets[consultant][month]) {
+    const mData = TARGETS.targets[consultant][month];
+    if (!category || category === 'all') {
+      let sum = 0;
+      PRODUCT_CATEGORIES.forEach(cat => {
+        sum += Number(mData[cat] || 0);
+      });
+      if (sum > 0) return sum;
+      const vals = Object.values(mData);
+      if (vals.length > 0) return vals.reduce((a, b) => a + Number(b || 0), 0);
+    } else if (mData[category] !== undefined) {
+      return Number(mData[category] || 0);
+    }
+  }
+
+  // DB에 해당 월 목표가 없는 경우 사 전체 기본 확정 목표 반영
   if (!category || category === 'all') {
     let sum = 0;
     PRODUCT_CATEGORIES.forEach(cat => {
-      sum += Number(mData[cat] || 0);
+      const def = DEFAULT_TARGET_AMOUNTS[cat];
+      if (def && def.amounts && def.amounts[consultant]) sum += def.amounts[consultant];
     });
-    if (sum === 0 && mData['일반알람'] === undefined) {
-      const vals = Object.values(mData);
-      if (vals.length > 0) return vals.reduce((a, b) => a + Number(b || 0), 0);
-    }
     return sum;
   }
-  return Number(mData[category] || 0);
+  const def = DEFAULT_TARGET_AMOUNTS[category];
+  return (def && def.amounts && def.amounts[consultant]) ? def.amounts[consultant] : 0;
 }
 
+// 사 전체(지사 전체) 목표 합계 반환
 function getTotalTarget(month, category) {
+  month = month || currentMonthStr();
   let sum = 0;
   CONSULTANTS.forEach(n => {
     sum += getConsultantTarget(n, month, category);
   });
   return sum;
+}
+
+// 사 전체 목표 헬퍼 (getOverallTarget 호환 함수 완벽 보장)
+function getOverallTarget(month, category) {
+  return getTotalTarget(month, category);
 }
 
 function getConsultantRate(consultant, month, category) {
@@ -2095,13 +2134,13 @@ function buildLeadChanges(oldLead, newPayload) {
 // 5. 대시보드 뷰 렌더링
 // ==========================================
 function render() {
-  renderKPI();
-  renderTodayList();
-  renderBarChart();
-  renderDonut();
-  renderTargets();
-  renderCalendarGrid();
-  renderLeadTable();
+  try { renderKPI(); } catch (e) { console.error('renderKPI error:', e); }
+  try { renderTodayList(); } catch (e) { console.error('renderTodayList error:', e); }
+  try { renderBarChart(); } catch (e) { console.error('renderBarChart error:', e); }
+  try { renderDonut(); } catch (e) { console.error('renderDonut error:', e); }
+  try { renderTargets(); } catch (e) { console.error('renderTargets error:', e); }
+  try { renderCalendarGrid(); } catch (e) { console.error('renderCalendarGrid error:', e); }
+  try { renderLeadTable(); } catch (e) { console.error('renderLeadTable error:', e); }
 }
 
 function renderKPI() {
@@ -2120,18 +2159,31 @@ function renderKPI() {
   el('kpiFailedCount').textContent = m.failedCount + '건';
 
   el('kpiAchieveRate').textContent = m.achievementRate === null ? '목표 미설정' : m.achievementRate + '%';
-    const alarmTotal = getOverallTarget(month, '일반알람');
-  const digiTotal = getOverallTarget(month, '디지털(정보보안)');
-  const safeTotal = getOverallTarget(month, '안전상품');
+
+  // 사 전체 목표 계산
+  const alarmTotal = getTotalTarget(month, '일반알람');
+  const digiTotal = getTotalTarget(month, '디지털(정보보안)');
+  const safeTotal = getTotalTarget(month, '안전상품');
+  const grandTotal = alarmTotal + digiTotal + safeTotal;
 
   if (el('masterMonthlyTargetBadge')) {
-    el('masterMonthlyTargetBadge').innerHTML = `🎯 <strong>이달 목표</strong> (알람 ${formatCurrency(alarmTotal)} · 디지털 ${formatCurrency(digiTotal)} · 안전상품 ${formatCurrency(safeTotal)})`;
+    if (activeDashboardCategory === 'all') {
+      el('masterMonthlyTargetBadge').innerHTML = `🎯 <strong>사 전체 이달 목표</strong>: 총 ${formatCurrency(grandTotal)} (일반알람 ${formatCurrency(alarmTotal)} · 디지털 ${formatCurrency(digiTotal)} · 안전상품 ${formatCurrency(safeTotal)})`;
+    } else if (activeDashboardCategory === '일반알람') {
+      el('masterMonthlyTargetBadge').innerHTML = `🎯 <strong>사 전체 이달 목표 (일반알람)</strong>: ${formatCurrency(alarmTotal)} <span style="font-size:12px;font-weight:normal;color:#475569;">(사 전체 총 목표: ${formatCurrency(grandTotal)})</span>`;
+    } else if (activeDashboardCategory === '디지털(정보보안)') {
+      el('masterMonthlyTargetBadge').innerHTML = `🎯 <strong>사 전체 이달 목표 (디지털)</strong>: ${formatCurrency(digiTotal)} <span style="font-size:12px;font-weight:normal;color:#475569;">(사 전체 총 목표: ${formatCurrency(grandTotal)})</span>`;
+    } else if (activeDashboardCategory === '안전상품') {
+      el('masterMonthlyTargetBadge').innerHTML = `🎯 <strong>사 전체 이달 목표 (안전상품)</strong>: ${formatCurrency(safeTotal)} <span style="font-size:12px;font-weight:normal;color:#475569;">(사 전체 총 목표: ${formatCurrency(grandTotal)})</span>`;
+    }
   }
+
   if (activeDashboardCategory === 'all') {
-    el('kpiAchieveSub').textContent = `목표 (알람 ${formatCurrency(alarmTotal)} · 디지털 ${formatCurrency(digiTotal)} · 안전 ${formatCurrency(safeTotal)})`;
+    el('kpiAchieveSub').textContent = `사 전체 목표 ${formatCurrency(grandTotal)} (알람 ${formatCurrency(alarmTotal)} · 디지털 ${formatCurrency(digiTotal)} · 안전 ${formatCurrency(safeTotal)})`;
   } else {
-    el('kpiAchieveSub').textContent = totalTarget > 0 ? `목표 ${formatCurrency(totalTarget)}` : '목표 미설정';
+    el('kpiAchieveSub').textContent = totalTarget > 0 ? `사 전체 목표 ${formatCurrency(totalTarget)}` : '목표 미설정';
   }
+
   if (el('targetCategoryLabel')) {
     el('targetCategoryLabel').textContent = activeDashboardCategory === 'all' ? '전체 상품 합계' : activeDashboardCategory;
   }
@@ -2145,7 +2197,9 @@ function renderKPI() {
   el('kpiFailRate').textContent = m.failRate === null ? '-' : m.failRate + '%';
   el('kpiFailSub').textContent = '실패 ' + formatCurrency(m.failedAmount);
 
-  el('targetMonthLabel').textContent = '(' + month + ')';
+  if (el('targetMonthLabel')) {
+    el('targetMonthLabel').textContent = '(' + month + ')';
+  }
 }
 
 function renderTodayList() {
@@ -2212,17 +2266,35 @@ function renderDonut() {
 
 function renderTargets() {
   const month = currentMonthStr();
-  el('targetMonthLabel').textContent = '(' + month + ')';
+  if (el('targetMonthLabel')) el('targetMonthLabel').textContent = '(' + month + ')';
   if (el('targetCategoryLabel')) {
     el('targetCategoryLabel').textContent = activeDashboardCategory === 'all' ? '전체 상품 합계' : activeDashboardCategory;
   }
-  el('targetTbody').innerHTML = CONSULTANTS.map(name => {
+
+  let totalWonAmt = 0;
+  let totalWonCount = 0;
+  let totalTargetAmt = 0;
+  let totalPipelineAmt = 0;
+  let totalPipelineCount = 0;
+  let totalFailAmt = 0;
+  let totalAllWonAmt = 0;
+
+  const consultantRowsHtml = CONSULTANTS.map(name => {
     const target = getConsultantTarget(name, month, activeDashboardCategory);
     const leads = consultantLeads(name);
     const m = computeMetrics(leads, target, month);
     const rate = m.achievementRate === null ? 0 : m.achievementRate;
     const barClass = rate >= 100 ? 'over' : (rate >= 60 ? '' : 'warn');
     const barColor = rate >= 100 ? 'var(--blue)' : (rate >= 60 ? 'var(--green)' : 'var(--amber)');
+
+    totalWonAmt += m.monthWonAmount;
+    totalWonCount += m.monthWonCount;
+    totalTargetAmt += target;
+    totalPipelineAmt += m.pipelineAmount;
+    totalPipelineCount += m.pipelineCount;
+    totalFailAmt += m.failedAmount;
+    totalAllWonAmt += m.wonAllAmount;
+
     return `
       <tr>
         <td style="font-weight:700;color:${CONSULTANT_COLOR[name] || 'inherit'};white-space:nowrap;">
@@ -2231,7 +2303,6 @@ function renderTargets() {
         <td style="white-space:nowrap;">${formatCurrency(m.monthWonAmount)} <span class="count-tag">(${m.monthWonCount}건)</span></td>
         <td style="white-space:nowrap;">
           <div style="display:inline-flex;align-items:center;gap:10px;">
-            <!-- 수주달성률 백분율 앞에 차트(프로그레스 바) 표시 -->
             <div style="width:130px;height:14px;background:#e2e8f0;border-radius:999px;overflow:hidden;box-shadow:inset 0 1px 2px rgba(0,0,0,0.1);display:inline-block;vertical-align:middle;">
               <div class="progress-fill ${barClass}" style="width:${Math.min(100, Math.max(0, rate))}%;height:100%;border-radius:999px;background:${barColor};transition:width 0.3s ease;"></div>
             </div>
@@ -2246,6 +2317,42 @@ function renderTargets() {
       </tr>
     `;
   }).join('');
+
+  // 사 전체 합계 행 계산
+  const totalAchieveRate = totalTargetAmt > 0 ? Math.round((totalWonAmt / totalTargetAmt) * 100) : 0;
+  const totalBarClass = totalAchieveRate >= 100 ? 'over' : (totalAchieveRate >= 60 ? '' : 'warn');
+  const totalBarColor = totalAchieveRate >= 100 ? 'var(--blue)' : (totalAchieveRate >= 60 ? 'var(--green)' : 'var(--amber)');
+
+  const totalHoldingRate = totalTargetAmt > 0 ? Math.round((totalPipelineAmt / totalTargetAmt) * 100) : 0;
+  const totalDecisionAmt = totalAllWonAmt + totalFailAmt;
+  const totalWinRate = totalDecisionAmt > 0 ? Math.round((totalAllWonAmt / totalDecisionAmt) * 100) : 0;
+  const totalFailRate = totalDecisionAmt > 0 ? Math.round((totalFailAmt / totalDecisionAmt) * 100) : 0;
+
+  const totalRowHtml = `
+    <tr style="background:#f8fafc;font-weight:800;border-top:2px solid var(--navy);border-bottom:2px solid var(--navy);">
+      <td style="font-weight:800;color:var(--navy);white-space:nowrap;">
+        🏢 <strong>사 전체 합계</strong>
+      </td>
+      <td style="white-space:nowrap;color:var(--navy);">${formatCurrency(totalWonAmt)} <span class="count-tag" style="background:#dbeafe;color:#1e40af;">(${totalWonCount}건)</span></td>
+      <td style="white-space:nowrap;">
+        <div style="display:inline-flex;align-items:center;gap:10px;">
+          <div style="width:130px;height:14px;background:#e2e8f0;border-radius:999px;overflow:hidden;box-shadow:inset 0 1px 2px rgba(0,0,0,0.1);display:inline-block;vertical-align:middle;">
+            <div class="progress-fill ${totalBarClass}" style="width:${Math.min(100, Math.max(0, totalAchieveRate))}%;height:100%;border-radius:999px;background:${totalBarColor};transition:width 0.3s ease;"></div>
+          </div>
+          <strong style="min-width:50px;font-size:13.5px;color:${totalBarColor};">${totalTargetAmt > 0 ? totalAchieveRate + '%' : '-'}</strong>
+        </div>
+      </td>
+      <td style="white-space:nowrap;color:#0284c7;">${formatCurrency(totalPipelineAmt)} <span class="count-tag">(${totalPipelineCount}건)</span></td>
+      <td style="white-space:nowrap;">${totalHoldingRate}%</td>
+      <td style="white-space:nowrap;color:var(--green);">${totalWinRate}%</td>
+      <td style="white-space:nowrap;color:var(--red);">${totalFailRate}%</td>
+      <td style="font-weight:800;color:var(--navy);font-size:14.5px;white-space:nowrap;">${formatCurrency(totalTargetAmt)}</td>
+    </tr>
+  `;
+
+  if (el('targetTbody')) {
+    el('targetTbody').innerHTML = consultantRowsHtml + totalRowHtml;
+  }
 }
 
 // ==========================================
@@ -2538,10 +2645,10 @@ function renderCalendarGrid() {
   const weekdayNames = ['일', '월', '화', '수', '목', '금', '토'];
 
   const headRow = el('calendarHeadRow');
-  if (!headRow.dataset.filled) {
+  if (headRow && (!headRow.dataset || !headRow.dataset.filled)) {
     headRow.innerHTML = '<th>일자</th><th>합계</th>' +
       CONSULTANTS.map(n => `<th style="background:${CONSULTANT_COLOR[n] || 'var(--navy)'};">${n}</th>`).join('');
-    headRow.dataset.filled = '1';
+    if (headRow.dataset) headRow.dataset.filled = '1';
   }
   el('calendarMonthLabel').textContent = `(${y}년 ${m}월)`;
 
@@ -4082,6 +4189,14 @@ window.openUserEditForm = openUserEditForm;
 window.cancelUserEdit = cancelUserEdit;
 window.saveUserEdit = saveUserEdit;
 window.deleteUserAccount = deleteUserAccount;
+
+
+window.getOverallTarget = getOverallTarget;
+window.getTotalTarget = getTotalTarget;
+window.getConsultantTarget = getConsultantTarget;
+window.render = render;
+window.renderKPI = renderKPI;
+window.renderTargets = renderTargets;
 
 </script>
   <!-- ========================================== -->
