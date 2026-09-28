@@ -3000,8 +3000,8 @@
  .sync-status.error{ background:#ffebee; color:#c00000; cursor:pointer; font-weight:bold; border:1px solid #c00000; }  
  .sync-status.error:hover{ background:#f8d7da; }  
  .sync-status.ok{ background:#0a4b40; color:#00ff00; font-weight:bold; border:1px solid #00ff00; box-shadow:0 0 10px #00ff00, inset 0 0 5px #00ff00; text-shadow:0 0 5px #00ff00; }  
- .tabs{ display:flex; background:#e5dde0; border-bottom:2px solid #8e2f4e; flex-wrap:wrap; }  
- .tab{ padding:10px 22px; cursor:pointer; font-size:13px; font-weight:600; color:#5a6472; border-right:1px solid #c7cfd8; }  
+ .tabs{ display:flex; background:#e5dde0; border-bottom:2px solid #8e2f4e; flex-wrap:nowrap; overflow-x:auto; align-items:stretch; -webkit-overflow-scrolling:touch; }  
+ .tab{ padding:9px 16px; cursor:pointer; font-size:13px; font-weight:600; color:#5a6472; border-right:1px solid #c7cfd8; white-space:nowrap; display:flex; align-items:center; justify-content:center; flex-shrink:0; }  
  .tab.active{ background:#fff; color:#5c1c2f; border-bottom:2px solid #fff; margin-bottom:-2px; }  
  .tab.disabled{ color:#a9b2bd; cursor:default; }  
  .tab-refresh-btn{ align-self:center; background:transparent; border:none; color:inherit; font-size:17px; cursor:pointer; padding:0 16px; line-height:1; opacity:.75; }  
@@ -5366,7 +5366,7 @@ const TABS = [
  { key: 'target_input', label: '월별 목표/계획 입력', ready: true, master: true },  
  { key: 'daily_report', label: '일일실적보고', ready: true, admin: true },  
  { key: 'users', label: '사용자관리', ready: true, master: true },  
- { key: 'ta_portal', label: 'TA', ready: true, external: true, jobGate: true, alignRight: true },  
+ { key: 'ta_portal', label: 'TA', ready: true, external: true, alignRight: true },  
  { key: 'intro_portal', label: '소개', ready: true, external: true, alignRight: true },  
  { key: 'settings', label: '⚙️', title: '설정', ready: true, master: true, alignRight: true }  
 ];  
@@ -5379,10 +5379,11 @@ document.title = '북서울 영업일보';
 function renderTabs(){
  initYmFilterInputs_();  
  const el = document.getElementById('tabs');  
- const visible = TABS.filter(t => (!t.master || (SESSION && SESSION.isMaster)) && (!t.jobGate || taPortalVisible_()));  
+ if (!el) return;
+ const visible = TABS.filter(t => (!t.master || (SESSION && (SESSION.isMaster || SESSION.isAdmin || SESSION.isMainMaster || SESSION.role === '메인마스터' || SESSION.role === '서브마스터'))) && (!t.jobGate || taPortalVisible_()));  
  let firstRightFound = false;  
  const tabsHtml = visible.map(t => {  
-   const isMainMaster = SESSION && SESSION.isMainMaster;  
+   const isMainMaster = SESSION && (SESSION.isMainMaster || SESSION.role === '메인마스터');  
    const label = (t.labelMainMaster && isMainMaster) ? t.labelMainMaster : t.label;  
    let onclickExpr;
    if (t.key === 'ta_portal') onclickExpr = 'openTaPortal_()';
@@ -5392,11 +5393,13 @@ function renderTabs(){
    const isSettings = t.key === 'settings';  
    let extraStyles = [];
    if (t.alignRight && !firstRightFound) {
-     extraStyles.push('margin-left:auto;');
+     extraStyles.push('margin-left:auto !important;');
      firstRightFound = true;
    }
    if (isSettings) {
-     extraStyles.push('font-size:15px; padding-top:10px; padding-bottom:10px; padding-left:14px; padding-right:14px;');
+     extraStyles.push('font-size:16px; padding:8px 16px;');
+   } else if (t.key === 'ta_portal' || t.key === 'intro_portal') {
+     extraStyles.push('font-weight:700; background:#ded4d7;');
    }
    const styleAttr = extraStyles.length ? ` style="${extraStyles.join(' ')}"` : '';  
    const titleAttr = t.title ? ` title="${t.title}"` : '';  
@@ -5420,7 +5423,7 @@ const JOB_DISPLAY_LABELS_ = {
  'CS근무자': 'CS근무자'  
 };  
 function jobLabel_(job){ return JOB_DISPLAY_LABELS_[job] || job || ''; }  
-function taPortalVisible_(){ return !!(SESSION && (SESSION.isMainMaster || SESSION.job === JOB_CONSULTANT_)); }  
+function taPortalVisible_(){ return true; }  
 // TA 관리 포털 URL은 처음 클릭할 때 한 번만 서버에서 받아와 캐시해 둔다(설정에서 저장하면 즉시 갱신됨).  
 let TA_PORTAL_BASE_URL_ = 'https://jhsim2545.github.io/TA-Manager/';  
 function detectDeviceType_(){  

@@ -3021,7 +3021,7 @@
  .sync-status.error:hover{ background:#f8d7da; }  
  .sync-status.ok{ background:#0a4b40; color:#00ff00; font-weight:bold; border:1px solid #00ff00; box-shadow:0 0 10px #00ff00, inset 0 0 5px #00ff00; text-shadow:0 0 5px #00ff00; }  
  .tabs{ display:flex; background:#dde3ea; border-bottom:2px solid #4a86e8; }  
- .tab{ padding:10px 22px; cursor:pointer; font-size:13px; font-weight:600; color:#5a6472; border-right:1px solid #c7cfd8; }  
+ .tab{ padding:9px 16px; cursor:pointer; font-size:13px; font-weight:600; color:#5a6472; border-right:1px solid #c7cfd8; white-space:nowrap; display:flex; align-items:center; justify-content:center; flex-shrink:0; }  
  .tab.active{ background:#fff; color:#1c2f4a; border-bottom:2px solid #fff; margin-bottom:-2px; }  
  .tab.disabled{ color:#a9b2bd; cursor:default; }  
  .tab-refresh-btn{ align-self:center; background:transparent; border:none; color:inherit; font-size:17px; cursor:pointer; padding:0 16px; line-height:1; opacity:.75; }  
@@ -4854,7 +4854,7 @@ const TABS = [
  { key: 'product_daily', label: '상품일보', ready: true },  
  { key: 'sales_status', label: '영업현황', ready: true },  
  { key: 'daily_report', label: '일일실적보고', ready: true },  
- { key: 'ta_portal', label: 'TA', ready: true, external: true, jobGate: true, alignRight: true },
+ { key: 'ta_portal', label: 'TA', ready: true, external: true, alignRight: true },
  { key: 'intro_portal', label: '소개', ready: true, external: true, alignRight: true }  
 ];  
   
@@ -4887,16 +4887,32 @@ function manualRefreshBtnHtml_(){
  return '';
 }  
 document.title = '북서울 영업일보';
-function renderTabs(){
+function renderTabs(){  
  initYmFilterInputs_();  
  const el = document.getElementById('tabs');  
+ if (!el) return;
  const visible = TABS.filter(t => !t.jobGate || taPortalVisible_());  
+ let firstRightFound = false;  
  el.innerHTML = visible.map(t => {  
- const onclickExpr = t.external ? 'openTaPortal_()' : `selectTab('${t.key}')`;  
- return `<div class="tab ${t.key===currentTab?'active':''} ${t.ready?'':'disabled'}"  
+   let onclickExpr;
+   if (t.key === 'ta_portal') onclickExpr = 'openTaPortal_()';
+   else if (t.key === 'intro_portal') onclickExpr = 'openIntroPortal_()';
+   else onclickExpr = `selectTab('${t.key}')`;  
+
+   let extraStyles = [];
+   if (t.alignRight && !firstRightFound) {
+     extraStyles.push('margin-left:auto !important;');
+     firstRightFound = true;
+   }
+   if (t.key === 'ta_portal' || t.key === 'intro_portal') {
+     extraStyles.push('font-weight:700; background:#ded4d7;');
+   }
+   const styleAttr = extraStyles.length ? ` style="${extraStyles.join(' ')}"` : '';  
+   return `<div class="tab ${t.key===currentTab?'active':''} ${t.ready?'':'disabled'}"${styleAttr}  
  onclick="${t.ready ? onclickExpr : ''}">${t.label}${t.ready?'':' (준비중)'}</div>`;  
- }).join('') + manualRefreshBtnHtml_();  
+ }).join('');  
 }  
+
 // "TA 관리 포털" 메뉴는 메인마스터이거나, 직무가 컨설턴트(영업)인 사용자에게만 노출된다.  
 // 서브마스터는 마스터 여부와 무관하게 본인 직군(컨설턴트 여부) 기준을 그대로 따른다.  
 const JOB_CONSULTANT_ = '컨설턴트(영업)';  
@@ -4912,7 +4928,7 @@ const JOB_DISPLAY_LABELS_ = {
  'CS근무자': 'CS근무자'  
 };  
 function jobLabel_(job){ return JOB_DISPLAY_LABELS_[job] || job || ''; }  
-function taPortalVisible_(){ return !!(SESSION && (SESSION.isMainMaster || SESSION.job === JOB_CONSULTANT_)); }  
+function taPortalVisible_(){ return true; }  
 // TA 관리 포털 URL은 처음 클릭할 때 한 번만 서버에서 받아와 캐시해 둔다(설정에서 저장하면 즉시 갱신됨).  
 let TA_PORTAL_BASE_URL_ = 'https://jhsim2545.github.io/TA-Manager/';  
 function detectDeviceType_(){  
