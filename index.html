@@ -2257,11 +2257,13 @@ async function loadTargetsFromSupabase(month) {
 
 async function logActivity(consultant, action, company, leadId, changes) {
   try {
+    var logId = generateUUID();
     await db.from('activity_logs').insert([{
-      consultant: consultant,
-      action: action,
-      company: company,
-      lead_id: leadId,
+      id: logId,
+      consultant: String(consultant || '시스템').slice(0, 20),
+      action: String(action || '기타').slice(0, 50),
+      company: String(company || '').slice(0, 200),
+      lead_id: String(leadId || '').slice(0, 50),
       changes: changes || [],
       created_at: new Date().toISOString()
     }]);
@@ -4289,6 +4291,13 @@ window.doLogout = doLogout;
 // ==========================================
 // 사용자 관리 (소개영업 앱 100% 동일 로직)
 // ==========================================
+function generateUUID() {
+  if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+    return crypto.randomUUID();
+  }
+  return 'id_' + Date.now() + '_' + Math.random().toString(36).substring(2, 11);
+}
+
 // ==========================================
 // TA 관리 시스템 전용 기기 및 접속 감지 헬퍼
 // ==========================================
@@ -4373,14 +4382,16 @@ async function recordTAAccess(statusType) {
   var nowIso = new Date().toISOString();
   var isOnline = (statusType !== 'logout');
 
-  // TA 관리 시스템 전용 접속 기록 (기존 activity_logs 테이블 활용 - 400 오류 원천 방지)
+  // TA 관리 시스템 전용 접속 기록 (id 필수 제공으로 400 Bad Request 원천 방지)
+  var logId = generateUUID();
   try {
     await db.from('activity_logs').insert([{
-      consultant: name,
+      id: logId,
+      consultant: String(name || '사용자').slice(0, 20),
       action: 'TA 접속',
-      company: device,
-      lead_id: phone,
-      changes: ['TA 관리 시스템 접속 (' + (isOnline ? '온라인' : '오프라인') + ')', device],
+      company: String(device || 'PC').slice(0, 200),
+      lead_id: String(phone || '').slice(0, 50),
+      changes: ['TA 관리 시스템 접속 (' + (isOnline ? '온라인' : '오프라인') + ')', String(device || '')],
       created_at: nowIso
     }]);
   } catch(e) {
