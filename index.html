@@ -1275,6 +1275,15 @@
             <option value="기술사원">기술사원</option>
           </select>
         </div>
+        <div style="flex:1;min-width:140px;">
+          <label style="display:block;font-size:0.82rem;font-weight:700;color:#3c4043;margin-bottom:5px;">권한</label>
+          <select id="editUserRoleSelect" style="width:100%;padding:8px 10px;border:1.5px solid #dadce0;border-radius:6px;font-size:14px;background:#fff;box-sizing:border-box;">
+            <option value="메인마스터">메인마스터</option>
+            <option value="서브마스터">서브마스터</option>
+            <option value="수정가능">수정가능</option>
+            <option value="읽기전용">읽기전용</option>
+          </select>
+        </div>
       </div>
       <div style="margin-bottom:12px;">
         <label style="display:block;font-size:0.82rem;font-weight:700;color:#3c4043;margin-bottom:5px;">비밀번호 변경 <span style="font-weight:normal;color:#5f6368;font-size:0.75rem;">(변경 시에만 8~10자 입력)</span></label>
@@ -4366,6 +4375,14 @@ async function doLogin() {
     }
     const user = matchedUser;
 
+    // 5. 직무별 접속제한: TA 관리포털에는 "컨설턴트"와 "지사관리자"만 로그인 가능
+    const userJob = (user.job || '').trim();
+    if (userJob !== '컨설턴트' && userJob !== '지사관리자' && user.name !== '심정환') {
+      msgEl.innerHTML = '시스템 접속 권한이 없습니다<br>담당자에게 문의해 주세요';
+      msgEl.style.color = 'var(--red)';
+      alert('시스템 접속 권한이 없습니다\n담당자에게 문의해 주세요');
+      return;
+    }
 
     currentUser = {
       name: user.name,
@@ -4778,6 +4795,7 @@ async function loadAllUsers() {
 
 
     var rawUsers = res.data || [];
+    window.rawUsersList_ = rawUsers;
 
     // 표준 사용자 및 직무 코드 자동 동기화
     try {
@@ -4895,6 +4913,13 @@ function openUserEditForm(phone, name, job) {
 
 
   el('editUserJobSelect').value = normalizedJob;
+  if (el('editUserRoleSelect')) {
+    var r = (phone && window.rawUsersList_) ? (window.rawUsersList_.find(function(x){ return x.phone === phone; }) || {}).role : '';
+    if (!r) r = (normalizedJob === '지사관리자' || normalizedJob === '본사관리자') ? '메인마스터' : '수정가능';
+    if (r === 'master') r = '메인마스터';
+    else if (r === 'user') r = '수정가능';
+    el('editUserRoleSelect').value = r;
+  }
   el('editUserNewPwdInput').value = '';
   box.style.display = 'block';
   box.scrollIntoView({ behavior: 'smooth' });
@@ -4924,7 +4949,7 @@ async function saveUserEdit() {
   if (btn) { btn.disabled = true; btn.innerText = '저장 중...'; }
 
 
-  var userRole = (job === '본사관리자' || job === '지사관리자') ? 'master' : 'user';
+  var userRole = (el('editUserRoleSelect') && el('editUserRoleSelect').value) ? el('editUserRoleSelect').value : ((job === '본사관리자' || job === '지사관리자') ? '메인마스터' : '수정가능');
   var updateData = {
     name: name,
     job: job,
