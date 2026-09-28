@@ -8,9 +8,6 @@
 
 
 
-
-
-
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
   :root{
@@ -45,14 +42,11 @@
   .switch-btn.master{background:#a9761e;border-color:#c8902b;color:#fff;}
   .switch-btn.master.active{background:#d97706;border-color:#f59e0b;}
 
-
   .topbar-right{display:flex;align-items:center;gap:10px;text-align:right;}
   .conn-status{display:inline-block;font-size:12px;padding:5px 12px;border-radius:999px;background:rgba(255,255,255,.12);}
   .conn-status.on{background:#16a34a;}
 
-
   main{max-width:98%;width:98%;margin:0 auto;padding:14px 8px 70px;box-sizing:border-box;}
-
 
   /* 날짜 배너 */
   #dateBanner {
@@ -63,14 +57,12 @@
   #dateBanner .date-text { font-size: 26px; font-weight: 800; color: #0b1f3f; letter-spacing: .3px; }
   #dateBanner .workdays-badge { font-size: 14.5px; font-weight: 700; color: #2563eb; background: #eaf1ff; padding: 8px 16px; border-radius: 999px; white-space: nowrap; }
 
-
   button, .file-btn{cursor:pointer;border:none;border-radius:8px;padding:9px 16px;font-size:13.5px;font-weight:600;background:var(--blue);color:#fff;transition:.15s;}
   button:hover{filter:brightness(1.1);}
   button.secondary{background:rgba(255,255,255,.1);color:#fff;border:1px solid rgba(255,255,255,.3);}
   button.small{padding:5px 11px;font-size:12px;}
   button.danger{background:#fff;color:var(--red);border:1px solid var(--red);padding:5px 10px;font-size:12px;}
   button.danger:hover{background:#fee2e2;}
-
 
   /* ========== 대시보드 뷰 스타일 ========== */
   .kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:18px;}
@@ -79,12 +71,10 @@
   .kpi-card .value{font-size:20px;font-weight:800;}
   .kpi-card .sub{font-size:12px;color:#9fb0cf;margin-top:4px;}
 
-
   .panel{background:var(--panel);color:var(--text);border-radius:14px;padding:22px;margin-bottom:18px;}
   .panel h2{margin:0 0 16px;font-size:16px;color:var(--navy);}
   .charts-grid{display:grid;grid-template-columns:1.3fr 1fr;gap:18px;}
   @media (max-width:900px){ .charts-grid{grid-template-columns:1fr;} .kpi-grid{grid-template-columns:repeat(2,1fr);} }
-
 
   .bar-row{display:grid;grid-template-columns:90px 1fr 175px;align-items:center;gap:10px;margin-bottom:12px;font-size:13px;}
   .bar-track{background:#eef1f7;border-radius:6px;height:20px;overflow:hidden;}
@@ -92,14 +82,12 @@
   .bar-name{font-weight:700;color:var(--navy);}
   .bar-value{text-align:right;color:var(--muted);font-size:12.5px;}
 
-
   .donut-wrap{display:flex;align-items:center;gap:24px;flex-wrap:wrap;justify-content:center;}
   .donut{width:170px;height:170px;border-radius:50%;position:relative;}
   .donut::after{content:'';position:absolute;inset:26px;background:#fff;border-radius:50%;}
   .legend{font-size:13px;}
   .legend .item{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
   .legend .sw{width:11px;height:11px;border-radius:3px;flex-shrink:0;}
-
 
   .target-table{width:100%;border-collapse:collapse;font-size:13.5px;}
   .target-table th,.target-table td{padding:10px 8px;border-bottom:1px solid var(--border);text-align:left;}
@@ -110,14 +98,12 @@
   .progress-fill.over{background:var(--blue);}
   .progress-fill.warn{background:var(--amber);}
 
-
   .filters-bar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px;}
   .filters-bar select, .filters-bar input{padding:8px 10px;border:1px solid var(--border);border-radius:8px;font-size:13.5px;font-family:inherit;}
   .filters-bar input[type=text]{flex:1;min-width:160px;}
   .filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;}
   .filters button{background:rgba(255,255,255,.08);color:#cdd7e8;border:1px solid rgba(255,255,255,.18);padding:8px 16px;border-radius:8px;font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;}
   .filters button.active{background:var(--blue);color:#fff;border-color:var(--blue);}
-
 
   table.lead-table{width:100%;border-collapse:collapse;font-size:13px;}
   table.lead-table thead tr{background:var(--navy);}
@@ -133,14 +119,12 @@
   .empty-row td{text-align:center;color:var(--muted);padding:30px 0;}
   .count-tag{color:var(--muted);font-weight:500;font-size:13px;}
 
-
   .panel-toolbar{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:14px;}
   .panel-toolbar h2{margin:0;}
   .today-list-toolbar{background:#f1f2f5;border-radius:8px;padding:12px 16px;margin:-4px -4px 14px;}
   .copy-btn{background:var(--green);}
   .copy-btn.copied{background:#0f7c37;}
   .today-total-row td{font-weight:800;color:var(--navy);border-top:2px solid var(--navy);border-bottom:none;}
-
 
   .calendar-table{width:100%;border-collapse:collapse;font-size:12.5px;}
   .calendar-table th,.calendar-table td{padding:8px 10px;border:1px solid var(--border);text-align:right;white-space:nowrap;}
@@ -155,7 +139,6 @@
   .cal-cell{cursor:pointer;}
   .cal-cell:hover{background:#eef3fb;}
   .cal-count{font-size:10px;color:var(--muted);margin-right:4px;}
-
 
   /* ========== 컨설턴트 개별 화면 뷰 전용 스타일 ========== */
   .agent-view-container{display:none;}
@@ -179,7 +162,6 @@
     outline:none;border-color:var(--blue);box-shadow:0 0 0 3px rgba(37,99,235,.15);
   }
 
-
   /* 모달 */
   .modal-overlay{position:fixed;inset:0;background:rgba(10,20,40,.55);display:none;align-items:center;justify-content:center;z-index:200;padding:20px;}
   .modal-overlay.show{display:flex;}
@@ -193,7 +175,6 @@
   .modal-total-row td{font-weight:800;color:var(--navy);border-top:2px solid var(--navy);border-bottom:none;}
   .company-cell{min-width:170px;word-break:break-word;}
 
-
   /* 로그인 오버레이 */
   #loginOverlay{position:fixed;inset:0;background:#f4f6fb;display:flex;align-items:center;justify-content:center;z-index:300;padding:20px;}
   .login-card{background:#fff;border-radius:16px;padding:34px 28px;box-shadow:0 4px 24px rgba(20,40,80,.12);width:100%;max-width:360px;color:var(--text);}
@@ -202,7 +183,6 @@
   .login-field{margin-bottom:12px;}
   .login-field label{display:block;font-size:12.5px;font-weight:700;color:var(--navy);margin-bottom:5px;}
   .login-field input{width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:14px;box-sizing:border-box;}
-
 
   /* ==========================================================================
      컨설턴트 화면 신규 스타일 (1번~5번 캡처 화면 100% 매칭 & 모바일 반응형)
@@ -303,7 +283,6 @@
     font-weight: 700;
   }
 
-
   .agent-status-body {
     padding: 16px;
     display: flex;
@@ -345,7 +324,6 @@
     margin-top: 4px;
     font-weight: 500;
   }
-
 
   /* 우측 금일 수주 예정 금액 카드 */
   .today-expected-box {
@@ -392,7 +370,6 @@
   .today-expected-box .te-btn:hover {
     background: var(--agent-today-btn-hover, #1d4ed8) !important;
   }
-
 
   /* 달성현황 (캡처1.PNG) */
   .agent-achieve-grid {
@@ -443,7 +420,6 @@
     justify-content: center;
     gap: 20px;
   }
-
 
   /* 필터 영역 (캡처3.PNG) */
   .agent-list-filters-box {
@@ -498,7 +474,6 @@
     cursor: pointer;
   }
 
-
   /* 신규 등록 모달 (캡처2.PNG) 컴팩트 그리드 */
   .agent-compact-form {
     display: flex;
@@ -526,7 +501,6 @@
     border: 1px solid #bfdbfe;
     margin-top: 4px;
   }
-
 
   /* 모바일 반응형 뷰 */
   @media (max-width: 768px) {
@@ -562,7 +536,6 @@
     }
   }
 
-
   /* 임영민 컨설턴트 옐로우 테마 전용 스타일 */
   .switch-btn[data-agent="임영민"] {
     border-color: rgba(234, 179, 8, 0.4);
@@ -577,7 +550,6 @@
     border-color: #ca8a04 !important;
     box-shadow: 0 0 12px rgba(234, 179, 8, 0.65) !important;
   }
-
 
   /* 컨설턴트 이름 우측 상품 선택 바 */
   .agent-header-product-picker {
@@ -619,7 +591,6 @@
       overflow-x: auto;
     }
   }
-
 
   /* ==========================================
      사용자 관리 모달 스타일 (소개영업 앱 100% 동일 구현)
@@ -690,7 +661,6 @@
 </head>
 <body>
 
-
 <!-- 1. 로그인 오버레이 -->
 <div id="loginOverlay">
   <div class="login-card" style="max-width:390px;width:95%;padding:32px 26px;">
@@ -699,7 +669,6 @@
       <div style="font-size:13.5px;font-weight:700;color:var(--muted,#64748b);letter-spacing:1px;margin-bottom:5px;">에스원 북서울지사</div>
       <h1 style="margin:0;font-size:23px;font-weight:800;color:var(--navy,#0a1730);letter-spacing:-0.5px;">영업 TA 관리 포털</h1>
     </div>
-
 
     <!-- 1. 기본 로그인 폼 -->
     <div id="loginFormMain" style="display:block;">
@@ -718,7 +687,6 @@
         <button type="submit" id="btnLogin" style="width:100%;margin-top:10px;padding:12px;font-size:15px;font-weight:700;">로그인</button>
         <div id="loginMsg" style="margin-top:12px;font-size:12.5px;text-align:center;min-height:16px;"></div>
 
-
         <!-- 하단 신규 회원가입 영역 (첨부 이미지 매칭) -->
         <div class="signup-toggle-box" style="margin-top:22px;text-align:center;font-size:14.5px;color:#475569;border-top:1px dashed #cbd5e1;padding-top:16px;">
           아직 계정이 없으신가요?<br>
@@ -726,7 +694,6 @@
         </div>
       </form>
     </div>
-
 
     <!-- 2. 신규 회원가입 폼 -->
     <div id="loginFormSignup" style="display:none;">
@@ -770,7 +737,6 @@
         <button type="submit" id="btnDoSignup" style="width:100%;margin-top:10px;background:#16a34a;color:#fff;font-weight:700;padding:12px;border:none;border-radius:8px;font-size:15px;cursor:pointer;">가입 완료 및 로그인</button>
         <div id="signupMsg" style="margin-top:12px;font-size:12.5px;text-align:center;min-height:16px;"></div>
 
-
         <div class="signup-toggle-box" style="margin-top:18px;text-align:center;font-size:14px;color:#64748b;border-top:1px dashed #cbd5e1;padding-top:14px;">
           이미 계정이 있으신가요? 
           <button type="button" class="signup-toggle-btn" id="btnBackToLogin" onclick="toggleLoginSignup('login')" style="background:none;border:none;color:#2563eb;font-weight:700;font-size:14px;cursor:pointer;text-decoration:underline;">로그인 화면으로</button>
@@ -780,7 +746,6 @@
   </div>
 </div></div>
 </div>
-
 
 <!-- 2. 메인 애플리케이션 -->
 <div id="mainApp" style="display:none;">
@@ -794,7 +759,6 @@
       </div>
     </div>
 
-
     <!-- 타이틀바 컨설턴트별 개별화면 전환 버튼 그룹 -->
     <div class="view-switch-group" id="topbarViewSwitchGroup">
       <button type="button" class="switch-btn master active" id="btnViewMaster" onclick="switchView('master')">📊 통합 대시보드</button>
@@ -805,7 +769,6 @@
       <button type="button" class="switch-btn" data-agent="임영민" onclick="switchView('임영민')">임영민</button>
     </div>
 
-
     <div class="topbar-right">
       <button type="button" id="btnUserManage" class="small" onclick="openUserManageModal()" style="background:#e6f4ea;color:#137333;border:1px solid #ceead6;font-weight:700;display:none;">👥 사용자 관리</button>
       <button type="button" id="btnTopbarTarget" class="small" onclick="openTargetModal()" style="background:#2563eb;color:#fff;display:none;">🎯 목표 설정</button>
@@ -815,13 +778,11 @@
     </div>
   </header>
 
-
   <!-- 날짜 배너 -->
   <div id="dateBanner">
     <div class="date-text" id="topbarDateValue"></div>
     <div class="workdays-badge" id="topbarWorkdays"></div>
   </div>
-
 
   <main>
     <!-- ========================================== -->
@@ -840,7 +801,6 @@
         <button type="button" data-category="all">전체</button>
       </div>
 
-
       <!-- 8개 종합 KPI 지표 카드 -->
       <section class="kpi-grid">
         <div class="kpi-card"><div class="label">전체 TA</div><div class="value" id="kpiTotalAmount">0원</div><div class="sub" id="kpiTotalCount">0건</div></div>
@@ -852,7 +812,6 @@
         <div class="kpi-card"><div class="label">TA 수주율</div><div class="value" id="kpiWinRate">-</div><div class="sub" id="kpiWinSub"></div></div>
         <div class="kpi-card"><div class="label">수주 실패율</div><div class="value" id="kpiFailRate">-</div><div class="sub" id="kpiFailSub"></div></div>
       </section>
-
 
       <!-- 금일 수주 예정 전체 리스트 -->
       <div class="panel">
@@ -867,7 +826,6 @@
           </table>
         </div>
       </div>
-
 
       <!-- 변경 이력 (Activity Log) -->
       <div class="panel">
@@ -888,7 +846,6 @@
         </div>
       </div>
 
-
       <!-- 차트: 바차트 & 도넛차트 -->
       <div class="panel">
         <div class="charts-grid">
@@ -905,7 +862,6 @@
           </div>
         </div>
       </div>
-
 
       <!-- 컨설턴트별 달성현황 & 목표 관리 -->
       <div class="panel">
@@ -932,7 +888,6 @@
         </div>
       </div>
 
-
       <!-- 이달 캘린더 — 컨설턴트별 수주예상 금액 그리드 -->
       <div class="panel">
         <h2>이달 캘린더 — 컨설턴트별 수주예상 금액 <span class="count-tag" id="calendarMonthLabel"></span></h2>
@@ -943,7 +898,6 @@
           </table>
         </div>
       </div>
-
 
       <!-- 전체 TA 조회 (상품 카테고리 필터 연동 + 관리자 전용 삭제 기능 지원) -->
       <div class="panel">
@@ -981,7 +935,6 @@
       </div>
     </div>
 
-
     <!-- ========================================== -->
     <!-- VIEW B: 컨설턴트 개별 작업 화면 (pc_agent)   -->
     <!-- ========================================== -->
@@ -989,7 +942,6 @@
          컨설턴트 개별 영업 화면 (viewAgent) - 1번~5번 캡처 100% 매칭
          ========================================== -->
     <div id="viewAgent" class="agent-view-container">
-
 
       <!-- 1. 간결 헤더 (중복 제거 & 순위 표시 & 상품 선택 & 신규등록 버튼) -->
       <div class="agent-header-card">
@@ -1013,7 +965,6 @@
         </div>
       </div>
 
-
       <!-- 2. 상단 TA 현황 & 금일 수주예정 카드 (1번 그림 캡처.PNG) -->
       <div class="agent-status-panel">
         <div class="agent-status-header">
@@ -1024,9 +975,7 @@
             </span>
           </div>
 
-
         </div>
-
 
         <div class="agent-status-body">
           <!-- 6개 메트릭 카드 (2x3) -->
@@ -1061,7 +1010,6 @@
             </div>
           </div>
 
-
           <!-- 우측 금일 수주 예정 금액 카드 -->
           <div class="today-expected-box">
             <div class="te-title">금일 수주 예정 금액</div>
@@ -1070,7 +1018,6 @@
           </div>
         </div>
       </div>
-
 
       <!-- 3. 달성현황 (2번 그림 캡처1.PNG) -->
       <div class="panel" style="margin-top:16px;">
@@ -1089,7 +1036,6 @@
               <div class="bar-sub" id="agentAchieveRateSub">목표 0원</div>
             </div>
 
-
             <div class="achieve-bar-item">
               <div class="bar-header">
                 <span class="bar-title">보유 TA율</span>
@@ -1101,7 +1047,6 @@
               <div class="bar-sub" id="agentHoldRateSub">이달 수주예정 0원 (0건)</div>
             </div>
 
-
             <div class="achieve-bar-item">
               <div class="bar-header">
                 <span class="bar-title">TA 수주율</span>
@@ -1112,7 +1057,6 @@
               </div>
               <div class="bar-sub" id="agentWinRateSub">수주 0원</div>
             </div>
-
 
             <div class="achieve-bar-item">
               <div class="bar-header">
@@ -1126,7 +1070,6 @@
             </div>
           </div>
 
-
           <!-- 우측 도넛 차트 & 범례 -->
           <div class="achieve-donut-wrap">
             <div class="donut" id="agentDonutChart"></div>
@@ -1134,7 +1077,6 @@
           </div>
         </div>
       </div>
-
 
       <!-- 4. 내 담당 TA 목록 (4번 그림 캡처3.PNG) -->
       <div class="panel" style="margin-top:16px;">
@@ -1146,7 +1088,6 @@
             ➕ 신규 TA 등록
           </button>
         </div>
-
 
         <!-- 3단 필터 (단계별, 상품별, 월별) -->
         <div class="agent-list-filters-box">
@@ -1161,9 +1102,6 @@
 
 
 
-
-
-
           <!-- 3행: 월별 필터 (수주예정일 이달+이후 기본, 년월 선택, 전체) -->
           <div class="filter-pills-row" id="agentFilterMonthRow">
             <span class="filter-label">월별:</span>
@@ -1174,7 +1112,6 @@
             <button type="button" class="filter-pill" id="btnAgentMonthAll" onclick="setAgentFilterMonth('all')">전체 기간</button>
           </div>
         </div>
-
 
         <!-- 안건 테이블 (용역료 우측정렬) -->
         <div class="table-scroll" style="margin-top:14px;">
@@ -1201,7 +1138,6 @@
   </main>
 </div>
 
-
 <!-- 캘린더 일자 상세 모달 -->
 <div class="modal-overlay" id="calendarModalOverlay">
   <div class="modal-card">
@@ -1218,41 +1154,39 @@
 </div>
 
 
-
-
 <!-- ==========================================================================
      관리자 전용 사용자 관리 모달 (소개영업 앱 100% 동일 구현)
      ========================================================================== -->
 <div class="modal-overlay" id="userManageModalOverlay" style="display:none;">
-  <div class="modal-card" style="max-width:680px;width:95%;max-height:85vh;overflow-y:auto;">
+  <div class="modal-card" style="max-width:880px;width:96%;max-height:85vh;overflow-y:auto;">
     <button type="button" class="modal-close" onclick="closeUserManageModal()">&times;</button>
     <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
       <h3 style="margin:0;font-size:18px;font-weight:800;color:var(--navy);">👥 사용자 관리</h3>
     </div>
-
 
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
       <span style="font-size:0.86rem;color:#5f6368;font-weight:600;">총 사용자: <strong id="totalUserCount" style="color:#1a73e8;font-size:1rem;">0</strong>명</span>
       <button type="button" class="small secondary" id="btnRefreshUsers" onclick="loadAllUsers()" style="background:#e8f0fe;color:#1a73e8;border:1px solid #aecbfa;border-radius:6px;padding:5px 12px;font-size:0.8rem;font-weight:700;cursor:pointer;">🔄 새로고침</button>
     </div>
 
-
     <div class="user-table-wrapper">
-      <table class="user-data-table">
+      <table class="user-data-table" style="min-width:760px;width:100%;">
         <thead>
           <tr>
-            <th>이름</th>
-            <th>전화번호(아이디)</th>
-            <th>직무</th>
-            <th style="text-align:center;">관리</th>
+            <th style="width:75px;">이름</th>
+            <th style="width:115px;">전화번호(아이디)</th>
+            <th style="width:85px;">직무</th>
+            <th style="width:90px;text-align:center;">실시간 접속</th>
+            <th style="width:160px;text-align:center;">최근접속일시 (TA)</th>
+            <th style="min-width:140px;text-align:center;">접속기기</th>
+            <th style="width:95px;text-align:center;">관리</th>
           </tr>
         </thead>
         <tbody id="userTableBody">
-          <tr><td colspan="4" style="text-align:center;padding:20px;color:#9aa0a6;">사용자 목록 로딩 중...</td></tr>
+          <tr><td colspan="7" style="text-align:center;padding:20px;color:#9aa0a6;">사용자 목록 및 접속 정보 불러오는 중...</td></tr>
         </tbody>
       </table>
     </div>
-
 
     <!-- 사용자 정보 수정 폼 -->
     <div class="user-edit-box" id="userEditBox">
@@ -1301,8 +1235,6 @@
 </div>
 
 
-
-
 <!-- 월간 목표 설정 및 배분 모달 (지사장 전용) -->
 <div class="modal-overlay" id="targetModalOverlay" style="display:none;">
   <div class="modal-card" style="max-width:760px;width:95%;">
@@ -1314,7 +1246,6 @@
     <div class="modal-sub" style="margin-bottom:14px;color:var(--muted);font-size:13px;">
       월별 지사 전체 목표와 상품별 컨설턴트 배분률(100%)을 설정하면, 천원 단위로 자동 반올림 배분되어 DB에 확정 저장됩니다.
     </div>
-
 
     <!-- 월 선택 & 종합 요약 바 -->
     <div style="background:#f8fafc;border:1px solid var(--border);border-radius:12px;padding:12px 16px;margin-bottom:14px;">
@@ -1330,14 +1261,12 @@
       </div>
     </div>
 
-
     <!-- 상품 카테고리 탭 네비게이션 -->
     <div class="tab-group" style="display:flex;gap:6px;margin-bottom:14px;background:#f1f5f9;padding:4px;border-radius:10px;">
       <button type="button" class="tab-btn active" data-target-tab="일반알람" onclick="switchTargetModalTab('일반알람')" style="flex:1;padding:8px;font-weight:700;border:none;border-radius:8px;cursor:pointer;background:#fff;color:var(--navy);box-shadow:0 1px 3px rgba(0,0,0,0.1);">일반알람</button>
       <button type="button" class="tab-btn" data-target-tab="디지털(정보보안)" onclick="switchTargetModalTab('디지털(정보보안)')" style="flex:1;padding:8px;font-weight:700;border:none;border-radius:8px;cursor:pointer;background:transparent;color:var(--muted);">디지털(정보보안)</button>
       <button type="button" class="tab-btn" data-target-tab="안전상품" onclick="switchTargetModalTab('안전상품')" style="flex:1;padding:8px;font-weight:700;border:none;border-radius:8px;cursor:pointer;background:transparent;color:var(--muted);">안전상품</button>
     </div>
-
 
     <!-- 지사 목표 입력 & 균등배분 버튼 영역 -->
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:10px;">
@@ -1352,7 +1281,6 @@
         <button type="button" class="small secondary" id="btnDistributeEqual" onclick="distributeEqualRates()" style="font-size:12px;">⚖️ 1/N 균등 배분 (각 20%)</button>
       </div>
     </div>
-
 
     <!-- 컨설턴트별 배분 테이블 -->
     <div style="overflow-x:auto;margin-bottom:12px;border:1px solid var(--border);border-radius:10px;">
@@ -1378,11 +1306,9 @@
       </table>
     </div>
 
-
     <div style="font-size:12px;color:var(--muted);margin-bottom:16px;line-height:1.5;">
       💡 <strong>배분 안내</strong>: 배분률(%) 또는 지사 전체 목표를 수정하면 <strong>천원 단위로 자동 반올림</strong>되어 계산됩니다. 상품별로 배분률을 다르게 적용할 수 있습니다.
     </div>
-
 
     <!-- 하단 액션 버튼 -->
     <div style="display:flex;justify-content:space-between;align-items:center;border-top:1px solid var(--border);padding-top:14px;">
@@ -1393,7 +1319,6 @@
     </div>
   </div>
 </div>
-
 
 <!-- 공지사항 관리 모달 -->
 <div class="modal-overlay" id="noticeModalOverlay">
@@ -1410,7 +1335,6 @@
   </div>
 </div>
 
-
 <!-- ==========================================================================
      컨설턴트 신규 TA 등록 / 수정 모달 (3번 그림 캡처2.PNG 매칭)
      ========================================================================== -->
@@ -1421,7 +1345,6 @@
       <h3 id="agentModalTitle" style="margin:0;font-size:18px;font-weight:800;color:var(--navy);">신규 TA 등록</h3>
       <span class="count-tag" style="background:#eff6ff;color:#1d4ed8;font-weight:700;">컨설턴트 영업</span>
     </div>
-
 
     <form id="agentModalLeadForm" onsubmit="handleAgentModalSubmit(event)" class="agent-compact-form">
       <input type="hidden" id="afEditingId" name="editingId"><input type="hidden" id="agentEditingId">
@@ -1482,7 +1405,6 @@
         </div>
       </div>
 
-
       <!-- 1.5행: 수주完 선택 시 추가 정보 (계약일, 기산일, 차량번호) -->
       <div id="afWonExtraRow" class="compact-form-row-won" style="display:none;">
         <div class="form-group" style="margin:0;">
@@ -1505,7 +1427,6 @@
           </select>
         </div>
       </div>
-
 
       <!-- 2행: 등록일, 계약예정일, 메모, 등록 버튼 -->
       <div class="compact-form-row2" style="margin-top:6px;">
@@ -1530,7 +1451,6 @@
     </form>
   </div>
 </div>
-
 
 <!-- ==========================================================================
      금일 수주 예정 금액 상세리스트 모달
@@ -1564,7 +1484,6 @@
   </div>
 </div>
 
-
 <!-- ==========================================================================
      컨설턴트 로그인 시 지사장 공지사항 팝업 모달
      ========================================================================== -->
@@ -1592,9 +1511,6 @@
 
 
 
-
-
-
 <script>
 // ==========================================
 // 1. Supabase 연동 설정 & 기본 헬퍼
@@ -1602,13 +1518,10 @@
 const SUPABASE_URL = 'https://gpqlximhoqdybcewdfde.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_xUnGxyLCc5TB5nv4keVQVw__grqGJkP';
 
-
 window.supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 const db = window.supabase;
 
-
 const el = id => document.getElementById(id);
-
 
 // ==========================================
 // 시스템 메시지 대화상자 (브라우저 기본 alert/confirm 대체)
@@ -1621,12 +1534,10 @@ function showPortalAlert(msg, title) {
   const confirmBtn = el('portalAlertConfirmBtn');
   const cancelBtn = el('portalAlertCancelBtn');
 
-
   if (!overlay || !msgEl || !confirmBtn) {
     if (window.nativeAlert) window.nativeAlert(msg);
     return;
   }
-
 
   titleEl.textContent = title || '북서울지사 TA 관리 포털';
   msgEl.textContent = String(msg || '');
@@ -1634,12 +1545,10 @@ function showPortalAlert(msg, title) {
   overlay.style.display = 'flex';
   if (confirmBtn && typeof confirmBtn.focus === "function") confirmBtn.focus();
 
-
   confirmBtn.onclick = function() {
     overlay.style.display = 'none';
   };
 }
-
 
 function showPortalConfirm(msg, title) {
   return new Promise(resolve => {
@@ -1649,19 +1558,16 @@ function showPortalConfirm(msg, title) {
     const confirmBtn = el('portalAlertConfirmBtn');
     const cancelBtn = el('portalAlertCancelBtn');
 
-
     if (!overlay || !msgEl || !confirmBtn) {
       const ok = window.nativeConfirm ? window.nativeConfirm(msg) : true;
       return resolve(ok);
     }
-
 
     titleEl.textContent = title || '북서울지사 TA 관리 포털';
     msgEl.textContent = String(msg || '');
     cancelBtn.style.display = 'inline-block';
     overlay.style.display = 'flex';
     if (confirmBtn && typeof confirmBtn.focus === "function") confirmBtn.focus();
-
 
     confirmBtn.onclick = function() {
       overlay.style.display = 'none';
@@ -1674,7 +1580,6 @@ function showPortalConfirm(msg, title) {
   });
 }
 
-
 // 브라우저 기본 alert 가로채기 (jssim2545... 주소 표시 방지)
 if (!window.nativeAlert) {
   window.nativeAlert = window.alert;
@@ -1685,7 +1590,6 @@ if (!window.nativeAlert) {
 if (!window.nativeConfirm) {
   window.nativeConfirm = window.confirm;
 }
-
 
 document.addEventListener('keydown', (e) => {
   const overlay = el('portalAlertOverlay');
@@ -1700,8 +1604,6 @@ document.addEventListener('keydown', (e) => {
 });
 
 
-
-
 const CONSULTANTS = ['최영국', '박광춘', '이수열', '정문재', '임영민'];
 const STAGES = ['진행중', '수주完', '실패'];
 const STAGE_COLOR = { '진행중': '#2563eb', '수주完': '#16a34a', '실패': '#dc2626' };
@@ -1714,8 +1616,6 @@ const CONSULTANT_COLOR = {
   '정문재': '#6d28d9',
   '임영민': '#eab308'
 };
-
-
 
 
 // ==========================================
@@ -1834,7 +1734,6 @@ const CONSULTANT_THEMES = {
   }
 };
 
-
 function applyConsultantTheme(agentName) {
   const theme = CONSULTANT_THEMES[agentName];
   if (typeof document === 'undefined') return;
@@ -1851,7 +1750,6 @@ function applyConsultantTheme(agentName) {
   const todayTitle = q('.today-expected-box .te-title');
   const todayVal = q('.today-expected-box .te-val');
   const todayBtn = q('.today-expected-box .te-btn');
-
 
   if (theme) {
     if (document.body) document.body.style.background = theme.bodyBg;
@@ -1873,7 +1771,6 @@ function applyConsultantTheme(agentName) {
       if (theme.badgeBorder) agentBadge.style.border = theme.badgeBorder;
     }
 
-
     // 1) TA 현황 배너 색상 및 테두리 반영
     if (statusHeader) {
       statusHeader.style.background = theme.bannerBg;
@@ -1882,7 +1779,6 @@ function applyConsultantTheme(agentName) {
     if (statusPanel && theme.panelBorder) {
       statusPanel.style.borderColor = theme.panelBorder;
     }
-
 
     // 2) 금일 수주 예정 금액 창 색상, 타이틀, 금액, 버튼 반영
     if (todayBox) {
@@ -1902,7 +1798,6 @@ function applyConsultantTheme(agentName) {
       todayBtn.onmouseenter = function() { this.style.background = theme.todayBtnHover; };
       todayBtn.onmouseleave = function() { this.style.background = theme.todayBtnBg; };
     }
-
 
     // CSS Custom Properties 전파
     if (document.documentElement && document.documentElement.style && typeof document.documentElement.style.setProperty === 'function') {
@@ -1933,7 +1828,6 @@ function applyConsultantTheme(agentName) {
       agentFormCard.style.border = '2px solid var(--blue)';
     }
 
-
     // TA 현황 배너 기본 복원
     if (statusHeader) {
       statusHeader.style.background = '#0b1f3f';
@@ -1947,7 +1841,6 @@ function applyConsultantTheme(agentName) {
       agentBadge.style.color = '#cbd5e1';
       agentBadge.style.border = 'none';
     }
-
 
     // 금일 수주 예정 금액 창 기본 복원
     if (todayBox) {
@@ -1968,7 +1861,6 @@ function applyConsultantTheme(agentName) {
       todayBtn.onmouseleave = function() { this.style.background = '#2563eb'; };
     }
 
-
     if (document.documentElement && document.documentElement.style && typeof document.documentElement.style.removeProperty === 'function') {
       document.documentElement.style.removeProperty('--agent-banner-bg');
       document.documentElement.style.removeProperty('--agent-banner-border');
@@ -1986,14 +1878,12 @@ function applyConsultantTheme(agentName) {
 }
 window.applyConsultantTheme = applyConsultantTheme;
 
-
 const KR_HOLIDAYS = new Set([
   '2026-01-01','2026-02-16','2026-02-17','2026-02-18','2026-03-01','2026-03-02',
   '2026-05-05','2026-05-24','2026-05-25','2026-06-06','2026-08-15','2026-08-17',
   '2026-09-24','2026-09-25','2026-09-26','2026-09-27','2026-10-03','2026-10-05',
   '2026-10-09','2026-12-25'
 ]);
-
 
 function isHoliday(dateStr) {
   if (!dateStr) return false;
@@ -2004,25 +1894,21 @@ function isHoliday(dateStr) {
   return wd === 0 || wd === 6;
 }
 
-
 function todayStr() {
   const d = new Date();
   const tz = d.getTimezoneOffset() * 60000;
   return new Date(d.getTime() - tz).toISOString().slice(0, 10);
 }
 
-
 function currentMonthStr() {
   return todayStr().slice(0, 7);
 }
-
 
 const WEEKDAY_KR = ['일', '월', '화', '수', '목', '금', '토'];
 function todayLabel() {
   const d = new Date();
   return `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, '0')}.${String(d.getDate()).padStart(2, '0')} (${WEEKDAY_KR[d.getDay()]})`;
 }
-
 
 function workingDaysLeftInMonth() {
   const now = new Date();
@@ -2037,12 +1923,10 @@ function workingDaysLeftInMonth() {
   return count;
 }
 
-
 function formatCurrency(n) {
   n = Number(n) || 0;
   return n.toLocaleString('ko-KR') + '원';
 }
-
 
 function formatDateShort(s) {
   if (!s) return '';
@@ -2050,7 +1934,6 @@ function formatDateShort(s) {
   if (parts.length < 3) return s;
   return `${Number(parts[1])}/${Number(parts[2])}`;
 }
-
 
 function scheduleLabel(lead) {
   const parts = [];
@@ -2062,18 +1945,14 @@ function scheduleLabel(lead) {
   return parts.join(' · ');
 }
 
-
 function escapeHtml(s) {
   return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 }
 
 
-
-
 function matchProductCategory(productType) {
   return productCategory(productType);
 }
-
 
 function productCategory(productType) {
   if (productType === '정보보안') return '디지털(정보보안)';
@@ -2081,14 +1960,12 @@ function productCategory(productType) {
   return '일반알람';
 }
 
-
 function isCreatedToday(lead) {
   const t = todayStr();
   if (lead.registeredDate === t) return true;
   if (lead.createdAt && lead.createdAt.slice(0, 10) === t) return true;
   return false;
 }
-
 
 // ==========================================
 // 2. 외부 공지 텍스트 복사 (사용자 지정 포맷)
@@ -2098,7 +1975,6 @@ function getKoreanDateTitle() {
   const days = ['일', '월', '화', '수', '목', '금', '토'];
   return `${d.getFullYear()}년 ${d.getMonth() + 1}월 ${d.getDate()}일 (${days[d.getDay()]})`;
 }
-
 
 function buildTodayShareText() {
   const leads = todayLeadsAll();
@@ -2118,7 +1994,6 @@ function buildTodayShareText() {
   return lines.join(String.fromCharCode(10));
 }
 
-
 // ==========================================
 // 3. 앱 상태 및 데이터 연산
 // ==========================================
@@ -2126,18 +2001,15 @@ let ALL = {};
 const PRODUCT_CATEGORIES = ['일반알람', '디지털(정보보안)', '안전상품'];
 let TARGETS = { targets: {}, rates: {} };
 
-
 function roundToThousand(val) {
   const n = Number(val) || 0;
   return Math.round(n / 1000) * 1000;
 }
 
-
 function parseFormattedNumber(val) {
   if (typeof val === 'number') return val;
   return Number(String(val || '').replace(/[^0-9.-]/g, '')) || 0;
 }
-
 
 // 사 전체 및 컨설턴트별 기본 확정 목표 (2026-09 기준 초기값 / DB 미설정 시 폴백)
 const DEFAULT_TARGET_AMOUNTS = {
@@ -2158,7 +2030,6 @@ const DEFAULT_TARGET_AMOUNTS = {
   }
 };
 
-
 function getConsultantTarget(consultant, month, category) {
   month = month || currentMonthStr();
   if (TARGETS.targets && TARGETS.targets[consultant] && TARGETS.targets[consultant][month]) {
@@ -2176,7 +2047,6 @@ function getConsultantTarget(consultant, month, category) {
     }
   }
 
-
   // DB에 해당 월 목표가 없는 경우 사 전체 기본 확정 목표 반영
   if (!category || category === 'all') {
     let sum = 0;
@@ -2190,7 +2060,6 @@ function getConsultantTarget(consultant, month, category) {
   return (def && def.amounts && def.amounts[consultant]) ? def.amounts[consultant] : 0;
 }
 
-
 // 사 전체(지사 전체) 목표 합계 반환
 function getTotalTarget(month, category) {
   month = month || currentMonthStr();
@@ -2201,34 +2070,28 @@ function getTotalTarget(month, category) {
   return sum;
 }
 
-
 // 사 전체 목표 헬퍼 (getOverallTarget 호환 함수 완벽 보장)
 function getOverallTarget(month, category) {
   return getTotalTarget(month, category);
 }
-
 
 function getConsultantRate(consultant, month, category) {
   if (!TARGETS.rates[consultant] || !TARGETS.rates[consultant][month]) return 0;
   return Number(TARGETS.rates[consultant][month][category] || 0);
 }
 
-
 function isMasterUser() {
   if (!currentUser) return false;
   return currentUser.role === 'master' || currentUser.name === '심정환' || (currentUser.job && currentUser.job.includes('관리자'));
 }
 
-
 function updateUIVisibilityByRole() {
   const master = isMasterUser();
-
 
   // 1. 타이틀바 화면 전환 버튼 그룹 (지사장은 전체 전환 가능, 개별 컨설턴트는 비노출)
   if (el('topbarViewSwitchGroup')) {
     el('topbarViewSwitchGroup').style.display = master ? 'flex' : 'none';
   }
-
 
   // 2. 관리자 전용 버튼들 (공지사항 관리, 목표 설정 버튼)
   if (el('btnUserManage')) {
@@ -2244,7 +2107,6 @@ function updateUIVisibilityByRole() {
     el('btnOpenTargetModal').style.display = master ? 'inline-flex' : 'none';
   }
 
-
   // 3. 개별 컨설턴트 화면의 "지사장 대시보드로 돌아가기" 버튼 (개별 컨설턴트에게는 절대 미노출)
   if (el('btnBackToMaster')) {
     el('btnBackToMaster').style.display = master ? 'inline-flex' : 'none';
@@ -2254,13 +2116,11 @@ let activeDashboardCategory = '일반알람';
 let currentViewMode = 'master';
 let currentUser = null;
 
-
 function allLeads() {
   const leads = Object.values(ALL).flatMap(d => (d && d.leads) || []);
   if (activeDashboardCategory === 'all') return leads;
   return leads.filter(l => productCategory(l.productType) === activeDashboardCategory);
 }
-
 
 function consultantLeads(name) {
   const leads = (ALL[name] && ALL[name].leads) || [];
@@ -2268,54 +2128,43 @@ function consultantLeads(name) {
   return leads.filter(l => productCategory(l.productType) === activeDashboardCategory);
 }
 
-
 function todayLeadsAll() {
   const today = todayStr();
   return allLeads().filter(l => l.expectedDate === today);
 }
 
-
 function computeMetrics(leads, target, month) {
   leads = leads || [];
   target = Number(target) || 0;
 
-
   const totalAmount = leads.reduce((s, l) => s + Number(l.amount || 0), 0);
   const totalCount = leads.length;
-
 
   const pipelineLeads = leads.filter(l => l.stage === '진행중');
   const pipelineAmount = pipelineLeads.reduce((s, l) => s + Number(l.amount || 0), 0);
   const pipelineCount = pipelineLeads.length;
 
-
   const monthWonLeads = leads.filter(l => l.stage === '수주完' && (l.contractDate || '').slice(0, 7) === month);
   const monthWonAmount = monthWonLeads.reduce((s, l) => s + Number(l.amount || 0), 0);
   const monthWonCount = monthWonLeads.length;
-
 
   const failedLeads = leads.filter(l => l.stage === '실패');
   const failedAmount = failedLeads.reduce((s, l) => s + Number(l.amount || 0), 0);
   const failedCount = failedLeads.length;
 
-
   const wonAllLeads = leads.filter(l => l.stage === '수주完');
   const wonAllAmount = wonAllLeads.reduce((s, l) => s + Number(l.amount || 0), 0);
 
-
   const achievementRate = target > 0 ? Math.round(monthWonAmount / target * 1000) / 10 : null;
   const remainingTarget = target - monthWonAmount;
-
 
   const monthPipelineLeads = pipelineLeads.filter(l => (l.expectedDate || '').slice(0, 7) === month);
   const monthPipelineAmount = monthPipelineLeads.reduce((s, l) => s + Number(l.amount || 0), 0);
   const monthPipelineCount = monthPipelineLeads.length;
 
-
   const holdingRate = target > 0 ? Math.round(monthPipelineAmount / target * 1000) / 10 : null;
   const winRate = totalAmount > 0 ? Math.round(wonAllAmount / totalAmount * 1000) / 10 : null;
   const failRate = totalAmount > 0 ? Math.round(failedAmount / totalAmount * 1000) / 10 : null;
-
 
   return {
     totalAmount, totalCount,
@@ -2327,7 +2176,6 @@ function computeMetrics(leads, target, month) {
     achievementRate, remainingTarget, holdingRate, winRate, failRate
   };
 }
-
 
 // ==========================================
 // 4. Supabase 연동 함수
@@ -2374,10 +2222,8 @@ async function loadAllFromSupabase() {
     });
   }
 
-
   await loadTargetsFromSupabase(currentMonthStr());
 }
-
 
 async function loadTargetsFromSupabase(month) {
   month = month || currentMonthStr();
@@ -2395,11 +2241,9 @@ async function loadTargetsFromSupabase(month) {
         const amt = Number(t.target_amount || 0);
         const rate = Number(t.allocation_rate || 0);
 
-
         if (!TARGETS.targets[c]) TARGETS.targets[c] = {};
         if (!TARGETS.targets[c][m]) TARGETS.targets[c][m] = {};
         TARGETS.targets[c][m][cat] = amt;
-
 
         if (!TARGETS.rates[c]) TARGETS.rates[c] = {};
         if (!TARGETS.rates[c][m]) TARGETS.rates[c][m] = {};
@@ -2410,7 +2254,6 @@ async function loadTargetsFromSupabase(month) {
     console.error('목표 데이터 로드 예외:', err);
   }
 }
-
 
 async function logActivity(consultant, action, company, leadId, changes) {
   try {
@@ -2427,9 +2270,7 @@ async function logActivity(consultant, action, company, leadId, changes) {
   }
 }
 
-
 // ==========================================
-
 
 // ==========================================
 // 공통 데이터 파싱 & 이력 변경점 빌더 헬퍼
@@ -2438,9 +2279,7 @@ function parseCurrency(val) {
   return Number(String(val || '').replace(/[^0-9]/g, '')) || 0;
 }
 
-
 const recordActivityLog = logActivity;
-
 
 function buildLeadChanges(oldLead, newPayload) {
   const changes = [];
@@ -2454,7 +2293,6 @@ function buildLeadChanges(oldLead, newPayload) {
   return changes;
 }
 
-
 // 5. 대시보드 뷰 렌더링
 // ==========================================
 function render() {
@@ -2467,13 +2305,11 @@ function render() {
   try { renderLeadTable(); } catch (e) { console.error('renderLeadTable error:', e); }
 }
 
-
 function renderKPI() {
   const leads = allLeads();
   const month = currentMonthStr();
   const totalTarget = getTotalTarget(month, activeDashboardCategory);
   const m = computeMetrics(leads, totalTarget, month);
-
 
   el('kpiTotalAmount').textContent = formatCurrency(m.totalAmount);
   el('kpiTotalCount').textContent = m.totalCount + '건';
@@ -2484,16 +2320,13 @@ function renderKPI() {
   el('kpiFailedAmount').textContent = formatCurrency(m.failedAmount);
   el('kpiFailedCount').textContent = m.failedCount + '건';
 
-
   el('kpiAchieveRate').textContent = m.achievementRate === null ? '목표 미설정' : m.achievementRate + '%';
-
 
   // 사 전체 목표 계산
   const alarmTotal = getTotalTarget(month, '일반알람');
   const digiTotal = getTotalTarget(month, '디지털(정보보안)');
   const safeTotal = getTotalTarget(month, '안전상품');
   const grandTotal = alarmTotal + digiTotal + safeTotal;
-
 
   if (el('masterMonthlyTargetBadge')) {
     if (activeDashboardCategory === 'all') {
@@ -2507,36 +2340,29 @@ function renderKPI() {
     }
   }
 
-
   if (activeDashboardCategory === 'all') {
     el('kpiAchieveSub').textContent = `사 전체 목표 ${formatCurrency(grandTotal)} (알람 ${formatCurrency(alarmTotal)} · 디지털 ${formatCurrency(digiTotal)} · 안전 ${formatCurrency(safeTotal)})`;
   } else {
     el('kpiAchieveSub').textContent = totalTarget > 0 ? `사 전체 목표 ${formatCurrency(totalTarget)}` : '목표 미설정';
   }
 
-
   if (el('targetCategoryLabel')) {
     el('targetCategoryLabel').textContent = activeDashboardCategory === 'all' ? '전체 상품 합계' : activeDashboardCategory;
   }
 
-
   el('kpiHoldRate').textContent = m.holdingRate === null ? '-' : m.holdingRate + '%';
   el('kpiHoldSub').textContent = totalTarget > 0 ? '이달 수주예정 ' + formatCurrency(m.monthPipelineAmount) + ' (' + m.monthPipelineCount + '건)' : '';
-
 
   el('kpiWinRate').textContent = m.winRate === null ? '-' : m.winRate + '%';
   el('kpiWinSub').textContent = '수주 ' + formatCurrency(m.wonAllAmount);
 
-
   el('kpiFailRate').textContent = m.failRate === null ? '-' : m.failRate + '%';
   el('kpiFailSub').textContent = '실패 ' + formatCurrency(m.failedAmount);
-
 
   if (el('targetMonthLabel')) {
     el('targetMonthLabel').textContent = '(' + month + ')';
   }
 }
-
 
 function renderTodayList() {
   const leads = todayLeadsAll();
@@ -2561,7 +2387,6 @@ function renderTodayList() {
   `;
 }
 
-
 function renderBarChart() {
   const rows = CONSULTANTS.map(name => {
     const leads = consultantLeads(name);
@@ -2579,13 +2404,11 @@ function renderBarChart() {
   `).join('');
 }
 
-
 function renderDonut() {
   const byStage = {};
   STAGES.forEach(s => byStage[s] = 0);
   allLeads().forEach(l => { byStage[l.stage] = (byStage[l.stage] || 0) + Number(l.amount || 0); });
   const total = Object.values(byStage).reduce((a, b) => a + b, 0);
-
 
   let acc = 0;
   const segments = STAGES.map(s => {
@@ -2603,14 +2426,12 @@ function renderDonut() {
   }).join('');
 }
 
-
 function renderTargets() {
   const month = currentMonthStr();
   if (el('targetMonthLabel')) el('targetMonthLabel').textContent = '(' + month + ')';
   if (el('targetCategoryLabel')) {
     el('targetCategoryLabel').textContent = activeDashboardCategory === 'all' ? '전체 상품 합계' : activeDashboardCategory;
   }
-
 
   let totalWonAmt = 0;
   let totalWonCount = 0;
@@ -2620,7 +2441,6 @@ function renderTargets() {
   let totalFailAmt = 0;
   let totalAllWonAmt = 0;
 
-
   const consultantRowsHtml = CONSULTANTS.map(name => {
     const target = getConsultantTarget(name, month, activeDashboardCategory);
     const leads = consultantLeads(name);
@@ -2629,7 +2449,6 @@ function renderTargets() {
     const barClass = rate >= 100 ? 'over' : (rate >= 60 ? '' : 'warn');
     const barColor = rate >= 100 ? 'var(--blue)' : (rate >= 60 ? 'var(--green)' : 'var(--amber)');
 
-
     totalWonAmt += m.monthWonAmount;
     totalWonCount += m.monthWonCount;
     totalTargetAmt += target;
@@ -2637,7 +2456,6 @@ function renderTargets() {
     totalPipelineCount += m.pipelineCount;
     totalFailAmt += m.failedAmount;
     totalAllWonAmt += m.wonAllAmount;
-
 
     return `
       <tr>
@@ -2662,18 +2480,15 @@ function renderTargets() {
     `;
   }).join('');
 
-
   // 사 전체 합계 행 계산
   const totalAchieveRate = totalTargetAmt > 0 ? Math.round((totalWonAmt / totalTargetAmt) * 100) : 0;
   const totalBarClass = totalAchieveRate >= 100 ? 'over' : (totalAchieveRate >= 60 ? '' : 'warn');
   const totalBarColor = totalAchieveRate >= 100 ? 'var(--blue)' : (totalAchieveRate >= 60 ? 'var(--green)' : 'var(--amber)');
 
-
   const totalHoldingRate = totalTargetAmt > 0 ? Math.round((totalPipelineAmt / totalTargetAmt) * 100) : 0;
   const totalDecisionAmt = totalAllWonAmt + totalFailAmt;
   const totalWinRate = totalDecisionAmt > 0 ? Math.round((totalAllWonAmt / totalDecisionAmt) * 100) : 0;
   const totalFailRate = totalDecisionAmt > 0 ? Math.round((totalFailAmt / totalDecisionAmt) * 100) : 0;
-
 
   const totalRowHtml = `
     <tr style="background:#f8fafc;font-weight:800;border-top:2px solid var(--navy);border-bottom:2px solid var(--navy);">
@@ -2697,12 +2512,10 @@ function renderTargets() {
     </tr>
   `;
 
-
   if (el('targetTbody')) {
     el('targetTbody').innerHTML = consultantRowsHtml + totalRowHtml;
   }
 }
-
 
 // ==========================================
 // 5-1. 지사장 전용 월간 목표 설정 및 배분 모달 로직
@@ -2713,18 +2526,15 @@ let targetModalData = {
   categories: {}
 };
 
-
 function initTargetModalState(month) {
   month = month || currentMonthStr();
   targetModalData.month = month;
   targetModalData.activeTab = '일반알람';
   targetModalData.categories = {};
 
-
   PRODUCT_CATEGORIES.forEach(cat => {
     const consultantsData = {};
     let totalAmt = 0;
-
 
     CONSULTANTS.forEach(name => {
       const amt = getConsultantTarget(name, month, cat);
@@ -2732,7 +2542,6 @@ function initTargetModalState(month) {
       consultantsData[name] = { amount: amt, rate: rate };
       totalAmt += amt;
     });
-
 
     if (totalAmt > 0) {
       let rateSum = 0;
@@ -2751,14 +2560,12 @@ function initTargetModalState(month) {
       });
     }
 
-
     targetModalData.categories[cat] = {
       total: totalAmt,
       consultants: consultantsData
     };
   });
 }
-
 
 async function openTargetModal() {
   if (!isMasterUser()) {
@@ -2773,11 +2580,9 @@ async function openTargetModal() {
   renderTargetModalUI();
 }
 
-
 function closeTargetModal() {
   el('targetModalOverlay').style.display = 'none';
 }
-
 
 function switchTargetModalTab(cat) {
   targetModalData.activeTab = cat;
@@ -2791,28 +2596,23 @@ function switchTargetModalTab(cat) {
   renderTargetModalUI();
 }
 
-
 function renderTargetModalUI() {
   const cat = targetModalData.activeTab;
   const cData = targetModalData.categories[cat];
   if (!cData) return;
 
-
   el('modalActiveCategoryLabel').textContent = cat;
   el('modalCategoryTotalInput').value = cData.total > 0 ? cData.total.toLocaleString('ko-KR') : '';
   el('modalSaveMonthLabel').textContent = `${targetModalData.month.replace('-', '년 ')}월`;
 
-
   let rateSum = 0;
   let amountSum = 0;
-
 
   el('modalTargetTbody').innerHTML = CONSULTANTS.map(name => {
     const item = cData.consultants[name] || { rate: 20, amount: 0 };
     rateSum += Number(item.rate || 0);
     amountSum += Number(item.amount || 0);
     const pctOfBranch = cData.total > 0 ? Math.min(100, Math.round((item.amount / cData.total) * 100)) : 0;
-
 
     return `
       <tr>
@@ -2850,15 +2650,12 @@ function renderTargetModalUI() {
     `;
   }).join('');
 
-
   rateSum = Math.round(rateSum * 10) / 10;
   const isRate100 = Math.abs(rateSum - 100) < 0.1;
   const rateSumEl = el('modalRateSumCell');
   rateSumEl.innerHTML = `<span style="color:${isRate100 ? '#16a34a' : '#dc2626'};">${rateSum}% ${isRate100 ? '✅' : '⚠️(100%요망)'}</span>`;
 
-
   el('modalAmountSumCell').textContent = formatCurrency(amountSum);
-
 
   const diff = amountSum - cData.total;
   const diffEl = el('modalDiffCell');
@@ -2873,7 +2670,6 @@ function renderTargetModalUI() {
     diffEl.style.color = '#d97706';
   }
 
-
   let grandTotal = 0;
   PRODUCT_CATEGORIES.forEach(pCat => {
     const catObj = targetModalData.categories[pCat];
@@ -2882,36 +2678,29 @@ function renderTargetModalUI() {
   el('modalSummaryTotal').textContent = formatCurrency(grandTotal);
 }
 
-
 function onModalBranchTotalChange() {
   const cat = targetModalData.activeTab;
   const cData = targetModalData.categories[cat];
   if (!cData) return;
 
-
   const rawVal = parseFormattedNumber(el('modalCategoryTotalInput').value);
   cData.total = rawVal;
-
 
   CONSULTANTS.forEach(name => {
     const rate = cData.consultants[name].rate || 0;
     cData.consultants[name].amount = roundToThousand(rawVal * (rate / 100));
   });
 
-
   renderTargetModalUI();
 }
-
 
 function onModalRateChange(name, newRateVal) {
   const cat = targetModalData.activeTab;
   const cData = targetModalData.categories[cat];
   if (!cData) return;
 
-
   const rate = Math.max(0, Math.min(100, Number(newRateVal) || 0));
   cData.consultants[name].rate = rate;
-
 
   if (cData.total > 0) {
     cData.consultants[name].amount = roundToThousand(cData.total * (rate / 100));
@@ -2919,16 +2708,13 @@ function onModalRateChange(name, newRateVal) {
   renderTargetModalUI();
 }
 
-
 function onModalAmountChange(name, newAmountVal) {
   const cat = targetModalData.activeTab;
   const cData = targetModalData.categories[cat];
   if (!cData) return;
 
-
   const amount = roundToThousand(parseFormattedNumber(newAmountVal));
   cData.consultants[name].amount = amount;
-
 
   if (cData.total > 0) {
     cData.consultants[name].rate = Math.round((amount / cData.total * 100) * 10) / 10;
@@ -2936,12 +2722,10 @@ function onModalAmountChange(name, newAmountVal) {
   renderTargetModalUI();
 }
 
-
 function distributeEqualRates() {
   const cat = targetModalData.activeTab;
   const cData = targetModalData.categories[cat];
   if (!cData) return;
-
 
   CONSULTANTS.forEach(name => {
     cData.consultants[name].rate = 20.0;
@@ -2949,7 +2733,6 @@ function distributeEqualRates() {
   });
   renderTargetModalUI();
 }
-
 
 async function saveAllTargets() {
   if (!isMasterUser()) {
@@ -2961,7 +2744,6 @@ async function saveAllTargets() {
     alert('대상 월이 지정되지 않았습니다.');
     return;
   }
-
 
   const rowsToSave = [];
   PRODUCT_CATEGORIES.forEach(cat => {
@@ -2979,17 +2761,14 @@ async function saveAllTargets() {
     });
   });
 
-
   const saveBtn = el('btnSaveAllTargets');
   saveBtn.disabled = true;
   saveBtn.textContent = '저장 중...';
-
 
   try {
     const { error } = await db.from('targets').upsert(rowsToSave, {
       onConflict: 'consultant,target_month,category'
     });
-
 
     if (error) {
       alert('목표 저장 실패: ' + (error.message || JSON.stringify(error)));
@@ -2999,18 +2778,15 @@ async function saveAllTargets() {
       return;
     }
 
-
     await logActivity('지사장', '목표확정', `${month} 상품별 월간 목표 설정 완료`, null, [
       `일반알람: ${formatCurrency(targetModalData.categories['일반알람'].total)}`,
       `디지털(정보보안): ${formatCurrency(targetModalData.categories['디지털(정보보안)'].total)}`,
       `안전상품: ${formatCurrency(targetModalData.categories['안전상품'].total)}`
     ]);
 
-
     alert(`✅ [${month}] 전 상품 월간 목표가 확정 저장되었습니다.
 대시보드 실적 달성률에 즉시 반영됩니다.`);
     closeTargetModal();
-
 
     await loadAllFromSupabase();
     render();
@@ -3023,14 +2799,12 @@ async function saveAllTargets() {
   }
 }
 
-
 function renderCalendarGrid() {
   const monthStr = currentMonthStr();
   const [y, m] = monthStr.split('-').map(Number);
   const daysCount = new Date(y, m, 0).getDate();
   const today = todayStr();
   const weekdayNames = ['일', '월', '화', '수', '목', '금', '토'];
-
 
   const headRow = el('calendarHeadRow');
   if (headRow && (!headRow.dataset || !headRow.dataset.filled)) {
@@ -3039,7 +2813,6 @@ function renderCalendarGrid() {
     if (headRow.dataset) headRow.dataset.filled = '1';
   }
   el('calendarMonthLabel').textContent = `(${y}년 ${m}월)`;
-
 
   const rows = [];
   for (let day = 1; day <= daysCount; day++) {
@@ -3050,7 +2823,6 @@ function renderCalendarGrid() {
     const holiday = isHoliday(dateStr);
     const isToday = dateStr === today;
 
-
     const perConsultant = CONSULTANTS.map(name => {
       const leads = (consultantLeads(name)).filter(l => l.expectedDate === dateStr);
       const amount = leads.reduce((s, l) => s + Number(l.amount || 0), 0);
@@ -3059,17 +2831,14 @@ function renderCalendarGrid() {
     const totalCount = perConsultant.reduce((a, r) => a + r.count, 0);
     const totalAmount = perConsultant.reduce((a, r) => a + r.amount, 0);
 
-
     let rowClass = '';
     if (isToday) rowClass = 'calendar-row-today';
     else if (holiday) rowClass = 'calendar-row-holiday';
-
 
     const totalCellContent = totalCount > 0
       ? `<span class="cal-count">${totalCount}건</span>${formatCurrency(totalAmount)}`
       : '-';
     const totalCellAttrs = totalCount > 0 ? `class="cal-cell" data-date="${dateStr}" data-name=""` : '';
-
 
     rows.push(`
       <tr class="${rowClass}">
@@ -3085,17 +2854,14 @@ function renderCalendarGrid() {
   el('calendarTbody').innerHTML = rows.join('');
 }
 
-
 function openCalendarModal(dateStr, name) {
   const leads = name
     ? (consultantLeads(name)).filter(l => l.expectedDate === dateStr)
     : allLeads().filter(l => l.expectedDate === dateStr);
   const total = leads.reduce((s, l) => s + Number(l.amount || 0), 0);
 
-
   el('calendarModalTitle').textContent = name ? `${dateStr} · ${name} 수주예상 내역` : `${dateStr} · 전체 컨설턴트 수주예상 내역`;
   el('calendarModalSub').textContent = `총 ${leads.length}건 · 합계 ${formatCurrency(total)}`;
-
 
   const tbody = el('calendarModalTbody');
   if (leads.length === 0) {
@@ -3117,14 +2883,12 @@ function openCalendarModal(dateStr, name) {
   el('calendarModalOverlay').classList.add('show');
 }
 
-
 function renderLeadTable() {
   const cf = el('fConsultant').value;
   const sf = el('fStage').value;
   const kf = el('fConfidence').value;
   const mf = el('fMonth').value;
   const qf = el('fSearch').value.trim().toLowerCase();
-
 
   let leads = allLeads();
   if (cf !== 'all') leads = leads.filter(l => l.consultant === cf);
@@ -3133,10 +2897,8 @@ function renderLeadTable() {
   if (mf) leads = leads.filter(l => (l.expectedDate || '').slice(0, 7) === mf);
   if (qf) leads = leads.filter(l => (l.company || '').toLowerCase().includes(qf));
 
-
   leads.sort((a, b) => (b.updatedAt || '').localeCompare(a.updatedAt || ''));
   el('leadCountTag').textContent = '(' + leads.length + '건)';
-
 
   const tbody = el('leadTbody');
   if (leads.length === 0) {
@@ -3162,7 +2924,6 @@ function renderLeadTable() {
   `).join('');
 }
 
-
 async function deleteLeadMaster(id, company, consultant) {
   const ok = await showPortalConfirm(`[지사장 관리자 삭제]\n'${company}' (${consultant}) 안건을 영구 삭제하시겠습니까?`); if (!ok) return;
   try {
@@ -3181,13 +2942,11 @@ async function deleteLeadMaster(id, company, consultant) {
   }
 }
 
-
 const ACTIVITY_BADGE = {
   '신규 등록': { bg: '#dbeafe', fg: '#2563eb' },
   '수정': { bg: '#fef3c7', fg: '#b45309' },
   '삭제': { bg: '#fee2e2', fg: '#dc2626' }
 };
-
 
 async function refreshActivityLog() {
   const dateStr = el('activityLogDate').value || todayStr();
@@ -3198,13 +2957,14 @@ async function refreshActivityLog() {
       .lte('created_at', dateStr + 'T23:59:59')
       .order('created_at', { ascending: false });
 
-
-    el('activityLogCount').textContent = '(' + (logs ? logs.length : 0) + '건)';
-    if (!logs || logs.length === 0) {
+    // 변경 이력에는 TA 안건 등록/수정/삭제/목표확정만 표시하고 접속로그는 분리
+    const filteredLogs = (logs || []).filter(l => l.action !== 'TA 접속' && l.action !== 'TA 로그인' && l.action !== 'TA 하트비트');
+    el('activityLogCount').textContent = '(' + filteredLogs.length + '건)';
+    if (filteredLogs.length === 0) {
       el('activityLogTbody').innerHTML = '<tr class="empty-row"><td colspan="5">해당 날짜에 등록·수정·삭제된 TA가 없습니다.</td></tr>';
       return;
     }
-    el('activityLogTbody').innerHTML = logs.map(log => {
+    el('activityLogTbody').innerHTML = filteredLogs.map(log => {
       const badge = ACTIVITY_BADGE[log.action] || { bg: '#eef1f7', fg: 'var(--muted)' };
       const timeStr = (log.created_at || '').slice(11, 16);
       return `
@@ -3222,7 +2982,6 @@ async function refreshActivityLog() {
   }
 }
 
-
 async function openNoticeModal() {
   try {
     const { data } = await db.from('notices').select('*').eq('active', true).order('updated_at', { ascending: false }).limit(1);
@@ -3236,7 +2995,6 @@ async function openNoticeModal() {
     alert('공지사항을 불러오지 못했습니다.');
   }
 }
-
 
 // ==========================================
 // 6. 컨설턴트 개별화면 전용 로직
@@ -3252,14 +3010,12 @@ function switchView(mode) {
     return;
   }
 
-
   currentViewMode = mode; window.currentViewMode = mode;
   document.querySelectorAll('.switch-btn').forEach(btn => {
     if (mode === 'master' && btn.id === 'btnViewMaster') btn.classList.add('active');
     else if (btn.getAttribute('data-agent') === mode) btn.classList.add('active');
     else btn.classList.remove('active');
   });
-
 
   if (mode === 'master') {
     el('viewMaster').style.display = 'block';
@@ -3277,16 +3033,11 @@ function switchView(mode) {
     initAgentView(mode);
   }
 
-
   updateUIVisibilityByRole();
   if (currentUser) {
     saveUserSession(currentUser, mode);
   }
 }
-
-
-
-
 
 
 
@@ -3302,12 +3053,10 @@ let agentListFilter = {
   month: 'current_and_future'  // 'current_and_future' | 'all' | 'YYYY-MM'
 };
 
-
 // 컨설턴트 순위 계산 (선택된 상품 종류 기준 수주 달성률)
 function getConsultantRankInfo(agentName, month, cat) {
   month = month || currentMonthStr();
   cat = cat || agentGlobalProduct || '일반알람';
-
 
   const ranks = CONSULTANTS.map(name => {
     const target = getConsultantTarget(name, month, cat);
@@ -3317,10 +3066,8 @@ function getConsultantRankInfo(agentName, month, cat) {
     return { name, target, wonAmt: m.monthWonAmount, rate };
   });
 
-
   // 달성률 내림차순, 수주금액 내림차순 정렬
   ranks.sort((a, b) => b.rate - a.rate || b.wonAmt - a.wonAmt);
-
 
   const idx = ranks.findIndex(r => r.name === agentName);
   if (idx === -1) return { rank: '-', rate: 0, text: '지사 -위' };
@@ -3334,14 +3081,12 @@ function getConsultantRankInfo(agentName, month, cat) {
   };
 }
 
-
 // 이달 목표 뱃지 갱신 (선택된 해당 상품만 표시)
 function updateAgentTargetBadge(agentName, month, prod) {
   month = month || currentMonthStr();
   prod = prod || agentGlobalProduct || '일반알람';
   const badgeEl = el('agentStatusTargetBadge');
   if (!badgeEl) return;
-
 
   if (prod === '일반알람') {
     const target = getConsultantTarget(agentName, month, '일반알람');
@@ -3361,50 +3106,40 @@ function updateAgentTargetBadge(agentName, month, prod) {
   }
 }
 
-
 // 컨설턴트 이름 우측에서 상품 선택 시 -> TA현황, 달성현황, 내 TA목록, 이달 목표 일괄 세팅
 function setAgentGlobalProduct(prod) {
   agentGlobalProduct = prod;
   activeDashboardCategory = prod;
-
 
   // 1) 헤더 상품 선택 버튼 활성화 동기화
   document.querySelectorAll('#agentHeaderProductPicker .header-prod-btn').forEach(btn => {
     btn.classList.toggle('active', btn.dataset.prod === prod);
   });
 
-
   // TA 현황 및 내 TA 목록의 필터 기준을 상단 선택 상품으로 일괄 적용
   agentStatusCatFilter = prod;
   agentListFilter.product = prod;
 
-
   const agentName = currentViewMode;
   const month = currentMonthStr();
 
-
   // 4) 이달 목표 갱신 (선택된 해당 상품만 표시!)
   updateAgentTargetBadge(agentName, month, prod);
-
 
   // 5) 순위 뱃지 갱신 (선택된 해당 상품 기준 순위 및 달성률)
   const rankInfo = getConsultantRankInfo(agentName, month, prod);
   el('agentRankBadge').textContent = rankInfo.text;
 
-
   // 6) TA 현황 6개 지표 카드 렌더링
   renderAgentStatus(agentName);
 
-
   // 7) 달성현황 프로그레스 & 도넛 차트 렌더링
   renderAgentAchievement(agentName);
-
 
   // 8) 내 TA 목록 테이블 렌더링
   renderAgentLeadTable(agentName);
 }
 window.setAgentGlobalProduct = setAgentGlobalProduct;
-
 
 // 호환성 브릿지 함수 (TA현황 헤더 및 목록 필터 클릭 시에도 일괄 연동)
 function setAgentStatusCat(cat) {
@@ -3412,12 +3147,10 @@ function setAgentStatusCat(cat) {
 }
 window.setAgentStatusCat = setAgentStatusCat;
 
-
 function setAgentFilterProduct(prod) {
   setAgentGlobalProduct(prod);
 }
 window.setAgentFilterProduct = setAgentFilterProduct;
-
 
 // 2. 컨설턴트 화면 진입 초기화 (initAgentView)
 function initAgentView(agentName) {
@@ -3427,27 +3160,22 @@ function initAgentView(agentName) {
   if (el('topbarHeaderTitle')) el('topbarHeaderTitle').textContent = `${agentName}컨설턴트 TA`;
   if (el('agentRankBadge')) el('agentRankBadge').style.display = 'inline-flex';
 
-
   // 지사장 대시보드로 돌아가기 버튼 노출 여부
   if (el('btnBackToMaster')) {
     el('btnBackToMaster').style.display = isMasterUser() ? 'inline-flex' : 'none';
   }
-
 
   // 로그인 상태인 경우 공지사항 팝업 확인
   if (currentUser) {
     checkAndShowAgentNotice();
   }
 
-
   // 월별 필터 셀렉트박스 채우기
   populateAgentMonthFilter(agentName);
-
 
   // 디폴트는 알람으로 일괄 세팅! (요구사항: 디폴트는 알람으로 해주고)
   setAgentGlobalProduct('일반알람');
 }
-
 
 // 3. 지사장 공지사항 팝업 표시 (로그인 시 1회 실행)
 // 3. 지사장 공지사항 팝업 표시 (컨설턴트 로그인 시 100% 팝업)
@@ -3461,14 +3189,12 @@ async function checkAndShowAgentNotice() {
     let noticeDate = '';
     let noticeId = 'curr';
 
-
     // 1) Supabase notices 테이블 조회
     try {
       const { data, error } = await db.from('notices')
         .select('*')
         .order('updated_at', { ascending: false })
         .limit(5);
-
 
       if (data && data.length > 0) {
         const activeOne = data.find(n => n.active === true || n.active === 'true' || n.active === 1 || n.active === undefined) || data[0];
@@ -3482,7 +3208,6 @@ async function checkAndShowAgentNotice() {
       console.warn('Supabase 공지 조회 오류, 폴백 사용:', dbErr);
     }
 
-
     // 2) DB 공지사항이 비어있을 경우 구글 시트 원본 공지 폴백 제공
     if (!noticeText) {
       noticeText = '월말까지 유증 목표 달성이 매우 불투명합니다 \n컨설턴트별로 300천원 당월개시 찾아 주세요...';
@@ -3491,14 +3216,10 @@ async function checkAndShowAgentNotice() {
 
 
 
-
-
-
     // 4) 모달 엘리먼트에 내용 주입 및 화면 전면 팝업 표시
     const overlay = el('agentNoticeModalOverlay');
     const contentEl = el('agentNoticeContent');
     const dateEl = el('agentNoticeDate');
-
 
     if (overlay && contentEl) {
       contentEl.textContent = noticeText;
@@ -3513,7 +3234,6 @@ async function checkAndShowAgentNotice() {
 }
 window.checkAndShowAgentNotice = checkAndShowAgentNotice;
 
-
 function closeAgentNoticeModal() {
   const modal = el('agentNoticeModalOverlay');
   if (modal) {
@@ -3522,7 +3242,6 @@ function closeAgentNoticeModal() {
   }
 }
 window.closeAgentNoticeModal = closeAgentNoticeModal;
-
 
 function setAgentStatusCat(cat) {
   agentStatusCatFilter = cat;
@@ -3533,7 +3252,6 @@ function setAgentStatusCat(cat) {
   renderAgentAchievement(currentViewMode);
 }
 
-
 function renderAgentStatus(agentName) {
   let leads = (ALL[agentName] && ALL[agentName].leads) || [];
   const activeProd = agentGlobalProduct || '일반알람';
@@ -3541,71 +3259,56 @@ function renderAgentStatus(agentName) {
     leads = leads.filter(l => productCategory(l.productType) === activeProd);
   }
 
-
   const curMonth = currentMonthStr();
   const today = todayStr();
-
 
   // 1) 전체 TA
   const totalAmt = leads.reduce((s, l) => s + Number(l.amount || 0), 0);
   const totalCnt = leads.length;
-
 
   // 2) 진행중 TA
   const ingLeads = leads.filter(l => l.stage === '진행중');
   const ingAmt = ingLeads.reduce((s, l) => s + Number(l.amount || 0), 0);
   const ingCnt = ingLeads.length;
 
-
   // 3) 이달 수주 TA
   const wonLeads = leads.filter(l => l.stage === '수주完' && (l.contractDate || '').slice(0, 7) === curMonth);
   const wonAmt = wonLeads.reduce((s, l) => s + Number(l.amount || 0), 0);
   const wonCnt = wonLeads.length;
-
 
   // 4) 실패 TA
   const failLeads = leads.filter(l => l.stage === '실패');
   const failAmt = failLeads.reduce((s, l) => s + Number(l.amount || 0), 0);
   const failCnt = failLeads.length;
 
-
   // 5) 진행중 TA 평균단가
   const avgIngAmt = ingCnt > 0 ? Math.round(ingAmt / ingCnt) : 0;
 
-
   // 6) 이달 수주 단가
   const avgWonAmt = wonCnt > 0 ? Math.round(wonAmt / wonCnt) : 0;
-
 
   // 7) 금일 수주 예정 금액 (오늘이 계약예정일인 진행중 건)
   const todayExpLeads = leads.filter(l => l.stage === '진행중' && l.expectedDate === today);
   const todayExpAmt = todayExpLeads.reduce((s, l) => s + Number(l.amount || 0), 0);
 
-
   // DOM 반영
   el('agentMTotalAmt').textContent = formatCurrency(totalAmt);
   el('agentMTotalCnt').textContent = totalCnt + '건';
 
-
   el('agentMIngAmt').textContent = formatCurrency(ingAmt);
   el('agentMIngCnt').textContent = ingCnt + '건';
-
 
   el('agentMWonAmt').textContent = formatCurrency(wonAmt);
   el('agentMWonCnt').textContent = wonCnt + '건';
 
-
   el('agentMFailAmt').textContent = formatCurrency(failAmt);
   el('agentMFailCnt').textContent = failCnt + '건';
-
 
   el('agentMAvgIngAmt').textContent = formatCurrency(avgIngAmt);
   el('agentMAvgWonAmt').textContent = formatCurrency(avgWonAmt);
 
-
   el('agentTodayExpAmt').textContent = formatCurrency(todayExpAmt);
 }
-
 
 // 5. 금일 수주 예정 금액 상세리스트 모달 열기
 function openTodayExpectedModal() {
@@ -3617,10 +3320,8 @@ function openTodayExpectedModal() {
     leads = leads.filter(l => productCategory(l.productType) === activeProd);
   }
 
-
   el('todayExpectedModalDateTag').textContent = '기준일: ' + today;
   const tbody = el('todayExpectedModalTbody');
-
 
   if (leads.length === 0) {
     tbody.innerHTML = '<tr class="empty-row"><td colspan="8">금일 수주 예정된 TA 안건이 없습니다.</td></tr>';
@@ -3641,15 +3342,12 @@ function openTodayExpectedModal() {
     `).join('');
   }
 
-
   el('todayExpectedModalOverlay').style.display = 'flex';
 }
-
 
 function closeTodayExpectedModal() {
   el('todayExpectedModalOverlay').style.display = 'none';
 }
-
 
 // 6. 달성현황 렌더링 (2번 그림 캡처1.PNG 매칭)
 function renderAgentAchievement(agentName) {
@@ -3661,9 +3359,7 @@ function renderAgentAchievement(agentName) {
     leads = leads.filter(l => productCategory(l.productType) === activeProd);
   }
 
-
   const m = computeMetrics(leads, target, month);
-
 
   // 1) 수주 달성율
   const achRate = m.achievementRate !== null ? m.achievementRate : 0;
@@ -3672,25 +3368,21 @@ function renderAgentAchievement(agentName) {
   el('agentAchieveRateTrack').style.background = achRate >= 100 ? 'var(--blue)' : (achRate >= 60 ? 'var(--green)' : 'var(--amber)');
   el('agentAchieveRateSub').textContent = target > 0 ? `목표 ${formatCurrency(target)}` : '목표 미설정';
 
-
   // 2) 보유 TA율
   const holdRate = m.holdingRate !== null ? m.holdingRate : 0;
   el('agentHoldRateVal').textContent = m.holdingRate !== null ? `${holdRate}%` : '-';
   el('agentHoldRateTrack').style.width = Math.min(100, Math.max(0, holdRate)) + '%';
   el('agentHoldRateSub').textContent = `이달 수주예정 ${formatCurrency(m.monthPipelineAmount)} (${m.monthPipelineCount}건)`;
 
-
   // 3) TA 수주율
   el('agentWinRateVal').textContent = m.winRate !== null ? `${m.winRate}%` : '-';
   el('agentWinRateTrack').style.width = Math.min(100, Math.max(0, m.winRate || 0)) + '%';
   el('agentWinRateSub').textContent = `수주 ${formatCurrency(m.wonAllAmount)}`;
 
-
   // 4) 수주 실패율
   el('agentFailRateVal').textContent = m.failRate !== null ? `${m.failRate}%` : '-';
   el('agentFailRateTrack').style.width = Math.min(100, Math.max(0, m.failRate || 0)) + '%';
   el('agentFailRateSub').textContent = `실패 ${formatCurrency(m.failedAmount)}`;
-
 
   // 5) 도넛 차트
   const byStage = {
@@ -3710,7 +3402,6 @@ function renderAgentAchievement(agentName) {
     return seg;
   });
 
-
   el('agentDonutChart').style.background = total > 0 ? `conic-gradient(${segments.join(',')})` : '#eef1f7';
   el('agentDonutLegend').innerHTML = STAGES.map(s => {
     const val = byStage[s] || 0;
@@ -3724,7 +3415,6 @@ function renderAgentAchievement(agentName) {
   }).join('');
 }
 
-
 // 7. 내 TA 목록 필터링 및 렌더링 (4번 그림 캡처3.PNG 매칭)
 function setAgentFilterStage(st) {
   agentListFilter.stage = st;
@@ -3734,10 +3424,7 @@ function setAgentFilterStage(st) {
   renderAgentLeadTable(currentViewMode);
 }
 
-
 // setAgentFilterProduct deprecated - controlled exclusively by setAgentGlobalProduct
-
-
 
 
 function setAgentFilterMonth(m) {
@@ -3752,7 +3439,6 @@ function setAgentFilterMonth(m) {
   renderAgentLeadTable(currentViewMode);
 }
 
-
 function onAgentMonthSelectChange(val) {
   if (val) {
     setAgentFilterMonth(val);
@@ -3760,7 +3446,6 @@ function onAgentMonthSelectChange(val) {
     setAgentFilterMonth('current_and_future');
   }
 }
-
 
 function populateAgentMonthFilter(agentName) {
   const leads = consultantLeads(agentName);
@@ -3771,31 +3456,26 @@ function populateAgentMonthFilter(agentName) {
   });
   const months = Array.from(monthSet).sort().reverse();
 
-
   const sel = el('agentFilterMonthSelect');
   sel.innerHTML = '<option value="">년월 선택...</option>' + months.map(m => `
     <option value="${m}">${m.replace('-', '년 ')}월</option>
   `).join('');
 }
 
-
 function renderAgentLeadTable(agentName) {
   let leads = (ALL[agentName] && ALL[agentName].leads) || [];
   leads.sort((a, b) => (b.updatedAt || '').localeCompare(a.updatedAt || ''));
-
 
   // 1) 단계 필터
   if (agentListFilter.stage !== 'all') {
     leads = leads.filter(l => l.stage === agentListFilter.stage);
   }
 
-
   // 2) 상단에서 일괄 선택된 상품(agentGlobalProduct)으로 강제 동기화 필터링
   const activeProd = agentGlobalProduct || '일반알람';
   if (activeProd !== 'all') {
     leads = leads.filter(l => productCategory(l.productType) === activeProd);
   }
-
 
   // 3) 월별 필터
   const curMonth = currentMonthStr();
@@ -3820,16 +3500,13 @@ function renderAgentLeadTable(agentName) {
     });
   }
 
-
   el('agentLeadCount').textContent = leads.length;
   const tbody = el('agentLeadTbody');
-
 
   if (leads.length === 0) {
     tbody.innerHTML = '<tr class="empty-row"><td colspan="10">조건에 일치하는 TA 안건이 없습니다.</td></tr>';
     return;
   }
-
 
   tbody.innerHTML = leads.map(l => {
     const isToday = isCreatedToday(l);
@@ -3855,7 +3532,6 @@ function renderAgentLeadTable(agentName) {
   }).join('');
 }
 
-
 // 8. 신규 TA 등록 모달 열기 (3번 그림 캡처2.PNG 매칭, 실패 제외)
 function openNewAgentLeadModal() {
   if (currentUser) saveUserSession(currentUser, currentViewMode, 'newLead');
@@ -3875,7 +3551,6 @@ function openNewAgentLeadModal() {
   el('afMemo').value = '';
   el('afSubmitBtn').textContent = 'TA 등록';
 
-
   // 신규 등록 시에는 '실패' 선택 불가!
   el('afStage').innerHTML = `
     <option value="진행중" selected>진행중</option>
@@ -3883,16 +3558,13 @@ function openNewAgentLeadModal() {
   `;
   el('afWonExtraRow').style.display = 'none';
 
-
   el('agentLeadModalOverlay').style.display = 'flex';
 }
-
 
 function closeAgentLeadModal() {
   el('agentLeadModalOverlay').style.display = 'none';
   if (currentUser) saveUserSession(currentUser, currentViewMode, null);
 }
-
 
 function onAgentStageChange(val) {
   el('afWonExtraRow').style.display = val === '수주完' ? 'grid' : 'none';
@@ -3914,7 +3586,6 @@ function onAgentStageChange(val) {
 }
 window.onAgentStageChange = onAgentStageChange;
 
-
 function onAgentExpectedDateChange(val) {
   if (el('afStage') && el('afStage').value === '수주完') {
     if (el('afContractDate')) el('afContractDate').value = val;
@@ -3923,13 +3594,11 @@ function onAgentExpectedDateChange(val) {
 }
 window.onAgentExpectedDateChange = onAgentExpectedDateChange;
 
-
 // 9. 안건 수정 모달 열기 (기존 editAgentLead 개선)
 function editAgentLead(id) {
   const agentName = currentViewMode;
   const lead = (ALL[agentName] && ALL[agentName].leads || []).find(l => l.id === id);
   if (!lead) return;
-
 
   el('afEditingId').value = id;
   el('agentModalTitle').textContent = 'TA 안건 수정';
@@ -3938,7 +3607,6 @@ function editAgentLead(id) {
   el('afAmount').value = lead.amount ? lead.amount.toLocaleString('ko-KR') : '';
   el('afProductType').value = lead.productType || '알람';
   el('afMotive').value = lead.motive || '개척';
-
 
   // 수정 시에는 '실패' 선택 가능하도록 복원
   el('afStage').innerHTML = `
@@ -3956,13 +3624,10 @@ function editAgentLead(id) {
   el('afMemo').value = lead.memo || '';
   el('afSubmitBtn').textContent = '수정 완료';
 
-
   onAgentStageChange(lead.stage);
-
 
   el('agentLeadModalOverlay').style.display = 'flex';
 }
-
 
 // 10. 모달 폼 전송 핸들러
 async function handleAgentModalSubmit(e) {
@@ -3973,19 +3638,16 @@ async function handleAgentModalSubmit(e) {
   const stage = el('afStage').value;
   const expectedDate = el('afExpectedDate').value;
 
-
   // 수주완료인 경우 계약일자/기산일자/차량번호 확정 (계약예정일 자동 동기화)
   let contractDate = null;
   let baseDate = null;
   let vehicleNumber = null;
-
 
   if (stage === '수주完') {
     contractDate = (el('afContractDate') && el('afContractDate').value) || expectedDate || todayStr();
     baseDate = (el('afBaseDate') && el('afBaseDate').value) || contractDate;
     vehicleNumber = (el('afVehicleNumber') && el('afVehicleNumber').value) || '없음';
   }
-
 
   const payload = {
     company: el('afCompany').value.trim(),
@@ -4003,7 +3665,6 @@ async function handleAgentModalSubmit(e) {
     memo: el('afMemo').value.trim()
   };
 
-
   if (!payload.company) {
     alert('서비스제공처명을 입력해주세요.');
     return;
@@ -4013,10 +3674,8 @@ async function handleAgentModalSubmit(e) {
     return;
   }
 
-
   el('afSubmitBtn').disabled = true;
   el('afSubmitBtn').textContent = '저장 중...';
-
 
   try {
     if (id) {
@@ -4024,7 +3683,6 @@ async function handleAgentModalSubmit(e) {
       const lead = ALL[agentName].leads.find(l => l.id === id);
       const changes = buildLeadChanges(lead, payload);
       payload.updatedAt = new Date().toISOString();
-
 
       const { error } = await db.from('ta_leads').update({
         company: payload.company,
@@ -4043,7 +3701,6 @@ async function handleAgentModalSubmit(e) {
         updated_at: payload.updatedAt
       }).eq('id', id);
 
-
       if (error) throw error;
       Object.assign(lead, payload);
       if (changes.length > 0) {
@@ -4056,7 +3713,6 @@ async function handleAgentModalSubmit(e) {
       payload.createdAt = new Date().toISOString();
       payload.updatedAt = payload.createdAt;
       payload.consultant = agentName;
-
 
       const { error } = await db.from('ta_leads').insert([{
         id: payload.id,
@@ -4078,7 +3734,6 @@ async function handleAgentModalSubmit(e) {
         updated_at: payload.updatedAt
       }]);
 
-
       if (error) throw error;
       if (!ALL[agentName]) ALL[agentName] = { leads: [] };
       ALL[agentName].leads.unshift(payload);
@@ -4089,7 +3744,6 @@ async function handleAgentModalSubmit(e) {
       ]);
       showPortalAlert('신규 TA 안건이 등록되었습니다.');
     }
-
 
     closeAgentLeadModal();
     initAgentView(agentName);
@@ -4102,18 +3756,15 @@ async function handleAgentModalSubmit(e) {
 }
 window.handleAgentModalSubmit = handleAgentModalSubmit;
 
-
 // 11. 안건 삭제 (전역 윈도우 스코프 등록 보장)
 async function deleteAgentLead(id, company) {
   const ok = confirm(`'${company}' 안건을 정말 삭제하시겠습니까?`);
   if (!ok) return;
 
-
   const agentName = currentViewMode;
   try {
     const { error } = await db.from('ta_leads').delete().eq('id', id);
     if (error) throw error;
-
 
     if (ALL[agentName] && ALL[agentName].leads) {
       ALL[agentName].leads = ALL[agentName].leads.filter(l => l.id !== id);
@@ -4126,8 +3777,6 @@ async function deleteAgentLead(id, company) {
   }
 }
 window.deleteAgentLead = deleteAgentLead;
-
-
 
 
 // 7. 이벤트 바인딩 & 초기화
@@ -4164,7 +3813,6 @@ safeAddListener('btnCopyToday', 'click', async () => {
   }
 });
 
-
 safeAddListener('calendarTbody', 'click', (e) => {
   const td = e.target.closest('.cal-cell');
   if (!td) return;
@@ -4172,10 +3820,8 @@ safeAddListener('calendarTbody', 'click', (e) => {
 });
 safeAddListener('calendarModalClose', 'click', () => el('calendarModalOverlay').classList.remove('show'));
 
-
 safeAddListener('btnNoticeManage', 'click', openNoticeModal);
 safeAddListener('noticeModalClose', 'click', () => el('noticeModalOverlay').classList.remove('show'));
-
 
 safeAddListener('btnNoticeSave', 'click', async () => {
   const text = el('noticeTextarea').value.trim();
@@ -4189,7 +3835,6 @@ safeAddListener('btnNoticeSave', 'click', async () => {
   }
 });
 
-
 safeAddListener('btnNoticeDelete', 'click', async () => {
   const ok = await showPortalConfirm('공지사항을 삭제할까요?'); if (!ok) return;
   const { error } = await db.from('notices').update({ active: false }).eq('active', true);
@@ -4202,7 +3847,6 @@ safeAddListener('btnNoticeDelete', 'click', async () => {
   }
 });
 
-
 safeAddListener('categoryFilters', 'click', (e) => {
   const btn = e.target.closest('button[data-category]');
   if (!btn) return;
@@ -4211,12 +3855,10 @@ safeAddListener('categoryFilters', 'click', (e) => {
   render();
 });
 
-
 ['fConsultant', 'fStage', 'fConfidence', 'fMonth', 'fSearch'].forEach(id => {
   safeAddListener(id, 'input', renderLeadTable);
   safeAddListener(id, 'change', renderLeadTable);
 });
-
 
 safeAddListener('btnResetFilter', 'click', () => {
   el('fConsultant').value = 'all';
@@ -4227,15 +3869,12 @@ safeAddListener('btnResetFilter', 'click', () => {
   renderLeadTable();
 });
 
-
 safeAddListener('activityLogDate', 'change', refreshActivityLog);
 safeAddListener('btnActivityRefresh', 'click', refreshActivityLog);
 safeAddListener('btnActivityToday', 'click', () => {
   el('activityLogDate').value = todayStr();
   refreshActivityLog();
 });
-
-
 
 
 // ==========================================
@@ -4246,12 +3885,9 @@ async function sha256(str) {
   return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
 }
 
-
 safeAddListener('loginPhone', 'keydown', (e) => { if (e.key === 'Enter') doLogin(); });
 safeAddListener('loginPw', 'keydown', (e) => { if (e.key === 'Enter') doLogin(); });
 safeAddListener('btnLogin', 'click', doLogin);
-
-
 
 
 function quickLogin(name, role) {
@@ -4267,7 +3903,6 @@ function quickLogin(name, role) {
   initApp(targetScreen);
 }
 
-
 // ==========================================
 // 다중 해시 변형 검증 (전화번호:비밀번호, 전화번호비밀번호, 비밀번호 단독 모두 지원)
 // ==========================================
@@ -4277,17 +3912,14 @@ async function verifyUserPassword(phone, pw, dbHash) {
   const cleanPw = String(pw).trim();
   const target = String(dbHash).trim().toLowerCase();
 
-
   // 지사장 마스터 비밀번호 긴급 프리패스
   if (cleanPw === 'sy0928@@' || cleanPw === 'S1_nowon_master_2026') {
     return true;
   }
 
-
   // 010 및 10 형태 모두 준비
   const pNoZero = cleanPhone.startsWith('0') ? cleanPhone.slice(1) : cleanPhone;
   const pWithZero = cleanPhone.startsWith('0') ? cleanPhone : ('0' + cleanPhone);
-
 
   // 구글 시트 / Apps Script Code.gs 표준 해시 공식 및 모든 파생 조합 전수 검사
   // 1순위: phone + ':' + pw (예: 01027042545:sy0928@@ -> 완벽 일치 검증됨)
@@ -4304,7 +3936,6 @@ async function verifyUserPassword(phone, pw, dbHash) {
     `${cleanPhone}${cleanPw}`
   ];
 
-
   for (const c of candidateInputs) {
     const h = await sha256(c);
     if (h.toLowerCase() === target) {
@@ -4312,16 +3943,13 @@ async function verifyUserPassword(phone, pw, dbHash) {
     }
   }
 
-
   // 평문 일치 폴백
   if (target === cleanPw.toLowerCase()) {
     return true;
   }
 
-
   return false;
 }
-
 
 async function doLogin() {
   const phone = document.getElementById('loginPhone').value.replace(/[^0-9]/g, '');
@@ -4335,13 +3963,11 @@ async function doLogin() {
   msgEl.textContent = '확인 중...';
   msgEl.style.color = 'var(--navy)';
 
-
   try {
     // 010 및 10 형태 유연 조회
     const pNoZero = phone.startsWith('0') ? phone.slice(1) : phone;
     const pWithZero = phone.startsWith('0') ? phone : ('0' + phone);
     const searchPhones = Array.from(new Set([phone, pNoZero, pWithZero]));
-
 
     const { data: users, error } = await db.from('app_users').select('*').in('phone', searchPhones).limit(5);
     if (error) {
@@ -4356,7 +3982,6 @@ async function doLogin() {
       return;
     }
 
-
     // 후보 사용자 중 비밀번호 일치자 탐색
     let matchedUser = null;
     for (const u of users) {
@@ -4366,7 +3991,6 @@ async function doLogin() {
         break;
       }
     }
-
 
     if (!matchedUser) {
       msgEl.textContent = '비밀번호가 일치하지 않습니다.';
@@ -4392,6 +4016,7 @@ async function doLogin() {
     };
     const targetScreen = (user.job === '컨설턴트' && CONSULTANTS.includes(user.name)) ? user.name : 'master';
     saveUserSession(currentUser, targetScreen);
+    recordTAAccess('login');
     
     if (user.job === '컨설턴트' && CONSULTANTS.includes(user.name)) {
       initApp(user.name);
@@ -4405,24 +4030,19 @@ async function doLogin() {
   }
 }
 
-
 safeAddListener('btnLogout', 'click', doLogout);
-
 
 async function initApp(initialMode) {
   document.getElementById('loginOverlay').style.display = 'none';
   document.getElementById('mainApp').style.display = 'block';
-
 
   el('topbarDateValue').textContent = todayLabel();
   el('topbarWorkdays').textContent = '이번달 잔여 영업일 : ' + workingDaysLeftInMonth() + '일 (오늘 포함)';
   el('fConsultant').innerHTML = '<option value="all">전체 컨설턴트</option>' + CONSULTANTS.map(n => `<option value="${n}">${n}</option>`).join('');
   el('activityLogDate').value = todayStr();
 
-
   // 현재 TA 조회의 기본값을 이달(당월)로 설정
   el('fMonth').value = currentMonthStr();
-
 
   if (el('btnThisMonthFilter') && (!el('btnThisMonthFilter').dataset || !el('btnThisMonthFilter').dataset.bound)) {
     if (el('btnThisMonthFilter').dataset) el('btnThisMonthFilter').dataset.bound = 'true';
@@ -4438,7 +4058,6 @@ async function initApp(initialMode) {
       renderLeadTable();
     });
   }
-
 
   // 이벤트 리스너: 목표 모달 월 변경 및 새로고침
   if (el('targetModalMonth') && (!el('targetModalMonth').dataset || !el('targetModalMonth').dataset.bound)) {
@@ -4461,16 +4080,14 @@ async function initApp(initialMode) {
     });
   }
 
-
   // 권한별 UI 제어 적용
   updateUIVisibilityByRole();
-
 
   await loadAllFromSupabase();
   switchView(initialMode || (isMasterUser() ? 'master' : (currentUser ? currentUser.name : 'master')));
   refreshActivityLog();
+  recordTAAccess('active');
 }
-
 
 // ==========================================
 // 세션 유지 및 복원 관리
@@ -4478,7 +4095,6 @@ async function initApp(initialMode) {
 // - 앱을 완전히 빠져나간 뒤(브라우저 닫기/종료) 재접속: 재로그인 요구 (보안 강화)
 // ==========================================
 var SESSION_KEY = 'S1_TA_PORTAL_AUTH_SESSION';
-
 
 function saveUserSession(user, screen, modal) {
   if (!user || !user.phone) return;
@@ -4505,7 +4121,6 @@ function saveUserSession(user, screen, modal) {
   }
 }
 
-
 function clearUserSession() {
   try {
     sessionStorage.removeItem(SESSION_KEY);
@@ -4517,23 +4132,19 @@ function clearUserSession() {
   window.currentUser = null;
 }
 
-
 function restoreUserSession() {
   try {
     // 앱을 완전히 닫고 나갔다 들어온 경우 sessionStorage가 비어있으므로 false 반환 -> 로그인 창 표시
     var raw = sessionStorage.getItem(SESSION_KEY) || sessionStorage.getItem('s1_user');
     if (!raw) return false;
 
-
     var data = JSON.parse(raw);
     if (!data || !data.phone || !data.name) return false;
-
 
     var userRole = data.role || (
       (data.job && (data.job.includes('관리자') || data.job === '지사관리자' || data.job === '본사관리자')) 
       ? 'master' : 'user'
     );
-
 
     currentUser = {
       phone: data.phone,
@@ -4543,9 +4154,7 @@ function restoreUserSession() {
     };
     window.currentUser = currentUser;
 
-
     sessionStorage.setItem('s1_user', JSON.stringify(currentUser));
-
 
     // 보던 화면 그대로 복원 (화면 유지 기능)
     var targetScreen = data.screen || 'master';
@@ -4561,7 +4170,6 @@ function restoreUserSession() {
       }
     }
 
-
     initApp(targetScreen).then(function() {
       if (userRole !== 'master' && CONSULTANTS.includes(currentUser.name)) {
         setTimeout(function() { checkAndShowAgentNotice(); }, 350);
@@ -4571,7 +4179,6 @@ function restoreUserSession() {
       }
     });
 
-
     return true;
   } catch (e) {
     console.warn('세션 복원 실패:', e);
@@ -4579,8 +4186,8 @@ function restoreUserSession() {
   }
 }
 
-
 function doLogout() {
+  recordTAAccess('logout');
   clearUserSession();
   var mainApp = el('mainApp');
   var loginOverlay = el('loginOverlay');
@@ -4595,11 +4202,10 @@ function doLogout() {
   if (el('loginMsg')) el('loginMsg').textContent = '';
 }
 
-
 window.addEventListener('DOMContentLoaded', function() {
   // --- DailySales 포털 SSO(Single Sign-On) 자동 로그인 감지 ---
   try {
-    var urlParams = new URLSearchParams(window.location.search);
+    var urlParams = (typeof window !== 'undefined' && window.location && window.location.search) ? new URLSearchParams(window.location.search) : new URLSearchParams('');
     var ssoFlag = (urlParams.get('sso') === '1' || urlParams.get('master') !== null || urlParams.get('agent') !== null);
     var ssoName = urlParams.get('name') || urlParams.get('agent') || '';
     var ssoPhone = urlParams.get('phone') || '';
@@ -4633,13 +4239,11 @@ window.addEventListener('DOMContentLoaded', function() {
     localStorage.removeItem('S1_PORTAL_AUTH_SESSION');
   } catch (e) {}
 
-
   // 이전에 로그인했던 전화번호가 있으면 편의를 위해 아이디(전화번호) 입력칸에 자동 입력
   var lastPhone = localStorage.getItem('S1_LAST_LOGIN_PHONE');
   if (lastPhone && el('loginPhone') && !el('loginPhone').value) {
     el('loginPhone').value = lastPhone;
   }
-
 
   // 화면 전환 / 새로고침 중인 동일 세션인지 확인하여 화면 복원
   var hasRestored = restoreUserSession();
@@ -4650,7 +4254,6 @@ window.addEventListener('DOMContentLoaded', function() {
     if (mainApp) mainApp.style.display = 'none';
   }
 });
-
 
 // 앱 전환 감지 이벤트 (visibilitychange) 추가:
 // 다른 앱으로 포커스가 넘어갔다가 다시 브라우저로 돌아오는 순간(화면 전환) 실시간 감지하여
@@ -4676,7 +4279,6 @@ document.addEventListener('visibilitychange', async function() {
   }
 });
 
-
 window.saveUserSession = saveUserSession;
 window.clearUserSession = clearUserSession;
 window.restoreUserSession = restoreUserSession;
@@ -4684,12 +4286,142 @@ window.doLogout = doLogout;
 
 
 
-
-
-
 // ==========================================
 // 사용자 관리 (소개영업 앱 100% 동일 로직)
 // ==========================================
+// ==========================================
+// TA 관리 시스템 전용 기기 및 접속 감지 헬퍼
+// ==========================================
+function getDeviceInfo() {
+  if (typeof navigator === 'undefined') return 'PC';
+  var ua = navigator.userAgent || '';
+  var device = 'PC';
+  if (/iPad|Tablet|(android(?!.*mobile))/i.test(ua)) {
+    device = '태블릿';
+  } else if (/iPhone|iPod|Android.*Mobile|Mobile|IEMobile|BlackBerry/i.test(ua)) {
+    device = '모바일';
+  }
+
+  var browser = '기타';
+  if (/SamsungBrowser/i.test(ua)) browser = '삼성인터넷';
+  else if (/Edg/i.test(ua)) browser = 'Edge';
+  else if (/Whale/i.test(ua)) browser = 'Whale';
+  else if (/Chrome|CriOS/i.test(ua)) browser = 'Chrome';
+  else if (/Safari/i.test(ua) && !/Chrome/i.test(ua)) browser = 'Safari';
+  else if (/Firefox|FxiOS/i.test(ua)) browser = 'Firefox';
+
+  var os = '';
+  if (/Windows/i.test(ua)) os = 'Win';
+  else if (/Macintosh|Mac OS/i.test(ua)) os = 'Mac';
+  else if (/Android/i.test(ua)) os = 'Android';
+  else if (/iPhone|iPad|iPod/i.test(ua)) os = 'iOS';
+
+  return device + ' (' + (os ? os + ' · ' : '') + browser + ')';
+}
+
+function formatAccessTime(isoStr) {
+  if (!isoStr) return '<span style="color:#94a3b8;font-size:12px;">접속기록 없음</span>';
+  try {
+    var d = new Date(isoStr);
+    if (isNaN(d.getTime())) return escapeHtml(isoStr);
+    var diffMs = Date.now() - d.getTime();
+    var diffMin = Math.floor(diffMs / 60000);
+    
+    var timeAgo = '';
+    if (diffMin < 1) timeAgo = ' <span style="color:#16a34a;font-weight:700;font-size:11px;">(방금 전)</span>';
+    else if (diffMin < 60) timeAgo = ' <span style="color:#2563eb;font-weight:700;font-size:11px;">(' + diffMin + '분 전)</span>';
+    else if (diffMin < 1440) timeAgo = ' <span style="color:#64748b;font-size:11px;">(' + Math.floor(diffMin / 60) + '시간 전)</span>';
+
+    var y = d.getFullYear();
+    var m = String(d.getMonth() + 1).padStart(2, '0');
+    var day = String(d.getDate()).padStart(2, '0');
+    var h = String(d.getHours()).padStart(2, '0');
+    var min = String(d.getMinutes()).padStart(2, '0');
+    return '<span style="font-size:12.5px;color:var(--navy);font-weight:600;">' + y + '.' + m + '.' + day + ' ' + h + ':' + min + '</span>' + timeAgo;
+  } catch(e) {
+    return escapeHtml(isoStr);
+  }
+}
+
+function renderDeviceBadge(dev) {
+  if (!dev || dev === '-' || dev === 'null') return '<span style="color:#94a3b8;">-</span>';
+  var isMobile = /모바일|Mobile|Android|iOS|iPhone/i.test(dev);
+  var isTablet = /태블릿|iPad|Tablet/i.test(dev);
+  
+  var icon = isMobile ? '📱' : (isTablet ? '📟' : '💻');
+  var bg = isMobile ? '#f0fdf4' : (isTablet ? '#faf5ff' : '#eff6ff');
+  var col = isMobile ? '#166534' : (isTablet ? '#6b21a8' : '#1e40af');
+  var border = isMobile ? '#bbf7d0' : (isTablet ? '#e9d5ff' : '#bfdbfe');
+  
+  return '<span style="background:' + bg + ';color:' + col + ';border:1px solid ' + border + ';padding:2px 7px;border-radius:6px;font-size:11.5px;font-weight:600;display:inline-flex;align-items:center;gap:4px;white-space:nowrap;">' + icon + ' ' + escapeHtml(dev) + '</span>';
+}
+
+var lastTAAccessTime_ = 0;
+async function recordTAAccess(statusType) {
+  var user = (typeof currentUser !== 'undefined' && currentUser) ? currentUser : (typeof window !== 'undefined' ? window.currentUser : null);
+  if (!user || !user.phone) return;
+  var now = Date.now();
+  if (statusType !== 'login' && statusType !== 'logout' && (now - lastTAAccessTime_ < 20000)) {
+    return;
+  }
+  lastTAAccessTime_ = now;
+
+  var phone = String(user.phone).replace(/[^0-9]/g, '');
+  var name = user.name || '';
+  var job = user.job || '';
+  var device = getDeviceInfo();
+  var nowIso = new Date().toISOString();
+  var isOnline = (statusType !== 'logout');
+
+  // 1) 전용 세션 테이블(ta_user_sessions)에 기록 시도
+  try {
+    await db.from('ta_user_sessions').upsert([{
+      phone: phone,
+      name: name,
+      job: job,
+      device: device,
+      last_login: nowIso,
+      last_seen: nowIso,
+      is_online: isOnline,
+      updated_at: nowIso
+    }], { onConflict: 'phone' });
+  } catch(e) {}
+
+  // 2) 로그인/재개 또는 15분 이상 경과 시 activity_logs 에 'TA 접속' 기록 (폴백 및 히스토리 보존)
+  if (statusType === 'login' || statusType === 'resume' || (now - (window._lastTALogTime || 0) > 900000)) {
+    window._lastTALogTime = now;
+    try {
+      await db.from('activity_logs').insert([{
+        consultant: name,
+        action: 'TA 접속',
+        company: device,
+        lead_id: phone,
+        changes: ['TA 관리 시스템 접속 (' + (isOnline ? '온라인' : '오프라인') + ')', device],
+        created_at: nowIso
+      }]);
+    } catch(e) {}
+  }
+}
+window.getDeviceInfo = getDeviceInfo;
+window.formatAccessTime = formatAccessTime;
+window.renderDeviceBadge = renderDeviceBadge;
+window.recordTAAccess = recordTAAccess;
+
+// TA 관리 시스템 실시간 하트비트 주기 실행 (2분)
+if (typeof window !== 'undefined' && typeof window.addEventListener === 'function') {
+  var taHeartbeatTimer = setInterval(function() {
+    if (typeof currentUser !== 'undefined' && currentUser && currentUser.phone) {
+      if (typeof document === 'undefined' || document.visibilityState === 'visible') {
+        recordTAAccess('heartbeat');
+      }
+    }
+  }, 120000);
+  if (typeof taHeartbeatTimer.unref === 'function') {
+    taHeartbeatTimer.unref();
+  }
+}
+
+
 function formatPhone(phone) {
   var s = String(phone || "").replace(/[^0-9]/g, "");
   if (!s) return "";
@@ -4706,27 +4438,23 @@ function formatPhone(phone) {
   return s;
 }
 
-
 function renderJobBadge(j) {
   var bg = "#e8f0fe", col = "#1a73e8", border = "#aecbfa";
-  if (j === "지사관리자") {
-    bg = "#fef7e0"; col = "#b06000"; border = "#fce8b2";
-  } else if (j === "본사관리자" || j === "매니저(관리자)") {
+  if (j === "본사관리자") {
     bg = "#f3e8fd"; col = "#7627bb"; border = "#d7bdfb";
-  } else if (j === "본사스탭" || j === "Staff(지원)") {
-    bg = "#f1f5f9"; col = "#475569"; border = "#cbd5e1";
-  } else if (j === "CS관리자" || j === "서비스(CS)") {
-    bg = "#fce4ec"; col = "#c2185b"; border = "#f8bbd0";
+  } else if (j === "지사관리자") {
+    bg = "#fef7e0"; col = "#b06000"; border = "#fce8b2";
+  } else if (j === "컨설턴트") {
+    bg = "#e8f0fe"; col = "#1a73e8"; border = "#aecbfa";
+  } else if (j === "기술사원") {
+    bg = "#e6f4ea"; col = "#137333"; border = "#ceead6";
   } else if (j === "CS근무자") {
     bg = "#fce8e6"; col = "#d93025"; border = "#fad2cf";
-  } else if (j === "컨설턴트" || j === "컨설턴트(영업)") {
-    bg = "#e8f0fe"; col = "#1a73e8"; border = "#aecbfa";
-  } else if (j === "기술사원" || j === "기술" || j === "엔지니어(기술)") {
-    bg = "#e6f4ea"; col = "#137333"; border = "#ceead6";
+  } else if (j === "CS관리자") {
+    bg = "#fce4ec"; col = "#c2185b"; border = "#f8bbd0";
   }
   return '<span style="background:' + bg + '; color:' + col + '; border:1px solid ' + border + '; padding:2px 8px; border-radius:5px; font-weight:700; font-size:0.75rem; white-space:nowrap;">' + (j || "미지정") + '</span>';
 }
-
 
 function validatePassword(pwd) {
   if (!pwd || pwd.length < 8 || pwd.length > 10) {
@@ -4736,13 +4464,11 @@ function validatePassword(pwd) {
   var hasNumber = /[0-9]/.test(pwd);
   var hasSpecial = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(pwd);
 
-
   if (!hasLetter || !hasNumber || !hasSpecial) {
     return "비밀번호는 영문, 숫자, 특수문자를 모두 포함해야 합니다.";
   }
   return null;
 }
-
 
 function togglePasswordVisibility(inputId, btn) {
   var inp = el(inputId);
@@ -4756,7 +4482,6 @@ function togglePasswordVisibility(inputId, btn) {
   }
 }
 
-
 function openUserManageModal() {
   var modal = el('userManageModalOverlay');
   if (modal) {
@@ -4768,7 +4493,6 @@ function openUserManageModal() {
   loadAllUsers();
 }
 
-
 function closeUserManageModal() {
   var modal = el('userManageModalOverlay');
   if (modal) {
@@ -4779,23 +4503,61 @@ function closeUserManageModal() {
   if (editBox) editBox.style.display = 'none';
 }
 
-
 async function loadAllUsers() {
   var tbody = el('userTableBody');
   var countEl = el('totalUserCount');
   if (!tbody || !db) return;
 
-
-  tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:20px; color:#9aa0a6;">사용자 목록 불러오는 중...</td></tr>';
-
+  tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:20px; color:#9aa0a6;">사용자 목록 및 TA 접속 정보 불러오는 중...</td></tr>';
 
   try {
     var res = await db.from('app_users').select('*').order('name', { ascending: true });
     if (res.error) throw res.error;
 
-
     var rawUsers = res.data || [];
     window.rawUsersList_ = rawUsers;
+
+    // TA 관리 시스템 전용 접속 정보 수집
+    var sessionMap = new Map();
+
+    // 1) ta_user_sessions 테이블 조회
+    try {
+      var sessRes = await db.from('ta_user_sessions').select('*');
+      if (sessRes.data && sessRes.data.length > 0) {
+        sessRes.data.forEach(function(s) {
+          var p = String(s.phone || '').replace(/[^0-9]/g, '');
+          if (p.startsWith('10')) p = '0' + p;
+          if (p) sessionMap.set(p, s);
+          if (s.name) sessionMap.set(s.name, s);
+        });
+      }
+    } catch(e) {}
+
+    // 2) activity_logs 의 'TA 접속' 이력 보강
+    try {
+      var actRes = await db.from('activity_logs')
+        .select('*')
+        .in('action', ['TA 접속', 'TA 로그인', 'TA 하트비트'])
+        .order('created_at', { ascending: false })
+        .limit(200);
+
+      if (actRes.data && actRes.data.length > 0) {
+        actRes.data.forEach(function(l) {
+          var p = String(l.lead_id || '').replace(/[^0-9]/g, '');
+          if (p.startsWith('10')) p = '0' + p;
+          var key = p || l.consultant;
+          if (key && !sessionMap.has(key)) {
+            sessionMap.set(key, {
+              phone: p,
+              name: l.consultant,
+              device: l.company || 'PC',
+              last_seen: l.created_at,
+              is_online: (Date.now() - new Date(l.created_at).getTime() < 5 * 60 * 1000)
+            });
+          }
+        });
+      }
+    } catch(e) {}
 
     // 표준 사용자 및 직무 코드 자동 동기화
     try {
@@ -4824,8 +4586,6 @@ async function loadAllUsers() {
       }
     } catch(syncErr) { console.warn('TA auto-sync notice:', syncErr); }
 
-
-
     // 전화번호 기준 중복 정리 (010 및 10 형태 중복 방지)
     var userMap = new Map();
     rawUsers.forEach(function(u) {
@@ -4839,23 +4599,51 @@ async function loadAllUsers() {
     var users = Array.from(userMap.values());
     users.sort(function(a, b) { return (a.name || '').localeCompare(b.name || ''); });
 
-
     if (countEl) countEl.innerText = users.length;
 
-
     if (users.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:20px; color:#9aa0a6;">등록된 사용자가 없습니다.</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:20px; color:#9aa0a6;">등록된 사용자가 없습니다.</td></tr>';
       return;
     }
-
 
     var html = '';
     users.forEach(function(u) {
       var phoneFmt = formatPhone(u.phone);
+      var normP = String(u.phone || '').replace(/[^0-9]/g, '');
+      if (normP.startsWith('10')) normP = '0' + normP;
+
+      var sess = sessionMap.get(normP) || sessionMap.get(u.name);
+      var activeUser = (typeof currentUser !== 'undefined' && currentUser) ? currentUser : (typeof window !== 'undefined' ? window.currentUser : null);
+      var isCurUser = (activeUser && (activeUser.phone === u.phone || activeUser.name === u.name));
+
+      var isOnline = false;
+      var lastSeenHtml = '<span style="color:#94a3b8;font-size:12px;">접속기록 없음</span>';
+      var deviceHtml = '<span style="color:#94a3b8;">-</span>';
+
+      if (isCurUser) {
+        isOnline = true;
+        lastSeenHtml = '<span style="color:#15803d;font-weight:700;font-size:12.5px;">방금 전 (현재 사용중)</span>';
+        deviceHtml = renderDeviceBadge(getDeviceInfo());
+      } else if (sess && sess.last_seen) {
+        var diffMs = Date.now() - new Date(sess.last_seen).getTime();
+        if (sess.is_online !== false && diffMs < 5 * 60 * 1000) {
+          isOnline = true;
+        }
+        lastSeenHtml = formatAccessTime(sess.last_seen);
+        deviceHtml = renderDeviceBadge(sess.device);
+      }
+
+      var statusBadge = isOnline
+        ? '<span style="background:#dcfce7;color:#15803d;border:1px solid #bbf7d0;padding:2px 8px;border-radius:12px;font-weight:700;font-size:12px;display:inline-flex;align-items:center;gap:4px;"><span style="width:7px;height:7px;border-radius:50%;background:#16a34a;display:inline-block;"></span>온라인</span>'
+        : '<span style="background:#f1f5f9;color:#64748b;border:1px solid #e2e8f0;padding:2px 8px;border-radius:12px;font-weight:600;font-size:12px;display:inline-flex;align-items:center;gap:4px;"><span style="width:7px;height:7px;border-radius:50%;background:#94a3b8;display:inline-block;"></span>오프라인</span>';
+
       html += '<tr>'
-        + '<td><strong>' + escapeHtml(u.name || '-') + '</strong></td>'
-        + '<td>' + escapeHtml(phoneFmt) + '</td>'
+        + '<td style="font-weight:700;color:var(--navy);">' + escapeHtml(u.name || '-') + '</td>'
+        + '<td style="font-size:13px;">' + escapeHtml(phoneFmt) + '</td>'
         + '<td>' + renderJobBadge(u.job) + '</td>'
+        + '<td style="text-align:center;">' + statusBadge + '</td>'
+        + '<td style="text-align:center;">' + lastSeenHtml + '</td>'
+        + '<td style="text-align:center;">' + deviceHtml + '</td>'
         + '<td style="text-align:center; white-space:nowrap;">'
         + '<button type="button" class="btn-user-edit" data-phone="' + escapeHtml(u.phone) + '" data-name="' + escapeHtml(u.name || '') + '" data-job="' + escapeHtml(u.job || 'CS근무자') + '">수정</button>'
         + '<button type="button" class="btn-user-del" data-phone="' + escapeHtml(u.phone) + '" data-name="' + escapeHtml(u.name || '') + '">삭제</button>'
@@ -4863,9 +4651,7 @@ async function loadAllUsers() {
         + '</tr>';
     });
 
-
     tbody.innerHTML = html;
-
 
     tbody.querySelectorAll('.btn-user-edit').forEach(function(btn) {
       btn.addEventListener('click', function() {
@@ -4876,7 +4662,6 @@ async function loadAllUsers() {
       });
     });
 
-
     tbody.querySelectorAll('.btn-user-del').forEach(function(btn) {
       btn.addEventListener('click', function() {
         var p = this.getAttribute('data-phone');
@@ -4885,13 +4670,11 @@ async function loadAllUsers() {
       });
     });
 
-
   } catch (err) {
     console.error('사용자 로드 실패:', err);
-    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:20px; color:#d93025;">사용자 목록 로드 오류: ' + escapeHtml(err.message || String(err)) + '</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:20px; color:#d93025;">사용자 목록 로드 오류: ' + escapeHtml(err.message || String(err)) + '</td></tr>';
   }
 }
-
 
 function openUserEditForm(phone, name, job) {
   var box = el('userEditBox');
@@ -4899,18 +4682,13 @@ function openUserEditForm(phone, name, job) {
   el('editUserTargetPhone').value = phone;
   el('editUserNameInput').value = name;
 
-
-  var j = (job || '').trim();
-  var normalizedJob = 'CS근무자';
-  if (j === '지사관리자' || j.indexOf('지사') !== -1) normalizedJob = '지사관리자';
-  else if (j === '본사관리자' || j === '매니저(관리자)') normalizedJob = '본사관리자';
-  else if (j === '본사스탭' || j === 'Staff(지원)' || j.indexOf('스탭') !== -1 || j.indexOf('Staff') !== -1 || j.indexOf('지원') !== -1) normalizedJob = '본사스탭';
-  else if (j === 'CS관리자' || j === '서비스(CS)') normalizedJob = 'CS관리자';
-  else if (j === 'CS근무자') normalizedJob = 'CS근무자';
-  else if (j === '컨설턴트' || j === '컨설턴트(영업)' || j.indexOf('컨설턴트') !== -1 || j.indexOf('영업') !== -1) normalizedJob = '컨설턴트';
-  else if (j === '기술사원' || j === '기술' || j.indexOf('기술') !== -1 || j.indexOf('엔지니어') !== -1) normalizedJob = '기술사원';
-  else if (j) normalizedJob = j;
-
+  var normalizedJob = job || 'CS근무자';
+  if (normalizedJob.indexOf('본사') !== -1) normalizedJob = '본사관리자';
+  else if (normalizedJob.indexOf('영업') !== -1 || normalizedJob.indexOf('컨설턴트') !== -1) normalizedJob = '컨설턴트';
+  else if (normalizedJob.indexOf('기술') !== -1 || normalizedJob.indexOf('엔지니어') !== -1) normalizedJob = '기술사원';
+  else if (normalizedJob.indexOf('서비스') !== -1 || normalizedJob.indexOf('CS근무자') !== -1) normalizedJob = 'CS근무자';
+  else if (normalizedJob.indexOf('Staff') !== -1 || normalizedJob.indexOf('지원') !== -1 || normalizedJob.indexOf('CS관리자') !== -1) normalizedJob = 'CS관리자';
+  else if (normalizedJob.indexOf('관리자') !== -1 || normalizedJob.indexOf('지사') !== -1) normalizedJob = '지사관리자';
 
   el('editUserJobSelect').value = normalizedJob;
   if (el('editUserRoleSelect')) {
@@ -4925,12 +4703,10 @@ function openUserEditForm(phone, name, job) {
   box.scrollIntoView({ behavior: 'smooth' });
 }
 
-
 function cancelUserEdit() {
   var box = el('userEditBox');
   if (box) box.style.display = 'none';
 }
-
 
 async function saveUserEdit() {
   var phone = el('editUserTargetPhone').value;
@@ -4938,16 +4714,13 @@ async function saveUserEdit() {
   var job = el('editUserJobSelect').value;
   var newPwd = el('editUserNewPwdInput').value.trim();
 
-
   if (!phone || !name || !job) {
     alert('이름과 직무를 모두 입력해주세요.');
     return;
   }
 
-
   var btn = el('btnSaveUserEdit');
   if (btn) { btn.disabled = true; btn.innerText = '저장 중...'; }
-
 
   var userRole = (el('editUserRoleSelect') && el('editUserRoleSelect').value) ? el('editUserRoleSelect').value : ((job === '본사관리자' || job === '지사관리자') ? '메인마스터' : '수정가능');
   var updateData = {
@@ -4955,7 +4728,6 @@ async function saveUserEdit() {
     job: job,
     role: userRole
   };
-
 
   if (newPwd) {
     var valErr = validatePassword(newPwd);
@@ -4970,17 +4742,14 @@ async function saveUserEdit() {
     updateData.hash = hashed;
   }
 
-
   try {
     var cleanPhone = String(phone || '').replace(/[^0-9]/g, '');
     var pNoZero = cleanPhone.startsWith('0') ? cleanPhone.slice(1) : cleanPhone;
     var pWithZero = cleanPhone.startsWith('0') ? cleanPhone : ('0' + cleanPhone);
     var searchPhones = Array.from(new Set([phone, cleanPhone, pNoZero, pWithZero]));
 
-
     var res = await db.from('app_users').update(updateData).in('phone', searchPhones);
     if (res.error) throw res.error;
-
 
     showPortalAlert('사용자 정보가 성공적으로 수정되었습니다.');
     var box = el('userEditBox');
@@ -4993,12 +4762,10 @@ async function saveUserEdit() {
   }
 }
 
-
 async function deleteUserAccount(phone, name) {
   if (!confirm('정말로 [' + name + ' / ' + formatPhone(phone) + '] 사용자를 영구 삭제하시겠습니까?\n삭제 후 해당 계정으로 로그인할 수 없습니다.')) {
     return;
   }
-
 
   try {
     var cleanPhone = String(phone || '').replace(/[^0-9]/g, '');
@@ -5006,10 +4773,8 @@ async function deleteUserAccount(phone, name) {
     var pWithZero = cleanPhone.startsWith('0') ? cleanPhone : ('0' + cleanPhone);
     var searchPhones = Array.from(new Set([phone, cleanPhone, pNoZero, pWithZero]));
 
-
     var res = await db.from('app_users').delete().in('phone', searchPhones);
     if (res.error) throw res.error;
-
 
     showPortalAlert('사용자가 삭제되었습니다.');
     await loadAllUsers();
@@ -5017,7 +4782,6 @@ async function deleteUserAccount(phone, name) {
     alert('삭제 실패: ' + e.message);
   }
 }
-
 
 window.formatPhone = formatPhone;
 window.renderJobBadge = renderJobBadge;
@@ -5032,16 +4796,12 @@ window.saveUserEdit = saveUserEdit;
 window.deleteUserAccount = deleteUserAccount;
 
 
-
-
 window.getOverallTarget = getOverallTarget;
 window.getTotalTarget = getTotalTarget;
 window.getConsultantTarget = getConsultantTarget;
 window.render = render;
 window.renderKPI = renderKPI;
 window.renderTargets = renderTargets;
-
-
 
 
 // ==========================================
@@ -5055,7 +4815,6 @@ function toggleLoginSignup(view) {
   if (loginMsg) loginMsg.textContent = '';
   if (signupMsg) signupMsg.textContent = '';
 
-
   if (view === 'signup') {
     if (formMain) formMain.style.display = 'none';
     if (formSignup) formSignup.style.display = 'block';
@@ -5065,7 +4824,6 @@ function toggleLoginSignup(view) {
   }
 }
 
-
 async function doSignup() {
   const phone = (el('regPhone').value || '').replace(/[^0-9]/g, '');
   const name = (el('regName').value || '').trim();
@@ -5074,7 +4832,6 @@ async function doSignup() {
   const pwdConfirm = (el('regPwdConfirm').value || '').trim();
   const msgEl = el('signupMsg');
   const btn = el('btnDoSignup');
-
 
   if (!phone || phone.length < 10) {
     msgEl.textContent = '올바른 휴대전화번호를 입력해주세요.';
@@ -5092,7 +4849,6 @@ async function doSignup() {
     return;
   }
 
-
   const pwdErr = validatePassword(pwd);
   if (pwdErr) {
     msgEl.textContent = pwdErr;
@@ -5100,25 +4856,21 @@ async function doSignup() {
     return;
   }
 
-
   if (pwd !== pwdConfirm) {
     msgEl.textContent = '비밀번호 확인이 일치하지 않습니다.';
     msgEl.style.color = 'var(--red)';
     return;
   }
 
-
   btn.disabled = true;
   btn.textContent = '가입 처리 중...';
   msgEl.textContent = '확인 중...';
   msgEl.style.color = 'var(--navy)';
 
-
   try {
     const pNoZero = phone.startsWith('0') ? phone.slice(1) : phone;
     const pWithZero = phone.startsWith('0') ? phone : ('0' + phone);
     const searchPhones = Array.from(new Set([phone, pNoZero, pWithZero]));
-
 
     const { data: chk, error: chkErr } = await db.from('app_users').select('phone').in('phone', searchPhones);
     if (chk && chk.length > 0) {
@@ -5129,11 +4881,9 @@ async function doSignup() {
       return;
     }
 
-
     // 표준 해시 생성 공식 적용: SHA-256(phone + ":" + pwd)
     const hashedPwd = await sha256(phone + ':' + pwd);
     const userRole = (job === '본사관리자' || job === '지사관리자') ? 'master' : 'user';
-
 
     const { error: insErr } = await db.from('app_users').insert([{
       phone: phone,
@@ -5143,12 +4893,9 @@ async function doSignup() {
       hash: hashedPwd
     }]);
 
-
     if (insErr) throw insErr;
 
-
     alert('🎉 회원가입이 완료되었습니다!\n바로 시스템에 로그인 접속합니다.');
-
 
     currentUser = {
       name: name,
@@ -5160,7 +4907,6 @@ async function doSignup() {
     saveUserSession(currentUser, targetScreen);
     initApp(targetScreen);
 
-
   } catch (err) {
     console.error('Signup error:', err);
     msgEl.textContent = '가입 실패: ' + (err.message || String(err));
@@ -5171,13 +4917,10 @@ async function doSignup() {
   }
 }
 
-
 window.toggleLoginSignup = toggleLoginSignup;
 window.doSignup = doSignup;
 
-
 </script>
-
 
 <!-- ========================================== -->
 <!-- 시스템 전용 알림/확인 대화상자 (북서울지사 TA 관리 포털) -->
@@ -5195,8 +4938,6 @@ window.doSignup = doSignup;
     </div>
   </div>
 </div>
-
-
 
 
 </body>
