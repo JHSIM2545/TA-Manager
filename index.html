@@ -4373,33 +4373,18 @@ async function recordTAAccess(statusType) {
   var nowIso = new Date().toISOString();
   var isOnline = (statusType !== 'logout');
 
-  // 1) 전용 세션 테이블(ta_user_sessions)에 기록 시도
+  // TA 관리 시스템 전용 접속 기록 (기존 activity_logs 테이블 활용 - 400 오류 원천 방지)
   try {
-    await db.from('ta_user_sessions').upsert([{
-      phone: phone,
-      name: name,
-      job: job,
-      device: device,
-      last_login: nowIso,
-      last_seen: nowIso,
-      is_online: isOnline,
-      updated_at: nowIso
-    }], { onConflict: 'phone' });
-  } catch(e) {}
-
-  // 2) 로그인/재개 또는 15분 이상 경과 시 activity_logs 에 'TA 접속' 기록 (폴백 및 히스토리 보존)
-  if (statusType === 'login' || statusType === 'resume' || (now - (window._lastTALogTime || 0) > 900000)) {
-    window._lastTALogTime = now;
-    try {
-      await db.from('activity_logs').insert([{
-        consultant: name,
-        action: 'TA 접속',
-        company: device,
-        lead_id: phone,
-        changes: ['TA 관리 시스템 접속 (' + (isOnline ? '온라인' : '오프라인') + ')', device],
-        created_at: nowIso
-      }]);
-    } catch(e) {}
+    await db.from('activity_logs').insert([{
+      consultant: name,
+      action: 'TA 접속',
+      company: device,
+      lead_id: phone,
+      changes: ['TA 관리 시스템 접속 (' + (isOnline ? '온라인' : '오프라인') + ')', device],
+      created_at: nowIso
+    }]);
+  } catch(e) {
+    console.warn('TA 접속 기록 실패:', e);
   }
 }
 window.getDeviceInfo = getDeviceInfo;
@@ -4517,23 +4502,9 @@ async function loadAllUsers() {
     var rawUsers = res.data || [];
     window.rawUsersList_ = rawUsers;
 
-    // TA 관리 시스템 전용 접속 정보 수집
+    // TA 관리 시스템 전용 접속 정보 수집 (activity_logs 테이블 활용 - 400 오류 원천 방지)
     var sessionMap = new Map();
 
-    // 1) ta_user_sessions 테이블 조회
-    try {
-      var sessRes = await db.from('ta_user_sessions').select('*');
-      if (sessRes.data && sessRes.data.length > 0) {
-        sessRes.data.forEach(function(s) {
-          var p = String(s.phone || '').replace(/[^0-9]/g, '');
-          if (p.startsWith('10')) p = '0' + p;
-          if (p) sessionMap.set(p, s);
-          if (s.name) sessionMap.set(s.name, s);
-        });
-      }
-    } catch(e) {}
-
-    // 2) activity_logs 의 'TA 접속' 이력 보강
     try {
       var actRes = await db.from('activity_logs')
         .select('*')
@@ -4541,23 +4512,25 @@ async function loadAllUsers() {
         .order('created_at', { ascending: false })
         .limit(200);
 
-      if (actRes.data && actRes.data.length > 0) {
+      if (actRes && actRes.data && actRes.data.length > 0) {
         actRes.data.forEach(function(l) {
           var p = String(l.lead_id || '').replace(/[^0-9]/g, '');
           if (p.startsWith('10')) p = '0' + p;
-          var key = p || l.consultant;
-          if (key && !sessionMap.has(key)) {
-            sessionMap.set(key, {
-              phone: p,
-              name: l.consultant,
-              device: l.company || 'PC',
-              last_seen: l.created_at,
-              is_online: (Date.now() - new Date(l.created_at).getTime() < 5 * 60 * 1000)
-            });
-          }
+          var isOnline = (Date.now() - new Date(l.created_at).getTime() < 5 * 60 * 1000);
+          var entry = {
+            phone: p,
+            name: l.consultant,
+            device: l.company || 'PC',
+            last_seen: l.created_at,
+            is_online: isOnline
+          };
+          if (p && !sessionMap.has(p)) sessionMap.set(p, entry);
+          if (l.consultant && !sessionMap.has(l.consultant)) sessionMap.set(l.consultant, entry);
         });
       }
-    } catch(e) {}
+    } catch(e) {
+      console.warn('TA 접속 정보 조회 예외:', e);
+    }
 
     // 표준 사용자 및 직무 코드 자동 동기화
     try {
@@ -4579,7 +4552,7 @@ async function loadAllUsers() {
           return up === cp || up === ('0' + cp) || (cp.startsWith('0') && up === cp.slice(1)) || u.name === t.name;
         });
         if (matched && (matched.job !== t.job || (t.role === 'master' && matched.role !== 'master'))) {
-          await db.from('app_users').update({ job: t.job, role: (t.role === 'master') ? 'master' : (matched.role || t.role) }).eq('id', matched.id);
+          await db.from('app_users').update({ job: t.job, role: (t.role === 'master') ? 'master' : (matched.role || t.role) }).eq('phone', matched.phone);
           matched.job = t.job;
           if (t.role === 'master') matched.role = 'master';
         }
