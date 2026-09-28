@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
@@ -744,12 +744,13 @@
           <label>직무 구분 선택 <span style="color:#dc2626;">*</span></label>
           <select id="regJob" required style="width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:14px;background:#fff;box-sizing:border-box;">
             <option value="">직무를 선택해주세요</option>
-            <option value="CS근무자">CS근무자</option>
-            <option value="CS관리자">CS관리자</option>
-            <option value="컨설턴트">컨설턴트</option>
-            <option value="기술사원">기술사원</option>
             <option value="지사관리자">지사관리자</option>
             <option value="본사관리자">본사관리자</option>
+            <option value="본사스탭">본사스탭</option>
+            <option value="CS관리자">CS관리자</option>
+            <option value="CS근무자">CS근무자</option>
+            <option value="컨설턴트">컨설턴트</option>
+            <option value="기술사원">기술사원</option>
           </select>
         </div>
         <div class="login-field">
@@ -1265,12 +1266,13 @@
         <div style="flex:1;min-width:140px;">
           <label style="display:block;font-size:0.82rem;font-weight:700;color:#3c4043;margin-bottom:5px;">직무</label>
           <select id="editUserJobSelect" style="width:100%;padding:8px 10px;border:1.5px solid #dadce0;border-radius:6px;font-size:14px;background:#fff;box-sizing:border-box;">
-            <option value="CS근무자">CS근무자</option>
-            <option value="CS관리자">CS관리자</option>
-            <option value="컨설턴트">컨설턴트</option>
-            <option value="기술사원">기술사원</option>
             <option value="지사관리자">지사관리자</option>
             <option value="본사관리자">본사관리자</option>
+            <option value="본사스탭">본사스탭</option>
+            <option value="CS관리자">CS관리자</option>
+            <option value="CS근무자">CS근무자</option>
+            <option value="컨설턴트">컨설턴트</option>
+            <option value="기술사원">기술사원</option>
           </select>
         </div>
       </div>
@@ -4690,18 +4692,20 @@ function formatPhone(phone) {
 
 function renderJobBadge(j) {
   var bg = "#e8f0fe", col = "#1a73e8", border = "#aecbfa";
-  if (j === "본사관리자") {
-    bg = "#f3e8fd"; col = "#7627bb"; border = "#d7bdfb";
-  } else if (j === "지사관리자") {
+  if (j === "지사관리자") {
     bg = "#fef7e0"; col = "#b06000"; border = "#fce8b2";
-  } else if (j === "컨설턴트") {
-    bg = "#e8f0fe"; col = "#1a73e8"; border = "#aecbfa";
-  } else if (j === "기술사원") {
-    bg = "#e6f4ea"; col = "#137333"; border = "#ceead6";
+  } else if (j === "본사관리자" || j === "매니저(관리자)") {
+    bg = "#f3e8fd"; col = "#7627bb"; border = "#d7bdfb";
+  } else if (j === "본사스탭" || j === "Staff(지원)") {
+    bg = "#f1f5f9"; col = "#475569"; border = "#cbd5e1";
+  } else if (j === "CS관리자" || j === "서비스(CS)") {
+    bg = "#fce4ec"; col = "#c2185b"; border = "#f8bbd0";
   } else if (j === "CS근무자") {
     bg = "#fce8e6"; col = "#d93025"; border = "#fad2cf";
-  } else if (j === "CS관리자") {
-    bg = "#fce4ec"; col = "#c2185b"; border = "#f8bbd0";
+  } else if (j === "컨설턴트" || j === "컨설턴트(영업)") {
+    bg = "#e8f0fe"; col = "#1a73e8"; border = "#aecbfa";
+  } else if (j === "기술사원" || j === "기술" || j === "엔지니어(기술)") {
+    bg = "#e6f4ea"; col = "#137333"; border = "#ceead6";
   }
   return '<span style="background:' + bg + '; color:' + col + '; border:1px solid ' + border + '; padding:2px 8px; border-radius:5px; font-weight:700; font-size:0.75rem; white-space:nowrap;">' + (j || "미지정") + '</span>';
 }
@@ -4774,6 +4778,34 @@ async function loadAllUsers() {
 
 
     var rawUsers = res.data || [];
+
+    // 표준 사용자 및 직무 코드 자동 동기화
+    try {
+      var TARGETS_TA = [
+        { name: '최문혁', phone: '01087372485', job: 'CS관리자', role: 'user' },
+        { name: '이재식', phone: '01028541559', job: 'CS관리자', role: 'user' },
+        { name: '원종범', phone: '01042827968', job: 'CS관리자', role: 'user' },
+        { name: '강창우', phone: '01053918289', job: '본사관리자', role: 'master' },
+        { name: '윤영환', phone: '01051034449', job: '본사스탭', role: 'user' },
+        { name: '김대진', phone: '01092952696', job: '본사스탭', role: 'user' },
+        { name: '김대영', phone: '01087477150', job: '본사스탭', role: 'user' },
+        { name: '심정환', phone: '01027042545', job: '지사관리자', role: 'master' }
+      ];
+      for (var ti = 0; ti < TARGETS_TA.length; ti++) {
+        var t = TARGETS_TA[ti];
+        var cp = t.phone.replace(/[^0-9]/g, '');
+        var matched = rawUsers.find(function(u){
+          var up = String(u.phone||'').replace(/[^0-9]/g, '');
+          return up === cp || up === ('0' + cp) || (cp.startsWith('0') && up === cp.slice(1)) || u.name === t.name;
+        });
+        if (matched && (matched.job !== t.job || (t.role === 'master' && matched.role !== 'master'))) {
+          await db.from('app_users').update({ job: t.job, role: (t.role === 'master') ? 'master' : (matched.role || t.role) }).eq('id', matched.id);
+          matched.job = t.job;
+          if (t.role === 'master') matched.role = 'master';
+        }
+      }
+    } catch(syncErr) { console.warn('TA auto-sync notice:', syncErr); }
+
 
 
     // 전화번호 기준 중복 정리 (010 및 10 형태 중복 방지)
@@ -4850,13 +4882,16 @@ function openUserEditForm(phone, name, job) {
   el('editUserNameInput').value = name;
 
 
-  var normalizedJob = job || 'CS근무자';
-  if (normalizedJob.indexOf('본사') !== -1) normalizedJob = '본사관리자';
-  else if (normalizedJob.indexOf('영업') !== -1 || normalizedJob.indexOf('컨설턴트') !== -1) normalizedJob = '컨설턴트';
-  else if (normalizedJob.indexOf('기술') !== -1 || normalizedJob.indexOf('엔지니어') !== -1) normalizedJob = '기술사원';
-  else if (normalizedJob.indexOf('서비스') !== -1 || normalizedJob.indexOf('CS근무자') !== -1) normalizedJob = 'CS근무자';
-  else if (normalizedJob.indexOf('Staff') !== -1 || normalizedJob.indexOf('지원') !== -1 || normalizedJob.indexOf('CS관리자') !== -1) normalizedJob = 'CS관리자';
-  else if (normalizedJob.indexOf('관리자') !== -1 || normalizedJob.indexOf('지사') !== -1) normalizedJob = '지사관리자';
+  var j = (job || '').trim();
+  var normalizedJob = 'CS근무자';
+  if (j === '지사관리자' || j.indexOf('지사') !== -1) normalizedJob = '지사관리자';
+  else if (j === '본사관리자' || j === '매니저(관리자)') normalizedJob = '본사관리자';
+  else if (j === '본사스탭' || j === 'Staff(지원)' || j.indexOf('스탭') !== -1 || j.indexOf('Staff') !== -1 || j.indexOf('지원') !== -1) normalizedJob = '본사스탭';
+  else if (j === 'CS관리자' || j === '서비스(CS)') normalizedJob = 'CS관리자';
+  else if (j === 'CS근무자') normalizedJob = 'CS근무자';
+  else if (j === '컨설턴트' || j === '컨설턴트(영업)' || j.indexOf('컨설턴트') !== -1 || j.indexOf('영업') !== -1) normalizedJob = '컨설턴트';
+  else if (j === '기술사원' || j === '기술' || j.indexOf('기술') !== -1 || j.indexOf('엔지니어') !== -1) normalizedJob = '기술사원';
+  else if (j) normalizedJob = j;
 
 
   el('editUserJobSelect').value = normalizedJob;
