@@ -770,6 +770,7 @@
     </div>
 
     <div class="topbar-right">
+      <button type="button" id="btnOpenActivityModal" class="small" onclick="openActivityLogModal()" style="background:#f1f5f9;color:var(--navy);border:1px solid #cbd5e1;font-weight:700;">📋 활동 내역</button>
       <button type="button" id="btnUserManage" class="small" onclick="openUserManageModal()" style="background:#e6f4ea;color:#137333;border:1px solid #ceead6;font-weight:700;display:none;">👥 사용자 관리</button>
       <button type="button" id="btnTopbarTarget" class="small" onclick="openTargetModal()" style="background:#2563eb;color:#fff;display:none;">🎯 목표 설정</button>
       <button type="button" id="btnNoticeManage" class="small">공지사항 관리</button>
@@ -829,18 +830,37 @@
 
       <!-- 변경 이력 (Activity Log) -->
       <div class="panel">
-        <div class="panel-toolbar">
-          <h2>변경 이력 <span class="count-tag" id="activityLogCount"></span></h2>
+        <div class="panel-toolbar" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:12px;">
+          <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+            <h2 style="margin:0;">변경 이력 <span class="count-tag" id="activityLogCount"></span></h2>
+            <div style="display:inline-flex;gap:4px;background:#f1f5f9;padding:3px;border-radius:8px;border:1px solid var(--border);">
+              <button type="button" class="small" id="btnActivityRecent" style="background:var(--blue);color:#fff;font-weight:700;border-radius:6px;padding:5px 12px;border:none;cursor:pointer;">최근 전체 (100건)</button>
+              <button type="button" class="small secondary" id="btnActivityToday" style="background:transparent;color:var(--navy);font-weight:700;border-radius:6px;padding:5px 12px;border:none;cursor:pointer;">오늘</button>
+            </div>
+          </div>
           <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
-            <input type="date" id="activityLogDate" style="padding:8px 10px;border:1px solid var(--border);border-radius:8px;font-size:13.5px;font-family:inherit;">
-            <button type="button" class="small secondary" id="btnActivityToday" style="background:#eef1f7;color:#1a2333;">오늘</button>
-            <button type="button" class="small" id="btnActivityRefresh">새로고침</button>
+            <select id="activityLogConsultant" style="padding:7px 10px;border:1px solid var(--border);border-radius:8px;font-size:13px;font-weight:600;color:var(--navy);background:#fff;">
+              <option value="all">전체 컨설턴트</option>
+              <option value="최영국">최영국</option>
+              <option value="박광춘">박광춘</option>
+              <option value="이수열">이수열</option>
+              <option value="정문재">정문재</option>
+              <option value="임영민">임영민</option>
+            </select>
+            <input type="date" id="activityLogDate" style="padding:7px 10px;border:1px solid var(--border);border-radius:8px;font-size:13px;font-family:inherit;">
+            <button type="button" class="small" id="btnActivityRefresh" style="padding:7px 12px;font-weight:700;">🔄 새로고침</button>
           </div>
         </div>
-        <p style="font-size:12px;color:var(--muted);margin:-6px 0 12px;">컨설턴트가 TA를 신규 등록/수정/삭제할 때마다 자동으로 기록됩니다. 하루치만 표시되며, 30초마다 자동 갱신됩니다.</p>
+        <p style="font-size:12px;color:var(--muted);margin:-4px 0 12px;">컨설턴트가 TA를 신규 등록/수정/삭제할 때마다 실시간으로 안전하게 기록됩니다. (30초마다 자동 갱신)</p>
         <div class="table-scroll" style="max-height:420px;">
           <table class="lead-table">
-            <thead><tr><th>시간</th><th>컨설턴트</th><th>구분</th><th style="min-width:170px;">서비스제공처명</th><th>변경 내용</th></tr></thead>
+            <thead><tr>
+              <th style="width:120px;">일시 (KST)</th>
+              <th style="width:90px;">컨설턴트</th>
+              <th style="width:85px;text-align:center;">구분</th>
+              <th style="min-width:170px;">서비스제공처명</th>
+              <th>변경 내용</th>
+            </tr></thead>
             <tbody id="activityLogTbody"></tbody>
           </table>
         </div>
@@ -1134,6 +1154,31 @@
           </table>
         </div>
       </div>
+    
+      <!-- 5. 컨설턴트 본인 최근 활동 내역 패널 -->
+      <div class="panel" style="margin-top:16px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:10px;">
+          <h2 style="font-size:17px;font-weight:800;color:var(--navy);margin:0;">
+            📋 <span id="agentActivityTitleName"></span> 최근 활동 내역 (<span id="agentActivityLogCount">0</span>건)
+          </h2>
+          <button type="button" class="small secondary" onclick="refreshAgentActivityLog()" style="background:#eef1f7;color:var(--navy);font-weight:700;border-radius:6px;padding:6px 12px;cursor:pointer;">
+            🔄 새로고침
+          </button>
+        </div>
+        <p style="font-size:12px;color:var(--muted);margin:-6px 0 12px;">안건 신규 등록, 수정, 삭제 시 실시간으로 기록됩니다.</p>
+        <div class="table-scroll" style="max-height:300px;">
+          <table class="lead-table">
+            <thead><tr>
+              <th style="width:120px;">일시 (KST)</th>
+              <th style="width:85px;text-align:center;">구분</th>
+              <th style="min-width:170px;">서비스제공처명</th>
+              <th>변경 내용</th>
+            </tr></thead>
+            <tbody id="agentActivityLogTbody"></tbody>
+          </table>
+        </div>
+      </div>
+
     </div>
   </main>
 </div>
@@ -1520,6 +1565,14 @@ const SUPABASE_ANON_KEY = 'sb_publishable_xUnGxyLCc5TB5nv4keVQVw__grqGJkP';
 
 window.supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 const db = window.supabase;
+
+
+function generateUUID() {
+  if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+    return crypto.randomUUID();
+  }
+  return 'id_' + Date.now() + '_' + Math.random().toString(36).substring(2, 11);
+}
 
 const el = id => document.getElementById(id);
 
@@ -2290,8 +2343,18 @@ function buildLeadChanges(oldLead, newPayload) {
   if (Number(oldLead.amount) !== Number(newPayload.amount)) changes.push(`용역료: ${formatCurrency(oldLead.amount)} → ${formatCurrency(newPayload.amount)}`);
   if (oldLead.stage !== newPayload.stage) changes.push(`영업단계: ${oldLead.stage} → ${newPayload.stage}`);
   if (oldLead.confidence !== newPayload.confidence) changes.push(`수주확도: ${oldLead.confidence || '-'} → ${newPayload.confidence}`);
+  if (oldLead.productType !== newPayload.productType) changes.push(`상품종류: ${oldLead.productType || '-'} → ${newPayload.productType}`);
+  if (oldLead.motive !== newPayload.motive) changes.push(`영업동기: ${oldLead.motive || '-'} → ${newPayload.motive}`);
   if ((oldLead.expectedDate || '') !== (newPayload.expectedDate || '')) changes.push(`계약예정일: ${oldLead.expectedDate || '(없음)'} → ${newPayload.expectedDate || '(없음)'}`);
   if ((oldLead.contractDate || '') !== (newPayload.contractDate || '')) changes.push(`계약일: ${oldLead.contractDate || '(없음)'} → ${newPayload.contractDate || '(없음)'}`);
+  if ((oldLead.baseDate || '') !== (newPayload.baseDate || '')) changes.push(`기산일: ${oldLead.baseDate || '(없음)'} → ${newPayload.baseDate || '(없음)'}`);
+  if ((oldLead.vehicleNumber || '') !== (newPayload.vehicleNumber || '')) changes.push(`차량: ${oldLead.vehicleNumber || '없음'} → ${newPayload.vehicleNumber || '없음'}`);
+  if ((oldLead.contact || '') !== (newPayload.contact || '')) changes.push(`담당자: ${oldLead.contact || '(없음)'} → ${newPayload.contact || '(없음)'}`);
+  if ((oldLead.memo || '') !== (newPayload.memo || '')) changes.push(`메모: ${newPayload.memo || '(삭제)'}`);
+
+  if (changes.length === 0) {
+    changes.push('안건 저장 완료 (수정 내용 확인)');
+  }
   return changes;
 }
 
@@ -2947,40 +3010,110 @@ async function deleteLeadMaster(id, company, consultant) {
 const ACTIVITY_BADGE = {
   '신규 등록': { bg: '#dbeafe', fg: '#2563eb' },
   '수정': { bg: '#fef3c7', fg: '#b45309' },
-  '삭제': { bg: '#fee2e2', fg: '#dc2626' }
+  '삭제': { bg: '#fee2e2', fg: '#dc2626' },
+  '목표확정': { bg: '#f3e8ff', fg: '#7e22ce' }
 };
 
-async function refreshActivityLog() {
-  const dateStr = el('activityLogDate').value || todayStr();
-  try {
-    const { data: logs, error } = await db.from('activity_logs')
-      .select('*')
-      .gte('created_at', dateStr + 'T00:00:00')
-      .lte('created_at', dateStr + 'T23:59:59')
-      .order('created_at', { ascending: false });
+var activityLogFilterMode = 'recent'; window.activityLogFilterMode = 'recent'; window.activityLogFilterMode = activityLogFilterMode; // 'recent' (기본: 최근 전체 이력) | 'date' (특정 일자)
 
-    // 변경 이력에는 TA 안건 등록/수정/삭제/목표확정만 표시하고 접속로그는 분리
-    const filteredLogs = (logs || []).filter(l => l.action !== 'TA 접속' && l.action !== 'TA 로그인' && l.action !== 'TA 하트비트');
-    el('activityLogCount').textContent = '(' + filteredLogs.length + '건)';
-    if (filteredLogs.length === 0) {
-      el('activityLogTbody').innerHTML = '<tr class="empty-row"><td colspan="5">해당 날짜에 등록·수정·삭제된 TA가 없습니다.</td></tr>';
+function formatLogDateTime(isoStr) {
+  if (!isoStr) return '-';
+  try {
+    const d = new Date(isoStr);
+    if (isNaN(d.getTime())) return isoStr;
+    const now = new Date();
+    const diffMs = now.getTime() - d.getTime();
+    const diffMin = Math.floor(diffMs / 60000);
+
+    let timeAgo = '';
+    if (diffMin < 1) timeAgo = ' <span style="color:#16a34a;font-weight:700;">(방금 전)</span>';
+    else if (diffMin < 60) timeAgo = ` <span style="color:#2563eb;font-weight:700;">(${diffMin}분 전)</span>`;
+    else if (diffMin < 1440 && d.getDate() === now.getDate()) timeAgo = ` <span style="color:#64748b;">(${Math.floor(diffMin / 60)}시간 전)</span>`;
+
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    const h = String(d.getHours()).padStart(2, '0');
+    const min = String(d.getMinutes()).padStart(2, '0');
+    return `${m}.${day} ${h}:${min}` + timeAgo;
+  } catch(e) {
+    return isoStr;
+  }
+}
+
+async function refreshActivityLog() {
+  const tbody = el('activityLogTbody');
+  const countTag = el('activityLogCount');
+  if (!tbody || !db) return;
+
+  const dateInput = el('activityLogDate');
+  const consultantSel = el('activityLogConsultant');
+  const selConsultant = consultantSel ? consultantSel.value : 'all';
+
+  try {
+    let query = db.from('activity_logs').select('*');
+
+    // TA 안건 변경(등록/수정/삭제/목표확정)만 조회하여 표시
+    query = query.in('action', ['신규 등록', '수정', '삭제', '목표확정']);
+
+    if (selConsultant && selConsultant !== 'all') {
+      query = query.eq('consultant', selConsultant);
+    }
+
+    if (activityLogFilterMode === 'date') {
+      const dateStr = dateInput ? dateInput.value : todayStr();
+      if (dateStr) {
+        // 한국 시간대(KST, UTC+9) 기준 당일 00:00:00 ~ 23:59:59.999 완전 커버
+        const startIso = new Date(dateStr + 'T00:00:00+09:00').toISOString();
+        const endIso = new Date(dateStr + 'T23:59:59.999+09:00').toISOString();
+        query = query.gte('created_at', startIso).lte('created_at', endIso);
+      }
+    } else {
+      // 'recent' 모드: 최근 변경 이력 100건 역순 조회 (날짜 제약 없이 최신 수정사항 즉시 표출)
+      query = query.limit(100);
+    }
+
+    query = query.order('created_at', { ascending: false });
+
+    const { data: logs, error } = await query;
+    if (error) throw error;
+
+    const list = logs || [];
+    if (countTag) {
+      countTag.textContent = '(' + list.length + '건)';
+    }
+
+    if (list.length === 0) {
+      const guideMsg = (activityLogFilterMode === 'date') 
+        ? `선택하신 날짜(${dateInput ? dateInput.value : todayStr()})에 등록·수정·삭제된 TA 이력이 없습니다.` 
+        : '최근 등록·수정·삭제된 TA 변경 이력이 없습니다.';
+      tbody.innerHTML = `<tr class="empty-row"><td colspan="5">${guideMsg}</td></tr>`;
       return;
     }
-    el('activityLogTbody').innerHTML = filteredLogs.map(log => {
+
+    tbody.innerHTML = list.map(log => {
       const badge = ACTIVITY_BADGE[log.action] || { bg: '#eef1f7', fg: 'var(--muted)' };
-      const timeStr = (log.created_at || '').slice(11, 16);
+      const timeFmt = formatLogDateTime(log.created_at);
+      const changesHtml = Array.isArray(log.changes)
+        ? log.changes.map(c => escapeHtml(c)).join('<br>')
+        : (log.changes ? escapeHtml(JSON.stringify(log.changes)) : '-');
+
       return `
         <tr>
-          <td style="white-space:nowrap;color:var(--muted);font-size:12px;">${escapeHtml(timeStr)}</td>
-          <td style="font-weight:700;color:${CONSULTANT_COLOR[log.consultant] || 'inherit'};">${escapeHtml(log.consultant)}</td>
-          <td><span class="badge" style="background:${badge.bg};color:${badge.fg};">${escapeHtml(log.action)}</span></td>
-          <td style="min-width:170px;word-break:break-word;">${escapeHtml(log.company) || '-'}</td>
-          <td style="font-size:12.5px;color:var(--muted);">${Array.isArray(log.changes) ? log.changes.map(c => escapeHtml(c)).join('<br>') : ''}</td>
+          <td style="white-space:nowrap;color:var(--navy);font-size:12px;font-weight:600;">${timeFmt}</td>
+          <td style="font-weight:700;color:${CONSULTANT_COLOR[log.consultant] || 'inherit'};white-space:nowrap;">
+            <span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${CONSULTANT_COLOR[log.consultant] || '#2563eb'};margin-right:5px;"></span>
+            ${escapeHtml(log.consultant)}
+          </td>
+          <td style="text-align:center;white-space:nowrap;"><span class="badge" style="background:${badge.bg};color:${badge.fg};">${escapeHtml(log.action)}</span></td>
+          <td style="min-width:170px;word-break:break-word;font-weight:700;">${escapeHtml(log.company) || '-'}</td>
+          <td style="font-size:12.5px;color:#334155;line-height:1.5;">${changesHtml}</td>
         </tr>
       `;
     }).join('');
+
   } catch (e) {
-    el('activityLogTbody').innerHTML = '<tr class="empty-row"><td colspan="5">이력을 불러오지 못했습니다.</td></tr>';
+    console.error('변경 이력 조회 실패:', e);
+    if (tbody) tbody.innerHTML = '<tr class="empty-row"><td colspan="5">이력을 불러오지 못했습니다: ' + escapeHtml(e.message || String(e)) + '</td></tr>';
   }
 }
 
@@ -3140,6 +3273,7 @@ function setAgentGlobalProduct(prod) {
 
   // 8) 내 TA 목록 테이블 렌더링
   renderAgentLeadTable(agentName);
+  refreshAgentActivityLog(agentName);
 }
 window.setAgentGlobalProduct = setAgentGlobalProduct;
 
@@ -3749,6 +3883,7 @@ async function handleAgentModalSubmit(e) {
 
     closeAgentLeadModal();
     initAgentView(agentName);
+    refreshActivityLog();
   } catch (err) {
     alert('저장 실패: ' + err.message);
   } finally {
@@ -3774,6 +3909,7 @@ async function deleteAgentLead(id, company) {
     await recordActivityLog(agentName, '삭제', company, id, [`서비스제공처명: ${company}`]);
     showPortalAlert('안건이 삭제되었습니다.');
     initAgentView(agentName);
+    refreshActivityLog();
   } catch (e) {
     alert('삭제 실패: ' + e.message);
   }
@@ -3871,12 +4007,62 @@ safeAddListener('btnResetFilter', 'click', () => {
   renderLeadTable();
 });
 
-safeAddListener('activityLogDate', 'change', refreshActivityLog);
-safeAddListener('btnActivityRefresh', 'click', refreshActivityLog);
-safeAddListener('btnActivityToday', 'click', () => {
-  el('activityLogDate').value = todayStr();
+safeAddListener('btnActivityRecent', 'click', () => {
+  activityLogFilterMode = 'recent'; window.activityLogFilterMode = 'recent';
+  if (el('btnActivityRecent')) {
+    el('btnActivityRecent').style.background = 'var(--blue)';
+    el('btnActivityRecent').style.color = '#fff';
+  }
+  if (el('btnActivityToday')) {
+    el('btnActivityToday').style.background = 'transparent';
+    el('btnActivityToday').style.color = 'var(--navy)';
+  }
+  if (el('activityLogDate')) el('activityLogDate').value = '';
   refreshActivityLog();
 });
+
+safeAddListener('btnActivityToday', 'click', () => {
+  activityLogFilterMode = 'date'; window.activityLogFilterMode = 'date';
+  if (el('btnActivityToday')) {
+    el('btnActivityToday').style.background = 'var(--blue)';
+    el('btnActivityToday').style.color = '#fff';
+  }
+  if (el('btnActivityRecent')) {
+    el('btnActivityRecent').style.background = 'transparent';
+    el('btnActivityRecent').style.color = 'var(--navy)';
+  }
+  if (el('activityLogDate')) el('activityLogDate').value = todayStr();
+  refreshActivityLog();
+});
+
+safeAddListener('activityLogDate', 'change', () => {
+  if (el('activityLogDate') && el('activityLogDate').value) {
+    activityLogFilterMode = 'date'; window.activityLogFilterMode = 'date';
+    if (el('btnActivityToday')) {
+      el('btnActivityToday').style.background = 'transparent';
+      el('btnActivityToday').style.color = 'var(--navy)';
+    }
+    if (el('btnActivityRecent')) {
+      el('btnActivityRecent').style.background = 'transparent';
+      el('btnActivityRecent').style.color = 'var(--navy)';
+    }
+  }
+  refreshActivityLog();
+});
+
+safeAddListener('activityLogConsultant', 'change', refreshActivityLog);
+safeAddListener('btnActivityRefresh', 'click', refreshActivityLog);
+
+// 30초 주기 자동 갱신
+if (typeof window !== 'undefined' && typeof window.addEventListener === 'function') {
+  var actLogTimer = setInterval(function() {
+    if (currentViewMode === 'master' && typeof document !== 'undefined' && document.visibilityState === 'visible') {
+      refreshActivityLog();
+    }
+  }, 30000);
+  if (typeof actLogTimer.unref === 'function') actLogTimer.unref();
+}
+
 
 
 // ==========================================
@@ -4904,6 +5090,173 @@ async function doSignup() {
 window.toggleLoginSignup = toggleLoginSignup;
 window.doSignup = doSignup;
 
+
+// ==========================================
+// 활동 내역 모달 및 개별 컨설턴트 활동 내역 로직
+// ==========================================
+var modalActFilterMode_ = 'recent';
+
+function openActivityLogModal() {
+  var overlay = el('activityLogModalOverlay');
+  if (overlay) {
+    overlay.style.display = 'flex';
+    setModalActMode('recent');
+    refreshModalActivityLog();
+  }
+}
+
+function closeActivityLogModal() {
+  var overlay = el('activityLogModalOverlay');
+  if (overlay) overlay.style.display = 'none';
+}
+
+function setModalActMode(mode) {
+  modalActFilterMode_ = mode;
+  var btnRecent = el('btnModalActRecent');
+  var btnToday = el('btnModalActToday');
+  var dateInput = el('modalActDate');
+
+  if (mode === 'recent') {
+    if (btnRecent) { btnRecent.style.background = 'var(--blue)'; btnRecent.style.color = '#fff'; }
+    if (btnToday) { btnToday.style.background = 'transparent'; btnToday.style.color = 'var(--navy)'; }
+    if (dateInput) dateInput.value = '';
+  } else if (mode === 'today') {
+    if (btnToday) { btnToday.style.background = 'var(--blue)'; btnToday.style.color = '#fff'; }
+    if (btnRecent) { btnRecent.style.background = 'transparent'; btnRecent.style.color = 'var(--navy)'; }
+    if (dateInput) dateInput.value = todayStr();
+  } else if (mode === 'date') {
+    if (btnToday) { btnToday.style.background = 'transparent'; btnToday.style.color = 'var(--navy)'; }
+    if (btnRecent) { btnRecent.style.background = 'transparent'; btnRecent.style.color = 'var(--navy)'; }
+  }
+  refreshModalActivityLog();
+}
+
+async function refreshModalActivityLog() {
+  var tbody = el('modalActivityLogTbody');
+  var countTag = el('modalActivityLogCount');
+  if (!tbody || !db) return;
+
+  var consSel = el('modalActConsultant') ? el('modalActConsultant').value : 'all';
+  var actionSel = el('modalActAction') ? el('modalActAction').value : 'all';
+  var dateInput = el('modalActDate');
+
+  tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:20px;color:#9aa0a6;">활동 내역 불러오는 중...</td></tr>';
+
+  try {
+    var query = db.from('activity_logs').select('*');
+
+    if (consSel && consSel !== 'all') {
+      query = query.eq('consultant', consSel);
+    }
+    if (actionSel && actionSel !== 'all') {
+      query = query.eq('action', actionSel);
+    }
+
+    if (modalActFilterMode_ === 'date' || (dateInput && dateInput.value)) {
+      var dateStr = dateInput.value || todayStr();
+      var startIso = new Date(dateStr + 'T00:00:00+09:00').toISOString();
+      var endIso = new Date(dateStr + 'T23:59:59.999+09:00').toISOString();
+      query = query.gte('created_at', startIso).lte('created_at', endIso);
+    }
+
+    query = query.order('created_at', { ascending: false }).limit(100);
+
+    var res = await query;
+    if (res.error) throw res.error;
+
+    var logs = (res.data || []).filter(function(l) {
+      return l.action !== 'TA 접속' && l.action !== 'TA 로그인' && l.action !== 'TA 하트비트';
+    });
+
+    if (countTag) countTag.textContent = '(' + logs.length + '건)';
+
+    if (logs.length === 0) {
+      tbody.innerHTML = '<tr class="empty-row"><td colspan="5">해당 조건의 TA 안건 활동 내역이 없습니다.</td></tr>';
+      return;
+    }
+
+    tbody.innerHTML = logs.map(function(log) {
+      var badge = ACTIVITY_BADGE[log.action] || { bg: '#eef1f7', fg: 'var(--muted)' };
+      var timeFmt = formatLogDateTime(log.created_at);
+      var changesHtml = Array.isArray(log.changes)
+        ? log.changes.map(function(c) { return escapeHtml(c); }).join('<br>')
+        : (log.changes ? escapeHtml(JSON.stringify(log.changes)) : '-');
+
+      return '<tr>'
+        + '<td style="white-space:nowrap;color:var(--navy);font-size:12px;font-weight:600;">' + timeFmt + '</td>'
+        + '<td style="font-weight:700;color:' + (CONSULTANT_COLOR[log.consultant] || 'inherit') + ';white-space:nowrap;">'
+        + '<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:' + (CONSULTANT_COLOR[log.consultant] || '#2563eb') + ';margin-right:5px;"></span>'
+        + escapeHtml(log.consultant)
+        + '</td>'
+        + '<td style="text-align:center;white-space:nowrap;"><span class="badge" style="background:' + badge.bg + ';color:' + badge.fg + ';">' + escapeHtml(log.action) + '</span></td>'
+        + '<td style="min-width:170px;word-break:break-word;font-weight:700;">' + escapeHtml(log.company || '-') + '</td>'
+        + '<td style="font-size:12.5px;color:#334155;line-height:1.5;">' + changesHtml + '</td>'
+        + '</tr>';
+    }).join('');
+
+  } catch(e) {
+    console.error('모달 활동 내역 조회 오류:', e);
+    tbody.innerHTML = '<tr class="empty-row"><td colspan="5">활동 내역 조회 실패: ' + escapeHtml(e.message || String(e)) + '</td></tr>';
+  }
+}
+
+async function refreshAgentActivityLog(agentName) {
+  agentName = agentName || currentViewMode;
+  var tbody = el('agentActivityLogTbody');
+  var countTag = el('agentActivityLogCount');
+  var titleName = el('agentActivityTitleName');
+  if (titleName) titleName.textContent = agentName;
+  if (!tbody || !db) return;
+
+  tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;padding:16px;color:#9aa0a6;">활동 내역 불러오는 중...</td></tr>';
+
+  try {
+    var res = await db.from('activity_logs')
+      .select('*')
+      .eq('consultant', agentName)
+      .order('created_at', { ascending: false })
+      .limit(50);
+
+    if (res.error) throw res.error;
+
+    var logs = (res.data || []).filter(function(l) {
+      return l.action !== 'TA 접속' && l.action !== 'TA 로그인' && l.action !== 'TA 하트비트';
+    });
+
+    if (countTag) countTag.textContent = logs.length;
+
+    if (logs.length === 0) {
+      tbody.innerHTML = '<tr class="empty-row"><td colspan="4">최근 등록·수정·삭제한 안건 활동 내역이 없습니다.</td></tr>';
+      return;
+    }
+
+    tbody.innerHTML = logs.map(function(log) {
+      var badge = ACTIVITY_BADGE[log.action] || { bg: '#eef1f7', fg: 'var(--muted)' };
+      var timeFmt = formatLogDateTime(log.created_at);
+      var changesHtml = Array.isArray(log.changes)
+        ? log.changes.map(function(c) { return escapeHtml(c); }).join('<br>')
+        : (log.changes ? escapeHtml(JSON.stringify(log.changes)) : '-');
+
+      return '<tr>'
+        + '<td style="white-space:nowrap;color:var(--navy);font-size:12px;font-weight:600;">' + timeFmt + '</td>'
+        + '<td style="text-align:center;white-space:nowrap;"><span class="badge" style="background:' + badge.bg + ';color:' + badge.fg + ';">' + escapeHtml(log.action) + '</span></td>'
+        + '<td style="min-width:170px;word-break:break-word;font-weight:700;">' + escapeHtml(log.company || '-') + '</td>'
+        + '<td style="font-size:12.5px;color:#334155;line-height:1.5;">' + changesHtml + '</td>'
+        + '</tr>';
+    }).join('');
+
+  } catch(e) {
+    console.error('개별 활동 내역 조회 실패:', e);
+    tbody.innerHTML = '<tr class="empty-row"><td colspan="4">활동 내역을 불러오지 못했습니다.</td></tr>';
+  }
+}
+
+window.openActivityLogModal = openActivityLogModal;
+window.closeActivityLogModal = closeActivityLogModal;
+window.setModalActMode = setModalActMode;
+window.refreshModalActivityLog = refreshModalActivityLog;
+window.refreshAgentActivityLog = refreshAgentActivityLog;
+
 </script>
 
 <!-- ========================================== -->
@@ -4923,6 +5276,60 @@ window.doSignup = doSignup;
   </div>
 </div>
 
+
+
+<!-- ========================================== -->
+<!-- 📋 TA 안건 수정 및 등록 활동 내역 전용 모달 -->
+<!-- ========================================== -->
+<div class="modal-overlay" id="activityLogModalOverlay" style="display:none;z-index:99990;">
+  <div class="modal-card" style="max-width:920px;width:96%;max-height:85vh;overflow-y:auto;">
+    <button type="button" class="modal-close" onclick="closeActivityLogModal()">&times;</button>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:10px;">
+      <h3 style="margin:0;font-size:18px;font-weight:800;color:var(--navy);">📋 TA 안건 수정 및 등록 활동 내역</h3>
+      <span class="count-tag" id="modalActivityLogCount" style="background:#eff6ff;color:#1d4ed8;font-weight:700;"></span>
+    </div>
+    <!-- 모달 내 필터 바 -->
+    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:12px;background:#f8fafc;padding:10px 14px;border-radius:10px;border:1px solid var(--border);">
+      <div style="display:inline-flex;gap:4px;">
+        <button type="button" class="small" id="btnModalActRecent" onclick="setModalActMode('recent')" style="background:var(--blue);color:#fff;font-weight:700;border:none;padding:6px 14px;border-radius:6px;cursor:pointer;">최근 전체 (100건)</button>
+        <button type="button" class="small secondary" id="btnModalActToday" onclick="setModalActMode('today')" style="background:transparent;color:var(--navy);font-weight:700;border:none;padding:6px 14px;border-radius:6px;cursor:pointer;">오늘</button>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+        <select id="modalActConsultant" onchange="refreshModalActivityLog()" style="padding:6px 10px;border:1.5px solid var(--border);border-radius:6px;font-size:13px;font-weight:600;background:#fff;color:var(--navy);">
+          <option value="all">전체 컨설턴트</option>
+          <option value="최영국">최영국</option>
+          <option value="박광춘">박광춘</option>
+          <option value="이수열">이수열</option>
+          <option value="정문재">정문재</option>
+          <option value="임영민">임영민</option>
+          <option value="지사장">지사장</option>
+        </select>
+        <select id="modalActAction" onchange="refreshModalActivityLog()" style="padding:6px 10px;border:1.5px solid var(--border);border-radius:6px;font-size:13px;font-weight:600;background:#fff;color:var(--navy);">
+          <option value="all">전체 구분</option>
+          <option value="신규 등록">신규 등록</option>
+          <option value="수정">수정</option>
+          <option value="삭제">삭제</option>
+          <option value="목표확정">목표확정</option>
+        </select>
+        <input type="date" id="modalActDate" onchange="setModalActMode('date')" style="padding:6px 10px;border:1.5px solid var(--border);border-radius:6px;font-size:13px;">
+        <button type="button" class="small" onclick="refreshModalActivityLog()" style="padding:6px 12px;font-weight:700;">🔄 새로고침</button>
+      </div>
+    </div>
+    <!-- 모달 내 테이블 -->
+    <div class="table-scroll" style="max-height:55vh;">
+      <table class="lead-table" style="width:100%;">
+        <thead><tr>
+          <th style="width:125px;">일시 (KST)</th>
+          <th style="width:90px;">컨설턴트</th>
+          <th style="width:85px;text-align:center;">구분</th>
+          <th style="min-width:170px;">서비스제공처명</th>
+          <th>변경 내용</th>
+        </tr></thead>
+        <tbody id="modalActivityLogTbody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
 
 </body>
 </html>
