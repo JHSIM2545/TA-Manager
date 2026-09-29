@@ -790,9 +790,9 @@
     </div>
 
     <div class="topbar-right">
-      <button type="button" id="btnOpenActivityModal" class="small" onclick="openActivityLogModal()" style="background:#f1f5f9;color:var(--navy);border:1px solid #cbd5e1;font-weight:700;">📋 활동 내역</button>
+      <button type="button" id="btnOpenActivityModal" class="small" onclick="openActivityLogModal()" style="background:#f1f5f9;color:var(--navy);border:1px solid #cbd5e1;font-weight:700;">📋 변경 이력</button>
       <button type="button" id="btnUserManage" class="small" onclick="openUserManageModal()" style="background:#e6f4ea;color:#137333;border:1px solid #ceead6;font-weight:700;display:none;">👥 사용자 관리</button>
-      <button type="button" id="btnTopbarTarget" class="small" onclick="openTargetModal()" style="background:#2563eb;color:#fff;display:none;">🎯 목표 설정</button>
+      <button type="button" id="btnTopbarTarget" class="small" onclick="openTargetModal()" style="display:none;">🎯 목표 설정</button>
       <button type="button" id="btnNoticeManage" class="small">공지사항 관리</button>
       <button type="button" id="btnLogout" class="small secondary">로그아웃</button>
       <div id="connStatus" style="display:none;"></div>
@@ -810,9 +810,9 @@
     <!-- VIEW A: 지사장 통합관제 대시보드 뷰          -->
     <!-- ========================================== -->
     <div id="viewMaster">
-      <!-- 지사 전체 이달 목표 (사 전체 목표) -->
+      <!-- 지사 전체 당월 목표 (영업일보 확정 연동) -->
       <div id="masterMonthlyTargetBadge" style="margin-bottom:12px;font-size:13.5px;font-weight:700;color:#1e3a8a;background:#eff6ff;padding:8px 16px;border-radius:8px;border:1px solid #bfdbfe;display:flex;align-items:center;gap:8px;">
-        🎯 <strong>사 전체 이달 목표 (일반알람)</strong>: 2,500,000원 <span style="font-size:12px;font-weight:normal;color:#475569;">(사 전체 총 목표: 3,739,000원)</span>
+        🎯 <strong>지사 전체 9월 목표</strong>: 3,739,000원
       </div>
       <!-- 상단 카테고리 필터 (전체 TA 조회 테이블과도 100% 동기화) -->
       <div class="filters" id="categoryFilters">
@@ -828,8 +828,8 @@
         <div class="kpi-card"><div class="label">진행중 TA</div><div class="value" id="kpiPipelineAmount">0원</div><div class="sub" id="kpiPipelineCount">0건</div></div>
         <div class="kpi-card"><div class="label">이달 수주 TA</div><div class="value" id="kpiMonthWonAmount">0원</div><div class="sub" id="kpiMonthWonCount">0건</div></div>
         <div class="kpi-card"><div class="label">실패 TA</div><div class="value" id="kpiFailedAmount">0원</div><div class="sub" id="kpiFailedCount">0건</div></div>
-        <div class="kpi-card"><div class="label">수주 달성율 (사 전체)</div><div class="value" id="kpiAchieveRate">-</div><div class="sub" id="kpiAchieveSub"></div></div>
-        <div class="kpi-card"><div class="label">보유 TA율 (사 전체)</div><div class="value" id="kpiHoldRate">-</div><div class="sub" id="kpiHoldSub"></div></div>
+        <div class="kpi-card"><div class="label">수주 달성율 (지사 전체)</div><div class="value" id="kpiAchieveRate">-</div><div class="sub" id="kpiAchieveSub"></div></div>
+        <div class="kpi-card"><div class="label">보유 TA율 (지사 전체)</div><div class="value" id="kpiHoldRate">-</div><div class="sub" id="kpiHoldSub"></div></div>
         <div class="kpi-card"><div class="label">TA 수주율</div><div class="value" id="kpiWinRate">-</div><div class="sub" id="kpiWinSub"></div></div>
         <div class="kpi-card"><div class="label">수주 실패율</div><div class="value" id="kpiFailRate">-</div><div class="sub" id="kpiFailSub"></div></div>
       </section>
@@ -849,43 +849,6 @@
       </div>
 
       <!-- 변경 이력 (Activity Log) -->
-      <div class="panel">
-        <div class="panel-toolbar" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:12px;">
-          <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
-            <h2 style="margin:0;">변경 이력 <span class="count-tag" id="activityLogCount"></span></h2>
-            <div style="display:inline-flex;gap:4px;background:#f1f5f9;padding:3px;border-radius:8px;border:1px solid var(--border);">
-              <button type="button" class="small" id="btnActivityRecent" style="background:var(--blue);color:#fff;font-weight:700;border-radius:6px;padding:5px 12px;border:none;cursor:pointer;">최근 전체 (100건)</button>
-              <button type="button" class="small secondary" id="btnActivityToday" style="background:transparent;color:var(--navy);font-weight:700;border-radius:6px;padding:5px 12px;border:none;cursor:pointer;">오늘</button>
-            </div>
-          </div>
-          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
-            <select id="activityLogConsultant" style="padding:7px 10px;border:1px solid var(--border);border-radius:8px;font-size:13px;font-weight:600;color:var(--navy);background:#fff;">
-              <option value="all">전체 컨설턴트</option>
-              <option value="최영국">최영국</option>
-              <option value="박광춘">박광춘</option>
-              <option value="이수열">이수열</option>
-              <option value="정문재">정문재</option>
-              <option value="임영민">임영민</option>
-            </select>
-            <input type="date" id="activityLogDate" style="padding:7px 10px;border:1px solid var(--border);border-radius:8px;font-size:13px;font-family:inherit;">
-            <button type="button" class="small" id="btnActivityRefresh" style="padding:7px 12px;font-weight:700;">🔄 새로고침</button>
-          </div>
-        </div>
-        <p style="font-size:12px;color:var(--muted);margin:-4px 0 12px;">컨설턴트가 TA를 신규 등록/수정/삭제할 때마다 실시간으로 안전하게 기록됩니다. (30초마다 자동 갱신)</p>
-        <div class="table-scroll" style="max-height:420px;">
-          <table class="lead-table">
-            <thead><tr>
-              <th style="width:120px;">일시 (KST)</th>
-              <th style="width:90px;">컨설턴트</th>
-              <th style="width:85px;text-align:center;">구분</th>
-              <th style="min-width:170px;">서비스제공처명</th>
-              <th>변경 내용</th>
-            </tr></thead>
-            <tbody id="activityLogTbody"></tbody>
-          </table>
-        </div>
-      </div>
-
       <!-- 차트: 바차트 & 도넛차트 -->
       <div class="panel">
         <div class="charts-grid">
@@ -907,7 +870,7 @@
       <div class="panel">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px;">
           <h2>컨설턴트별 달성현황 <span class="count-tag" id="targetMonthLabel"></span> <span class="count-tag" id="targetCategoryLabel" style="background:#e0e7ff;color:#3730a3;"></span></h2>
-          <button type="button" class="small" id="btnOpenTargetModal" onclick="openTargetModal()" style="background:var(--blue);color:#fff;font-weight:700;display:inline-flex;align-items:center;gap:6px;">
+          <button type="button" class="small" id="btnOpenTargetModal" onclick="openTargetModal()" style="display:none;" style="background:var(--blue);color:#fff;font-weight:700;display:inline-flex;align-items:center;gap:6px;">
             🎯 월간 목표 설정 / 배분
           </button>
         </div>
@@ -2084,27 +2047,49 @@ function parseFormattedNumber(val) {
   return Number(String(val || '').replace(/[^0-9.-]/g, '')) || 0;
 }
 
-// 사 전체 및 컨설턴트별 기본 확정 목표 (2026-09 기준 초기값 / DB 미설정 시 폴백)
+// 영업일보 연동 컨설턴트별 확정 목표 (영업일보 포털 targets 데이터 100% 일치)
+// 지사 전체 총 목표: 3,739,000원 (최영국 1,121,000 / 이수열 935,000 / 박광춘 748,000 / 임영민 561,000 / 정문재 374,000)
 const DEFAULT_TARGET_AMOUNTS = {
   '일반알람': {
     total: 2500000,
-    rates: { '최영국': 25, '박광춘': 20, '이수열': 25, '정문재': 15, '임영민': 15 },
-    amounts: { '최영국': 625000, '박광춘': 500000, '이수열': 625000, '정문재': 375000, '임영민': 375000 }
+    rates: { '최영국': 30, '이수열': 25, '박광춘': 20, '임영민': 15, '정문재': 10 },
+    amounts: { '최영국': 750000, '이수열': 625000, '박광춘': 500000, '임영민': 375000, '정문재': 250000 }
   },
   '디지털(정보보안)': {
     total: 700000,
-    rates: { '최영국': 25, '박광춘': 20, '이수열': 25, '정문재': 15, '임영민': 15 },
-    amounts: { '최영국': 175000, '박광춘': 140000, '이수열': 175000, '정문재': 105000, '임영민': 105000 }
+    rates: { '최영국': 30, '이수열': 25, '박광춘': 20, '임영민': 15, '정문재': 10 },
+    amounts: { '최영국': 210000, '이수열': 175000, '박광춘': 140000, '임영민': 105000, '정문재': 70000 }
   },
   '안전상품': {
     total: 539000,
-    rates: { '최영국': 25, '박광춘': 20, '이수열': 25, '정문재': 15, '임영민': 15 },
-    amounts: { '최영국': 135000, '박광춘': 108000, '이수열': 135000, '정문재': 81000, '임영민': 80000 }
+    rates: { '최영국': 30, '이수열': 25, '박광춘': 20, '임영민': 15, '정문재': 10 },
+    amounts: { '최영국': 161000, '이수열': 135000, '박광춘': 108000, '임영민': 81000, '정문재': 54000 }
+  }
+};
+
+// 영업일보 기준 컨설턴트별 월별 확정 총 목표 매핑 테이블
+const SALES_DAILY_CONSULTANT_TARGETS = {
+  '2026-09': {
+    'total': 3739000,
+    '최영국': 1121000,
+    '이수열': 935000,
+    '박광춘': 748000,
+    '임영민': 561000,
+    '정문재': 374000
+  },
+  '2026-08': {
+    '최영국': 849640,
+    '이수열': 849640,
+    '박광춘': 849640,
+    '정문재': 849640,
+    '임영민': 0
   }
 };
 
 function getConsultantTarget(consultant, month, category) {
   month = month || currentMonthStr();
+  
+  // 1) DB(Supabase) targets 테이블에 저장된 목표가 있는 경우 우선 적용
   if (TARGETS.targets && TARGETS.targets[consultant] && TARGETS.targets[consultant][month]) {
     const mData = TARGETS.targets[consultant][month];
     if (!category || category === 'all') {
@@ -2120,8 +2105,11 @@ function getConsultantTarget(consultant, month, category) {
     }
   }
 
-  // DB에 해당 월 목표가 없는 경우 사 전체 기본 확정 목표 반영
+  // 2) 영업일보 확정 목표 연동 (전체 카테고리 기준)
   if (!category || category === 'all') {
+    if (SALES_DAILY_CONSULTANT_TARGETS[month] && SALES_DAILY_CONSULTANT_TARGETS[month][consultant] !== undefined) {
+      return SALES_DAILY_CONSULTANT_TARGETS[month][consultant];
+    }
     let sum = 0;
     PRODUCT_CATEGORIES.forEach(cat => {
       const def = DEFAULT_TARGET_AMOUNTS[cat];
@@ -2129,6 +2117,8 @@ function getConsultantTarget(consultant, month, category) {
     });
     return sum;
   }
+
+  // 3) 특정 상품 필터링 시 해당 상품 영업일보 배분액 적용
   const def = DEFAULT_TARGET_AMOUNTS[category];
   return (def && def.amounts && def.amounts[consultant]) ? def.amounts[consultant] : 0;
 }
@@ -2174,11 +2164,12 @@ function updateUIVisibilityByRole() {
   if (el('btnNoticeManage')) {
     el('btnNoticeManage').style.display = master ? 'inline-block' : 'none';
   }
+  // 영업일보 연동으로 별도 입력 불필요: 목표 설정 수동 버튼 숨김
   if (el('btnTopbarTarget')) {
-    el('btnTopbarTarget').style.display = master ? 'inline-block' : 'none';
+    el('btnTopbarTarget').style.display = 'none';
   }
   if (el('btnOpenTargetModal')) {
-    el('btnOpenTargetModal').style.display = master ? 'inline-flex' : 'none';
+    el('btnOpenTargetModal').style.display = 'none';
   }
   if (el('btnOpenActivityModal')) {
     el('btnOpenActivityModal').style.display = master ? 'inline-block' : 'none';
@@ -2428,29 +2419,17 @@ function renderKPI() {
 
   el('kpiAchieveRate').textContent = m.achievementRate === null ? '목표 미설정' : m.achievementRate + '%';
 
-  // 사 전체 목표 계산
-  const alarmTotal = getTotalTarget(month, '일반알람');
-  const digiTotal = getTotalTarget(month, '디지털(정보보안)');
-  const safeTotal = getTotalTarget(month, '안전상품');
-  const grandTotal = alarmTotal + digiTotal + safeTotal;
+  // 영업일보 연동 지사 전체 목표 계산
+  const targetMonthStr = month || currentMonthStr();
+  const monthNum = parseInt(targetMonthStr.split('-')[1], 10);
+  const totalBranchTarget = getTotalTarget(month, activeDashboardCategory);
 
   if (el('masterMonthlyTargetBadge')) {
-    if (activeDashboardCategory === 'all') {
-      el('masterMonthlyTargetBadge').innerHTML = `🎯 <strong>사 전체 이달 목표</strong>: 총 ${formatCurrency(grandTotal)} (일반알람 ${formatCurrency(alarmTotal)} · 디지털 ${formatCurrency(digiTotal)} · 안전상품 ${formatCurrency(safeTotal)})`;
-    } else if (activeDashboardCategory === '일반알람') {
-      el('masterMonthlyTargetBadge').innerHTML = `🎯 <strong>사 전체 이달 목표 (일반알람)</strong>: ${formatCurrency(alarmTotal)} <span style="font-size:12px;font-weight:normal;color:#475569;">(사 전체 총 목표: ${formatCurrency(grandTotal)})</span>`;
-    } else if (activeDashboardCategory === '디지털(정보보안)') {
-      el('masterMonthlyTargetBadge').innerHTML = `🎯 <strong>사 전체 이달 목표 (디지털)</strong>: ${formatCurrency(digiTotal)} <span style="font-size:12px;font-weight:normal;color:#475569;">(사 전체 총 목표: ${formatCurrency(grandTotal)})</span>`;
-    } else if (activeDashboardCategory === '안전상품') {
-      el('masterMonthlyTargetBadge').innerHTML = `🎯 <strong>사 전체 이달 목표 (안전상품)</strong>: ${formatCurrency(safeTotal)} <span style="font-size:12px;font-weight:normal;color:#475569;">(사 전체 총 목표: ${formatCurrency(grandTotal)})</span>`;
-    }
+    // 요구사항: "지사 전체 9월 목표" 로 수정, ()괄호 안의 문구는 전체 삭제 (합계 불필요)
+    el('masterMonthlyTargetBadge').innerHTML = `🎯 <strong>지사 전체 ${monthNum}월 목표</strong>: ${formatCurrency(totalBranchTarget)}`;
   }
 
-  if (activeDashboardCategory === 'all') {
-    el('kpiAchieveSub').textContent = `사 전체 목표 ${formatCurrency(grandTotal)} (알람 ${formatCurrency(alarmTotal)} · 디지털 ${formatCurrency(digiTotal)} · 안전 ${formatCurrency(safeTotal)})`;
-  } else {
-    el('kpiAchieveSub').textContent = totalTarget > 0 ? `사 전체 목표 ${formatCurrency(totalTarget)}` : '목표 미설정';
-  }
+  el('kpiAchieveSub').textContent = totalBranchTarget > 0 ? `지사 전체 목표 ${formatCurrency(totalBranchTarget)}` : '목표 미설정';
 
   if (el('targetCategoryLabel')) {
     el('targetCategoryLabel').textContent = activeDashboardCategory === 'all' ? '전체 상품 합계' : activeDashboardCategory;
@@ -2599,7 +2578,7 @@ function renderTargets() {
   const totalRowHtml = `
     <tr style="background:#f8fafc;font-weight:800;border-top:2px solid var(--navy);border-bottom:2px solid var(--navy);">
       <td style="font-weight:800;color:var(--navy);white-space:nowrap;">
-        🏢 <strong>사 전체 합계</strong>
+        🏢 <strong>지사 전체 합계</strong>
       </td>
       <td style="white-space:nowrap;color:var(--navy);">${formatCurrency(totalWonAmt)} <span class="count-tag" style="background:#dbeafe;color:#1e40af;">(${totalWonCount}건)</span></td>
       <td style="white-space:nowrap;">
@@ -3408,9 +3387,10 @@ function initAgentView(agentName) {
 // 3. 지사장 공지사항 팝업 표시 (컨설턴트 로그인 시 100% 팝업)
 async function checkAndShowAgentNotice() {
   // 로그인 성공 전에는 공지사항이 절대 노출되지 않도록 엄격 차단
-  if (!currentUser) return;
+  var u = (typeof currentUser !== 'undefined' && currentUser) ? currentUser : (typeof window !== 'undefined' ? window.currentUser : null);
+  if (!u) return;
   const loginOverlay = el('loginOverlay');
-  if (loginOverlay && loginOverlay.style.display !== 'none') return;
+  if (loginOverlay && loginOverlay.style && loginOverlay.style.display !== 'none') return;
   try {
     let noticeText = '';
     let noticeDate = '';
@@ -3443,12 +3423,21 @@ async function checkAndShowAgentNotice() {
 
 
 
+    // 3) 오늘 하루 보지 않기 체크 여부 검증 (당일 자정까지 팝업 차단)
+    const todayStr = new Date().toISOString().slice(0, 10);
+    const dismissedDate = localStorage.getItem('ta_notice_dismiss_date');
+    if (dismissedDate === todayStr) {
+      return; // 오늘 하루 보지 않기가 설정되어 있으면 팝업을 띄우지 않음!
+    }
+
     // 4) 모달 엘리먼트에 내용 주입 및 화면 전면 팝업 표시
     const overlay = el('agentNoticeModalOverlay');
     const contentEl = el('agentNoticeContent');
     const dateEl = el('agentNoticeDate');
+    const chkDismiss = el('chkNoticeDismissToday');
 
     if (overlay && contentEl) {
+      if (chkDismiss) chkDismiss.checked = false;
       contentEl.textContent = noticeText;
       if (dateEl) dateEl.textContent = noticeDate;
       overlay.style.display = 'flex';
@@ -3462,6 +3451,12 @@ async function checkAndShowAgentNotice() {
 window.checkAndShowAgentNotice = checkAndShowAgentNotice;
 
 function closeAgentNoticeModal() {
+  // 오늘 하루 보지 않기 체크 상태 확인 및 영구 저장
+  const chkDismiss = el('chkNoticeDismissToday');
+  if (chkDismiss && chkDismiss.checked) {
+    const todayStr = new Date().toISOString().slice(0, 10);
+    localStorage.setItem('ta_notice_dismiss_date', todayStr);
+  }
   const modal = el('agentNoticeModalOverlay');
   if (modal) {
     modal.style.display = 'none';
@@ -4316,9 +4311,9 @@ async function initApp(initialMode) {
   document.getElementById('mainApp').style.display = 'block';
 
   el('topbarDateValue').textContent = todayLabel();
-  el('topbarWorkdays').textContent = '이번달 잔여 영업일 : ' + workingDaysLeftInMonth() + '일 (오늘 포함)';
+  el('topbarWorkdays').textContent = '이번달 잔여 영업일 : ' + workingDaysLeftInMonth() + '일';
   el('fConsultant').innerHTML = '<option value="all">전체 컨설턴트</option>' + CONSULTANTS.map(n => `<option value="${n}">${n}</option>`).join('');
-  el('activityLogDate').value = todayStr();
+  if (el('activityLogDate')) el('activityLogDate').value = todayStr();
 
   // 현재 TA 조회의 기본값을 이달(당월)로 설정
   el('fMonth').value = currentMonthStr();
