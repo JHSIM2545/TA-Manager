@@ -1175,29 +1175,7 @@
         </div>
       </div>
     
-      <!-- 5. 컨설턴트 본인 최근 활동 내역 패널 -->
-      <div class="panel" style="margin-top:16px;">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:10px;">
-          <h2 style="font-size:17px;font-weight:800;color:var(--navy);margin:0;">
-            📋 <span id="agentActivityTitleName"></span> 최근 활동 내역 (<span id="agentActivityLogCount">0</span>건)
-          </h2>
-          <button type="button" class="small secondary" onclick="refreshAgentActivityLog()" style="background:#eef1f7;color:var(--navy);font-weight:700;border-radius:6px;padding:6px 12px;cursor:pointer;">
-            🔄 새로고침
-          </button>
-        </div>
-        <p style="font-size:12px;color:var(--muted);margin:-6px 0 12px;">안건 신규 등록, 수정, 삭제 시 실시간으로 기록됩니다.</p>
-        <div class="table-scroll" style="max-height:300px;">
-          <table class="lead-table">
-            <thead><tr>
-              <th style="width:120px;">일시 (KST)</th>
-              <th style="width:85px;text-align:center;">구분</th>
-              <th style="min-width:170px;">서비스제공처명</th>
-              <th>변경 내용</th>
-            </tr></thead>
-            <tbody id="agentActivityLogTbody"></tbody>
-          </table>
-        </div>
-      </div>
+
 
     </div>
   </main>
@@ -1594,6 +1572,27 @@ function generateUUID() {
   }
   return 'id_' + Date.now() + '_' + Math.random().toString(36).substring(2, 11);
 }
+
+
+// ==========================================
+// TA 관리 포털 접근 권한 검증 헬퍼 (컨설턴트 및 지사관리자만 허용)
+// ==========================================
+function isAuthorizedTAUser(user) {
+  if (!user) return false;
+  var name = (user.name || '').trim();
+  var job = (user.job || '').trim();
+
+  // 지사장(심정환)은 무조건 승인
+  if (name === '심정환') return true;
+
+  // 지사관리자 또는 컨설턴트만 접속 가능
+  if (job === '지사관리자') return true;
+  if (job === '컨설턴트' || job === '컨설턴트(영업)' || job.indexOf('컨설턴트') !== -1) return true;
+  if (typeof CONSULTANTS !== 'undefined' && CONSULTANTS.includes(name)) return true;
+
+  return false;
+}
+window.isAuthorizedTAUser = isAuthorizedTAUser;
 
 const el = id => document.getElementById(id);
 
@@ -2155,8 +2154,9 @@ function getConsultantRate(consultant, month, category) {
 }
 
 function isMasterUser() {
-  if (!currentUser) return false;
-  return currentUser.role === 'master' || currentUser.name === '심정환' || (currentUser.job && currentUser.job.includes('관리자'));
+  var u = (typeof currentUser !== 'undefined' && currentUser) ? currentUser : (typeof window !== 'undefined' ? window.currentUser : null);
+  if (!u) return false;
+  return u.name === '심정환' || u.job === '지사관리자' || u.role === 'master';
 }
 
 function updateUIVisibilityByRole() {
@@ -2179,6 +2179,12 @@ function updateUIVisibilityByRole() {
   }
   if (el('btnOpenTargetModal')) {
     el('btnOpenTargetModal').style.display = master ? 'inline-flex' : 'none';
+  }
+  if (el('btnOpenActivityModal')) {
+    el('btnOpenActivityModal').style.display = master ? 'inline-block' : 'none';
+  }
+  if (el('btnOpenActivityModal')) {
+    el('btnOpenActivityModal').style.display = master ? 'inline-block' : 'none';
   }
 
   // 3. 개별 컨설턴트 화면의 "지사장 대시보드로 돌아가기" 버튼 (개별 컨설턴트에게는 절대 미노출)
@@ -2332,17 +2338,31 @@ async function loadTargetsFromSupabase(month) {
 async function logActivity(consultant, action, company, leadId, changes) {
   try {
     var logId = generateUUID();
-    await db.from('activity_logs').insert([{
+    var cleanAction = String(action || '수정').trim();
+    if (!cleanAction.startsWith('TA ')) {
+      cleanAction = 'TA ' + cleanAction;
+    }
+    var cleanChanges = Array.isArray(changes) ? changes : [String(changes || '')];
+    // 다른 시스템과 혼선되지 않도록 [TA] 메타데이터 보장
+    cleanChanges = cleanChanges.map(function(c) {
+      return (typeof c === 'string' && !c.startsWith('[TA]')) ? ('[TA] ' + c) : c;
+    });
+
+    var res = await db.from('activity_logs').insert([{
       id: logId,
-      consultant: String(consultant || '시스템').slice(0, 20),
-      action: String(action || '기타').slice(0, 50),
-      company: String(company || '').slice(0, 200),
-      lead_id: String(leadId || '').slice(0, 50),
-      changes: changes || [],
+      consultant: String(consultant || '시스템').trim().slice(0, 20),
+      action: cleanAction.slice(0, 50),
+      company: String(company || '').trim().slice(0, 200),
+      lead_id: String(leadId || '').trim().slice(0, 50),
+      changes: cleanChanges,
       created_at: new Date().toISOString()
     }]);
+
+    if (res && res.error) {
+      console.warn('활동 이력 DB 저장 오류:', res.error);
+    }
   } catch (e) {
-    console.error('이력 기록 실패:', e);
+    console.warn('활동 이력 기록 실패:', e);
   }
 }
 
@@ -3028,6 +3048,54 @@ async function deleteLeadMaster(id, company, consultant) {
   }
 }
 
+
+// ==========================================
+// TA 관리 시스템 고유 안건 변경이력 판별 필터 (타 시스템 활동내역 100% 배제)
+// ==========================================
+function isTALeadActivityLog(log) {
+  if (!log) return false;
+  var action = String(log.action || '').trim();
+
+  // 1. 접속, 로그인, 하트비트 로그는 안건 변경이력이 아니므로 배제
+  if (action === 'TA 접속' || action === 'TA 로그인' || action === 'TA 하트비트' || action.indexOf('접속') !== -1 || action.indexOf('로그인') !== -1) {
+    return false;
+  }
+
+  // 2. 다른 시스템(영업일보 포털 등)의 활동내역 엄격 차단
+  // 영업일보는 changes 객체에 scope('수주개시', '해약중지', '인상인하', '재개시', '상품일보' 등)를 포함함
+  if (log.changes && typeof log.changes === 'object' && !Array.isArray(log.changes)) {
+    if (log.changes.scope || log.changes.field || log.changes.contractNo) {
+      return false; // 영업일보 활동내역 완벽 차단!
+    }
+    if (log.changes.system && log.changes.system !== 'TA') {
+      return false;
+    }
+  }
+
+  // 3. TA 시스템 전용 액션 확인 ('TA 신규 등록', 'TA 수정', 'TA 삭제', 'TA 목표확정')
+  if (action.startsWith('TA ')) {
+    return true;
+  }
+
+  // 4. 레거시 일반 액션('신규 등록', '수정', '삭제', '목표확정')의 경우 내용 기반 TA 검증
+  if (action === '신규 등록' || action === '수정' || action === '삭제' || action === '목표확정') {
+    if (Array.isArray(log.changes)) {
+      var joined = log.changes.join(' ');
+      // 영업일보 전용 항목이 포함된 경우 배제
+      if (joined.indexOf('수주개시') !== -1 || joined.indexOf('해약중지') !== -1 || joined.indexOf('인상인하') !== -1 || joined.indexOf('재개시') !== -1 || joined.indexOf('담당차량') !== -1) {
+        return false;
+      }
+      // TA 안건 관련 키워드가 있는 경우만 표출
+      if (joined.indexOf('[TA]') !== -1 || joined.indexOf('용역료') !== -1 || joined.indexOf('서비스제공처명') !== -1 || joined.indexOf('영업단계') !== -1 || joined.indexOf('계약예정일') !== -1 || joined.indexOf('수주확도') !== -1 || joined.indexOf('목표 설정') !== -1) {
+        return true;
+      }
+    }
+  }
+
+  return false;
+}
+window.isTALeadActivityLog = isTALeadActivityLog;
+
 const ACTIVITY_BADGE = {
   '신규 등록': { bg: '#dbeafe', fg: '#2563eb' },
   '수정': { bg: '#fef3c7', fg: '#b45309' },
@@ -3098,7 +3166,8 @@ async function refreshActivityLog() {
     const { data: logs, error } = await query;
     if (error) throw error;
 
-    const list = logs || [];
+    // 다른 시스템 활동내역을 완전 배제하고 오직 TA 관리 안건 변경이력만 엄격 선별
+    const list = (logs || []).filter(isTALeadActivityLog);
     if (countTag) {
       countTag.textContent = '(' + list.length + '건)';
     }
@@ -3112,7 +3181,8 @@ async function refreshActivityLog() {
     }
 
     tbody.innerHTML = list.map(log => {
-      const badge = ACTIVITY_BADGE[log.action] || { bg: '#eef1f7', fg: 'var(--muted)' };
+      var cleanAct = log.action.replace(/^TA\s+/, '');
+      const badge = ACTIVITY_BADGE[cleanAct] || ACTIVITY_BADGE[log.action] || { bg: '#eef1f7', fg: 'var(--muted)' };
       const timeFmt = formatLogDateTime(log.created_at);
       const changesHtml = Array.isArray(log.changes)
         ? log.changes.map(c => escapeHtml(c)).join('<br>')
@@ -3125,7 +3195,7 @@ async function refreshActivityLog() {
             <span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${CONSULTANT_COLOR[log.consultant] || '#2563eb'};margin-right:5px;"></span>
             ${escapeHtml(log.consultant)}
           </td>
-          <td style="text-align:center;white-space:nowrap;"><span class="badge" style="background:${badge.bg};color:${badge.fg};">${escapeHtml(log.action)}</span></td>
+          <td style="text-align:center;white-space:nowrap;"><span class="badge" style="background:${badge.bg};color:${badge.fg};">${escapeHtml(cleanAct)}</span></td>
           <td style="min-width:170px;word-break:break-word;font-weight:700;">${escapeHtml(log.company) || '-'}</td>
           <td style="font-size:12.5px;color:#334155;line-height:1.5;">${changesHtml}</td>
         </tr>
@@ -3294,7 +3364,7 @@ function setAgentGlobalProduct(prod) {
 
   // 8) 내 TA 목록 테이블 렌더링
   renderAgentLeadTable(agentName);
-  refreshAgentActivityLog(agentName);
+  
 }
 window.setAgentGlobalProduct = setAgentGlobalProduct;
 
@@ -4363,6 +4433,12 @@ function restoreUserSession() {
     };
     window.currentUser = currentUser;
 
+    // 세션 복원 시 직무 권한 재검증
+    if (!isAuthorizedTAUser(currentUser)) {
+      clearUserSession();
+      return false;
+    }
+
     sessionStorage.setItem('s1_user', JSON.stringify(currentUser));
 
     // 보던 화면 그대로 복원 (화면 유지 기능)
@@ -4412,7 +4488,7 @@ function doLogout() {
 }
 
 window.addEventListener('DOMContentLoaded', function() {
-  // --- DailySales 포털 SSO(Single Sign-On) 자동 로그인 감지 ---
+  // --- 영업일보 / DailySales 포털 SSO 접속 감지 및 권한 엄격 통제 ---
   try {
     var urlParams = (typeof window !== 'undefined' && window.location && window.location.search) ? new URLSearchParams(window.location.search) : new URLSearchParams('');
     var ssoFlag = (urlParams.get('sso') === '1' || urlParams.get('master') !== null || urlParams.get('agent') !== null);
@@ -4423,17 +4499,44 @@ window.addEventListener('DOMContentLoaded', function() {
 
     if (ssoFlag && (ssoName || ssoPhone)) {
       var ssoUser = {
-        name: ssoName || '지사장',
-        phone: ssoPhone || '01027042545',
-        job: ssoJob || (ssoRole === 'master' ? '본사관리자' : '컨설턴트'),
-        role: ssoRole
+        name: ssoName,
+        phone: ssoPhone,
+        job: ssoJob || (ssoRole === 'master' ? '지사관리자' : '컨설턴트'),
+        role: (ssoRole === 'master' || ssoJob === '지사관리자' || ssoName === '심정환') ? 'master' : 'user'
       };
-      saveUserSession(ssoUser, ssoRole === 'master' ? 'master' : ssoName);
+
+      // 컨설턴트 및 지사관리자가 아닌 경우 접속 원천 차단
+      if (!isAuthorizedTAUser(ssoUser)) {
+        clearUserSession();
+        try { localStorage.removeItem('S1_TA_SSO_SESSION'); } catch(e) {}
+        if (window.history && window.history.replaceState) {
+          window.history.replaceState({}, document.title, window.location.pathname);
+        }
+        alert('시스템 접속 권한이 없습니다\n담당자에게 문의해 주세요');
+        var msgEl = el('loginMsg');
+        if (msgEl) {
+          msgEl.innerHTML = '시스템 접속 권한이 없습니다<br>담당자에게 문의해 주세요';
+          msgEl.style.color = 'var(--red)';
+        }
+        var overlay = el('loginOverlay');
+        if (overlay) overlay.style.display = 'flex';
+        var app = el('mainApp');
+        if (app) app.style.display = 'none';
+        return;
+      }
+
+      saveUserSession(ssoUser, ssoUser.role === 'master' ? 'master' : ssoName);
     } else {
       var ssoStorage = localStorage.getItem('S1_TA_SSO_SESSION');
       if (ssoStorage) {
         var ssoData = JSON.parse(ssoStorage);
         if (ssoData && ssoData.phone && ssoData.name) {
+          if (!isAuthorizedTAUser(ssoData)) {
+            try { localStorage.removeItem('S1_TA_SSO_SESSION'); } catch(e) {}
+            clearUserSession();
+            alert('시스템 접속 권한이 없습니다\n담당자에게 문의해 주세요');
+            return;
+          }
           saveUserSession(ssoData, ssoData.screen || (ssoData.role === 'master' ? 'master' : ssoData.name));
         }
       }
@@ -5118,6 +5221,10 @@ window.doSignup = doSignup;
 var modalActFilterMode_ = 'recent';
 
 function openActivityLogModal() {
+  if (!isMasterUser()) {
+    alert('지사관리자만 변경이력을 조회할 수 있습니다.');
+    return;
+  }
   var overlay = el('activityLogModalOverlay');
   if (overlay) {
     overlay.style.display = 'flex';
@@ -5185,9 +5292,13 @@ async function refreshModalActivityLog() {
     var res = await query;
     if (res.error) throw res.error;
 
-    var logs = (res.data || []).filter(function(l) {
-      return l.action !== 'TA 접속' && l.action !== 'TA 로그인' && l.action !== 'TA 하트비트';
-    });
+    var logs = (res.data || []).filter(isTALeadActivityLog);
+    if (actionSel && actionSel !== 'all') {
+      logs = logs.filter(function(l) {
+        var a = l.action.replace(/^TA\s+/, '');
+        return a === actionSel || l.action === actionSel;
+      });
+    }
 
     if (countTag) countTag.textContent = '(' + logs.length + '건)';
 
@@ -5221,62 +5332,11 @@ async function refreshModalActivityLog() {
   }
 }
 
-async function refreshAgentActivityLog(agentName) {
-  agentName = agentName || currentViewMode;
-  var tbody = el('agentActivityLogTbody');
-  var countTag = el('agentActivityLogCount');
-  var titleName = el('agentActivityTitleName');
-  if (titleName) titleName.textContent = agentName;
-  if (!tbody || !db) return;
-
-  tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;padding:16px;color:#9aa0a6;">활동 내역 불러오는 중...</td></tr>';
-
-  try {
-    var res = await db.from('activity_logs')
-      .select('*')
-      .eq('consultant', agentName)
-      .order('created_at', { ascending: false })
-      .limit(50);
-
-    if (res.error) throw res.error;
-
-    var logs = (res.data || []).filter(function(l) {
-      return l.action !== 'TA 접속' && l.action !== 'TA 로그인' && l.action !== 'TA 하트비트';
-    });
-
-    if (countTag) countTag.textContent = logs.length;
-
-    if (logs.length === 0) {
-      tbody.innerHTML = '<tr class="empty-row"><td colspan="4">최근 등록·수정·삭제한 안건 활동 내역이 없습니다.</td></tr>';
-      return;
-    }
-
-    tbody.innerHTML = logs.map(function(log) {
-      var badge = ACTIVITY_BADGE[log.action] || { bg: '#eef1f7', fg: 'var(--muted)' };
-      var timeFmt = formatLogDateTime(log.created_at);
-      var changesHtml = Array.isArray(log.changes)
-        ? log.changes.map(function(c) { return escapeHtml(c); }).join('<br>')
-        : (log.changes ? escapeHtml(JSON.stringify(log.changes)) : '-');
-
-      return '<tr>'
-        + '<td style="white-space:nowrap;color:var(--navy);font-size:12px;font-weight:600;">' + timeFmt + '</td>'
-        + '<td style="text-align:center;white-space:nowrap;"><span class="badge" style="background:' + badge.bg + ';color:' + badge.fg + ';">' + escapeHtml(log.action) + '</span></td>'
-        + '<td style="min-width:170px;word-break:break-word;font-weight:700;">' + escapeHtml(log.company || '-') + '</td>'
-        + '<td style="font-size:12.5px;color:#334155;line-height:1.5;">' + changesHtml + '</td>'
-        + '</tr>';
-    }).join('');
-
-  } catch(e) {
-    console.error('개별 활동 내역 조회 실패:', e);
-    tbody.innerHTML = '<tr class="empty-row"><td colspan="4">활동 내역을 불러오지 못했습니다.</td></tr>';
-  }
-}
-
 window.openActivityLogModal = openActivityLogModal;
 window.closeActivityLogModal = closeActivityLogModal;
 window.setModalActMode = setModalActMode;
 window.refreshModalActivityLog = refreshModalActivityLog;
-window.refreshAgentActivityLog = refreshAgentActivityLog;
+
 
 </script>
 
