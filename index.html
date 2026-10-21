@@ -856,7 +856,184 @@
   @media (max-width:768px){ .ta2-brow{grid-template-columns:30px 1fr;} .ta2-brow .bd{grid-column:2;} }
   #ta2DetailOverlay{align-items:center;}
   @media (max-width:768px){ #ta2DetailOverlay{align-items:flex-end;padding:0 !important;} }
+
+  /* ==========================================================================
+     TA 수첩 v3 — 모바일 우선 앱 셸 (ta3-*)
+     컨셉: 영업사원의 전자 수첩 · 종이 느낌의 밝은 배경 + 짙은 남색 잉크 + 하단 탭바
+     ========================================================================== */
+  body.ta3-on{background:#f3f1ea !important;color:#1a2333;-webkit-tap-highlight-color:transparent;}
+  body.ta3-on header.topbar, body.ta3-on #dateBanner, body.ta3-on #dbErrorBanner{display:none !important;}
+  body.ta3-on main{max-width:none !important;width:100% !important;padding:0 !important;margin:0 !important;}
+  body.ta3-on #viewMaster{display:none !important;}
+  body.ta3-on button{font-family:inherit;}
+  :root{--ink:#0f2547;--paper:#f3f1ea;--line:#e4e0d4;--accent:#2563eb;--bar-h:54px;--tab-h:62px;}
+
+  .ta3-app{min-height:100vh;min-height:100dvh;padding-bottom:calc(var(--tab-h) + env(safe-area-inset-bottom) + 14px);}
+  .ta3-bar{position:sticky;top:0;z-index:60;background:var(--ink);color:#fff;height:calc(var(--bar-h) + env(safe-area-inset-top));padding:env(safe-area-inset-top) 14px 0;display:flex;align-items:center;justify-content:space-between;gap:10px;box-shadow:0 2px 10px rgba(15,37,71,.25);}
+  .ta3-bar .tt{font-size:16.5px;font-weight:900;letter-spacing:-.3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .ta3-bar .tt small{display:block;font-size:10.5px;font-weight:700;opacity:.65;letter-spacing:.4px;margin-bottom:-1px;}
+  .ta3-bar button{background:rgba(255,255,255,.14);color:#fff;border:none;border-radius:12px;height:38px;min-width:38px;padding:0 12px;font-size:14px;font-weight:800;}
+  .ta3-bar .pl{background:#2563eb;padding:0 14px;box-shadow:0 2px 8px rgba(37,99,235,.5);}
+
+  .ta3-screen{display:none;padding:12px 14px 6px;max-width:760px;margin:0 auto;}
+  .ta3-screen.on{display:block;}
+  .ta3-h{display:flex;align-items:baseline;justify-content:space-between;margin:16px 2px 8px;}
+  .ta3-h b{font-size:15.5px;font-weight:900;color:var(--ink);}
+  .ta3-h span,.ta3-h a{font-size:12.5px;font-weight:800;color:#697386;}
+  .ta3-h button{background:none;border:none;color:var(--accent);font-size:13px;font-weight:800;padding:4px;}
+
+  /* 하단 탭바 */
+  .ta3-tabbar{position:fixed;left:0;right:0;bottom:0;z-index:70;background:#fff;border-top:1px solid var(--line);height:calc(var(--tab-h) + env(safe-area-inset-bottom));padding-bottom:env(safe-area-inset-bottom);display:grid;grid-template-columns:repeat(5,1fr);box-shadow:0 -4px 16px rgba(15,37,71,.08);}
+  .ta3-tab{background:none !important;border:none;color:#8a94a6 !important;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font-size:11px;font-weight:800;padding:0 !important;border-radius:0 !important;}
+  .ta3-tab svg{width:23px;height:23px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+  .ta3-tab.on{color:var(--accent) !important;}
+  .ta3-tab.add{color:#fff !important;}
+  .ta3-tab.add i{width:50px;height:50px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;margin-top:-22px;box-shadow:0 4px 14px rgba(37,99,235,.5);border:4px solid #f3f1ea;}
+  .ta3-tab.add svg{stroke:#fff;width:26px;height:26px;}
+  .ta3-tab.add span{color:#8a94a6;margin-top:-1px;}
+
+  /* 홈 */
+  .ta3-hello{background:#fff;border:1px solid var(--line);border-radius:18px;padding:16px 16px 14px;position:relative;overflow:hidden;}
+  .ta3-hello:before{content:"";position:absolute;left:0;top:0;bottom:0;width:8px;background:repeating-linear-gradient(to bottom,#cfc9b8 0 10px,transparent 10px 18px);opacity:.7;}
+  .ta3-hello .d{font-size:21px;font-weight:900;color:var(--ink);letter-spacing:-.4px;padding-left:8px;}
+  .ta3-hello .c{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;padding-left:8px;}
+  .ta3-pill{display:inline-flex;align-items:center;background:#eaf1ff;color:#1d4ed8;border-radius:999px;padding:4px 11px;font-size:12.5px;font-weight:800;white-space:nowrap;}
+  .ta3-pill.am{background:#fef3c7;color:#92400e;} .ta3-pill.gr{background:#dcfce7;color:#15803d;} .ta3-pill.rd{background:#fee2e2;color:#b91c1c;} .ta3-pill.pu{background:#ede9fe;color:#6d28d9;} .ta3-pill.gy{background:#eceff3;color:#475569;}
+  .ta3-kpi{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px;}
+  .ta3-k{background:#fff;border:1px solid var(--line);border-radius:16px;padding:12px 14px;min-width:0;}
+  .ta3-k .l{font-size:12px;font-weight:800;color:#8a94a6;}
+  .ta3-k .v{font-size:19px;font-weight:900;color:var(--ink);margin-top:3px;letter-spacing:-.4px;white-space:nowrap;}
+  .ta3-k .n{font-size:12.5px;font-weight:800;color:var(--accent);}
+  .ta3-k.wide{grid-column:1/-1;display:flex;align-items:center;justify-content:space-between;gap:10px;cursor:pointer;}
+  .ta3-bar2{height:6px;background:#e8e5da;border-radius:99px;overflow:hidden;margin-top:7px;} .ta3-bar2 i{display:block;height:100%;background:#16a34a;}
+  .ta3-today{background:linear-gradient(120deg,#0f2547,#1e3a8a);color:#fff;border-radius:16px;padding:14px 16px;display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:10px;}
+  .ta3-today .t{font-size:12px;font-weight:800;opacity:.8;} .ta3-today .a{font-size:23px;font-weight:900;letter-spacing:-.5px;}
+  .ta3-today button{background:#fff;color:#1e3a8a;border:none;border-radius:11px;padding:10px 14px;font-size:13px;font-weight:900;}
+  .ta3-list{background:#fff;border:1px solid var(--line);border-radius:16px;overflow:hidden;}
+  .ta3-row{display:flex;gap:10px;align-items:center;padding:12px 14px;border-bottom:1px solid #f0ede3;cursor:pointer;}
+  .ta3-row:last-child{border-bottom:none;} .ta3-row:active{background:#f1f6ff;}
+  .ta3-row .tm{min-width:50px;font-size:12.5px;font-weight:900;color:var(--accent);}
+  .ta3-row .ti{font-size:14.5px;font-weight:800;color:var(--ink);} .ta3-row .su{font-size:12px;color:#8a94a6;margin-top:1px;}
+  .ta3-empty{color:#8a94a6;font-size:13px;padding:16px 8px;text-align:center;line-height:1.6;}
+
+  /* 안건 목록 */
+  .ta3-search{position:relative;margin-bottom:10px;}
+  .ta3-search input{width:100%;height:46px;border:1.5px solid var(--line);border-radius:14px;background:#fff;padding:0 14px 0 40px;font-size:16px;font-family:inherit;color:var(--ink);}
+  .ta3-search input:focus{outline:none;border-color:var(--accent);}
+  .ta3-search svg{position:absolute;left:13px;top:13px;width:20px;height:20px;stroke:#8a94a6;fill:none;stroke-width:2;stroke-linecap:round;}
+  .ta3-chips{display:flex;gap:7px;overflow-x:auto;padding:2px 0 8px;scrollbar-width:none;}
+  .ta3-chips::-webkit-scrollbar{display:none;}
+  .ta3-chip{flex:0 0 auto;background:#fff !important;color:#475569 !important;border:1.5px solid var(--line) !important;border-radius:999px !important;padding:8px 14px !important;font-size:13.5px !important;font-weight:800 !important;white-space:nowrap;}
+  .ta3-chip b{margin-left:4px;opacity:.7;font-weight:900;}
+  .ta3-chip.on{background:var(--ink) !important;color:#fff !important;border-color:var(--ink) !important;}
+  .ta3-seg{display:inline-flex;background:#e8e5da;border-radius:12px;padding:3px;margin-bottom:8px;}
+  .ta3-seg button{background:none !important;color:#697386 !important;border:none;border-radius:9px !important;padding:7px 14px !important;font-size:13px !important;font-weight:900 !important;}
+  .ta3-seg button.on{background:#fff !important;color:var(--ink) !important;box-shadow:0 1px 3px rgba(0,0,0,.12);}
+  .ta3-card{background:#fff;border:1px solid var(--line);border-left:6px solid var(--c,#2563eb);border-radius:16px;padding:12px 14px;margin-bottom:10px;position:relative;box-shadow:0 1px 3px rgba(15,37,71,.05);}
+  .ta3-card:active{background:#f6f9ff;}
+  .ta3-card .r1{display:flex;justify-content:space-between;gap:8px;align-items:flex-start;padding-right:46px;}
+  .ta3-card .nm{font-size:16px;font-weight:900;color:var(--ink);letter-spacing:-.3px;word-break:break-word;}
+  .ta3-card .amt{position:absolute;right:14px;top:12px;font-size:15px;font-weight:900;color:var(--ink);white-space:nowrap;}
+  .ta3-card .r2{display:flex;gap:5px;flex-wrap:wrap;margin-top:7px;align-items:center;}
+  .ta3-card .r3{font-size:12.5px;color:#697386;font-weight:700;margin-top:7px;line-height:1.5;}
+  .ta3-card .r3 em{font-style:normal;font-weight:900;border-radius:6px;padding:1px 6px;margin-left:4px;font-size:11.5px;}
+  .ta3-card .r3 em.today{background:#fee2e2;color:#b91c1c;} .ta3-card .r3 em.soon{background:#fef3c7;color:#92400e;} .ta3-card .r3 em.late{background:#e5e7eb;color:#4b5563;}
+  .ta3-call{position:absolute;right:10px;bottom:10px;width:40px;height:40px;border-radius:50%;background:#16a34a !important;color:#fff !important;border:none;display:flex;align-items:center;justify-content:center;padding:0 !important;font-size:17px;box-shadow:0 2px 8px rgba(22,163,74,.35);}
+  .ta3-tag{display:inline-block;border-radius:7px;padding:2px 8px;font-size:11.5px;font-weight:900;white-space:nowrap;}
+
+  /* 지도 */
+  #ta3ScrMap{padding:0;max-width:none;}
+  .ta3-mapwrap{position:relative;height:calc(100vh - var(--bar-h) - var(--tab-h) - env(safe-area-inset-top) - env(safe-area-inset-bottom));height:calc(100dvh - var(--bar-h) - var(--tab-h) - env(safe-area-inset-top) - env(safe-area-inset-bottom));}
+  #ta3Map{position:absolute;inset:0;background:#e9ecef;}
+  .ta3-maptop{position:absolute;left:10px;right:10px;top:10px;z-index:500;display:flex;flex-direction:column;gap:6px;pointer-events:none;}
+  .ta3-maptop>*{pointer-events:auto;}
+  .ta3-maptop .ta3-chips{padding:0;}
+  .ta3-mapbtn{position:absolute;right:12px;z-index:500;width:46px;height:46px;border-radius:50%;background:#fff !important;color:var(--ink) !important;border:none;box-shadow:0 2px 10px rgba(0,0,0,.25);display:flex;align-items:center;justify-content:center;padding:0 !important;font-size:20px;}
+  .ta3-mapnote{background:#fffbeb;border:1px solid #fde68a;color:#92400e;border-radius:12px;padding:8px 12px;font-size:12.5px;font-weight:800;display:flex;justify-content:space-between;gap:8px;align-items:center;box-shadow:0 2px 8px rgba(0,0,0,.12);}
+  .ta3-mapnote button{background:#92400e !important;color:#fff !important;border:none;border-radius:9px !important;padding:6px 10px !important;font-size:12px !important;font-weight:900 !important;white-space:nowrap;}
+  .ta3-prev{position:absolute;left:10px;right:10px;bottom:10px;z-index:510;background:#fff;border-radius:18px;padding:14px 14px 12px;box-shadow:0 6px 24px rgba(0,0,0,.28);display:none;}
+  .ta3-prev .nm{font-size:16.5px;font-weight:900;color:var(--ink);padding-right:28px;} .ta3-prev .ad{font-size:12.5px;color:#697386;margin-top:4px;font-weight:700;}
+  .ta3-prev .bt{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:10px;}
+  .ta3-prev .bt button,.ta3-btn{border-radius:12px !important;padding:11px 6px !important;font-size:13.5px !important;font-weight:900 !important;border:none;}
+  .ta3-prev .x{position:absolute;right:8px;top:8px;background:none !important;color:#8a94a6 !important;border:none;font-size:22px;padding:4px 10px !important;}
+  .ta3-pin{width:30px;height:30px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);background:var(--c,#2563eb);border:3px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,.4);display:flex;align-items:center;justify-content:center;}
+  .ta3-pin span{transform:rotate(45deg);color:#fff;font-size:11px;font-weight:900;line-height:1;}
+  .ta3-pin.ref{border-radius:8px;transform:rotate(45deg);} .ta3-pin.ref span{transform:rotate(-45deg);}
+  .ta3-pin.sel{width:38px;height:38px;border-color:#facc15;}
+  .ta3-me{width:16px;height:16px;border-radius:50%;background:#2563eb;border:3px solid #fff;box-shadow:0 0 0 6px rgba(37,99,235,.25);}
+
+  /* 캘린더 */
+  .ta3-calbox{background:#fff;border:1px solid var(--line);border-radius:18px;padding:12px;}
+  .ta3-calhead{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
+  .ta3-calhead b{font-size:17px;font-weight:900;color:var(--ink);}
+  .ta3-calhead button{background:#f3f1ea !important;color:var(--ink) !important;border:none;border-radius:11px !important;width:40px;height:36px;padding:0 !important;font-size:15px;font-weight:900;}
+  .ta3-cal{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;}
+  .ta3-cal .dw{text-align:center;font-size:11.5px;font-weight:800;color:#8a94a6;padding:3px 0;} .ta3-cal .dw:first-child{color:#dc2626;} .ta3-cal .dw:nth-child(7){color:#2563eb;}
+  .ta3-d{height:50px;border:1px solid #f0ede3;border-radius:11px;background:#fff !important;color:var(--ink) !important;font-size:14px !important;font-weight:800 !important;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding:5px 0 0 !important;gap:3px;position:relative;}
+  .ta3-d.out{visibility:hidden;} .ta3-d.sun,.ta3-d.hol{color:#dc2626 !important;} .ta3-d.sat{color:#2563eb !important;}
+  .ta3-d.today{box-shadow:inset 0 0 0 2px var(--accent);}
+  .ta3-d.sel{background:var(--ink) !important;color:#fff !important;}
+  .ta3-d .dots{display:flex;gap:3px;} .ta3-d .dots i{width:6px;height:6px;border-radius:50%;background:#f59e0b;display:block;} .ta3-d .dots i.e{background:#16a34a;} .ta3-d .dots i.r{background:#8b5cf6;}
+
+  /* MY */
+  .ta3-me-card{background:#fff;border:1px solid var(--line);border-radius:18px;padding:16px;display:flex;gap:14px;align-items:center;}
+  .ta3-av{width:54px;height:54px;border-radius:50%;background:var(--ink);color:#fff;display:flex;align-items:center;justify-content:center;font-size:21px;font-weight:900;}
+  .ta3-menu{background:#fff;border:1px solid var(--line);border-radius:16px;overflow:hidden;margin-top:12px;}
+  .ta3-menu button{width:100%;text-align:left;background:#fff !important;color:var(--ink) !important;border:none;border-bottom:1px solid #f0ede3;border-radius:0 !important;padding:16px 16px !important;font-size:15px !important;font-weight:800 !important;display:flex;justify-content:space-between;align-items:center;}
+  .ta3-menu button:last-child{border-bottom:none;} .ta3-menu button small{color:#8a94a6;font-weight:700;font-size:12px;}
+  .ta3-field{margin:10px 0;} .ta3-field label{display:block;font-size:12.5px;font-weight:800;color:#697386;margin-bottom:5px;}
+  .ta3-field input,.ta3-field select{width:100%;height:46px;border:1.5px solid #d5dbe6;border-radius:12px;padding:0 12px;font-size:16px;font-family:inherit;}
+
+  /* 위치 선택기 / 안건 선택 / 토스트 */
+  .ta3-full{position:fixed;inset:0;z-index:100010;background:#fff;display:none;flex-direction:column;}
+  .ta3-full.on{display:flex;}
+  .ta3-fhead{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:calc(10px + env(safe-area-inset-top)) 12px 10px;background:var(--ink);color:#fff;}
+  .ta3-fhead b{font-size:16px;font-weight:900;} .ta3-fhead button{background:rgba(255,255,255,.15);color:#fff;border:none;border-radius:11px;padding:9px 14px;font-size:14px;font-weight:800;}
+  .ta3-fhead button.ok{background:var(--accent);}
+  .ta3-pk{position:relative;flex:1;}
+  #ta3PkMap{position:absolute;inset:0;}
+  .ta3-cross{position:absolute;left:50%;top:50%;z-index:600;width:38px;height:46px;margin:-46px 0 0 -19px;pointer-events:none;}
+  .ta3-cross:before{content:"";position:absolute;left:4px;top:0;width:30px;height:30px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);background:#dc2626;border:3px solid #fff;box-shadow:0 3px 8px rgba(0,0,0,.4);}
+  .ta3-pksearch{position:absolute;left:10px;right:10px;top:10px;z-index:620;display:flex;gap:6px;}
+  .ta3-pksearch input{flex:1;height:46px;border:none;border-radius:13px;padding:0 14px;font-size:16px;box-shadow:0 2px 10px rgba(0,0,0,.25);}
+  .ta3-pksearch button{height:46px;border-radius:13px;border:none;background:var(--accent);color:#fff;font-weight:900;padding:0 16px;font-size:14px;}
+  .ta3-pkaddr{position:absolute;left:10px;right:10px;bottom:calc(10px + env(safe-area-inset-bottom));z-index:620;background:#fff;border-radius:15px;padding:12px 14px;box-shadow:0 4px 18px rgba(0,0,0,.3);font-size:14px;font-weight:800;color:var(--ink);}
+  .ta3-pkaddr small{display:block;color:#8a94a6;font-size:11.5px;margin-top:2px;font-weight:700;}
+  .ta3-pkgps{position:absolute;right:12px;bottom:calc(92px + env(safe-area-inset-bottom));z-index:620;width:46px;height:46px;border-radius:50%;background:#fff !important;color:var(--ink) !important;border:none;box-shadow:0 2px 10px rgba(0,0,0,.3);padding:0 !important;font-size:20px;}
+  .ta3-plist{flex:1;overflow-y:auto;padding:10px 14px;background:var(--paper);}
+  .ta3-toast{position:fixed;left:50%;bottom:calc(var(--tab-h) + env(safe-area-inset-bottom) + 18px);transform:translateX(-50%);z-index:100020;background:rgba(15,37,71,.94);color:#fff;border-radius:999px;padding:10px 18px;font-size:13.5px;font-weight:800;display:none;max-width:90vw;text-align:center;}
+
+  /* 상세 시트: 위치 탭 */
+  .ta3-mini{height:190px;border-radius:14px;overflow:hidden;border:1px solid #e3e8f0;background:#e9ecef;margin:8px 0;position:relative;}
+  .ta3-btnrow{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px;margin-top:8px;}
+  .ta3-btnrow button{border-radius:12px !important;padding:12px 8px !important;font-size:13.5px !important;font-weight:900 !important;}
+  .ta3-pladdr{width:100%;height:46px;border:1.5px solid #d5dbe6;border-radius:12px;padding:0 12px;font-size:16px;font-family:inherit;font-weight:700;}
+  .ta3-plstat{font-size:12.5px;font-weight:800;color:#697386;margin-top:6px;}
+
+  /* 상세/신규 입력 시트 모바일 최적화 */
+  #agentLeadModalOverlay,#ta2DetailOverlay{align-items:flex-end !important;padding:0 !important;}
+  #agentLeadModalOverlay .modal-card{max-width:620px !important;width:100% !important;max-height:94vh !important;max-height:94dvh !important;border-radius:22px 22px 0 0 !important;padding:18px 16px calc(18px + env(safe-area-inset-bottom)) !important;}
+  #ta2DetailOverlay .ta2-modal{max-width:680px !important;max-height:96vh !important;max-height:96dvh !important;border-radius:22px 22px 0 0 !important;}
+  @media (min-width:769px){ #agentLeadModalOverlay,#ta2DetailOverlay{align-items:center !important;} #agentLeadModalOverlay .modal-card,#ta2DetailOverlay .ta2-modal{border-radius:20px !important;} }
+  @media (max-width:768px){
+    .compact-form-row1,.compact-form-row2,.compact-form-row-won{grid-template-columns:1fr 1fr !important;}
+    .compact-form-row2{grid-template-columns:1fr !important;}
+    #agentLeadModalOverlay input,#agentLeadModalOverlay select,#ta2DetailOverlay input,#ta2DetailOverlay select,#ta2DetailOverlay textarea,#ta2MemoPop textarea,#ta2DpOverlay input{font-size:16px !important;}
+    #agentLeadModalOverlay input,#agentLeadModalOverlay select{height:46px;}
+    #afSubmitBtn{width:100%;height:50px !important;font-size:16px !important;}
+    .ta2-info{grid-template-columns:1fr 1fr;}
+    .ta2-tab{padding:12px 4px;font-size:13px;}
+  }
+  .ta3-formplace{background:#f8fafc;border:1px solid #e3e8f0;border-radius:12px;padding:10px;margin-top:8px;}
+  .ta3-formplace label{font-size:12px;font-weight:800;color:#475569;}
+  .ta3-formplace input{width:100%;margin-top:4px;}
+  .ta3-formplace .row{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:8px;}
+  .ta3-formplace .row button{border-radius:10px !important;padding:10px 4px !important;font-size:12.5px !important;font-weight:900 !important;background:#eef1f7 !important;color:#1a2333 !important;border:1px solid #d5dbe6 !important;}
+  .ta3-pin2{width:26px;height:26px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);background:#dc2626;border:3px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.4);}
+#afAddress{border-radius:10px !important;border:1px solid #d5dbe6 !important;padding:11px 12px !important;width:100%;box-sizing:border-box;}
+
 </style>
+<meta name="theme-color" content="#0f2547">
 </head>
 <body>
 
@@ -1140,84 +1317,89 @@
         <!-- ==========================================
          컨설턴트 개별 영업 화면 (viewAgent) - 1번~5번 캡처 100% 매칭
          ========================================== -->
-        <div id="viewAgent" class="agent-view-container">
-     <div class="ta2-wrap">
-
-      <!-- 1. 헤더: 컨설턴트명 + TA 관리 / 오늘 날짜·영업일 / 신규 TA 버튼 -->
-      <section class="ta2-hero">
-        <div>
-          <span id="agentActiveName" style="display:none;"></span>
-          <div class="ta2-datebar" id="ta2DateBar"></div>
+    <div id="viewAgent" class="agent-view-container">
+     <div class="ta3-app">
+      <header class="ta3-bar">
+        <div class="tt"><small>에스원 북서울지사</small><span id="ta3Title">영업 TA 관리 포털</span></div>
+        <div style="display:flex;gap:8px;align-items:center;">
+          <button type="button" class="pl" onclick="openNewAgentLeadModal()">＋ 신규 TA</button>
+          <button type="button" onclick="ta3SetTab('my')" aria-label="내 정보"><span id="ta3Ini">·</span></button>
         </div>
-        <div class="ta2-hero-r">
-          <button type="button" id="btnBackToMaster" class="ta2-sm" style="display:none;" onclick="switchView('master')">🔙 통합 대시보드</button>
-          <button type="button" class="ta2-btn-new" onclick="openNewAgentLeadModal()">＋ 신규 TA</button>
+      </header>
+
+      <!-- 홈 -->
+      <section class="ta3-screen on" id="ta3ScrHome">
+        <div class="ta3-hello"><div class="d" id="ta3HDate"></div><div class="c" id="ta3HChips"></div></div>
+        <div class="ta3-kpi" id="ta3Kpi"></div>
+        <div class="ta3-today"><div><div class="t">금일 수주 예정 금액</div><div class="a" id="ta3TodayAmt">0원</div></div>
+          <button type="button" onclick="openTodayExpectedModal()">상세리스트</button></div>
+
+        <div class="ta3-h"><b>📒 오늘의 수첩</b><span id="ta3TodayCnt"></span></div>
+        <div class="ta3-list" id="ta3TodayList"></div>
+
+        <div class="ta3-h"><b>📅 앞으로 7일</b><button type="button" onclick="ta3SetTab('cal')">전체 일정 ›</button></div>
+        <div class="ta3-list" id="ta3WeekList"></div>
+
+        <div class="ta3-h"><b>⏰ 일정이 지난 진행 안건</b><span id="ta3LateCnt"></span></div>
+        <div class="ta3-list" id="ta3LateList"></div>
+      </section>
+
+      <!-- 안건 -->
+      <section class="ta3-screen" id="ta3ScrItems">
+        <div class="ta3-search"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+          <input id="ta3Q" type="search" placeholder="서비스처 · 고객담당자 · 연락처 · 주소 검색" oninput="ta3SetQ(this.value)"></div>
+        <div class="ta3-seg" id="ta3Src"></div>
+        <div class="ta3-chips" id="ta3Groups"></div>
+        <div id="ta3Items"></div>
+      </section>
+
+      <!-- 지도 -->
+      <section class="ta3-screen" id="ta3ScrMap">
+        <div class="ta3-mapwrap">
+          <div id="ta3Map"></div>
+          <div class="ta3-maptop">
+            <div class="ta3-seg" id="ta3MapSrc" style="align-self:flex-start;box-shadow:0 2px 8px rgba(0,0,0,.2);margin:0;"></div>
+            <div class="ta3-chips" id="ta3MapGroups"></div>
+            <div id="ta3MapNote"></div>
+          </div>
+          <button type="button" class="ta3-mapbtn" style="bottom:16px;" onclick="ta3MapMyLoc()" aria-label="내 위치">◎</button>
+          <button type="button" class="ta3-mapbtn" style="bottom:70px;font-size:15px;font-weight:900;" onclick="ta3MapFit()" aria-label="전체 보기">⤢</button>
+          <div class="ta3-prev" id="ta3Prev"></div>
         </div>
       </section>
 
-      <!-- 2. TA 대시보드 (간략) -->
-      <section class="ta2-kpis">
-        <div class="ta2-kpi k1">
-          <div class="l">진행 TA</div>
-          <div class="v" id="ta2KIngAmt">0원</div>
-          <div class="c" id="ta2KIngCnt">0건</div>
-          <div class="s">진행중 전체</div>
+      <!-- 일정 -->
+      <section class="ta3-screen" id="ta3ScrCal">
+        <div class="ta3-calbox">
+          <div class="ta3-calhead"><button type="button" onclick="ta3CalMove(-1)">◀</button><b id="ta3CalTitle"></b><button type="button" onclick="ta3CalMove(1)">▶</button></div>
+          <div class="ta3-cal" id="ta3CalGrid"></div>
+          <div style="font-size:11.5px;color:#8a94a6;margin-top:8px;"><span style="color:#f59e0b;">●</span> 고객 일정 &nbsp;<span style="color:#16a34a;">●</span> TA 수주예정 &nbsp;<span style="color:#8b5cf6;">●</span> 소개영업 예상계약</div>
         </div>
-        <div class="ta2-kpi k2">
-          <div class="l">이달 잔여 TA</div>
-          <div class="v" id="ta2KRemAmt">0원</div>
-          <div class="c" id="ta2KRemCnt">0건</div>
-          <div class="s">이달 수주예정 · 미수주</div>
-        </div>
-        <div class="ta2-kpi k3">
-          <div class="l">이달 수주 TA</div>
-          <div class="v" id="ta2KWonAmt">0원</div>
-          <div class="c" id="ta2KWonCnt">0건</div>
-          <div class="ta2-bar" id="ta2KWonBarWrap" style="display:none;"><i id="ta2KWonBar" style="width:0%"></i></div>
-          <div class="s" id="ta2KWonSub"></div>
-        </div>
-        <div class="ta2-kpi k4">
-          <div class="l">TA 평균 단가</div>
-          <div class="v" id="ta2KAvgAmt">0원</div>
-          <div class="c">진행중 기준</div>
-          <div class="s" id="ta2KAvgSub"></div>
-        </div>
+        <div class="ta3-h"><b id="ta3CalSel"></b><button type="button" onclick="ta3CalAdd()">＋ 일정 추가</button></div>
+        <div class="ta3-list" id="ta3CalList"></div>
       </section>
 
-      <!-- 금일 수주 예정 -->
-      <section class="ta2-today">
-        <div>
-          <div class="t">금일 수주 예정 금액</div>
-          <div><span class="a" id="ta2TodayAmt">0원</span><span class="n" id="ta2TodayCnt">0건</span></div>
+      <!-- MY -->
+      <section class="ta3-screen" id="ta3ScrMy">
+        <div class="ta3-me-card"><div class="ta3-av" id="ta3Av"></div><div><div style="font-size:19px;font-weight:900;color:var(--ink);" id="ta3MyName"></div><div style="font-size:12.5px;color:#8a94a6;font-weight:700;margin-top:2px;" id="ta3MyJob"></div></div></div>
+        <div class="ta3-menu" id="ta3MyMenu"></div>
+        <div class="ta3-h"><b>🗺️ 지도 설정</b></div>
+        <div class="ta3-menu" style="padding:6px 14px 14px;">
+          <div class="ta3-field"><label>카카오맵 JavaScript 키</label><input id="ta3KeyInp" placeholder="미입력 시 OpenStreetMap 지도 사용" autocomplete="off"></div>
+          <button type="button" onclick="ta3SaveKey()" style="display:block;width:100%;margin-top:4px;padding:13px 0 !important;border-radius:12px;background:#0f2547 !important;color:#fff !important;font-weight:800;font-size:15px;justify-content:center;text-align:center;">저장하고 지도 다시 불러오기</button>
+          <div class="ta3-plstat" id="ta3MapStat"></div>
         </div>
-        <button type="button" onclick="openTodayExpectedModal()">상세리스트</button>
+        <div class="ta3-h"><b>소개영업 연동</b></div>
+        <div class="ta3-menu"><div style="padding:12px 16px;font-size:13px;color:#475569;line-height:1.6;font-weight:700;" id="ta3RefStat"></div></div>
       </section>
 
-      <!-- 다가오는 일정 -->
-      <section class="ta2-card">
-        <h2>📅 다가오는 고객 일정 <span class="cnt" id="ta2UpCnt">0</span></h2>
-        <div class="ta2-upcoming" id="ta2Upcoming"></div>
-      </section>
-
-      <!-- 3. TA 목록 -->
-      <section class="ta2-card">
-        <h2>TA 목록 <span class="cnt" id="agentLeadCount">0</span></h2>
-        <div class="ta2-stage-tabs" id="ta2StageTabs"></div>
-        <div class="ta2-tools">
-          <input type="search" id="ta2Search" placeholder="서비스제공처 · 고객담당자 · 연락처 검색" oninput="ta2SetSearch(this.value)">
-          <select id="ta2Period" onchange="ta2SetPeriod(this.value)"></select>
-          <select id="ta2Product" onchange="ta2SetProduct(this.value)">
-            <option value="all">상품 전체</option>
-            <option value="일반알람">일반알람</option>
-            <option value="디지털(정보보안)">디지털(정보보안)</option>
-            <option value="안전상품">안전상품</option>
-          </select>
-        </div>
-        <div>
-          <div id="ta2List" class="ta2-cards"></div>
-        </div>
-      </section>
-
+      <nav class="ta3-tabbar">
+        <button type="button" class="ta3-tab on" data-t="home" onclick="ta3SetTab('home')"><svg viewBox="0 0 24 24"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/></svg>홈</button>
+        <button type="button" class="ta3-tab" data-t="items" onclick="ta3SetTab('items')"><svg viewBox="0 0 24 24"><path d="M8 6h13M8 12h13M8 18h13"/><circle cx="3.5" cy="6" r="1"/><circle cx="3.5" cy="12" r="1"/><circle cx="3.5" cy="18" r="1"/></svg>안건</button>
+        <button type="button" class="ta3-tab add" onclick="openNewAgentLeadModal()"><i><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></i><span>신규</span></button>
+        <button type="button" class="ta3-tab" data-t="map" onclick="ta3SetTab('map')"><svg viewBox="0 0 24 24"><path d="M12 21s7-6.2 7-11.5A7 7 0 005 9.5C5 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg>지도</button>
+        <button type="button" class="ta3-tab" data-t="cal" onclick="ta3SetTab('cal')"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>일정</button>
+      </nav>
      </div>
     </div>
   </main>
@@ -1242,6 +1424,7 @@
       <div class="ta2-tabs">
         <button type="button" class="ta2-tab active" data-tab="memo" onclick="ta2Tab('memo')">📝 메모 · 사진</button>
         <button type="button" class="ta2-tab" data-tab="cal" onclick="ta2Tab('cal')">📅 일정</button>
+        <button type="button" class="ta2-tab" data-tab="place" onclick="ta2Tab('place')">📍 위치</button>
       </div>
       <div id="ta2StoreWarn"></div>
 
@@ -1249,6 +1432,25 @@
       <div id="ta2PaneMemo">
         <div id="ta2MemoList"></div>
       </div>
+
+<!-- 위치 -->
+      <div id="ta2PanePlace" style="display:none;">
+        <label style="font-size:12.5px;font-weight:800;color:#697386;">주소 / 위치 메모</label>
+        <input class="ta3-pladdr" id="ta3PlAddr" placeholder="예) 강북구 번동 123, 2층 사무실" onchange="ta3PlAddrChange(this.value)">
+        <div class="ta3-mini" id="ta3PlMap"></div>
+        <div class="ta3-plstat" id="ta3PlStat"></div>
+        <div class="ta3-btnrow">
+          <button type="button" onclick="ta3PlGps()" style="background:#2563eb;color:#fff;">📍 현재 위치로 기록</button>
+          <button type="button" onclick="ta3PlPick()" style="background:#0f2547;color:#fff;">🗺️ 지도에서 지정</button>
+          <button type="button" onclick="ta3PlFind()" style="background:#eef1f7;color:#1a2333;border:1px solid #d5dbe6;">🔎 주소로 찾기</button>
+        </div>
+        <div class="ta3-btnrow">
+          <button type="button" onclick="ta3PlNav('naver')" style="background:#03c75a;color:#fff;">🧭 네이버지도 길찾기</button>
+          <button type="button" onclick="ta3PlNav('kakao')" style="background:#fee500;color:#191600;">🧭 카카오맵 길찾기</button>
+        </div>
+      </div>
+
+      
 
       <!-- 일정 캘린더 -->
       <div id="ta2PaneCal" style="display:none;">
@@ -1641,6 +1843,19 @@
           </select>
         </div>
       </div>
+
+<div class="ta3-formplace">
+        <label>📍 위치 / 주소 (선택)</label>
+        <input type="text" id="afAddress" placeholder="주소를 입력하거나 아래 버튼으로 기록">
+        <div class="row">
+          <button type="button" onclick="ta3FormGps()">현재 위치</button>
+          <button type="button" onclick="ta3FormPick()">지도에서 지정</button>
+          <button type="button" onclick="ta3FormGeo()">주소로 찾기</button>
+        </div>
+        <div id="afPlaceInfo" style="font-size:12px;font-weight:800;color:#15803d;margin-top:6px;"></div>
+      </div>
+
+      
 
       <!-- 2행: 등록일, 계약예정일, 메모, 등록 버튼 -->
       <div class="compact-form-row2" style="margin-top:6px;">
@@ -3287,6 +3502,7 @@ function switchView(mode) {
   });
 
   if (mode === 'master') {
+    document.body.classList.remove('ta3-on');
     el('viewMaster').style.display = 'block';
     el('viewAgent').style.display = 'none';
     if (el('dateBanner')) el('dateBanner').style.display = 'flex';
@@ -3807,6 +4023,7 @@ function renderAgentLeadTable(agentName) {
 function openNewAgentLeadModal() {
   if (currentUser) saveUserSession(currentUser, currentViewMode, 'newLead');
   el('afEditingId').value = '';
+  try { ta3FormReset(); } catch (e) {}
   el('agentModalTitle').textContent = '신규 TA 등록';
   el('afCompany').value = '';
   el('afContact').value = '';
@@ -4013,6 +4230,7 @@ async function handleAgentModalSubmit(e) {
       if (error) throw error;
       if (!ALL[agentName]) ALL[agentName] = { leads: [] };
       ALL[agentName].leads.unshift(payload);
+      try { await ta3AfterCreate(payload.id); } catch (e) { console.warn(e); }
       await recordActivityLog(agentName, '신규 등록', payload.company, payload.id, [
         `서비스제공처명: ${payload.company}`,
         `용역료: ${formatCurrency(payload.amount)}`,
@@ -5127,7 +5345,7 @@ function ta2WorkdayInfo() {
   return { total, elapsed, left: workingDaysLeftInMonth(), todayWork: !isHoliday(todayStr()) };
 }
 
-function initAgentView(agentName) {
+function initAgentView_ta2(agentName) {
   applyConsultantTheme(agentName);
   currentViewMode = agentName;
   agentGlobalProduct = 'all';      // 금일 수주예정 상세리스트 등 기존 모달이 전체 상품 기준으로 동작
@@ -5317,7 +5535,7 @@ async function ta2SchedUpdate(id, patch) {
 }
 
 // ---------- 상세보기 ----------
-function ta2CurLead() { return ta2Leads(currentViewMode).find(l => l.id === TA2.leadId) || null; }
+function ta2CurLead() { return ta3FindLead(TA2.leadId); }
 let TA2_FT = null;
 function ta2Flash(msg, err) {
   const e = el('ta2Saved'); if (!e) return;
@@ -5335,6 +5553,7 @@ function ta2OptHtml(pairs, cur) {
 function ta2RenderHead() {
   const l = ta2CurLead(); if (!l) return;
   el('ta2DName').textContent = l.company || '-';
+  if (l._ref) { el('ta2DBadges').innerHTML = '<span class="ta3-tag" style="background:#ede9fe;color:#6d28d9;">소개영업</span> <span class="ta2-badge" style="background:#eef1f7;color:#0f2547;">' + escapeHtml(l.stage) + '</span>'; return; }
   el('ta2DBadges').innerHTML =
     `<span class="ta2-badge" style="background:${STAGE_BG[l.stage] || '#e5e7eb'};color:${STAGE_COLOR[l.stage] || '#374151'};">${ta2StageLabel(l.stage)}</span> ` +
     `<span class="ta2-conf" style="margin-left:6px;"><i style="background:${CONF_COLOR[l.confidence] || '#ccc'};"></i>확도 ${escapeHtml(l.confidence || '-')}</span>`;
@@ -5344,6 +5563,7 @@ function ta2DateBtn(field, ds) {
 }
 function ta2RenderInfo() {
   const l = ta2CurLead(); if (!l) return;
+  if (l._ref) { ta3RenderRefInfo(l); return; }
   const f = (k, v) => `<div><div class="k">${k}</div><div class="vv">${v}</div></div>`;
   const regDate = l.registeredDate || (l.createdAt || '').slice(0, 10);
   el('ta2DInfo').innerHTML = [
@@ -5371,7 +5591,8 @@ function ta2RenderActions() {
   } else {
     a += `<span style="font-size:12.5px;color:#8a94a6;font-weight:700;align-self:center;">전화번호를 입력하면 바로 전화·연락처 저장을 할 수 있습니다.</span>`;
   }
-  if (isCreatedToday(l)) a += `<button type="button" class="danger" onclick="ta2DeleteFromDetail()">삭제</button>`;
+  if (l._ref) a += `<button type="button" style="background:#6d28d9;color:#fff;" onclick="window.open(REFERRAL_APP_URL,'_blank')">소개영업 앱에서 처리</button>`;
+  if (!l._ref && isCreatedToday(l)) a += `<button type="button" class="danger" onclick="ta2DeleteFromDetail()">삭제</button>`;
   el('ta2DActions').innerHTML = a;
 }
 
@@ -5410,7 +5631,7 @@ async function ta2SaveFields(patch, rerender) {
   ta2Flash('저장됨 ✓');
   ta2RenderHead();
   if (rerender) ta2RenderInfo(); else ta2RenderActions();
-  ta2RenderKpi(currentViewMode); ta2RenderList(currentViewMode);
+  ta3Refresh();
   if (TA2.tab === 'cal') ta2RenderCal();
   return true;
 }
@@ -5476,7 +5697,7 @@ function ta2DpRender() {
 }
 
 async function ta2OpenDetail(id, tab, date) {
-  const lead = ta2Leads(currentViewMode).find(l => l.id === id);
+  const lead = ta3FindLead(id);
   if (!lead) return;
   TA2.leadId = id; TA2.mode = {}; TA2.notes = []; TA2.scheds = []; TA2.pending = [];
   TA2.calSel = date || todayStr();
@@ -5486,7 +5707,7 @@ async function ta2OpenDetail(id, tab, date) {
   el('ta2MemoText').value = '';
   ta2RenderPending(); ta2CloseDraw();
   ta2Flash('항목을 눌러 바로 수정하면 자동 저장됩니다'); el('ta2Saved').className = 'ta2-autosave';
-  ta2Tab(tab === 'cal' ? 'cal' : 'memo');
+  ta2Tab(tab === 'cal' ? 'cal' : tab === 'place' ? 'place' : 'memo');
   const myId = id;
   await Promise.all([ta2Probe('ta_notes'), ta2Probe('ta_schedules')]);
   if (TA2.leadId !== myId) return;
@@ -5498,7 +5719,7 @@ function ta2CloseDetail() {
   el('ta2DetailOverlay').style.display = 'none';
   ta2CloseMemoPop(); ta2CloseDraw(); ta2CloseLightbox(); ta2DpClose();
   TA2.leadId = null;
-  ta2RenderUpcoming(currentViewMode);
+  ta3Refresh();
 }
 function ta2DeleteFromDetail() {
   const lead = ta2CurLead(); if (!lead) return;
@@ -5510,6 +5731,8 @@ function ta2Tab(t) {
   document.querySelectorAll('.ta2-tab').forEach(b => b.classList.toggle('active', b.dataset.tab === t));
   el('ta2PaneMemo').style.display = t === 'memo' ? 'block' : 'none';
   el('ta2PaneCal').style.display = t === 'cal' ? 'block' : 'none';
+  el('ta2PanePlace').style.display = t === 'place' ? 'block' : 'none';
+  if (t === 'place') ta3PlRender();
   if (t !== 'memo') ta2CloseDraw();
   if (t === 'cal') { ta2RenderCal(); ta2RenderSchedList(); ta2SetSchDate(TA2.calSel); }
   ta2ShowStoreWarn();
@@ -5873,6 +6096,717 @@ async function leadWriteWithPhone(mode, id, phone, row) {
   return res;
 }
 
+
+// ==========================================================================
+// TA 수첩 v3 — 모바일 앱 셸 (홈 / 안건 / 지도 / 일정 / MY) + 소개영업 연동 + 위치 기록
+// ==========================================================================
+const KAKAO_MAP_KEY = '';                                   // ← 카카오 JavaScript 키 (비워두면 OpenStreetMap 사용)
+const NAVER_MAP_KEY = '';                                   // ← 네이버 지도 JavaScript Client ID (비워두면 OpenStreetMap 사용)
+const REFERRAL_APP_URL = 'https://mws0008.github.io/Lead-app/'; // 소개영업 앱 주소 (소개영업 소스의 기본값)
+const TA3_DEFAULT_CENTER = { lat: 37.6396, lng: 127.0257 };       // 북서울(강북) 기본 중심
+const TA3_LS_PLACES = 'S1_TA3_PLACES';
+
+const TA3 = {
+  tab: 'home', refs: [], refErr: '', places: {}, scheds: [], items: [],
+  f: { group: 'all', src: 'all', q: '' }, mapF: { src: 'all', group: 'all' },
+  cal: { ym: '', sel: '' }, map: null, markers: [], mapSel: null, myMarker: null,
+  formPlace: null, pk: null, pkMap: null, plMap: null, ipPick: null
+};
+const TA3_GRP = { ing: { l: '진행중', c: '#2563eb' }, won: { l: '수주완료', c: '#16a34a' }, fail: { l: '실패', c: '#dc2626' }, hold: { l: '보류', c: '#d97706' } };
+function ta3GrpTa(s) { return s === '수주完' ? 'won' : s === '실패' ? 'fail' : s === '보류' ? 'hold' : 'ing'; }
+function ta3GrpRef(s) { return s === '계약완료' ? 'won' : s === '계약실패' ? 'fail' : s === '계약보류' ? 'hold' : 'ing'; }
+
+function ta3Toast(msg, ms) {
+  const t = el('ta3Toast'); if (!t) return;
+  t.textContent = msg; t.style.display = 'block';
+  clearTimeout(ta3Toast._t); ta3Toast._t = setTimeout(() => { t.style.display = 'none'; }, ms || 2400);
+}
+
+// ---------- 소개영업 안건 → 공통 안건 형태 ----------
+function ta3RefLead(r) {
+  const amt = Number(r.contract_amount || r.quote_amount || 0);
+  return {
+    id: r.lead_id, _ref: true, company: r.customer_name || '(고객명 없음)', contact: r.contact_person || '',
+    contactPhone: String(r.contact_phone || '').replace(/[^0-9]/g, ''), amount: amt, productType: r.product || '',
+    motive: '소개영업', stage: r.status || '접수대기', confidence: '', registeredDate: (r.created_at || '').slice(0, 10),
+    expectedDate: r.expected_contract_date || '', contractDate: r.contract_success_date || '', createdAt: r.created_at, memo: '', raw: r
+  };
+}
+function ta3FindLead(id) {
+  const t = ta2Leads(currentViewMode).find(l => l.id === id);
+  if (t) return t;
+  const r = TA3.refs.find(x => x.lead_id === id);
+  return r ? ta3RefLead(r) : null;
+}
+function ta3BuildItems() {
+  const out = [], today = todayStr();
+  ta2Leads(currentViewMode).forEach(l => {
+    const g = ta3GrpTa(l.stage), pl = TA3.places[l.id];
+    out.push({
+      src: 'ta', id: l.id, name: l.company, contact: l.contact, phone: l.contactPhone, amount: Number(l.amount || 0), group: g,
+      stage: ta2StageLabel(l.stage), conf: l.confidence, product: l.productType, address: (pl && pl.address) || '',
+      date: l.stage === '수주完' ? (l.contractDate || l.expectedDate) : l.expectedDate, updated: l.updatedAt || '', raw: l
+    });
+  });
+  TA3.refs.forEach(r => {
+    const g = ta3GrpRef(r.status), pl = TA3.places[r.lead_id];
+    out.push({
+      src: 'ref', id: r.lead_id, name: r.customer_name || '(고객명 없음)', contact: r.contact_person, phone: String(r.contact_phone || '').replace(/[^0-9]/g, ''),
+      amount: Number(r.contract_amount || r.quote_amount || 0), group: g, stage: r.status || '접수대기', conf: '', product: r.product,
+      address: (pl && pl.address) || r.address || '', date: r.expected_contract_date || '', updated: r.updated_at || r.created_at || '', raw: r
+    });
+  });
+  TA3.items = out;
+  return out;
+}
+// 소개영업 면담 일정(meeting_datetime)을 일정으로 함께 표시
+function ta3AllScheds() {
+  const m = [];
+  TA3.refs.forEach(r => {
+    if (!r.meeting_datetime) return; const d = new Date(r.meeting_datetime); if (isNaN(d)) return;
+    m.push({ id: 'm-' + r.lead_id, lead_id: r.lead_id, sched_date: `${d.getFullYear()}-${TA2_PAD(d.getMonth() + 1)}-${TA2_PAD(d.getDate())}`,
+      sched_time: `${TA2_PAD(d.getHours())}:${TA2_PAD(d.getMinutes())}`, title: '면담' + (r.meeting_method ? ' (' + r.meeting_method + ')' : ''), done: false });
+  });
+  return TA3.scheds.concat(m);
+}
+function ta3Item(id) { return TA3.items.find(i => i.id === id); }
+
+// ---------- 데이터 로드 ----------
+async function ta3LoadRefs() {
+  try {
+    const { data, error } = await db.from('leads').select('*').eq('assigned_rep', currentViewMode).order('created_at', { ascending: false }).limit(500);
+    if (error) throw error;
+    TA3.refs = data || []; TA3.refErr = '';
+  } catch (e) { TA3.refs = []; TA3.refErr = (e && e.message) || String(e); }
+}
+async function ta3LoadPlaces() {
+  if (await ta2Probe('ta_places') === 'remote') {
+    const { data, error } = await db.from('ta_places').select('*').eq('consultant', currentViewMode);
+    if (!error) { TA3.places = {}; (data || []).forEach(p => { TA3.places[p.lead_id] = p; }); return; }
+  }
+  TA3.places = {};
+  ta2LsGet(TA3_LS_PLACES).filter(p => p.consultant === currentViewMode).forEach(p => { TA3.places[p.lead_id] = p; });
+}
+async function ta3PlaceSave(id, src, patch) {
+  const base = TA3.places[id] || {};
+  const row = Object.assign({}, base, patch, { lead_id: id, src: src, consultant: currentViewMode, updated_at: new Date().toISOString() });
+  if (await ta2Probe('ta_places') === 'remote') {
+    const { error } = await db.from('ta_places').upsert([row], { onConflict: 'lead_id' });
+    if (error) throw error;
+  } else {
+    const arr = ta2LsGet(TA3_LS_PLACES).filter(p => p.lead_id !== id); arr.push(row);
+    if (!ta2LsSet(TA3_LS_PLACES, arr)) throw new Error('저장 공간 부족');
+  }
+  TA3.places[id] = row;
+  return row;
+}
+async function ta3LoadScheds() {
+  if (await ta2Probe('ta_schedules') === 'remote') {
+    const { data, error } = await db.from('ta_schedules').select('*').eq('consultant', currentViewMode).order('sched_date', { ascending: true }).limit(1000);
+    if (!error) { TA3.scheds = data || []; return; }
+  }
+  TA3.scheds = ta2LsGet(TA2_LS_SCHEDS).filter(s => s.consultant === currentViewMode);
+}
+
+// ---------- 지도 엔진 (네이버지도 → 키 없으면 OpenStreetMap) ----------
+const MAPK = { kind: null, loading: null, authFail: false };
+function ta3KakaoKey() { try { return (localStorage.getItem('S1_KAKAO_MAP_KEY') || KAKAO_MAP_KEY || '').trim(); } catch (e) { return KAKAO_MAP_KEY; } }
+function ta3NaverKey() { try { return (localStorage.getItem('S1_NAVER_MAP_KEY') || NAVER_MAP_KEY || '').trim(); } catch (e) { return NAVER_MAP_KEY; } }
+function ta3LoadScript(src) { return new Promise((res, rej) => { const s = document.createElement('script'); s.src = src; s.onload = res; s.onerror = () => rej(new Error('로드 실패: ' + src)); document.head.appendChild(s); }); }
+function ta3LoadCss(href) { const l = document.createElement('link'); l.rel = 'stylesheet'; l.href = href; document.head.appendChild(l); }
+window.navermap_authFailure = function () { MAPK.authFail = true; ta3Toast('네이버 지도 인증 실패 — 키와 등록된 웹 서비스 URL을 확인하세요', 4500); };
+function ta3MapInit() {
+  if (MAPK.loading) return MAPK.loading;
+  MAPK.loading = (async () => {
+    const kk = ta3KakaoKey();
+    if (kk) {
+      try {
+        await ta3LoadScript('https://dapi.kakao.com/v2/maps/sdk.js?appkey=' + encodeURIComponent(kk) + '&libraries=services&autoload=false');
+        await new Promise((res, rej) => { if (!(window.kakao && kakao.maps)) return rej(new Error('kakao sdk')); kakao.maps.load(res); });
+        MAPK.kind = 'kakao'; return 'kakao';
+      } catch (e) { console.warn('[TA3] 카카오맵 로드 실패, OSM으로 대체', e); }
+    }
+    const key = kk ? '' : ta3NaverKey();
+    if (key) {
+      try {
+        await ta3LoadScript('https://oapi.map.naver.com/openapi/v3/maps.js?ncpKeyId=' + encodeURIComponent(key) + '&submodules=geocoder');
+        if (window.naver && naver.maps) { MAPK.kind = 'naver'; return 'naver'; }
+      } catch (e) { console.warn('[TA3] 네이버 지도 로드 실패, OSM으로 대체', e); }
+    }
+    ta3LoadCss('https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css');
+    await ta3LoadScript('https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js');
+    MAPK.kind = 'osm'; return 'osm';
+  })();
+  return MAPK.loading;
+}
+function ta3PinHtml(color, src, label, sel) {
+  return `<div class="ta3-pin${src === 'ref' ? ' ref' : ''}${sel ? ' sel' : ''}" style="--c:${color}"><span>${label || ''}</span></div>`;
+}
+// 지도 래퍼: setView / addMarker / clear / fit / center / onMove / onClick / invalidate
+function ta3NewMap(container, opts) {
+  opts = opts || {};
+  const lat = opts.lat || TA3_DEFAULT_CENTER.lat, lng = opts.lng || TA3_DEFAULT_CENTER.lng, zoom = opts.zoom || 14;
+  if (MAPK.kind === 'kakao') {
+    const K = kakao.maps, lv = z => Math.max(1, Math.min(14, 19 - z));
+    const map = new K.Map(container, { center: new K.LatLng(lat, lng), level: lv(zoom) });
+    let ms = [];
+    const api = {
+      setView(a, b, z) { map.setCenter(new K.LatLng(a, b)); if (z) map.setLevel(lv(z)); },
+      addMarker(o) {
+        const d = document.createElement('div'); d.innerHTML = o.html; if (o.onClick) d.addEventListener('click', o.onClick);
+        const m = new K.CustomOverlay({ position: new K.LatLng(o.lat, o.lng), content: d, xAnchor: 0.5, yAnchor: 1, map: map });
+        ms.push(m); return m;
+      },
+      clear() { ms.forEach(m => m.setMap(null)); ms = []; },
+      fit(pts) {
+        if (!pts.length) return;
+        if (pts.length === 1) { api.setView(pts[0][0], pts[0][1], 16); return; }
+        const b = new K.LatLngBounds(); pts.forEach(p => b.extend(new K.LatLng(p[0], p[1])));
+        map.setBounds(b, 110, 30, 90, 30);
+      },
+      center() { const c = map.getCenter(); return { lat: c.getLat(), lng: c.getLng() }; },
+      onMove(cb) { K.event.addListener(map, 'idle', cb); },
+      onClick(cb) { K.event.addListener(map, 'click', e => cb(e.latLng.getLat(), e.latLng.getLng())); },
+      invalidate() { map.relayout(); }
+    };
+    return api;
+  }
+  if (MAPK.kind === 'naver') {
+    const map = new naver.maps.Map(container, { center: new naver.maps.LatLng(lat, lng), zoom: zoom + 1, zoomControl: false, mapDataControl: false, scaleControl: false, logoControl: true });
+    let ms = [];
+    const api = {
+      setView(a, b, z) { map.setCenter(new naver.maps.LatLng(a, b)); if (z) map.setZoom(z + 1); },
+      addMarker(o) {
+        const m = new naver.maps.Marker({ position: new naver.maps.LatLng(o.lat, o.lng), map: map, icon: { content: o.html, anchor: new naver.maps.Point(15, 32) } });
+        if (o.onClick) naver.maps.Event.addListener(m, 'click', o.onClick);
+        ms.push(m); return m;
+      },
+      clear() { ms.forEach(m => m.setMap(null)); ms = []; },
+      fit(pts) {
+        if (!pts.length) return;
+        if (pts.length === 1) { api.setView(pts[0][0], pts[0][1], 16); return; }
+        const b = new naver.maps.LatLngBounds(); pts.forEach(p => b.extend(new naver.maps.LatLng(p[0], p[1])));
+        map.fitBounds(b, { top: 110, bottom: 90, left: 30, right: 30 });
+      },
+      center() { const c = map.getCenter(); return { lat: c.lat(), lng: c.lng() }; },
+      onMove(cb) { naver.maps.Event.addListener(map, 'idle', cb); },
+      onClick(cb) { naver.maps.Event.addListener(map, 'click', e => cb(e.coord.lat(), e.coord.lng())); },
+      invalidate() { naver.maps.Event.trigger(map, 'resize'); }
+    };
+    return api;
+  }
+  const map = L.map(container, { zoomControl: false, attributionControl: true }).setView([lat, lng], zoom);
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '© OpenStreetMap' }).addTo(map);
+  const layer = L.layerGroup().addTo(map);
+  return {
+    setView(a, b, z) { map.setView([a, b], z || map.getZoom()); },
+    addMarker(o) {
+      const m = L.marker([o.lat, o.lng], { icon: L.divIcon({ html: o.html, className: '', iconSize: [30, 30], iconAnchor: [15, 30] }) }).addTo(layer);
+      if (o.onClick) m.on('click', o.onClick);
+      return m;
+    },
+    clear() { layer.clearLayers(); },
+    fit(pts) {
+      if (!pts.length) return;
+      if (pts.length === 1) { map.setView(pts[0], 16); return; }
+      map.fitBounds(L.latLngBounds(pts), { padding: [50, 50] });
+    },
+    center() { const c = map.getCenter(); return { lat: c.lat, lng: c.lng }; },
+    onMove(cb) { map.on('moveend', cb); },
+    onClick(cb) { map.on('click', e => cb(e.latlng.lat, e.latlng.lng)); },
+    invalidate() { map.invalidateSize(); }
+  };
+}
+function ta3Sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+let TA3_LAST_NOM = 0;
+async function ta3Geocode(q) {
+  q = String(q || '').trim(); if (!q) return null;
+  await ta3MapInit();
+  if (MAPK.kind === 'kakao') {
+    const S = kakao.maps.services;
+    const byAddr = new Promise(res => new S.Geocoder().addressSearch(q, (r, st) => res(st === S.Status.OK && r.length ? { lat: parseFloat(r[0].y), lng: parseFloat(r[0].x), address: (r[0].road_address && r[0].road_address.address_name) || r[0].address_name || q } : null)));
+    const a = await byAddr; if (a) return a;
+    return new Promise(res => new S.Places().keywordSearch(q, (r, st) => res(st === S.Status.OK && r.length ? { lat: parseFloat(r[0].y), lng: parseFloat(r[0].x), address: r[0].road_address_name || r[0].address_name || q } : null)));
+  }
+  if (MAPK.kind === 'naver' && naver.maps.Service) {
+    return new Promise(res => naver.maps.Service.geocode({ query: q }, (st, r) => {
+      if (st !== naver.maps.Service.Status.OK || !r.v2 || !r.v2.addresses || !r.v2.addresses.length) return res(null);
+      const a = r.v2.addresses[0]; res({ lat: parseFloat(a.y), lng: parseFloat(a.x), address: a.roadAddress || a.jibunAddress || q });
+    }));
+  }
+  const wait = 1100 - (Date.now() - TA3_LAST_NOM); if (wait > 0) await ta3Sleep(wait);
+  TA3_LAST_NOM = Date.now();
+  try {
+    const r = await fetch('https://nominatim.openstreetmap.org/search?format=jsonv2&limit=1&countrycodes=kr&accept-language=ko&q=' + encodeURIComponent(q));
+    const j = await r.json(); if (!j.length) return null;
+    return { lat: parseFloat(j[0].lat), lng: parseFloat(j[0].lon), address: q };
+  } catch (e) { return null; }
+}
+async function ta3Reverse(lat, lng) {
+  await ta3MapInit();
+  if (MAPK.kind === 'kakao') {
+    const S = kakao.maps.services;
+    return new Promise(res => new S.Geocoder().coord2Address(lng, lat, (r, st) => {
+      if (st !== S.Status.OK || !r.length) return res('');
+      res((r[0].road_address && r[0].road_address.address_name) || (r[0].address && r[0].address.address_name) || '');
+    }));
+  }
+  if (MAPK.kind === 'naver' && naver.maps.Service) {
+    return new Promise(res => naver.maps.Service.reverseGeocode({ coords: new naver.maps.LatLng(lat, lng), orders: [naver.maps.Service.OrderType.ROAD_ADDR, naver.maps.Service.OrderType.ADDR].join(',') }, (st, r) => {
+      if (st !== naver.maps.Service.Status.OK) return res('');
+      const a = r.v2 && r.v2.address; res(a ? (a.roadAddress || a.jibunAddress || '') : '');
+    }));
+  }
+  const wait = 1100 - (Date.now() - TA3_LAST_NOM); if (wait > 0) await ta3Sleep(wait);
+  TA3_LAST_NOM = Date.now();
+  try {
+    const r = await fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&accept-language=ko&lat=${lat}&lon=${lng}`);
+    const j = await r.json(); if (!j || !j.display_name) return '';
+    const parts = j.display_name.split(',').map(s => s.trim()).filter(s => s && s !== '대한민국' && !/^\d{5}$/.test(s));
+    return parts.reverse().join(' ');
+  } catch (e) { return ''; }
+}
+function ta3Gps() {
+  return new Promise((res, rej) => {
+    if (!navigator.geolocation) return rej(new Error('이 기기는 위치 기능을 지원하지 않습니다.'));
+    navigator.geolocation.getCurrentPosition(p => res({ lat: p.coords.latitude, lng: p.coords.longitude, acc: p.coords.accuracy }),
+      e => rej(new Error(e.code === 1 ? '위치 권한이 꺼져 있습니다. 브라우저 설정에서 허용해주세요.' : '현재 위치를 가져오지 못했습니다.')), { enableHighAccuracy: true, timeout: 12000, maximumAge: 15000 });
+  });
+}
+function ta3NavUrl(kind, name, pl) {
+  const n = encodeURIComponent(name || '목적지');
+  if (kind === 'kakao') return pl && pl.lat ? `https://map.kakao.com/link/to/${n},${pl.lat},${pl.lng}` : `https://map.kakao.com/link/search/${encodeURIComponent((pl && pl.address) || name)}`;
+  if (pl && pl.lat) return `nmap://route/car?dlat=${pl.lat}&dlng=${pl.lng}&dname=${n}&appname=kr.co.s1.tamanager`;
+  return `https://map.naver.com/p/search/${encodeURIComponent((pl && pl.address) || name)}`;
+}
+function ta3OpenNav(kind, name, pl) {
+  const url = ta3NavUrl(kind, name, pl);
+  if (kind === 'naver' && pl && pl.lat) {
+    const web = `https://map.naver.com/p/search/${encodeURIComponent(pl.address || name)}`;
+    let left = false; const onv = () => { if (document.hidden) left = true; }; document.addEventListener('visibilitychange', onv);
+    location.href = url;
+    setTimeout(() => { document.removeEventListener('visibilitychange', onv); if (!left) window.open(web, '_blank'); }, 1500);
+  } else window.open(url, '_blank');
+}
+
+// ---------- 앱 셸 ----------
+async function ta3Boot() {
+  document.body.classList.add('ta3-on');
+  const name = currentViewMode;
+  el('ta3Title').textContent = `영업 TA 관리 포털 (${name})`;
+  el('ta3Ini').textContent = (name || '·').slice(0, 1);
+  try { const t = sessionStorage.getItem('S1_TA3_TAB'); if (t && !TA3.booted) TA3.tab = t; } catch (e) {}
+  TA3.booted = true;
+  ta3Refresh();
+  await ta3MapInit().catch(() => {});
+  await Promise.all([ta3LoadRefs(), ta3LoadPlaces(), ta3LoadScheds()]);
+  ta3Refresh();
+}
+function ta3SetTab(t) {
+  TA3.tab = t;
+  try { sessionStorage.setItem('S1_TA3_TAB', t); } catch (e) {}
+  const map = { home: 'ta3ScrHome', items: 'ta3ScrItems', map: 'ta3ScrMap', cal: 'ta3ScrCal', my: 'ta3ScrMy' };
+  Object.keys(map).forEach(k => el(map[k]).classList.toggle('on', k === t));
+  document.querySelectorAll('.ta3-tab[data-t]').forEach(b => b.classList.toggle('on', b.dataset.t === t));
+  window.scrollTo(0, 0);
+  ta3Refresh();
+}
+function ta3Refresh() {
+  ta3BuildItems();
+  const t = TA3.tab;
+  if (t === 'home') ta3RenderHome();
+  else if (t === 'items') ta3RenderItems();
+  else if (t === 'map') ta3RenderMap();
+  else if (t === 'cal') ta3RenderCal();
+  else if (t === 'my') ta3RenderMy();
+}
+function ta3Open(id, tab, date) { ta2OpenDetail(id, tab, date); }
+
+// ---------- 공통 렌더 조각 ----------
+function ta3SchedLabel(it) {
+  if (!it.date) return '<span style="color:#9ca3af;">일정 미정</span>';
+  const base = it.group === 'won' ? '계약' : '예정';
+  let em = '';
+  if (it.group === 'ing' || it.group === 'hold') {
+    const d = ta2DayDiff(it.date);
+    if (d === 0) em = '<em class="today">오늘</em>'; else if (d > 0 && d <= 3) em = `<em class="soon">D-${d}</em>`; else if (d < 0) em = `<em class="late">${-d}일 지남</em>`;
+  }
+  return `${base} ${ta2DateLabel(it.date)}${em}`;
+}
+function ta3CardHtml(it) {
+  const g = TA3_GRP[it.group], tel = String(it.phone || '').replace(/[^0-9]/g, '');
+  const pl = TA3.places[it.id];
+  const srcTag = it.src === 'ref' ? '<span class="ta3-tag" style="background:#ede9fe;color:#6d28d9;">소개영업</span>' : '<span class="ta3-tag" style="background:#e0e7ff;color:#3730a3;">TA</span>';
+  const stBg = it.src === 'ta' ? (STAGE_BG[it.raw.stage] || '#eee') : '#eef1f7', stCl = it.src === 'ta' ? (STAGE_COLOR[it.raw.stage] || '#374151') : g.c;
+  return `<div class="ta3-card" style="--c:${g.c}" onclick="ta3Open('${escapeHtml(it.id)}')">
+    <div class="r1"><div class="nm">${escapeHtml(it.name)}</div></div>
+    ${it.amount ? `<div class="amt">${formatCurrency(it.amount)}</div>` : ''}
+    <div class="r2">${srcTag}<span class="ta3-tag" style="background:${stBg};color:${stCl};">${escapeHtml(it.stage)}</span>${it.conf ? `<span class="ta3-tag" style="background:#f3f4f6;color:#374151;">확도 ${escapeHtml(it.conf)}</span>` : ''}${it.product ? `<span class="ta3-tag" style="background:#f3f4f6;color:#374151;">${escapeHtml(it.product)}</span>` : ''}</div>
+    <div class="r3">📅 ${ta3SchedLabel(it)}${it.contact ? ' · 👤 ' + escapeHtml(it.contact) : ''}<br>${pl && pl.lat ? '📍 ' : '📌 '}${it.address ? escapeHtml(it.address) : '<span style="color:#b6bcc8;">위치 미등록</span>'}</div>
+    ${tel ? `<button type="button" class="ta3-call" onclick="event.stopPropagation();location.href='tel:${tel}'" aria-label="전화">📞</button>` : ''}
+  </div>`;
+}
+function ta3RowHtml(timeLabel, title, sub, onclick) {
+  return `<div class="ta3-row" onclick="${onclick}"><div class="tm">${timeLabel}</div><div style="flex:1;min-width:0;"><div class="ti">${escapeHtml(title)}</div>${sub ? `<div class="su">${sub}</div>` : ''}</div><span style="color:#c4c8d0;">›</span></div>`;
+}
+
+// ---------- 홈 ----------
+function ta3RenderHome() {
+  const name = currentViewMode, w = ta2WorkdayInfo(), month = currentMonthStr(), today = todayStr();
+  el('ta3HDate').textContent = todayLabel();
+  el('ta3HChips').innerHTML = (w.todayWork ? `<span class="ta3-pill">영업일 ${w.elapsed}일차 / ${w.total}일</span>` : '<span class="ta3-pill am">휴무일</span>') + `<span class="ta3-pill am">잔여 영업일 ${w.left}일</span>`;
+
+  const leads = ta2Leads(name), ing = leads.filter(l => l.stage === '진행중');
+  const rem = ing.filter(l => (l.expectedDate || '').slice(0, 7) === month);
+  const won = leads.filter(l => l.stage === '수주完' && (l.contractDate || '').slice(0, 7) === month);
+  const wonAmt = ta2Sum(won), avg = ing.length ? Math.round(ta2Sum(ing) / ing.length) : 0;
+  const target = getConsultantTarget(name, month, 'all');
+  const pct = target > 0 ? Math.round(wonAmt / target * 1000) / 10 : null;
+  const refIng = TA3.refs.filter(r => ta3GrpRef(r.status) === 'ing').length, refWon = TA3.refs.filter(r => ta3GrpRef(r.status) === 'won').length;
+  el('ta3Kpi').innerHTML = `
+    <div class="ta3-k"><div class="l">진행 TA</div><div class="v">${formatCurrency(ta2Sum(ing))}</div><div class="n">${ing.length}건</div></div>
+    <div class="ta3-k"><div class="l">이달 잔여 TA</div><div class="v">${formatCurrency(ta2Sum(rem))}</div><div class="n">${rem.length}건</div></div>
+    <div class="ta3-k"><div class="l">이달 수주 TA</div><div class="v">${formatCurrency(wonAmt)}</div><div class="n">${won.length}건${pct !== null ? ` · 목표 ${pct}%` : ''}</div>${pct !== null ? `<div class="ta3-bar2"><i style="width:${Math.min(100, pct)}%"></i></div>` : ''}</div>
+    <div class="ta3-k"><div class="l">TA 평균 단가</div><div class="v">${formatCurrency(avg)}</div><div class="n">진행중 기준</div></div>
+    <div class="ta3-k wide" onclick="TA3.f.src='ref';TA3.f.group='all';ta3SetTab('items')"><div><div class="l">소개영업 안건</div><div class="v" style="font-size:17px;">진행 ${refIng}건 · 계약완료 ${refWon}건</div></div><span class="ta3-pill pu">${TA3.refErr ? '불러오기 실패' : '전체 ' + TA3.refs.length + '건 ›'}</span></div>`;
+
+  const todayExp = ing.filter(l => l.expectedDate === today);
+  el('ta3TodayAmt').textContent = formatCurrency(ta2Sum(todayExp));
+
+  // 오늘의 수첩: 오늘 일정 + 오늘 수주예정(TA/소개)
+  const rows = [];
+  ta3AllScheds().filter(s => s.sched_date === today && !s.done).sort((a, b) => (a.sched_time || '').localeCompare(b.sched_time || '')).forEach(s => {
+    const it = ta3Item(s.lead_id);
+    rows.push(ta3RowHtml(s.sched_time ? String(s.sched_time).slice(0, 5) : '종일', s.title, it ? escapeHtml(it.name) : '', `ta3Open('${escapeHtml(s.lead_id)}','cal','${today}')`));
+  });
+  TA3.items.filter(i => i.date === today && i.group === 'ing').forEach(i => rows.push(ta3RowHtml(i.src === 'ref' ? '소개' : '수주', `${i.name} — 계약 예정`, i.amount ? formatCurrency(i.amount) : '', `ta3Open('${escapeHtml(i.id)}')`)));
+  el('ta3TodayCnt').textContent = rows.length ? rows.length + '건' : '';
+  el('ta3TodayList').innerHTML = rows.join('') || '<div class="ta3-empty">오늘 예정된 일정이 없습니다.<br>「일정」 탭에서 고객 약속을 기록해보세요.</div>';
+
+  const wk = []; const end = new Date(today + 'T00:00:00'); end.setDate(end.getDate() + 7);
+  const endStr = `${end.getFullYear()}-${TA2_PAD(end.getMonth() + 1)}-${TA2_PAD(end.getDate())}`;
+  ta3AllScheds().filter(s => s.sched_date > today && s.sched_date <= endStr && !s.done).forEach(s => {
+    const it = ta3Item(s.lead_id); wk.push({ d: s.sched_date + (s.sched_time || ''), h: ta3RowHtml(ta2DateLabel(s.sched_date), s.title, it ? escapeHtml(it.name) : '', `ta3Open('${escapeHtml(s.lead_id)}','cal','${s.sched_date}')`) });
+  });
+  TA3.items.filter(i => i.group === 'ing' && i.date > today && i.date <= endStr).forEach(i => wk.push({ d: i.date + 'z', h: ta3RowHtml(ta2DateLabel(i.date), `${i.name} — ${i.src === 'ref' ? '예상 계약' : '수주 예정'}`, i.amount ? formatCurrency(i.amount) : '', `ta3Open('${escapeHtml(i.id)}')`) }));
+  wk.sort((a, b) => a.d.localeCompare(b.d));
+  el('ta3WeekList').innerHTML = wk.map(x => x.h).join('') || '<div class="ta3-empty">앞으로 7일간 예정이 없습니다.</div>';
+
+  const late = TA3.items.filter(i => i.group === 'ing' && i.date && i.date < today).sort((a, b) => a.date.localeCompare(b.date));
+  el('ta3LateCnt').textContent = late.length ? late.length + '건' : '';
+  el('ta3LateList').innerHTML = late.slice(0, 6).map(i => ta3RowHtml(`<span style="color:#b91c1c">${-ta2DayDiff(i.date)}일</span>`, i.name, `${i.src === 'ref' ? '소개영업' : 'TA'} · ${escapeHtml(i.stage)}${i.amount ? ' · ' + formatCurrency(i.amount) : ''}`, `ta3Open('${escapeHtml(i.id)}')`)).join('') + (late.length > 6 ? `<div class="ta3-empty" style="padding:8px;">외 ${late.length - 6}건 — 안건 탭에서 확인</div>` : '') || '<div class="ta3-empty">일정이 지난 진행 안건이 없습니다 👍</div>';
+}
+
+// ---------- 안건 ----------
+function ta3SetQ(v) { TA3.f.q = v || ''; ta3RenderItems(); }
+function ta3SetSrc(v) { TA3.f.src = v; ta3RenderItems(); }
+function ta3SetGroup(v) { TA3.f.group = v; ta3RenderItems(); }
+function ta3FilterItems(src, q) {
+  let a = TA3.items.slice();
+  if (src !== 'all') a = a.filter(i => i.src === src);
+  q = String(q || '').trim().toLowerCase();
+  if (q) {
+    const qd = q.replace(/[^0-9]/g, '');
+    a = a.filter(i => ((i.name || '') + ' ' + (i.contact || '') + ' ' + (i.address || '') + ' ' + (i.phone || '')).toLowerCase().includes(q) || (qd.length >= 3 && String(i.phone || '').replace(/[^0-9]/g, '').includes(qd)));
+  }
+  return a;
+}
+function ta3Sorted(a) {
+  const ord = { ing: 0, hold: 1, won: 2, fail: 3 };
+  return a.slice().sort((x, y) => ord[x.group] - ord[y.group] || (x.group === 'ing' || x.group === 'hold' ? (x.date || '9999').localeCompare(y.date || '9999') : (y.date || y.updated || '').localeCompare(x.date || x.updated || '')));
+}
+function ta3SegHtml(cur, fn) {
+  return [['all', '전체'], ['ta', 'TA'], ['ref', '소개영업']].map(([v, l]) => `<button type="button" class="${cur === v ? 'on' : ''}" onclick="${fn}('${v}')">${l}</button>`).join('');
+}
+function ta3ChipsHtml(base, cur, fn) {
+  const cnt = g => g === 'all' ? base.length : base.filter(i => i.group === g).length;
+  return [['all', '전체'], ['ing', '진행중'], ['won', '수주완료'], ['fail', '실패'], ['hold', '보류']].map(([v, l]) => `<button type="button" class="ta3-chip${cur === v ? ' on' : ''}" onclick="${fn}('${v}')">${l}<b>${cnt(v)}</b></button>`).join('');
+}
+function ta3RenderItems() {
+  el('ta3Src').innerHTML = ta3SegHtml(TA3.f.src, 'ta3SetSrc');
+  if (el('ta3Q').value !== TA3.f.q) el('ta3Q').value = TA3.f.q;
+  const base = ta3FilterItems(TA3.f.src, TA3.f.q);
+  el('ta3Groups').innerHTML = ta3ChipsHtml(base, TA3.f.group, 'ta3SetGroup');
+  const list = ta3Sorted(TA3.f.group === 'all' ? base : base.filter(i => i.group === TA3.f.group));
+  let note = '';
+  if (TA3.f.src !== 'ta' && TA3.refErr) note = `<div class="ta3-mapnote" style="margin-bottom:10px;"><span>소개영업 안건을 불러오지 못했습니다.<br><small style="font-weight:600">${escapeHtml(TA3.refErr)}</small></span><button type="button" onclick="ta3LoadRefs().then(ta3Refresh)">다시 시도</button></div>`;
+  el('ta3Items').innerHTML = note + (list.map(ta3CardHtml).join('') || '<div class="ta3-empty">조건에 맞는 안건이 없습니다.</div>');
+}
+
+// ---------- 지도 ----------
+function ta3MapSrcSet(v) { ta3MapSet('src', v); }
+function ta3MapSet(k, v) { TA3.mapF[k] = v; ta3RenderMap(true); }
+async function ta3RenderMap(noFit) {
+  el('ta3MapSrc').innerHTML = ta3SegHtml(TA3.mapF.src, 'ta3MapSrcSet');
+  const base = TA3.items.filter(i => TA3.mapF.src === 'all' || i.src === TA3.mapF.src);
+  const cnt = g => g === 'all' ? base.length : base.filter(i => i.group === g).length;
+  el('ta3MapGroups').innerHTML = [['all', '전체'], ['ing', '진행중'], ['won', '수주완료'], ['fail', '실패'], ['hold', '보류']].map(([v, l]) => `<button type="button" class="ta3-chip${TA3.mapF.group === v ? ' on' : ''}" onclick="ta3MapSet('group','${v}')">${l}<b>${cnt(v)}</b></button>`).join('');
+  const shown = base.filter(i => TA3.mapF.group === 'all' || i.group === TA3.mapF.group);
+  const placed = shown.filter(i => TA3.places[i.id] && TA3.places[i.id].lat);
+  const noPlace = shown.filter(i => !(TA3.places[i.id] && TA3.places[i.id].lat));
+  const geoable = noPlace.filter(i => i.address);
+  el('ta3MapNote').innerHTML = noPlace.length ? `<div class="ta3-mapnote"><span>📌 위치 미등록 ${noPlace.length}건${geoable.length ? ` (주소 있음 ${geoable.length}건)` : ''}</span>${geoable.length ? `<button type="button" onclick="ta3BatchGeo()">주소로 자동 등록</button>` : `<button type="button" onclick="ta3SetTab('items')">안건에서 등록</button>`}</div>` : '';
+  try { await ta3MapInit(); } catch (e) { el('ta3Map').innerHTML = '<div class="ta3-empty">지도를 불러오지 못했습니다. 네트워크를 확인해주세요.</div>'; return; }
+  if (!TA3.map) {
+    el('ta3Map').innerHTML = '';
+    TA3.map = ta3NewMap(el('ta3Map'));
+    TA3.map.onClick(() => { el('ta3Prev').style.display = 'none'; TA3.mapSel = null; });
+  }
+  TA3.map.invalidate();
+  TA3.map.clear();
+  placed.forEach(i => {
+    const pl = TA3.places[i.id], g = TA3_GRP[i.group];
+    TA3.map.addMarker({ lat: pl.lat, lng: pl.lng, html: ta3PinHtml(g.c, i.src, i.src === 'ref' ? '소' : 'T', TA3.mapSel === i.id), onClick: () => ta3MapPreview(i.id) });
+  });
+  if (!noFit) TA3.map.fit(placed.map(i => [TA3.places[i.id].lat, TA3.places[i.id].lng]));
+}
+function ta3MapPreview(id) {
+  const i = ta3Item(id); if (!i) return;
+  TA3.mapSel = id; const pl = TA3.places[id], g = TA3_GRP[i.group], tel = String(i.phone || '').replace(/[^0-9]/g, '');
+  el('ta3Prev').innerHTML = `<button type="button" class="x" onclick="el('ta3Prev').style.display='none'">×</button>
+    <div class="nm">${escapeHtml(i.name)}</div>
+    <div style="margin-top:6px;display:flex;gap:5px;flex-wrap:wrap;"><span class="ta3-tag" style="background:#eef1f7;color:${g.c};">${escapeHtml(i.stage)}</span><span class="ta3-tag" style="background:${i.src === 'ref' ? '#ede9fe' : '#e0e7ff'};color:${i.src === 'ref' ? '#6d28d9' : '#3730a3'};">${i.src === 'ref' ? '소개영업' : 'TA'}</span>${i.amount ? `<span class="ta3-tag" style="background:#f3f4f6;color:#0f2547;">${formatCurrency(i.amount)}</span>` : ''}</div>
+    <div class="ad">📍 ${escapeHtml((pl && pl.address) || i.address || '')}</div>
+    <div class="bt"><button type="button" style="background:#0f2547;color:#fff;" onclick="ta3Open('${escapeHtml(id)}')">상세보기</button>
+      <button type="button" style="background:#03c75a;color:#fff;" onclick="ta3OpenNav('naver','${escapeHtml(i.name).replace(/'/g, '')}',TA3.places['${escapeHtml(id)}'])">길찾기</button>
+      ${tel ? `<button type="button" style="background:#16a34a;color:#fff;" onclick="location.href='tel:${tel}'">전화</button>` : `<button type="button" style="background:#eef1f7;color:#1a2333;" onclick="ta3Open('${escapeHtml(id)}','place')">위치 수정</button>`}</div>`;
+  el('ta3Prev').style.display = 'block';
+  ta3RenderMap(true);
+}
+function ta3MapFit() {
+  if (!TA3.map) return;
+  const pts = TA3.items.filter(i => TA3.places[i.id] && TA3.places[i.id].lat).map(i => [TA3.places[i.id].lat, TA3.places[i.id].lng]);
+  TA3.map.fit(pts);
+}
+async function ta3MapMyLoc() {
+  try {
+    const p = await ta3Gps(); await ta3MapInit();
+    if (!TA3.map) await ta3RenderMap(true);
+    TA3.map.setView(p.lat, p.lng, 16);
+    TA3.map.addMarker({ lat: p.lat, lng: p.lng, html: '<div class="ta3-me"></div>' });
+  } catch (e) { ta3Toast(e.message); }
+}
+let TA3_BATCH = false;
+async function ta3BatchGeo() {
+  if (TA3_BATCH) return;
+  const todo = TA3.items.filter(i => i.address && !(TA3.places[i.id] && TA3.places[i.id].lat));
+  if (!todo.length) return;
+  TA3_BATCH = true; let ok = 0, fail = 0;
+  for (let k = 0; k < todo.length; k++) {
+    ta3Toast(`주소로 위치 찾는 중... ${k + 1}/${todo.length}`, 4000);
+    const i = todo[k], r = await ta3Geocode(i.address);
+    if (r) { try { await ta3PlaceSave(i.id, i.src, { lat: r.lat, lng: r.lng, address: i.address }); ok++; } catch (e) { fail++; } } else fail++;
+    if (k % 3 === 2) ta3RenderMap(true);
+  }
+  TA3_BATCH = false;
+  ta3Toast(`위치 등록 ${ok}건 완료${fail ? ` · ${fail}건은 주소를 찾지 못했습니다` : ''}`, 4000);
+  ta3RenderMap();
+}
+
+// ---------- 일정 ----------
+function ta3CalMove(d) { const [y, m] = TA3.cal.ym.split('-').map(Number), x = new Date(y, m - 1 + d, 1); TA3.cal.ym = `${x.getFullYear()}-${TA2_PAD(x.getMonth() + 1)}`; ta3RenderCal(); }
+function ta3CalSel(ds) { TA3.cal.sel = ds; ta3RenderCal(); }
+function ta3RenderCal() {
+  if (!TA3.cal.ym) { TA3.cal.sel = todayStr(); TA3.cal.ym = TA3.cal.sel.slice(0, 7); }
+  const [y, m] = TA3.cal.ym.split('-').map(Number), first = new Date(y, m - 1, 1).getDay(), last = new Date(y, m, 0).getDate(), today = todayStr();
+  const mark = {};
+  const mk = (d, k) => { (mark[d] = mark[d] || {})[k] = true; };
+  ta3AllScheds().filter(s => !s.done).forEach(s => mk(s.sched_date, 's'));
+  TA3.items.filter(i => i.group === 'ing' && i.date).forEach(i => mk(i.date, i.src === 'ref' ? 'r' : 'e'));
+  el('ta3CalTitle').textContent = `${y}년 ${m}월`;
+  let h = WEEKDAY_KR.map(d => `<div class="dw">${d}</div>`).join('');
+  for (let i = 0; i < first; i++) h += '<button type="button" class="ta3-d out" tabindex="-1"></button>';
+  for (let d = 1; d <= last; d++) {
+    const ds = `${y}-${TA2_PAD(m)}-${TA2_PAD(d)}`, wd = new Date(y, m - 1, d).getDay(), c = ['ta3-d'], mm = mark[ds] || {};
+    if (wd === 0) c.push('sun'); else if (wd === 6) c.push('sat'); else if (KR_HOLIDAYS.has(ds)) c.push('hol');
+    if (ds === today) c.push('today'); if (ds === TA3.cal.sel) c.push('sel');
+    h += `<button type="button" class="${c.join(' ')}" onclick="ta3CalSel('${ds}')">${d}<span class="dots">${mm.s ? '<i></i>' : ''}${mm.e ? '<i class="e"></i>' : ''}${mm.r ? '<i class="r"></i>' : ''}</span></button>`;
+  }
+  el('ta3CalGrid').innerHTML = h;
+  const sel = TA3.cal.sel;
+  el('ta3CalSel').textContent = ta2FullDate(sel);
+  const rows = [];
+  ta3AllScheds().filter(s => s.sched_date === sel).sort((a, b) => (a.sched_time || '').localeCompare(b.sched_time || '')).forEach(s => {
+    const it = ta3Item(s.lead_id);
+    rows.push(ta3RowHtml(s.sched_time ? String(s.sched_time).slice(0, 5) : '종일', (s.done ? '✓ ' : '') + s.title, it ? escapeHtml(it.name) : '', `ta3Open('${escapeHtml(s.lead_id)}','cal','${sel}')`));
+  });
+  TA3.items.filter(i => i.date === sel && i.group === 'ing').forEach(i => rows.push(ta3RowHtml(i.src === 'ref' ? '소개' : '수주', `${i.name} — ${i.src === 'ref' ? '예상 계약' : '수주 예정'}`, i.amount ? formatCurrency(i.amount) : '', `ta3Open('${escapeHtml(i.id)}')`)));
+  el('ta3CalList').innerHTML = rows.join('') || '<div class="ta3-empty">이 날짜에 일정이 없습니다.<br>「＋ 일정 추가」로 고객과의 약속을 기록하세요.</div>';
+}
+function ta3CalAdd() { TA3.ipPick = TA3.cal.sel; el('ta3IpQ').value = ''; ta3IpRender(); el('ta3ItemPick').classList.add('on'); }
+function ta3IpClose() { el('ta3ItemPick').classList.remove('on'); }
+function ta3IpRender() {
+  const list = ta3Sorted(ta3FilterItems('all', el('ta3IpQ').value)).filter(i => i.group === 'ing' || i.group === 'hold').slice(0, 80);
+  el('ta3IpList').innerHTML = list.map(ta3CardHtml).join('').replace(/onclick="ta3Open\('([^']*)'\)"/g, (m, id) => `onclick="ta3IpGo('${id}')"`) || '<div class="ta3-empty">안건이 없습니다.</div>';
+}
+function ta3IpGo(id) { ta3IpClose(); ta3Open(id, 'cal', TA3.ipPick); }
+
+// ---------- MY ----------
+function ta3RenderMy() {
+  const name = currentViewMode, master = isMasterUser();
+  el('ta3Av').textContent = (name || '·').slice(0, 1);
+  el('ta3MyName').textContent = name;
+  el('ta3MyJob').textContent = (currentUser && currentUser.job) || '컨설턴트';
+  let m = `<button type="button" onclick="window.open(REFERRAL_APP_URL,'_blank')">소개영업 앱 열기 <small>접수·면담·견적 처리</small></button>
+    <button type="button" onclick="ta3Reload()">데이터 새로고침 <small>TA · 소개영업 · 위치 · 일정</small></button>`;
+  if (master) {
+    m += `<button type="button" onclick="switchView('master')">📊 통합 대시보드(관리자) <small>admin.html</small></button>`;
+    CONSULTANTS.filter(n => n !== name).forEach(n => { m += `<button type="button" onclick="switchView('${n}')">${n} 컨설턴트 화면 보기</button>`; });
+  }
+  m += `<button type="button" onclick="doLogout()" style="color:#b91c1c !important;">로그아웃</button>`;
+  el('ta3MyMenu').innerHTML = m;
+  el('ta3KeyInp').value = (function () { try { return localStorage.getItem('S1_KAKAO_MAP_KEY') || ''; } catch (e) { return ''; } })();
+  el('ta3MapStat').textContent = MAPK.kind === 'kakao' ? '현재: 카카오맵 사용 중' : (ta3KakaoKey() ? '현재: OpenStreetMap (카카오맵 로드 실패 — 키 종류(JavaScript 키), 웹 도메인 등록, 카카오맵 사용 설정을 확인하세요)' : '현재: OpenStreetMap 사용 중 (키를 입력하면 카카오맵으로 전환)');
+  el('ta3RefStat').innerHTML = TA3.refErr ? `⚠️ 소개영업 데이터를 불러오지 못했습니다.<br><span style="color:#8a94a6;font-weight:600">${escapeHtml(TA3.refErr)}</span>` : `소개영업 안건 중 <b>담당 컨설턴트가 ${escapeHtml(name)}</b>인 건 <b>${TA3.refs.length}건</b>을 함께 조회합니다. (읽기 전용 · 단계 처리는 소개영업 앱에서)`;
+}
+async function ta3Reload() {
+  ta3Toast('새로고침 중...');
+  try { await loadAllFromSupabase(); } catch (e) {}
+  await Promise.all([ta3LoadRefs(), ta3LoadPlaces(), ta3LoadScheds()]);
+  ta3Refresh(); ta3Toast('최신 데이터로 갱신했습니다');
+}
+function ta3SaveKey() {
+  const v = el('ta3KeyInp').value.trim();
+  try { if (v) localStorage.setItem('S1_KAKAO_MAP_KEY', v); else localStorage.removeItem('S1_KAKAO_MAP_KEY'); } catch (e) {}
+  ta3Toast('저장했습니다. 지도를 다시 불러옵니다...'); setTimeout(() => location.reload(), 700);
+}
+
+// ---------- 새 TA 등록 시 위치 ----------
+function ta3FormReset() { TA3.formPlace = null; if (el('afAddress')) el('afAddress').value = ''; if (el('afPlaceInfo')) el('afPlaceInfo').textContent = ''; }
+function ta3FormInfo() { const p = TA3.formPlace; el('afPlaceInfo').textContent = p && p.lat ? `✓ 위치 지정됨 (${p.lat.toFixed(5)}, ${p.lng.toFixed(5)})` : ''; }
+async function ta3FormGps() {
+  try {
+    ta3Toast('현재 위치 확인 중...'); const p = await ta3Gps(); const a = await ta3Reverse(p.lat, p.lng);
+    TA3.formPlace = { lat: p.lat, lng: p.lng, address: a }; if (a) el('afAddress').value = a; ta3FormInfo();
+  } catch (e) { ta3Toast(e.message, 3500); }
+}
+function ta3FormPick() {
+  const cur = TA3.formPlace;
+  ta3PickOnMap(cur, async r => { TA3.formPlace = r; if (r.address) el('afAddress').value = r.address; ta3FormInfo(); });
+}
+async function ta3FormGeo() {
+  const q = el('afAddress').value.trim(); if (!q) { ta3Toast('주소를 먼저 입력하세요'); return; }
+  ta3Toast('주소로 위치 찾는 중...'); const r = await ta3Geocode(q);
+  if (!r) { ta3Toast('주소를 찾지 못했습니다. 지도에서 직접 지정해보세요.', 3500); return; }
+  TA3.formPlace = { lat: r.lat, lng: r.lng, address: q }; ta3FormInfo();
+}
+async function ta3AfterCreate(id) {
+  const addr = (el('afAddress') && el('afAddress').value.trim()) || '';
+  const p = TA3.formPlace;
+  if (!p && !addr) return;
+  try { await ta3PlaceSave(id, 'ta', { lat: p ? p.lat : null, lng: p ? p.lng : null, address: addr || (p && p.address) || '' }); } catch (e) { ta3Toast('안건은 저장됐지만 위치 저장에 실패했습니다: ' + (e.message || e), 4000); }
+  TA3.formPlace = null; ta3Refresh();
+}
+
+// ---------- 위치 선택기 (중앙 핀) ----------
+let TA3_PK_CB = null, TA3_PK_T = null;
+async function ta3PickOnMap(init, cb) {
+  TA3_PK_CB = cb; el('ta3Picker').classList.add('on');
+  el('ta3PkQ').value = ''; el('ta3PkAddr').textContent = '지도를 움직여 핀 위치를 맞추세요'; el('ta3PkCoord').textContent = '';
+  try { await ta3MapInit(); } catch (e) { ta3Toast('지도를 불러오지 못했습니다'); ta3PkClose(); return; }
+  const c = (init && init.lat) ? init : null;
+  if (!TA3.pkMap) {
+    el('ta3PkMap').innerHTML = '';
+    TA3.pkMap = ta3NewMap(el('ta3PkMap'), c ? { lat: c.lat, lng: c.lng, zoom: 17 } : {});
+    TA3.pkMap.onMove(() => { clearTimeout(TA3_PK_T); TA3_PK_T = setTimeout(ta3PkUpdate, 450); });
+  }
+  TA3.pkMap.invalidate();
+  if (c) TA3.pkMap.setView(c.lat, c.lng, 17);
+  else { try { const p = await ta3Gps(); TA3.pkMap.setView(p.lat, p.lng, 17); } catch (e) { TA3.pkMap.setView(TA3_DEFAULT_CENTER.lat, TA3_DEFAULT_CENTER.lng, 14); } }
+  setTimeout(ta3PkUpdate, 500);
+}
+async function ta3PkUpdate() {
+  if (!TA3.pkMap || !el('ta3Picker').classList.contains('on')) return;
+  const c = TA3.pkMap.center(); el('ta3PkCoord').textContent = `${c.lat.toFixed(5)}, ${c.lng.toFixed(5)}`;
+  el('ta3PkAddr').textContent = '주소 확인 중...';
+  const a = await ta3Reverse(c.lat, c.lng); TA3.pkAddr = a;
+  el('ta3PkAddr').textContent = a || '주소를 확인할 수 없는 위치입니다 (좌표만 저장됩니다)';
+}
+async function ta3PkSearch() {
+  const q = el('ta3PkQ').value.trim(); if (!q) return;
+  ta3Toast('검색 중...'); const r = await ta3Geocode(q);
+  if (!r) { ta3Toast('검색 결과가 없습니다. 도로명/지번 주소로 다시 시도해보세요.', 3500); return; }
+  TA3.pkMap.setView(r.lat, r.lng, 17);
+}
+async function ta3PkGps() { try { const p = await ta3Gps(); TA3.pkMap.setView(p.lat, p.lng, 17); } catch (e) { ta3Toast(e.message, 3500); } }
+function ta3PkClose() { el('ta3Picker').classList.remove('on'); TA3_PK_CB = null; }
+function ta3PkOk() {
+  if (!TA3.pkMap) return; const c = TA3.pkMap.center(), cb = TA3_PK_CB, a = TA3.pkAddr || '';
+  el('ta3Picker').classList.remove('on'); TA3_PK_CB = null;
+  if (cb) cb({ lat: c.lat, lng: c.lng, address: a });
+}
+
+// ---------- 상세 시트: 위치 탭 ----------
+function ta3PlCur() { const l = ta2CurLead(); return l ? { l, p: TA3.places[l.id] } : null; }
+async function ta3PlRender() {
+  const cur = ta3PlCur(); if (!cur) return;
+  const { l, p } = cur;
+  el('ta3PlAddr').value = (p && p.address) || (l._ref ? (l.raw.address || '') : '') || '';
+  el('ta3PlStat').textContent = p && p.lat ? `📍 위치 기록됨 (${Number(p.lat).toFixed(5)}, ${Number(p.lng).toFixed(5)})` : '아직 지도 위치가 기록되지 않았습니다.';
+  try { await ta3MapInit(); } catch (e) { el('ta3PlMap').innerHTML = '<div class="ta3-empty">지도를 불러오지 못했습니다.</div>'; return; }
+  if (!TA3.plMap) { el('ta3PlMap').innerHTML = ''; TA3.plMap = ta3NewMap(el('ta3PlMap'), {}); }
+  TA3.plMap.invalidate(); TA3.plMap.clear();
+  if (p && p.lat) { TA3.plMap.setView(p.lat, p.lng, 16); TA3.plMap.addMarker({ lat: p.lat, lng: p.lng, html: ta3PinHtml('#dc2626', l._ref ? 'ref' : 'ta', '●', false) }); }
+  else TA3.plMap.setView(TA3_DEFAULT_CENTER.lat, TA3_DEFAULT_CENTER.lng, 12);
+}
+async function ta3PlSaveSet(r) {
+  const cur = ta3PlCur(); if (!cur) return;
+  try { await ta3PlaceSave(cur.l.id, cur.l._ref ? 'ref' : 'ta', r); ta2Flash('위치 저장됨 ✓'); }
+  catch (e) { ta2Flash('위치 저장 실패: ' + (e.message || e), true); return; }
+  ta3PlRender(); ta3BuildItems();
+}
+async function ta3PlGps() {
+  try { ta2Flash('현재 위치 확인 중...'); const p = await ta3Gps(); const a = await ta3Reverse(p.lat, p.lng); await ta3PlSaveSet({ lat: p.lat, lng: p.lng, address: a || el('ta3PlAddr').value.trim() }); }
+  catch (e) { ta2Flash(e.message, true); }
+}
+function ta3PlPick() { const cur = ta3PlCur(); ta3PickOnMap(cur && cur.p, r => ta3PlSaveSet({ lat: r.lat, lng: r.lng, address: r.address || el('ta3PlAddr').value.trim() })); }
+async function ta3PlFind() {
+  const q = el('ta3PlAddr').value.trim(); if (!q) { ta2Flash('주소를 먼저 입력하세요', true); return; }
+  ta2Flash('주소로 위치 찾는 중...'); const r = await ta3Geocode(q);
+  if (!r) { ta2Flash('주소를 찾지 못했습니다. 「지도에서 지정」을 이용해보세요.', true); return; }
+  ta3PlSaveSet({ lat: r.lat, lng: r.lng, address: q });
+}
+async function ta3PlAddrChange(v) {
+  const cur = ta3PlCur(); if (!cur) return;
+  try { await ta3PlaceSave(cur.l.id, cur.l._ref ? 'ref' : 'ta', { address: String(v || '').trim() }); ta2Flash('주소 저장됨 ✓'); ta3BuildItems(); } catch (e) { ta2Flash('저장 실패: ' + (e.message || e), true); }
+}
+function ta3PlNav(kind) {
+  const cur = ta3PlCur(); if (!cur) return;
+  const pl = cur.p || { address: el('ta3PlAddr').value.trim() };
+  if (!pl.lat && !pl.address) { ta2Flash('위치나 주소를 먼저 기록하세요', true); return; }
+  ta3OpenNav(kind, cur.l.company, pl);
+}
+
+// ---------- 소개영업 안건 상세(읽기 전용) ----------
+function ta3RenderRefInfo(l) {
+  const r = l.raw, v = x => (x === null || x === undefined || x === '') ? '<span style="color:#9ca3af;">-</span>' : escapeHtml(x);
+  const f = (k, val, full) => `<div${full ? ' style="grid-column:1/-1"' : ''}><div class="k">${k}</div><div class="vv">${val}</div></div>`;
+  const photos = Array.isArray(r.photo_urls) ? r.photo_urls : [];
+  el('ta2DInfo').innerHTML = [
+    f('고객명', v(r.customer_name)), f('진행 상태', `<span class="ta3-tag" style="background:#ede9fe;color:#6d28d9;">소개영업</span> ${v(r.status || '접수대기')}`),
+    f('고객 담당자', v(r.contact_person)), f('연락처', r.contact_phone ? `<a href="tel:${escapeHtml(String(r.contact_phone).replace(/[^0-9+]/g, ''))}">${escapeHtml(r.contact_phone)} 📞</a>` : v('')),
+    f('주소', v(r.address), true), f('업종', v(r.business_type)), f('상품', v(r.product)),
+    f('현 경비업체', v(r.current_company)), f('현 요금', r.current_fee ? formatCurrency(Number(String(r.current_fee).replace(/[^0-9]/g, ''))) : v('')),
+    f('견적 금액', r.quote_amount ? formatCurrency(r.quote_amount) : v('')), f('예상 계약일', r.expected_contract_date ? ta2FullDate(r.expected_contract_date) : v('')),
+    f('계약 금액', r.contract_amount ? formatCurrency(r.contract_amount) : v('')), f('계약일', r.contract_success_date ? ta2FullDate(r.contract_success_date) : v('')),
+    f('소개자', v(r.agent_name)), f('접수일', ta2FmtTs(r.created_at) || '-'),
+    r.field_description ? f('현장 설명', `<span style="font-weight:600;white-space:pre-wrap;">${escapeHtml(r.field_description)}</span>`, true) : '',
+    (r.fail_reason ? f('실패 사유', v(r.fail_reason), true) : ''), (r.hold_reason ? f('보류 사유', v(r.hold_reason), true) : ''),
+    photos.length ? f('현장 사진', `<div class="ta2-att-grid">${photos.map(u => `<a href="${escapeHtml(u)}" target="_blank" class="ta2-att" style="display:block"><img src="${escapeHtml(u)}" alt="" loading="lazy"></a>`).join('')}</div>`, true) : ''
+  ].join('');
+  ta2RenderActions();
+}
+
+// ---------- 화면 진입 ----------
+function initAgentView(agentName) {
+  currentViewMode = agentName;
+  if (el('topbarHeaderTitle')) el('topbarHeaderTitle').textContent = `영업 TA 관리 포털 (${agentName})`;
+  if (currentUser) checkAndShowAgentNotice();
+  ta3Boot();
+  const st = el('ta3SetTabInit'); if (st) st.remove();
+  ta3SetTab(TA3.tab || 'home');
+}
+
 </script>
 
 <!-- ========================================== -->
@@ -5892,6 +6826,26 @@ async function leadWriteWithPhone(mode, id, phone, row) {
   </div>
 </div>
 
+<!-- 지도에서 위치 지정 (중앙 핀 방식) -->
+<div class="ta3-full" id="ta3Picker">
+  <div class="ta3-fhead"><button type="button" onclick="ta3PkClose()">취소</button><b>위치 지정</b><button type="button" class="ok" onclick="ta3PkOk()">이 위치로 지정</button></div>
+  <div class="ta3-pk">
+    <div id="ta3PkMap"></div>
+    <div class="ta3-cross"></div>
+    <div class="ta3-pksearch"><input id="ta3PkQ" placeholder="주소 · 건물명 검색" onkeydown="if(event.key==='Enter')ta3PkSearch()"><button type="button" onclick="ta3PkSearch()">검색</button></div>
+    <button type="button" class="ta3-pkgps" onclick="ta3PkGps()" aria-label="내 위치">◎</button>
+    <div class="ta3-pkaddr"><span id="ta3PkAddr">지도를 움직여 핀 위치를 맞추세요</span><small id="ta3PkCoord"></small></div>
+  </div>
+</div>
+
+<!-- 안건 선택 (일정 추가용) -->
+<div class="ta3-full" id="ta3ItemPick">
+  <div class="ta3-fhead"><button type="button" onclick="ta3IpClose()">닫기</button><b>어느 안건의 일정인가요?</b><span style="width:56px"></span></div>
+  <div style="padding:10px 14px 0;background:var(--paper);"><div class="ta3-search"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg><input id="ta3IpQ" type="search" placeholder="안건 검색" oninput="ta3IpRender()"></div></div>
+  <div class="ta3-plist" id="ta3IpList"></div>
+</div>
+
+<div class="ta3-toast" id="ta3Toast"></div>
 
 </body>
 </html>
