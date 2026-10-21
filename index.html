@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>에스원 북서울지사 | 영업 TA 통합관리 포털</title>
+<title>에스원 북서울지사 | 영업 TA 관리</title>
 <!-- Supabase JS Client v2 CDN -->
 
 
@@ -1651,6 +1651,21 @@ const SUPABASE_ANON_KEY = 'sb_publishable_xUnGxyLCc5TB5nv4keVQVw__grqGJkP';
 window.supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 const db = window.supabase;
 
+// 화면 분리: index.html = 컨설턴트 화면 / admin.html = 대시보드·관리자 화면 (같은 로그인 세션 공유)
+const APP_MODE = 'agent';
+function appRoute(mode) {
+  const q = new URLSearchParams(location.search).get('view');
+  if (APP_MODE === 'agent') {
+    if (!isMasterUser()) return null;
+    if (q && CONSULTANTS.includes(q)) return { mode: q };
+    if (CONSULTANTS.includes(mode)) return { mode: mode };
+    return { go: 'admin.html' };
+  }
+  if (!isMasterUser()) return { go: 'index.html' };
+  if (mode && mode !== 'master') return { go: 'index.html?view=' + encodeURIComponent(mode) };
+  return null;
+}
+
 const el = id => document.getElementById(id);
 
 // ==========================================
@@ -3174,6 +3189,12 @@ function switchView(mode) {
     return;
   }
 
+  // 화면 분리: 다른 HTML로 이동해야 하는 경우
+  if (currentUser && ((APP_MODE === 'agent' && mode === 'master') || (APP_MODE === 'admin' && mode !== 'master'))) {
+    saveUserSession(currentUser, mode);
+    location.href = mode === 'master' ? 'admin.html' : 'index.html?view=' + encodeURIComponent(mode);
+    return;
+  }
   currentViewMode = mode; window.currentViewMode = mode;
   document.querySelectorAll('.switch-btn').forEach(btn => {
     if (mode === 'master' && btn.id === 'btnViewMaster') btn.classList.add('active');
@@ -4203,6 +4224,9 @@ async function doLogin() {
 safeAddListener('btnLogout', 'click', doLogout);
 
 async function initApp(initialMode) {
+  const route = appRoute(initialMode);
+  if (route && route.go) { location.replace(route.go); return; }
+  if (route && route.mode) initialMode = route.mode;
   document.getElementById('loginOverlay').style.display = 'none';
   document.getElementById('mainApp').style.display = 'block';
 
