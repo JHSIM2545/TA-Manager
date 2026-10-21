@@ -1086,13 +1086,10 @@
         <div class="login-field">
           <label>직무 구분 선택 <span style="color:#dc2626;">*</span></label>
           <select id="regJob" required style="width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:14px;background:#fff;box-sizing:border-box;">
-            <option value="">직무를 선택해주세요</option>
-            <option value="지사관리자">지사관리자</option>
-            <option value="본사관리자">본사관리자</option>
+            <option value="컨설턴트" selected>컨설턴트</option>
             <option value="본사스탭">본사스탭</option>
             <option value="CS관리자">CS관리자</option>
             <option value="CS근무자">CS근무자</option>
-            <option value="컨설턴트">컨설턴트</option>
             <option value="기술사원">기술사원</option>
           </select>
         </div>
@@ -1952,6 +1949,7 @@ const db = window.supabase;
 
 // 화면 분리: index.html = 컨설턴트 화면 / admin.html = 대시보드·관리자 화면 (같은 로그인 세션 공유)
 const APP_MODE = 'admin';
+if (APP_MODE === 'agent') document.body.classList.add('ta3-on'); // 로그인 직후 옛 대시보드가 잠깐 보이는 현상 방지
 function appRoute(mode) {
   const q = new URLSearchParams(location.search).get('view');
   if (APP_MODE === 'agent') {
@@ -6104,7 +6102,7 @@ async function leadWriteWithPhone(mode, id, phone, row) {
 // ==========================================================================
 const KAKAO_MAP_KEY = '4ab1f892386fe4e3375fc2823082d2de';                                   // ← 카카오 JavaScript 키 (비워두면 OpenStreetMap 사용)
 const NAVER_MAP_KEY = '';                                   // ← 네이버 지도 JavaScript Client ID (비워두면 OpenStreetMap 사용)
-const REFERRAL_APP_URL = 'https://mws0008.github.io/Lead-app/'; // 소개영업 앱 주소 (소개영업 소스의 기본값)
+const REFERRAL_APP_URL = 'https://jhsim2545.github.io/Lead-app/'; // 소개영업 앱 주소 (소개영업 소스의 기본값)
 const TA3_DEFAULT_CENTER = { lat: 37.6396, lng: 127.0257 };       // 북서울(강북) 기본 중심
 const TA3_LS_PLACES = 'S1_TA3_PLACES';
 
@@ -6802,6 +6800,8 @@ function ta3RenderRefInfo(l) {
 
 // ---------- 화면 진입 ----------
 function initAgentView(agentName) {
+  // 컨설턴트는 항상 본인 명의 화면만 (관리자만 다른 컨설턴트 화면 조회 가능)
+  if (currentUser && !isMasterUser() && currentUser.name) agentName = currentUser.name;
   currentViewMode = agentName;
   try { localStorage.setItem('S1_TA3_LASTVIEW', agentName); } catch (e) {}
   if (el('topbarHeaderTitle')) el('topbarHeaderTitle').textContent = `영업 TA 관리 포털 (${agentName})`;
