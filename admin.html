@@ -3703,6 +3703,14 @@ async function checkAndShowAgentNotice() {
 
 
 
+    // 오늘 하루 보지 않기 / 같은 로그인 세션에서 반복 팝업 방지
+    const nKey = String(noticeId) + '|' + noticeText.length;
+    try {
+      const uk = String(currentUser.phone || currentUser.name || '');
+      if (localStorage.getItem('S1_NOTICE_HIDE_' + uk) === todayStr() + '|' + nKey) return;
+      if (sessionStorage.getItem('S1_NOTICE_SEEN_' + uk) === nKey) return;
+      sessionStorage.setItem('S1_NOTICE_SEEN_' + uk, nKey);
+    } catch (e) {}
     // 4) 모달 엘리먼트에 내용 주입 및 화면 전면 팝업 표시
     const overlay = el('agentNoticeModalOverlay');
     const contentEl = el('agentNoticeContent');
@@ -3714,6 +3722,8 @@ async function checkAndShowAgentNotice() {
       overlay.style.display = 'flex';
       overlay.classList.add('show');
       overlay.dataset.noticeId = String(noticeId);
+      overlay.dataset.noticeKey = nKey;
+      const ck = el('chkNoticeDismissToday'); if (ck) ck.checked = false;
     }
   } catch (e) {
     console.error('공지사항 확인 실패:', e);
@@ -3723,6 +3733,10 @@ window.checkAndShowAgentNotice = checkAndShowAgentNotice;
 
 function closeAgentNoticeModal() {
   const modal = el('agentNoticeModalOverlay');
+  try {
+    const ck = el('chkNoticeDismissToday');
+    if (ck && ck.checked && modal && modal.dataset.noticeKey && currentUser) localStorage.setItem('S1_NOTICE_HIDE_' + String(currentUser.phone || currentUser.name || ''), todayStr() + '|' + modal.dataset.noticeKey);
+  } catch (e) {}
   if (modal) {
     modal.style.display = 'none';
     modal.classList.remove('show');
