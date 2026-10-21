@@ -807,6 +807,37 @@
     .ta2-draw canvas{height:260px;}
   }
 
+
+  /* 인라인 편집 / 자동저장 / 첨부 미리보기 */
+  .ta2-autosave{font-size:11.5px;font-weight:800;color:#8a94a6;margin-top:6px;}
+  .ta2-autosave.ok{color:#16a34a;} .ta2-autosave.err{color:#dc2626;}
+  .ta2-inp{width:100%;border:1.5px solid transparent;background:transparent;font:inherit;font-weight:800;font-size:14.5px;color:#0a1730;padding:4px 7px;margin:0 -7px;border-radius:8px;box-sizing:content-box;max-width:calc(100% - 0px);}
+  .ta2-info .ta2-inp{width:calc(100% - 4px);}
+  .ta2-inp:hover{border-color:#cbd5e1;background:#fff;}
+  .ta2-inp:focus{outline:none;border-color:#2563eb;background:#fff;box-shadow:0 0 0 3px rgba(37,99,235,.15);}
+  select.ta2-inp{cursor:pointer;}
+  .ta2-datebtn{display:block;width:100%;text-align:left;background:#fff !important;color:#0a1730 !important;border:1.5px solid #d5dbe6 !important;border-radius:8px !important;padding:6px 9px !important;font-size:14px !important;font-weight:800 !important;}
+  .ta2-datebtn:hover{border-color:#2563eb !important;}
+  .ta2-datebtn.sm{padding:3px 7px !important;font-size:12px !important;width:auto;}
+  .ta2-composer{border:1.5px solid #d5dbe6;border-radius:12px;padding:10px;background:#fff;margin-bottom:12px;}
+  .ta2-composer textarea{width:100%;min-height:70px;border:none;font-size:14px;font-family:inherit;resize:vertical;padding:2px;}
+  .ta2-composer textarea:focus{outline:none;}
+  .ta2-att-grid{display:flex;flex-wrap:wrap;gap:8px;margin:6px 0;}
+  .ta2-att{position:relative;width:92px;height:92px;border:1px solid #e3e8f0;border-radius:10px;overflow:hidden;background:#f8fafc;cursor:pointer;}
+  .ta2-att img{width:100%;height:100%;object-fit:cover;display:block;}
+  .ta2-att.dr img{object-fit:contain;background:#fff;}
+  .ta2-att .kd{position:absolute;left:4px;top:4px;background:rgba(10,23,48,.75);color:#fff;font-size:10px;font-weight:800;padding:1px 6px;border-radius:99px;}
+  .ta2-att .rm{position:absolute;right:3px;top:3px;width:22px;height:22px;border-radius:50%;background:rgba(0,0,0,.6) !important;color:#fff !important;padding:0 !important;font-size:13px !important;line-height:22px;border:none !important;}
+  .ta2-photo-bar{display:flex;gap:6px;flex-wrap:wrap;align-items:center;}
+  .ta2-memo-edit{width:100%;min-height:54px;border:1.5px solid transparent;border-radius:8px;padding:5px 6px;margin:4px -6px 0;font-size:14px;font-family:inherit;line-height:1.55;color:#1a2333;resize:vertical;background:transparent;box-sizing:content-box;width:calc(100% - 4px);}
+  .ta2-memo-edit:hover{border-color:#cbd5e1;background:#fff;}
+  .ta2-memo-edit:focus{outline:none;border-color:#2563eb;background:#fff;box-shadow:0 0 0 3px rgba(37,99,235,.15);}
+  .ta2-sch-item .ta2-inp{font-size:14px;}
+  .ta2-sch-item textarea.ta2-inp{font-weight:600;font-size:12.5px;color:#697386;resize:none;min-height:30px;}
+  .ta2-sch-item input[type=time].ta2-inp{width:84px;font-size:12.5px;color:#2563eb;font-weight:900;padding:2px 4px;margin:2px 0 0 0;}
+  .ta2-sch-item.done .ta2-inp{text-decoration:line-through;}
+  .ta2-sch-item{text-decoration:none !important;}
+  .ta2-sched-form .ta2-datebtn{height:100%;}
   #ta2DetailOverlay{align-items:center;}
   @media (max-width:768px){ #ta2DetailOverlay{align-items:flex-end;padding:0 !important;} }
 </style>
@@ -1157,7 +1188,7 @@
         <h2>TA 목록 <span class="cnt" id="agentLeadCount">0</span></h2>
         <div class="ta2-stage-tabs" id="ta2StageTabs"></div>
         <div class="ta2-tools">
-          <input type="search" id="ta2Search" placeholder="서비스제공처 · 담당자 검색" oninput="ta2SetSearch(this.value)">
+          <input type="search" id="ta2Search" placeholder="서비스제공처 · 고객담당자 · 연락처 검색" oninput="ta2SetSearch(this.value)">
           <select id="ta2Period" onchange="ta2SetPeriod(this.value)"></select>
           <select id="ta2Product" onchange="ta2SetProduct(this.value)">
             <option value="all">상품 전체</option>
@@ -1186,34 +1217,31 @@
       <button type="button" class="modal-close" onclick="ta2CloseDetail()">&times;</button>
       <h3 id="ta2DName">-</h3>
       <div id="ta2DBadges"></div>
+      <div class="ta2-autosave" id="ta2Saved">항목을 눌러 바로 수정하면 자동 저장됩니다</div>
     </div>
     <div class="ta2-m-scroll">
       <div class="ta2-info" id="ta2DInfo"></div>
       <div class="ta2-actions" id="ta2DActions"></div>
 
       <div class="ta2-tabs">
-        <button type="button" class="ta2-tab active" data-tab="memo" onclick="ta2Tab('memo')">📝 메모</button>
-        <button type="button" class="ta2-tab" data-tab="photo" onclick="ta2Tab('photo')">📷 사진·그림</button>
+        <button type="button" class="ta2-tab active" data-tab="memo" onclick="ta2Tab('memo')">📝 메모 · 사진</button>
         <button type="button" class="ta2-tab" data-tab="cal" onclick="ta2Tab('cal')">📅 일정</button>
       </div>
       <div id="ta2StoreWarn"></div>
 
-      <!-- 메모 -->
+      <!-- 메모 (사진·그림은 메모에 첨부) -->
       <div id="ta2PaneMemo">
-        <div class="ta2-note-form">
+        <div class="ta2-composer">
           <textarea id="ta2MemoText" placeholder="안건 관리 메모 (고객 반응, 경쟁사, 다음 액션 등 자유롭게)"></textarea>
-          <div style="text-align:right;margin-top:6px;"><button type="button" onclick="ta2AddMemo()" style="border-radius:10px;padding:9px 18px;font-weight:900;">메모 저장</button></div>
+          <div class="ta2-att-grid" id="ta2Pending"></div>
+          <div class="ta2-photo-bar">
+            <button type="button" class="ta2-sm" onclick="ta2AttachPick('new','cam')">📷 촬영</button>
+            <button type="button" class="ta2-sm" onclick="ta2AttachPick('new','album')">🖼️ 앨범</button>
+            <button type="button" class="ta2-sm" onclick="ta2OpenDraw('new')">✏️ 그림</button>
+            <button type="button" onclick="ta2AddMemo()" style="margin-left:auto;border-radius:10px;padding:9px 18px;font-weight:900;">메모 등록</button>
+          </div>
         </div>
-        <div id="ta2MemoList"></div>
-      </div>
 
-      <!-- 사진·그림 -->
-      <div id="ta2PanePhoto" style="display:none;">
-        <div class="ta2-photo-bar">
-          <label style="background:#2563eb;color:#fff;">📷 사진 촬영<input type="file" accept="image/*" capture="environment" style="display:none;" onchange="ta2PickPhoto(this)"></label>
-          <label style="background:#eef1f7;color:#1a2333;border:1px solid #d5dbe6;">🖼️ 앨범에서 선택<input type="file" accept="image/*" multiple style="display:none;" onchange="ta2PickPhoto(this)"></label>
-          <button type="button" style="background:#7c3aed;color:#fff;" onclick="ta2OpenDraw()">✏️ 그림 그리기</button>
-        </div>
         <div class="ta2-draw" id="ta2DrawBox" style="display:none;">
           <div class="tl">
             <button type="button" class="ta2-swatch on" data-c="#111827" style="background:#111827;" onclick="ta2DrawColor(this)"></button>
@@ -1228,13 +1256,12 @@
             <button type="button" class="ta2-sm" onclick="ta2DrawClear()">전체 지움</button>
           </div>
           <canvas id="ta2Canvas"></canvas>
-          <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap;">
-            <input type="text" id="ta2DrawCap" placeholder="그림 설명 (선택)" style="flex:1;min-width:140px;border:1.5px solid #d5dbe6;border-radius:10px;padding:9px 10px;font-size:14px;">
-            <button type="button" onclick="ta2SaveDraw()" style="border-radius:10px;padding:9px 16px;font-weight:900;">그림 저장</button>
-            <button type="button" class="ta2-sm" onclick="ta2CloseDraw()">닫기</button>
+          <div style="display:flex;gap:8px;margin-top:8px;justify-content:flex-end;">
+            <button type="button" class="ta2-sm" onclick="ta2CloseDraw()">취소</button>
+            <button type="button" onclick="ta2SaveDraw()" style="border-radius:10px;padding:9px 16px;font-weight:900;">그림 첨부</button>
           </div>
         </div>
-        <div class="ta2-gallery" id="ta2Gallery"></div>
+        <div id="ta2MemoList"></div>
       </div>
 
       <!-- 일정 캘린더 -->
@@ -1249,13 +1276,34 @@
         <div style="margin-top:12px;font-size:14px;font-weight:900;color:#0a1730;" id="ta2SelDateLabel"></div>
         <div id="ta2SchedList"></div>
         <div class="ta2-sched-form">
-          <input type="date" id="ta2SchDate">
+          <input type="hidden" id="ta2SchDate">
+          <button type="button" class="ta2-datebtn" id="ta2SchDateBtn" onclick="ta2PickDate(el('ta2SchDate').value, ta2SetSchDate)">📅 날짜 선택</button>
           <input type="time" id="ta2SchTime">
           <input type="text" id="ta2SchTitle" class="full" placeholder="일정 제목 (예: 현장 방문 미팅, 견적서 전달)">
           <textarea id="ta2SchNote" class="full" rows="2" placeholder="상세 내용 / 약속 장소 (선택)"></textarea>
           <button type="button" class="full" onclick="ta2AddSched()" style="border-radius:10px;padding:11px;font-weight:900;">일정 추가</button>
         </div>
       </div>
+    </div>
+  </div>
+</div>
+
+<input type="file" id="ta2FileCam" accept="image/*" capture="environment" style="display:none;" onchange="ta2OnFiles(this)">
+<input type="file" id="ta2FileAlbum" accept="image/*" multiple style="display:none;" onchange="ta2OnFiles(this)">
+
+<!-- 날짜 선택 달력 (선택 즉시 적용) -->
+<div class="modal-overlay" id="ta2DpOverlay" style="display:none;z-index:100002;" onclick="if(event.target===this)ta2DpClose()">
+  <div class="modal-card" style="max-width:360px;padding:18px;">
+    <div class="ta2-cal-head">
+      <button type="button" class="ta2-sm" onclick="ta2DpMove(-1)">◀</button>
+      <b id="ta2DpTitle"></b>
+      <button type="button" class="ta2-sm" onclick="ta2DpMove(1)">▶</button>
+    </div>
+    <div class="ta2-cal" id="ta2DpGrid"></div>
+    <div style="display:flex;gap:8px;justify-content:space-between;margin-top:12px;">
+      <button type="button" class="ta2-sm" onclick="ta2DpSelect(todayStr())">오늘</button>
+      <span style="display:flex;gap:8px;"><button type="button" class="ta2-sm" id="ta2DpClear" onclick="ta2DpSelect('')">날짜 지움</button>
+      <button type="button" class="ta2-sm" onclick="ta2DpClose()">닫기</button></span>
     </div>
   </div>
 </div>
@@ -5123,7 +5171,9 @@ function ta2BaseFiltered(name) {
   if (TA2.product !== 'all') leads = leads.filter(l => productCategory(l.productType) === TA2.product);
   const q = TA2.search.trim().toLowerCase();
   if (q) {
-    leads = leads.filter(l => ((l.company || '') + ' ' + (l.contact || '')).toLowerCase().includes(q));
+    const qd = q.replace(/[^0-9]/g, '');
+    leads = leads.filter(l => ((l.company || '') + ' ' + (l.contact || '') + ' ' + (l.contactPhone || '')).toLowerCase().includes(q) ||
+      (qd.length >= 3 && String(l.contactPhone || '').replace(/[^0-9]/g, '').includes(qd)));
     return leads;   // 검색 시에는 기간 제한 없이 전체에서 찾기
   }
   const cur = currentMonthStr();
@@ -5216,45 +5266,195 @@ async function ta2RenderUpcoming(name) {
   } catch (e) { box.innerHTML = '<div class="ta2-empty">일정을 불러오지 못했습니다.</div>'; }
 }
 
+// ---------- 노트/일정 수정용 저장소 ----------
+async function ta2NoteUpdate(id, patch) {
+  if (await ta2Probe('ta_notes') === 'remote') {
+    const { error } = await db.from('ta_notes').update(patch).eq('id', id);
+    if (error) throw error;
+    return;
+  }
+  ta2LsSet(TA2_LS_NOTES, ta2LsGet(TA2_LS_NOTES).map(n => n.id === id ? Object.assign({}, n, patch) : n));
+}
+async function ta2SchedUpdate(id, patch) {
+  if (await ta2Probe('ta_schedules') === 'remote') {
+    const { error } = await db.from('ta_schedules').update(patch).eq('id', id);
+    if (error) throw error;
+    return;
+  }
+  ta2LsSet(TA2_LS_SCHEDS, ta2LsGet(TA2_LS_SCHEDS).map(s => s.id === id ? Object.assign({}, s, patch) : s));
+}
+
 // ---------- 상세보기 ----------
 function ta2CurLead() { return ta2Leads(currentViewMode).find(l => l.id === TA2.leadId) || null; }
+let TA2_FT = null;
+function ta2Flash(msg, err) {
+  const e = el('ta2Saved'); if (!e) return;
+  e.textContent = msg; e.className = 'ta2-autosave ' + (err ? 'err' : 'ok');
+  clearTimeout(TA2_FT);
+  TA2_FT = setTimeout(() => { e.textContent = '항목을 눌러 바로 수정하면 자동 저장됩니다'; e.className = 'ta2-autosave'; }, 2400);
+}
+const TA2_PRODUCTS = ['알람', '휴엔', '정보보안', '블루스캔', '유지보수', '안전상품'];
+const TA2_MOTIVES = ['개척', '콜센터', '사내소개', '고객소개', '대리점', '관내이전', '관외이전', '기타'];
+const TA2_EDIT_STAGES = [['진행중', '진행중'], ['수주完', '수주완료'], ['보류', '보류'], ['실패', '실패']];
+
+function ta2OptHtml(pairs, cur) {
+  return pairs.map(p => { const v = Array.isArray(p) ? p[0] : p, t = Array.isArray(p) ? p[1] : p; return `<option value="${escapeHtml(v)}"${v === cur ? ' selected' : ''}>${escapeHtml(t)}</option>`; }).join('');
+}
+function ta2RenderHead() {
+  const l = ta2CurLead(); if (!l) return;
+  el('ta2DName').textContent = l.company || '-';
+  el('ta2DBadges').innerHTML =
+    `<span class="ta2-badge" style="background:${STAGE_BG[l.stage] || '#e5e7eb'};color:${STAGE_COLOR[l.stage] || '#374151'};">${ta2StageLabel(l.stage)}</span> ` +
+    `<span class="ta2-conf" style="margin-left:6px;"><i style="background:${CONF_COLOR[l.confidence] || '#ccc'};"></i>확도 ${escapeHtml(l.confidence || '-')}</span>`;
+}
+function ta2DateBtn(field, ds) {
+  return `<button type="button" class="ta2-datebtn" onclick="ta2EditDate('${field}')">📅 ${ds ? ta2FullDate(ds) : '날짜 선택'}</button>`;
+}
+function ta2RenderInfo() {
+  const l = ta2CurLead(); if (!l) return;
+  const f = (k, v) => `<div><div class="k">${k}</div><div class="vv">${v}</div></div>`;
+  const regDate = l.registeredDate || (l.createdAt || '').slice(0, 10);
+  el('ta2DInfo').innerHTML = [
+    f('서비스제공처명', `<input class="ta2-inp" value="${escapeHtml(l.company)}" onchange="ta2FText('company',this.value)">`),
+    f('고객 담당자', `<input class="ta2-inp" value="${escapeHtml(l.contact)}" placeholder="담당자 성명" onchange="ta2FText('contact',this.value)">`),
+    f('담당자 전화번호', `<input class="ta2-inp" type="tel" inputmode="tel" value="${escapeHtml(ta2Phone(l.contactPhone))}" placeholder="010-0000-0000" onchange="ta2FPhone(this.value)">`),
+    f('용역료(원)', `<input class="ta2-inp" inputmode="numeric" value="${l.amount ? Number(l.amount).toLocaleString('ko-KR') : ''}" onchange="ta2FAmount(this)">`),
+    f('단계', `<select class="ta2-inp" onchange="ta2FSelect('stage',this.value)">${ta2OptHtml(TA2_EDIT_STAGES, l.stage)}</select>`),
+    f('상품종류', `<select class="ta2-inp" onchange="ta2FSelect('productType',this.value)">${ta2OptHtml(TA2_PRODUCTS, l.productType)}</select>`),
+    f('등록일자', ta2DateBtn('registeredDate', regDate)),
+    f('수주예정일자', ta2DateBtn('expectedDate', l.expectedDate)),
+    f('수주확도', `<select class="ta2-inp" onchange="ta2FSelect('confidence',this.value)">${ta2OptHtml([['A', 'A (상)'], ['B', 'B (중)'], ['C', 'C (하)']], l.confidence || 'B')}</select>`),
+    f('영업동기', `<select class="ta2-inp" onchange="ta2FSelect('motive',this.value)">${ta2OptHtml(TA2_MOTIVES, l.motive)}</select>`)
+  ].join('');
+  ta2RenderActions();
+}
+function ta2TelHref(l) { return 'tel:' + String(l.contactPhone || '').replace(/[^0-9+]/g, ''); }
+function ta2RenderActions() {
+  const l = ta2CurLead(); if (!l) return;
+  const has = !!String(l.contactPhone || '').replace(/[^0-9]/g, '');
+  let a = '';
+  if (has) {
+    a += `<a href="${ta2TelHref(l)}" style="text-decoration:none;"><button type="button" style="background:#16a34a;color:#fff;">📞 ${escapeHtml(ta2Phone(l.contactPhone))} 전화</button></a>`;
+    a += `<button type="button" style="background:#0b1f3f;color:#fff;" onclick="ta2SaveContact()">👤 연락처 저장</button>`;
+  } else {
+    a += `<span style="font-size:12.5px;color:#8a94a6;font-weight:700;align-self:center;">전화번호를 입력하면 바로 전화·연락처 저장을 할 수 있습니다.</span>`;
+  }
+  if (isCreatedToday(l)) a += `<button type="button" class="danger" onclick="ta2DeleteFromDetail()">삭제</button>`;
+  el('ta2DActions').innerHTML = a;
+}
+
+// 변경 즉시 저장 (저장 버튼 없음)
+async function ta2SaveFields(patch, rerender) {
+  const lead = ta2CurLead(); if (!lead) return false;
+  const old = Object.assign({}, lead), next = Object.assign({}, lead, patch);
+  if (!String(next.company || '').trim()) { ta2Flash('서비스제공처명은 비울 수 없습니다', true); ta2RenderInfo(); return false; }
+  if (next.stage === '진행중' || next.stage === '보류') { /* 계약 정보는 유지 */ }
+  if (patch.stage === '수주完') {
+    next.contractDate = next.contractDate || next.expectedDate || todayStr();
+    next.baseDate = next.baseDate || next.contractDate;
+    next.vehicleNumber = next.vehicleNumber || '없음';
+    if (!patch.confidence) next.confidence = 'A';
+  }
+  if (patch.expectedDate && next.stage === '수주完') {
+    next.contractDate = patch.expectedDate;
+    if (!next.baseDate) next.baseDate = patch.expectedDate;
+  }
+  next.updatedAt = new Date().toISOString();
+  ta2Flash('저장 중...');
+  let res;
+  try {
+    res = await leadWriteWithPhone('update', lead.id, next.contactPhone, {
+      company: next.company, contact: next.contact || '', amount: Number(next.amount || 0),
+      product_type: next.productType, motive: next.motive, stage: next.stage, confidence: next.confidence,
+      registered_date: next.registeredDate || null, expected_date: next.expectedDate || null,
+      contract_date: next.contractDate || null, base_date: next.baseDate || null,
+      vehicle_number: next.vehicleNumber || null, memo: next.memo || null, updated_at: next.updatedAt
+    });
+  } catch (e) { res = { error: e }; }
+  if (res.error) { ta2Flash('저장 실패: ' + (res.error.message || res.error), true); ta2RenderInfo(); return false; }
+  Object.assign(lead, next);
+  const changes = buildLeadChanges(old, next);
+  if (changes.length) { try { await recordActivityLog(currentViewMode, '수정', lead.company, lead.id, changes); } catch (e) {} }
+  ta2Flash('저장됨 ✓');
+  ta2RenderHead();
+  if (rerender) ta2RenderInfo(); else ta2RenderActions();
+  ta2RenderKpi(currentViewMode); ta2RenderList(currentViewMode);
+  if (TA2.tab === 'cal') ta2RenderCal();
+  return true;
+}
+function ta2FText(k, v) { ta2SaveFields({ [k]: String(v || '').trim() }, false); }
+function ta2FPhone(v) {
+  const digits = String(v || '').replace(/[^0-9]/g, '');
+  ta2SaveFields({ contactPhone: digits }, true);
+}
+function ta2FAmount(inp) {
+  const n = parseCurrency(inp.value);
+  inp.value = n ? n.toLocaleString('ko-KR') : '';
+  ta2SaveFields({ amount: n }, false);
+}
+function ta2FSelect(k, v) { ta2SaveFields({ [k]: v }, true); }
+function ta2EditDate(field) {
+  const l = ta2CurLead(); if (!l) return;
+  const cur = field === 'registeredDate' ? (l.registeredDate || (l.createdAt || '').slice(0, 10)) : l[field];
+  ta2PickDate(cur, ds => {
+    if (!ds && field === 'expectedDate') { ta2Flash('수주예정일은 비울 수 없습니다', true); return; }
+    ta2SaveFields({ [field]: ds }, true);
+  }, { clearable: field === 'registeredDate' });
+}
+
+// 개인 연락처(휴대폰 주소록) 저장: vCard 파일 -> 기기 연락처 앱에서 저장
+function ta2SaveContact() {
+  const l = ta2CurLead();
+  if (!l || !l.contactPhone) { alert('전화번호를 먼저 입력해주세요.'); return; }
+  const esc = s => String(s || '').replace(/[\\;,]/g, m => '\\' + m).replace(/\r?\n/g, ' ');
+  const person = (l.contact || '고객담당자').trim();
+  const lines = ['BEGIN:VCARD', 'VERSION:3.0', 'FN:' + esc(person + ' (' + l.company + ')'), 'N:;' + esc(person) + ';;;', 'ORG:' + esc(l.company),
+    'TEL;TYPE=CELL,VOICE:' + String(l.contactPhone).replace(/[^0-9+]/g, ''), 'NOTE:에스원 북서울지사 TA 고객담당자', 'END:VCARD'];
+  const blob = new Blob([lines.join('\r\n')], { type: 'text/vcard;charset=utf-8' });
+  const url = URL.createObjectURL(blob), a = document.createElement('a');
+  a.href = url; a.download = person.replace(/[^\w가-힣]/g, '_') + '.vcf';
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 4000);
+  ta2Flash('연락처 파일을 열어 저장하세요 ✓');
+}
+
+// 날짜 선택 달력 (선택 즉시 적용)
+const DP = { cb: null, ym: '', sel: '' };
+function ta2PickDate(cur, cb, opts) {
+  DP.cb = cb; DP.sel = cur || ''; DP.ym = (cur || todayStr()).slice(0, 7);
+  el('ta2DpClear').style.display = (opts && opts.clearable) ? '' : 'none';
+  ta2DpRender();
+  el('ta2DpOverlay').style.display = 'flex';
+}
+function ta2DpClose() { el('ta2DpOverlay').style.display = 'none'; }
+function ta2DpMove(d) { const [y, m] = DP.ym.split('-').map(Number), x = new Date(y, m - 1 + d, 1); DP.ym = `${x.getFullYear()}-${TA2_PAD(x.getMonth() + 1)}`; ta2DpRender(); }
+function ta2DpSelect(ds) { const cb = DP.cb; ta2DpClose(); if (cb) cb(ds); }
+function ta2DpRender() {
+  const [y, m] = DP.ym.split('-').map(Number), first = new Date(y, m - 1, 1).getDay(), last = new Date(y, m, 0).getDate(), today = todayStr();
+  el('ta2DpTitle').textContent = `${y}년 ${m}월`;
+  let h = WEEKDAY_KR.map(d => `<div class="dw">${d}</div>`).join('');
+  for (let i = 0; i < first; i++) h += '<button type="button" class="ta2-day out" tabindex="-1"></button>';
+  for (let d = 1; d <= last; d++) {
+    const ds = `${y}-${TA2_PAD(m)}-${TA2_PAD(d)}`, wd = new Date(y, m - 1, d).getDay(), c = ['ta2-day'];
+    if (wd === 0) c.push('sun'); else if (wd === 6) c.push('sat'); else if (KR_HOLIDAYS.has(ds)) c.push('hol');
+    if (ds === today) c.push('today'); if (ds === DP.sel) c.push('sel');
+    h += `<button type="button" class="${c.join(' ')}" onclick="ta2DpSelect('${ds}')">${d}</button>`;
+  }
+  el('ta2DpGrid').innerHTML = h;
+}
 
 async function ta2OpenDetail(id, tab, date) {
   const lead = ta2Leads(currentViewMode).find(l => l.id === id);
   if (!lead) return;
-  TA2.leadId = id; TA2.mode = {}; TA2.notes = []; TA2.scheds = [];
+  TA2.leadId = id; TA2.mode = {}; TA2.notes = []; TA2.scheds = []; TA2.pending = [];
   TA2.calSel = date || todayStr();
   TA2.calYM = TA2.calSel.slice(0, 7);
-
-  el('ta2DName').textContent = lead.company || '-';
-  el('ta2DBadges').innerHTML =
-    `<span class="ta2-badge" style="background:${STAGE_BG[lead.stage] || '#e5e7eb'};color:${STAGE_COLOR[lead.stage] || '#374151'};">${ta2StageLabel(lead.stage)}</span> ` +
-    `<span class="ta2-conf" style="margin-left:6px;"><i style="background:${CONF_COLOR[lead.confidence] || '#ccc'};"></i>확도 ${escapeHtml(lead.confidence || '-')}</span>` +
-    (lead.motive ? ` <span style="margin-left:8px;font-size:12px;color:#697386;font-weight:700;">영업동기 ${escapeHtml(lead.motive)}</span>` : '');
-
-  const ph = ta2Phone(lead.contactPhone);
-  const phHtml = ph ? `<a href="tel:${escapeHtml(String(lead.contactPhone).replace(/[^0-9+]/g, ''))}">${escapeHtml(ph)} 📞</a>` : '<span style="color:#9ca3af;">미입력</span>';
-  const info = [
-    ['서비스제공처명', escapeHtml(lead.company)],
-    ['고객 담당자', escapeHtml(lead.contact) || '<span style="color:#9ca3af;">미입력</span>'],
-    ['담당자 전화번호', phHtml],
-    ['용역료', formatCurrency(lead.amount)],
-    ['단계', ta2StageLabel(lead.stage)],
-    ['상품종류', escapeHtml(lead.productType) || '-'],
-    ['등록일자', ta2FullDate(lead.registeredDate || (lead.createdAt || '').slice(0, 10))],
-    ['수주예정일자', ta2FullDate(lead.expectedDate)]
-  ];
-  el('ta2DInfo').innerHTML = info.map(([k, v]) => `<div><div class="k">${k}</div><div class="vv">${v}</div></div>`).join('');
-
-  let act = `<button type="button" style="background:#0b1f3f;color:#fff;" onclick="ta2EditFromDetail()">✏️ 정보 수정</button>`;
-  if (ph) act += `<a href="tel:${escapeHtml(String(lead.contactPhone).replace(/[^0-9+]/g, ''))}" style="text-decoration:none;"><button type="button" style="background:#16a34a;color:#fff;">📞 전화하기</button></a>`;
-  if (isCreatedToday(lead)) act += `<button type="button" class="danger" onclick="ta2DeleteFromDetail()">삭제</button>`;
-  el('ta2DActions').innerHTML = act;
-
+  ta2RenderHead(); ta2RenderInfo();
   el('ta2DetailOverlay').style.display = 'flex';
   el('ta2MemoText').value = '';
-  ta2CloseDraw();
-  ta2Tab(tab || 'memo');
+  ta2RenderPending(); ta2CloseDraw();
+  ta2Flash('항목을 눌러 바로 수정하면 자동 저장됩니다'); el('ta2Saved').className = 'ta2-autosave';
+  ta2Tab(tab === 'cal' ? 'cal' : 'memo');
   const myId = id;
   await Promise.all([ta2Probe('ta_notes'), ta2Probe('ta_schedules')]);
   if (TA2.leadId !== myId) return;
@@ -5264,11 +5464,10 @@ async function ta2OpenDetail(id, tab, date) {
 }
 function ta2CloseDetail() {
   el('ta2DetailOverlay').style.display = 'none';
-  ta2CloseDraw(); ta2CloseLightbox();
+  ta2CloseDraw(); ta2CloseLightbox(); ta2DpClose();
   TA2.leadId = null;
   ta2RenderUpcoming(currentViewMode);
 }
-function ta2EditFromDetail() { const id = TA2.leadId; ta2CloseDetail(); editAgentLead(id); }
 function ta2DeleteFromDetail() {
   const lead = ta2CurLead(); if (!lead) return;
   const id = lead.id, co = lead.company;
@@ -5278,10 +5477,9 @@ function ta2Tab(t) {
   TA2.tab = t;
   document.querySelectorAll('.ta2-tab').forEach(b => b.classList.toggle('active', b.dataset.tab === t));
   el('ta2PaneMemo').style.display = t === 'memo' ? 'block' : 'none';
-  el('ta2PanePhoto').style.display = t === 'photo' ? 'block' : 'none';
   el('ta2PaneCal').style.display = t === 'cal' ? 'block' : 'none';
-  if (t !== 'photo') ta2CloseDraw();
-  if (t === 'cal') { ta2RenderCal(); ta2RenderSchedList(); el('ta2SchDate').value = TA2.calSel; }
+  if (t !== 'memo') ta2CloseDraw();
+  if (t === 'cal') { ta2RenderCal(); ta2RenderSchedList(); ta2SetSchDate(TA2.calSel); }
   ta2ShowStoreWarn();
 }
 function ta2ShowStoreWarn() {
@@ -5291,46 +5489,72 @@ function ta2ShowStoreWarn() {
     : '';
 }
 
-// ---------- 메모 ----------
+// ---------- 메모 (사진·그림 첨부) ----------
 async function ta2LoadNotes() {
   const id = TA2.leadId;
   const rows = await ta2NotesList(id);
   if (TA2.leadId !== id) return;
   TA2.notes = rows;
-  ta2RenderMemos(); ta2RenderGallery();
+  ta2RenderMemos();
 }
 function ta2FmtTs(ts) {
   const d = new Date(ts); if (isNaN(d.getTime())) return '';
   return `${d.getFullYear()}.${TA2_PAD(d.getMonth() + 1)}.${TA2_PAD(d.getDate())} ${TA2_PAD(d.getHours())}:${TA2_PAD(d.getMinutes())}`;
 }
+function ta2Atts(n) {
+  if (n.kind === 'memo') { try { const a = JSON.parse(n.image || '[]'); return Array.isArray(a) ? a : []; } catch (e) { return []; } }
+  return n.image ? [{ t: n.kind === 'drawing' ? 'drawing' : 'photo', d: n.image }] : [];
+}
+function ta2AttThumbs(atts, noteId, removable) {
+  return atts.map((a, i) => `<div class="ta2-att${a.t === 'drawing' ? ' dr' : ''}" onclick="ta2OpenLightbox('${noteId}',${i})">
+    <span class="kd">${a.t === 'drawing' ? '그림' : '사진'}</span><img src="${a.d}" alt="" loading="lazy">
+    ${removable ? `<button type="button" class="rm" onclick="event.stopPropagation();ta2RemoveAtt('${noteId}',${i})">×</button>` : ''}</div>`).join('');
+}
 function ta2RenderMemos() {
   const lead = ta2CurLead();
-  const memos = TA2.notes.filter(n => n.kind === 'memo');
-  let html = memos.map(n => `
+  let html = TA2.notes.map(n => `
     <div class="ta2-note"><div class="tm"><span>${ta2FmtTs(n.created_at)}</span>
       <button type="button" class="ta2-x" onclick="ta2DelNote('${escapeHtml(n.id)}')">삭제</button></div>
-      <div class="tx">${escapeHtml(n.content)}</div></div>`).join('');
-  if (lead && lead.memo) {
-    html += `<div class="ta2-note" style="background:#f8fafc;"><div class="tm"><span>등록 시 입력한 메모</span></div><div class="tx">${escapeHtml(lead.memo)}</div></div>`;
+      <textarea class="ta2-memo-edit" placeholder="(내용 없음)" oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px'" onchange="ta2EditMemo('${escapeHtml(n.id)}',this.value)">${escapeHtml(n.content)}</textarea>
+      <div class="ta2-att-grid">${ta2AttThumbs(ta2Atts(n), escapeHtml(n.id), true)}</div>
+      <div class="ta2-photo-bar">
+        <button type="button" class="ta2-sm" onclick="ta2AttachPick('${escapeHtml(n.id)}','cam')">📷 촬영</button>
+        <button type="button" class="ta2-sm" onclick="ta2AttachPick('${escapeHtml(n.id)}','album')">🖼️ 앨범</button>
+        <button type="button" class="ta2-sm" onclick="ta2OpenDraw('${escapeHtml(n.id)}')">✏️ 그림</button></div>
+    </div>`).join('');
+  if (lead) {
+    html += `<div class="ta2-note" style="background:#f8fafc;"><div class="tm"><span>기본 메모 (등록 시 입력)</span></div>
+      <textarea class="ta2-memo-edit" placeholder="기본 메모를 입력하세요" onchange="ta2FText('memo',this.value)">${escapeHtml(lead.memo)}</textarea></div>`;
   }
   el('ta2MemoList').innerHTML = html || '<div class="ta2-empty">아직 메모가 없습니다.</div>';
+  el('ta2MemoList').querySelectorAll('.ta2-memo-edit').forEach(t => { t.style.height = 'auto'; t.style.height = Math.max(54, t.scrollHeight) + 'px'; });
 }
+function ta2RenderPending() {
+  el('ta2Pending').innerHTML = (TA2.pending || []).map((a, i) => `<div class="ta2-att${a.t === 'drawing' ? ' dr' : ''}" onclick="ta2OpenLightboxSrc(${i})">
+    <span class="kd">${a.t === 'drawing' ? '그림' : '사진'}</span><img src="${a.d}" alt="">
+    <button type="button" class="rm" onclick="event.stopPropagation();ta2RemovePending(${i})">×</button></div>`).join('');
+}
+function ta2RemovePending(i) { TA2.pending.splice(i, 1); ta2RenderPending(); }
 async function ta2AddMemo() {
-  const text = el('ta2MemoText').value.trim();
-  if (!text) return;
+  const text = el('ta2MemoText').value.trim(), atts = TA2.pending || [];
+  if (!text && !atts.length) return;
   try {
-    await ta2NoteAdd({ lead_id: TA2.leadId, kind: 'memo', content: text });
-    el('ta2MemoText').value = '';
-    await ta2LoadNotes();
+    await ta2NoteAdd({ lead_id: TA2.leadId, kind: 'memo', content: text, image: atts.length ? JSON.stringify(atts) : null });
+    el('ta2MemoText').value = ''; TA2.pending = []; ta2RenderPending();
+    await ta2LoadNotes(); ta2Flash('메모 저장됨 ✓');
   } catch (e) { alert('메모 저장 실패: ' + (e.message || e)); }
 }
+async function ta2EditMemo(id, v) {
+  try { await ta2NoteUpdate(id, { content: String(v || '').trim() }); const n = TA2.notes.find(x => x.id === id); if (n) n.content = String(v || '').trim(); ta2Flash('저장됨 ✓'); }
+  catch (e) { ta2Flash('저장 실패: ' + (e.message || e), true); }
+}
 async function ta2DelNote(id) {
-  if (!confirm('삭제하시겠습니까?')) return;
-  try { await ta2NoteDel(id); ta2CloseLightbox(); await ta2LoadNotes(); }
+  if (!confirm('이 메모를 삭제하시겠습니까? (첨부된 사진·그림도 함께 삭제됩니다)')) return;
+  try { await ta2NoteDel(id); ta2CloseLightbox(); await ta2LoadNotes(); ta2Flash('삭제됨'); }
   catch (e) { alert('삭제 실패: ' + (e.message || e)); }
 }
 
-// ---------- 사진 · 그림 ----------
+// 첨부 (사진 촬영 / 앨범 / 그림)
 function ta2Compress(file, maxDim, q) {
   maxDim = maxDim || 1100; q = q || 0.72;
   return new Promise((res, rej) => {
@@ -5352,39 +5576,57 @@ function ta2Compress(file, maxDim, q) {
     fr.readAsDataURL(file);
   });
 }
-async function ta2PickPhoto(input) {
-  const files = Array.from(input.files || []);
-  input.value = '';
+function ta2AttachPick(target, how) { TA2.attachTarget = target; el(how === 'cam' ? 'ta2FileCam' : 'ta2FileAlbum').click(); }
+async function ta2OnFiles(input) {
+  const files = Array.from(input.files || []); input.value = '';
   if (!files.length) return;
   try {
-    for (const f of files) {
-      const data = await ta2Compress(f);
-      await ta2NoteAdd({ lead_id: TA2.leadId, kind: 'photo', content: '', image: data });
-    }
-    await ta2LoadNotes();
-  } catch (e) { alert('사진 저장 실패: ' + (e.message || e)); }
+    const atts = [];
+    for (const f of files) atts.push({ t: 'photo', d: await ta2Compress(f) });
+    await ta2AppendAtts(TA2.attachTarget, atts);
+  } catch (e) { alert('사진 처리 실패: ' + (e.message || e)); }
 }
-function ta2RenderGallery() {
-  const imgs = TA2.notes.filter(n => n.kind === 'photo' || n.kind === 'drawing');
-  el('ta2Gallery').innerHTML = imgs.length ? imgs.map(n => `
-    <div class="ta2-thumb${n.kind === 'drawing' ? ' dr' : ''}" onclick="ta2OpenLightbox('${escapeHtml(n.id)}')">
-      <span class="kd">${n.kind === 'drawing' ? '그림' : '사진'}</span>
-      <img src="${n.image}" alt="" loading="lazy">
-      <div class="cap">${escapeHtml(n.content || ta2FmtTs(n.created_at))}</div></div>`).join('')
-    : '<div class="ta2-empty" style="grid-column:1/-1;">등록된 사진·그림이 없습니다.</div>';
+async function ta2AppendAtts(target, atts) {
+  if (target === 'new') { TA2.pending = (TA2.pending || []).concat(atts); ta2RenderPending(); return; }
+  const n = TA2.notes.find(x => x.id === target); if (!n) return;
+  const all = ta2Atts(n).concat(atts);
+  try {
+    await ta2NoteUpdate(target, { kind: 'memo', image: JSON.stringify(all) });
+    n.kind = 'memo'; n.image = JSON.stringify(all);
+    ta2RenderMemos(); ta2Flash('첨부 저장됨 ✓');
+  } catch (e) { alert('첨부 저장 실패: ' + (e.message || e)); }
 }
-function ta2OpenLightbox(id) {
-  const n = TA2.notes.find(x => x.id === id); if (!n) return;
-  el('ta2LbImg').src = n.image;
-  el('ta2LbCap').textContent = (n.content ? n.content + ' · ' : '') + ta2FmtTs(n.created_at);
-  el('ta2LbDel').onclick = () => ta2DelNote(id);
+async function ta2RemoveAtt(noteId, idx) {
+  const n = TA2.notes.find(x => x.id === noteId); if (!n) return;
+  if (!confirm('이 사진·그림을 삭제하시겠습니까?')) return;
+  const atts = ta2Atts(n); atts.splice(idx, 1);
+  try {
+    if (n.kind !== 'memo' && !atts.length && !n.content) await ta2NoteDel(noteId);
+    else { await ta2NoteUpdate(noteId, { kind: 'memo', image: atts.length ? JSON.stringify(atts) : null }); }
+    ta2CloseLightbox(); await ta2LoadNotes(); ta2Flash('삭제됨');
+  } catch (e) { alert('삭제 실패: ' + (e.message || e)); }
+}
+function ta2OpenLightbox(noteId, idx) {
+  const n = TA2.notes.find(x => x.id === noteId); if (!n) return;
+  const a = ta2Atts(n)[idx]; if (!a) return;
+  el('ta2LbImg').src = a.d;
+  el('ta2LbCap').textContent = (a.t === 'drawing' ? '그림' : '사진') + ' · ' + ta2FmtTs(n.created_at);
+  el('ta2LbDel').style.display = '';
+  el('ta2LbDel').onclick = () => ta2RemoveAtt(noteId, idx);
+  el('ta2Lightbox').style.display = 'flex';
+}
+function ta2OpenLightboxSrc(i) {
+  const a = (TA2.pending || [])[i]; if (!a) return;
+  el('ta2LbImg').src = a.d; el('ta2LbCap').textContent = '첨부 미리보기 (메모 등록 시 저장)';
+  el('ta2LbDel').style.display = 'none';
   el('ta2Lightbox').style.display = 'flex';
 }
 function ta2CloseLightbox() { if (el('ta2Lightbox')) { el('ta2Lightbox').style.display = 'none'; el('ta2LbImg').removeAttribute('src'); } }
 
 // 그림 그리기 (손가락/펜/마우스)
-const DR = { strokes: [], cur: null, color: '#111827', width: 7, erase: false, bound: false, w: 0, h: 0 };
-function ta2OpenDraw() {
+const DR = { strokes: [], cur: null, color: '#111827', width: 7, erase: false, bound: false, w: 0, h: 0, target: 'new' };
+function ta2OpenDraw(target) {
+  DR.target = target || 'new';
   el('ta2DrawBox').style.display = 'block';
   const c = el('ta2Canvas'), r = c.getBoundingClientRect(), dpr = Math.min(2, window.devicePixelRatio || 1);
   DR.w = r.width; DR.h = r.height;
@@ -5429,19 +5671,15 @@ function ta2DrawUndo() { DR.strokes.pop(); ta2DrawRedraw(); }
 function ta2DrawClear() { DR.strokes = []; ta2DrawRedraw(); }
 async function ta2SaveDraw() {
   if (!DR.strokes.length) { alert('그림을 먼저 그려주세요.'); return; }
-  const c = el('ta2Canvas');
-  const scale = Math.min(1, 900 / c.width);
+  const c = el('ta2Canvas'), scale = Math.min(1, 900 / c.width);
   const t = document.createElement('canvas'); t.width = Math.round(c.width * scale); t.height = Math.round(c.height * scale);
   const x = t.getContext('2d'); x.fillStyle = '#fff'; x.fillRect(0, 0, t.width, t.height); x.drawImage(c, 0, 0, t.width, t.height);
-  try {
-    await ta2NoteAdd({ lead_id: TA2.leadId, kind: 'drawing', content: el('ta2DrawCap').value.trim(), image: t.toDataURL('image/jpeg', 0.85) });
-    el('ta2DrawCap').value = '';
-    ta2CloseDraw();
-    await ta2LoadNotes();
-  } catch (e) { alert('그림 저장 실패: ' + (e.message || e)); }
+  const target = DR.target;
+  ta2CloseDraw();
+  await ta2AppendAtts(target, [{ t: 'drawing', d: t.toDataURL('image/jpeg', 0.85) }]);
 }
 
-// ---------- 일정 캘린더 ----------
+// ---------- 일정 캘린더 (수정 즉시 저장) ----------
 async function ta2LoadSched() {
   const id = TA2.leadId;
   const rows = await ta2SchedList(id);
@@ -5449,13 +5687,14 @@ async function ta2LoadSched() {
   TA2.scheds = rows;
   ta2RenderCal(); ta2RenderSchedList();
 }
+function ta2SetSchDate(ds) { el('ta2SchDate').value = ds || ''; el('ta2SchDateBtn').textContent = '📅 ' + (ds ? ta2FullDate(ds) : '날짜 선택'); if (ds) { TA2.calSel = ds; TA2.calYM = ds.slice(0, 7); ta2RenderCal(); ta2RenderSchedList(); } }
 function ta2CalMove(delta) {
   const [y, m] = TA2.calYM.split('-').map(Number);
   const d = new Date(y, m - 1 + delta, 1);
   TA2.calYM = `${d.getFullYear()}-${TA2_PAD(d.getMonth() + 1)}`;
   ta2RenderCal();
 }
-function ta2SelDate(ds) { TA2.calSel = ds; el('ta2SchDate').value = ds; ta2RenderCal(); ta2RenderSchedList(); }
+function ta2SelDate(ds) { TA2.calSel = ds; ta2SetSchDate(ds); }
 function ta2RenderCal() {
   if (!TA2.calYM) return;
   const [y, m] = TA2.calYM.split('-').map(Number);
@@ -5479,12 +5718,17 @@ function ta2RenderCal() {
   el('ta2CalGrid').innerHTML = h;
 }
 function ta2SchedItemHtml(s, showDate) {
+  const id = escapeHtml(s.id);
   return `<div class="ta2-sch-item${s.done ? ' done' : ''}">
-    <div class="tm">${showDate ? ta2DateLabel(s.sched_date) + '<br>' : ''}${s.sched_time ? escapeHtml(String(s.sched_time).slice(0, 5)) : '종일'}</div>
-    <div style="flex:1;min-width:0;"><div class="ti">${escapeHtml(s.title)}</div>${s.note ? `<div class="nt">${escapeHtml(s.note)}</div>` : ''}</div>
     <div style="display:flex;flex-direction:column;gap:2px;">
-      <button type="button" class="ta2-x" style="color:#16a34a !important;" onclick="ta2ToggleSched('${escapeHtml(s.id)}',${s.done ? 'false' : 'true'})">${s.done ? '되돌리기' : '완료'}</button>
-      <button type="button" class="ta2-x" onclick="ta2DelSched('${escapeHtml(s.id)}')">삭제</button></div></div>`;
+      <button type="button" class="ta2-datebtn sm" onclick="ta2EditSchedDate('${id}')">📅 ${ta2DateLabel(s.sched_date)}</button>
+      <input type="time" class="ta2-inp" value="${escapeHtml(String(s.sched_time || '').slice(0, 5))}" onchange="ta2EditSched('${id}',{sched_time:this.value||null},true)"></div>
+    <div style="flex:1;min-width:0;">
+      <input class="ta2-inp" value="${escapeHtml(s.title)}" onchange="ta2EditSched('${id}',{title:this.value.trim()},false,this)">
+      <textarea class="ta2-inp" rows="1" placeholder="상세 내용 / 장소" onchange="ta2EditSched('${id}',{note:this.value.trim()})">${escapeHtml(s.note)}</textarea></div>
+    <div style="display:flex;flex-direction:column;gap:2px;">
+      <button type="button" class="ta2-x" style="color:#16a34a !important;" onclick="ta2EditSched('${id}',{done:${s.done ? 'false' : 'true'}},true)">${s.done ? '되돌리기' : '완료'}</button>
+      <button type="button" class="ta2-x" onclick="ta2DelSched('${id}')">삭제</button></div></div>`;
 }
 function ta2RenderSchedList() {
   const sel = TA2.calSel;
@@ -5493,8 +5737,8 @@ function ta2RenderSchedList() {
   let html = day.length ? day.map(s => ta2SchedItemHtml(s, false)).join('') : '<div class="ta2-empty">이 날짜에 등록된 일정이 없습니다.</div>';
   const others = TA2.scheds.filter(s => s.sched_date !== sel && s.sched_date >= todayStr() && !s.done);
   if (others.length) {
-    html += '<div style="margin-top:14px;font-size:13px;font-weight:900;color:#475569;">예정된 다른 일정</div>' +
-      others.map(s => `<div onclick="ta2SelDate('${escapeHtml(s.sched_date)}')" style="cursor:pointer;">${ta2SchedItemHtml(s, true)}</div>`).join('');
+    html += '<div style="margin-top:14px;font-size:13px;font-weight:900;color:#475569;">예정된 다른 일정 (날짜를 눌러 이동)</div>' +
+      others.map(s => `<div class="ta2-sch-item" style="cursor:pointer;" onclick="ta2SelDate('${escapeHtml(s.sched_date)}')"><div class="tm">${ta2DateLabel(s.sched_date)}<br>${s.sched_time ? escapeHtml(String(s.sched_time).slice(0, 5)) : '종일'}</div><div class="ti">${escapeHtml(s.title)}</div></div>`).join('');
   }
   el('ta2SchedList').innerHTML = html;
 }
@@ -5506,15 +5750,26 @@ async function ta2AddSched() {
     await ta2SchedAdd({ lead_id: TA2.leadId, sched_date: date, sched_time: el('ta2SchTime').value, title: title, note: el('ta2SchNote').value.trim() });
     el('ta2SchTitle').value = ''; el('ta2SchNote').value = ''; el('ta2SchTime').value = '';
     TA2.calSel = date; TA2.calYM = date.slice(0, 7);
-    await ta2LoadSched();
+    await ta2LoadSched(); ta2Flash('일정 저장됨 ✓');
   } catch (e) { alert('일정 저장 실패: ' + (e.message || e)); }
+}
+async function ta2EditSched(id, patch, rerender, inp) {
+  const s = TA2.scheds.find(x => x.id === id); if (!s) return;
+  if ('title' in patch && !patch.title) { ta2Flash('일정 제목은 비울 수 없습니다', true); if (inp) inp.value = s.title; return; }
+  try { await ta2SchedUpdate(id, patch); Object.assign(s, patch); ta2Flash('저장됨 ✓'); if (rerender) { ta2RenderCal(); ta2RenderSchedList(); } }
+  catch (e) { ta2Flash('저장 실패: ' + (e.message || e), true); }
+}
+function ta2EditSchedDate(id) {
+  const s = TA2.scheds.find(x => x.id === id); if (!s) return;
+  ta2PickDate(s.sched_date, async ds => {
+    if (!ds) return;
+    await ta2EditSched(id, { sched_date: ds }, false);
+    TA2.calSel = ds; TA2.calYM = ds.slice(0, 7); ta2RenderCal(); ta2RenderSchedList();
+  });
 }
 async function ta2DelSched(id) {
   if (!confirm('이 일정을 삭제하시겠습니까?')) return;
-  try { await ta2SchedDelRow(id); await ta2LoadSched(); } catch (e) { alert('삭제 실패: ' + (e.message || e)); }
-}
-async function ta2ToggleSched(id, done) {
-  try { await ta2SchedSetDone(id, done); await ta2LoadSched(); } catch (e) { alert('변경 실패: ' + (e.message || e)); }
+  try { await ta2SchedDelRow(id); await ta2LoadSched(); ta2Flash('삭제됨'); } catch (e) { alert('삭제 실패: ' + (e.message || e)); }
 }
 
 // ---------- 연락처 컬럼 대응 (contact_phone 컬럼이 없는 DB에서도 저장 실패 없이 동작) ----------
