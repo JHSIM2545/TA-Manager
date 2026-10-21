@@ -1958,9 +1958,11 @@ function appRoute(mode) {
     if (!isMasterUser()) return null;
     if (q && CONSULTANTS.includes(q)) return { mode: q };
     if (CONSULTANTS.includes(mode)) return { mode: mode };
-    return { go: 'admin.html' };
+    let lv = ''; try { lv = localStorage.getItem('S1_TA3_LASTVIEW') || ''; } catch (e) {}
+    return { mode: CONSULTANTS.includes(lv) ? lv : '박광춘' };
   }
   if (!isMasterUser()) return { go: 'index.html' };
+  if (!new URLSearchParams(location.search).get('admin')) return { go: 'index.html' };
   if (mode && mode !== 'master') return { go: 'index.html?view=' + encodeURIComponent(mode) };
   return null;
 }
@@ -3491,7 +3493,7 @@ function switchView(mode) {
   // 화면 분리: 다른 HTML로 이동해야 하는 경우
   if (currentUser && ((APP_MODE === 'agent' && mode === 'master') || (APP_MODE === 'admin' && mode !== 'master'))) {
     saveUserSession(currentUser, mode);
-    location.href = mode === 'master' ? 'admin.html' : 'index.html?view=' + encodeURIComponent(mode);
+    location.href = mode === 'master' ? 'admin.html?admin=1' : 'index.html?view=' + encodeURIComponent(mode);
     return;
   }
   currentViewMode = mode; window.currentViewMode = mode;
@@ -6100,7 +6102,7 @@ async function leadWriteWithPhone(mode, id, phone, row) {
 // ==========================================================================
 // TA 수첩 v3 — 모바일 앱 셸 (홈 / 안건 / 지도 / 일정 / MY) + 소개영업 연동 + 위치 기록
 // ==========================================================================
-const KAKAO_MAP_KEY = '';                                   // ← 카카오 JavaScript 키 (비워두면 OpenStreetMap 사용)
+const KAKAO_MAP_KEY = '4ab1f892386fe4e3375fc2823082d2de';                                   // ← 카카오 JavaScript 키 (비워두면 OpenStreetMap 사용)
 const NAVER_MAP_KEY = '';                                   // ← 네이버 지도 JavaScript Client ID (비워두면 OpenStreetMap 사용)
 const REFERRAL_APP_URL = 'https://mws0008.github.io/Lead-app/'; // 소개영업 앱 주소 (소개영업 소스의 기본값)
 const TA3_DEFAULT_CENTER = { lat: 37.6396, lng: 127.0257 };       // 북서울(강북) 기본 중심
@@ -6454,7 +6456,8 @@ function ta3RowHtml(timeLabel, title, sub, onclick) {
 function ta3RenderHome() {
   const name = currentViewMode, w = ta2WorkdayInfo(), month = currentMonthStr(), today = todayStr();
   el('ta3HDate').textContent = todayLabel();
-  el('ta3HChips').innerHTML = (w.todayWork ? `<span class="ta3-pill">영업일 ${w.elapsed}일차 / ${w.total}일</span>` : '<span class="ta3-pill am">휴무일</span>') + `<span class="ta3-pill am">잔여 영업일 ${w.left}일</span>`;
+  const sw = isMasterUser() ? `<select class="ta3-pill" style="border:0;font-weight:800;" onchange="switchView(this.value)">${CONSULTANTS.map(n => `<option value="${n}"${n === name ? ' selected' : ''}>${n} 컨설턴트</option>`).join('')}</select>` : '';
+  el('ta3HChips').innerHTML = sw + (w.todayWork ? `<span class="ta3-pill">영업일 ${w.elapsed}일차 / ${w.total}일</span>` : '<span class="ta3-pill am">휴무일</span>') + `<span class="ta3-pill am">잔여 영업일 ${w.left}일</span>`;
 
   const leads = ta2Leads(name), ing = leads.filter(l => l.stage === '진행중');
   const rem = ing.filter(l => (l.expectedDate || '').slice(0, 7) === month);
@@ -6650,7 +6653,7 @@ function ta3RenderMy() {
   let m = `<button type="button" onclick="window.open(REFERRAL_APP_URL,'_blank')">소개영업 앱 열기 <small>접수·면담·견적 처리</small></button>
     <button type="button" onclick="ta3Reload()">데이터 새로고침 <small>TA · 소개영업 · 위치 · 일정</small></button>`;
   if (master) {
-    m += `<button type="button" onclick="switchView('master')">📊 통합 대시보드(관리자) <small>admin.html</small></button>`;
+    m += `<button type="button" onclick="location.href='admin.html?admin=1'">📊 통합 대시보드(관리자) <small>나중에 보완 예정</small></button>`;
     CONSULTANTS.filter(n => n !== name).forEach(n => { m += `<button type="button" onclick="switchView('${n}')">${n} 컨설턴트 화면 보기</button>`; });
   }
   m += `<button type="button" onclick="doLogout()" style="color:#b91c1c !important;">로그아웃</button>`;
@@ -6800,6 +6803,7 @@ function ta3RenderRefInfo(l) {
 // ---------- 화면 진입 ----------
 function initAgentView(agentName) {
   currentViewMode = agentName;
+  try { localStorage.setItem('S1_TA3_LASTVIEW', agentName); } catch (e) {}
   if (el('topbarHeaderTitle')) el('topbarHeaderTitle').textContent = `영업 TA 관리 포털 (${agentName})`;
   if (currentUser) checkAndShowAgentNotice();
   ta3Boot();
