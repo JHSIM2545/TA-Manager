@@ -723,6 +723,13 @@
   .ta2-detail-btn{background:#eff6ff;color:#1d4ed8;border:1px solid #bfdbfe;border-radius:9px;padding:7px 10px;font-size:12.5px;font-weight:900;cursor:pointer;white-space:nowrap;}
   .ta2-detail-btn:hover{background:#dbeafe;}
 
+
+  .ta2-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px;}
+  .ta2-tacard{background:#fff;border:1px solid #e3e8f0;border-left:5px solid #2563eb;border-radius:14px;padding:14px 16px;cursor:pointer;box-shadow:0 1px 3px rgba(10,20,40,.08);transition:.15s;display:flex;flex-direction:column;gap:8px;}
+  .ta2-tacard:hover,.ta2-tacard:active{box-shadow:0 4px 14px rgba(37,99,235,.2);transform:translateY(-1px);border-color:#93c5fd;}
+  .ta2-tacard .tc-top{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;}
+  .ta2-tacard .tc-amt{font-size:22px;font-weight:900;color:#0a1730;letter-spacing:-.4px;}
+  .ta2-tacard .tc-bot{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;border-top:1px dashed #e3e8f0;padding-top:8px;}
   /* 상세 모달 */
   .ta2-modal{max-width:760px !important;width:96% !important;max-height:92vh !important;padding:0 !important;display:flex;flex-direction:column;overflow:hidden !important;}
   .ta2-m-head{padding:18px 22px 12px;border-bottom:1px solid #eef1f7;position:relative;}
@@ -1092,7 +1099,7 @@
       <!-- 1. 헤더: 컨설턴트명 + TA 관리 / 오늘 날짜·영업일 / 신규 TA 버튼 -->
       <section class="ta2-hero">
         <div>
-          <h1 class="ta2-title"><span id="agentActiveName"></span> TA 관리</h1>
+          <span id="agentActiveName" style="display:none;"></span>
           <div class="ta2-datebar" id="ta2DateBar"></div>
         </div>
         <div class="ta2-hero-r">
@@ -1160,10 +1167,7 @@
           </select>
         </div>
         <div>
-          <div class="ta2-row head">
-            <div>서비스제공처</div><div style="text-align:right;">용역료</div><div>단계</div><div>확도</div><div>수주일정</div><div></div>
-          </div>
-          <div id="ta2List"></div>
+          <div id="ta2List" class="ta2-cards"></div>
         </div>
       </section>
 
@@ -3213,7 +3217,7 @@ function switchView(mode) {
   } else {
     el('viewMaster').style.display = 'none';
     el('viewAgent').style.display = 'block';
-    el('topbarHeaderTitle').textContent = '영업 TA 관리 포털';
+    el('topbarHeaderTitle').textContent = `영업 TA 관리 포털 (${mode})`;
     if (el('agentRankBadge')) el('agentRankBadge').style.display = 'none';
     if (el('dateBanner')) el('dateBanner').style.display = 'none';
     applyConsultantTheme(mode);
@@ -5048,7 +5052,7 @@ function initAgentView(agentName) {
   currentViewMode = agentName;
   agentGlobalProduct = 'all';      // 금일 수주예정 상세리스트 등 기존 모달이 전체 상품 기준으로 동작
   if (el('agentActiveName')) el('agentActiveName').textContent = agentName;
-  if (el('topbarHeaderTitle')) el('topbarHeaderTitle').textContent = '영업 TA 관리 포털';
+  if (el('topbarHeaderTitle')) el('topbarHeaderTitle').textContent = `영업 TA 관리 포털 (${agentName})`;
   if (el('agentRankBadge')) el('agentRankBadge').style.display = 'none';
   if (el('dateBanner')) el('dateBanner').style.display = 'none';
   if (el('btnBackToMaster')) el('btnBackToMaster').style.display = isMasterUser() ? 'inline-flex' : 'none';
@@ -5180,13 +5184,16 @@ function ta2RenderList(name) {
   const box = el('ta2List');
   if (!leads.length) { box.innerHTML = '<div class="ta2-empty" style="padding:24px 4px;text-align:center;">조건에 맞는 TA가 없습니다.</div>'; return; }
   box.innerHTML = leads.map(l => `
-    <div class="ta2-row">
-      <div class="c-co ta2-co">${escapeHtml(l.company)}<small>${escapeHtml(l.contact || '담당자 미입력')}${l.productType ? ' · ' + escapeHtml(l.productType) : ''}</small></div>
-      <div class="c-amt ta2-amt">${formatCurrency(l.amount)}</div>
-      <div class="c-st"><span class="ta2-badge" style="background:${STAGE_BG[l.stage] || '#e5e7eb'};color:${STAGE_COLOR[l.stage] || '#374151'};">${ta2StageLabel(l.stage)}</span></div>
-      <div class="c-conf"><span class="ta2-conf"><i style="background:${CONF_COLOR[l.confidence] || '#ccc'};"></i>${escapeHtml(l.confidence || '-')}</span></div>
-      <div class="c-sc ta2-sched">${ta2SchedCell(l)}</div>
-      <div class="c-btn"><button type="button" class="ta2-detail-btn" onclick="ta2OpenDetail('${escapeHtml(l.id)}')">상세보기</button></div>
+    <div class="ta2-tacard" onclick="ta2OpenDetail('${escapeHtml(l.id)}')" role="button" tabindex="0">
+      <div class="tc-top">
+        <div class="ta2-co">${escapeHtml(l.company)}<small>${escapeHtml(l.contact || '담당자 미입력')}${l.productType ? ' · ' + escapeHtml(l.productType) : ''}</small></div>
+        <span class="ta2-badge" style="background:${STAGE_BG[l.stage] || '#e5e7eb'};color:${STAGE_COLOR[l.stage] || '#374151'};">${ta2StageLabel(l.stage)}</span>
+      </div>
+      <div class="tc-amt">${formatCurrency(l.amount)}</div>
+      <div class="tc-bot">
+        <span class="ta2-sched">${ta2SchedCell(l)}</span>
+        <span class="ta2-conf"><i style="background:${CONF_COLOR[l.confidence] || '#ccc'};"></i>확도 ${escapeHtml(l.confidence || '-')}</span>
+      </div>
     </div>`).join('');
 }
 
