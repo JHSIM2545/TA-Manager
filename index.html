@@ -838,6 +838,22 @@
   .ta2-sch-item.done .ta2-inp{text-decoration:line-through;}
   .ta2-sch-item{text-decoration:none !important;}
   .ta2-sched-form .ta2-datebtn{height:100%;}
+
+  .ta2-board-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;font-size:13.5px;font-weight:800;color:#475569;}
+  .ta2-board{border:1px solid #e3e8f0;border-radius:12px;overflow:hidden;background:#fff;}
+  .ta2-brow{display:grid;grid-template-columns:38px 1fr auto;gap:10px;align-items:center;padding:11px 12px;border-bottom:1px solid #eef1f7;cursor:pointer;}
+  .ta2-brow:last-child{border-bottom:none;}
+  .ta2-brow:hover,.ta2-brow:active{background:#f1f6ff;}
+  .ta2-brow.pin{background:#f8fafc;}
+  .ta2-brow .no{text-align:center;font-size:12.5px;font-weight:900;color:#8a94a6;}
+  .ta2-brow .t{font-size:14px;font-weight:800;color:#0a1730;word-break:break-word;}
+  .ta2-brow .t .ac{font-size:11.5px;color:#2563eb;font-weight:900;}
+  .ta2-brow .s{font-size:12px;color:#8a94a6;margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .ta2-brow .bd{font-size:11.5px;color:#697386;font-weight:700;white-space:nowrap;}
+  .ta2-mp-text{width:100%;min-height:200px;border:1.5px solid #d5dbe6;border-radius:12px;padding:12px;font-size:14.5px;line-height:1.6;font-family:inherit;resize:vertical;}
+  .ta2-mp-text:focus{outline:none;border-color:#2563eb;box-shadow:0 0 0 3px rgba(37,99,235,.15);}
+  .ta2-lightbox{z-index:100005 !important;}
+  @media (max-width:768px){ .ta2-brow{grid-template-columns:30px 1fr;} .ta2-brow .bd{grid-column:2;} }
   #ta2DetailOverlay{align-items:center;}
   @media (max-width:768px){ #ta2DetailOverlay{align-items:flex-end;padding:0 !important;} }
 </style>
@@ -1229,38 +1245,8 @@
       </div>
       <div id="ta2StoreWarn"></div>
 
-      <!-- 메모 (사진·그림은 메모에 첨부) -->
+      <!-- 메모 게시판 -->
       <div id="ta2PaneMemo">
-        <div class="ta2-composer">
-          <textarea id="ta2MemoText" placeholder="안건 관리 메모 (고객 반응, 경쟁사, 다음 액션 등 자유롭게)"></textarea>
-          <div class="ta2-att-grid" id="ta2Pending"></div>
-          <div class="ta2-photo-bar">
-            <button type="button" class="ta2-sm" onclick="ta2AttachPick('new','cam')">📷 촬영</button>
-            <button type="button" class="ta2-sm" onclick="ta2AttachPick('new','album')">🖼️ 앨범</button>
-            <button type="button" class="ta2-sm" onclick="ta2OpenDraw('new')">✏️ 그림</button>
-            <button type="button" onclick="ta2AddMemo()" style="margin-left:auto;border-radius:10px;padding:9px 18px;font-weight:900;">메모 등록</button>
-          </div>
-        </div>
-
-        <div class="ta2-draw" id="ta2DrawBox" style="display:none;">
-          <div class="tl">
-            <button type="button" class="ta2-swatch on" data-c="#111827" style="background:#111827;" onclick="ta2DrawColor(this)"></button>
-            <button type="button" class="ta2-swatch" data-c="#dc2626" style="background:#dc2626;" onclick="ta2DrawColor(this)"></button>
-            <button type="button" class="ta2-swatch" data-c="#2563eb" style="background:#2563eb;" onclick="ta2DrawColor(this)"></button>
-            <button type="button" class="ta2-swatch" data-c="#16a34a" style="background:#16a34a;" onclick="ta2DrawColor(this)"></button>
-            <button type="button" class="ta2-sm" onclick="ta2DrawWidth(3)">가늘게</button>
-            <button type="button" class="ta2-sm" onclick="ta2DrawWidth(7)">보통</button>
-            <button type="button" class="ta2-sm" onclick="ta2DrawWidth(14)">굵게</button>
-            <button type="button" class="ta2-sm" onclick="ta2DrawEraser()">지우개</button>
-            <button type="button" class="ta2-sm" onclick="ta2DrawUndo()">↩ 되돌리기</button>
-            <button type="button" class="ta2-sm" onclick="ta2DrawClear()">전체 지움</button>
-          </div>
-          <canvas id="ta2Canvas"></canvas>
-          <div style="display:flex;gap:8px;margin-top:8px;justify-content:flex-end;">
-            <button type="button" class="ta2-sm" onclick="ta2CloseDraw()">취소</button>
-            <button type="button" onclick="ta2SaveDraw()" style="border-radius:10px;padding:9px 16px;font-weight:900;">그림 첨부</button>
-          </div>
-        </div>
         <div id="ta2MemoList"></div>
       </div>
 
@@ -1283,6 +1269,52 @@
           <textarea id="ta2SchNote" class="full" rows="2" placeholder="상세 내용 / 약속 장소 (선택)"></textarea>
           <button type="button" class="full" onclick="ta2AddSched()" style="border-radius:10px;padding:11px;font-weight:900;">일정 추가</button>
         </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 메모 작성 / 보기 팝업 -->
+<div class="modal-overlay" id="ta2MemoPop" style="display:none;z-index:100001;" onclick="if(event.target===this)ta2CloseMemoPop()">
+  <div class="modal-card ta2-modal" style="max-width:640px !important;">
+    <div class="ta2-m-head">
+      <button type="button" class="modal-close" onclick="ta2CloseMemoPop()">&times;</button>
+      <h3 id="ta2MpTitle">메모 작성</h3>
+      <div class="ta2-autosave" id="ta2MpMeta" style="margin-top:2px;"></div>
+    </div>
+    <div class="ta2-m-scroll">
+      <textarea id="ta2MemoText" class="ta2-mp-text" placeholder="제목(첫 줄)과 내용을 자유롭게 작성하세요. 고객 반응, 경쟁사, 다음 액션 등" onchange="ta2MpTextChange(this.value)"></textarea>
+      <div class="ta2-att-grid" id="ta2MpAtts"></div>
+      <div class="ta2-photo-bar" id="ta2MpPhotoBar">
+        <button type="button" class="ta2-sm" onclick="ta2AttachPick(ta2MpTarget(),'cam')">📷 촬영</button>
+        <button type="button" class="ta2-sm" onclick="ta2AttachPick(ta2MpTarget(),'album')">🖼️ 앨범</button>
+        <button type="button" class="ta2-sm" onclick="ta2OpenDraw(ta2MpTarget())">✏️ 그림</button>
+      </div>
+      <div class="ta2-draw" id="ta2DrawBox" style="display:none;">
+          <div class="tl">
+            <button type="button" class="ta2-swatch on" data-c="#111827" style="background:#111827;" onclick="ta2DrawColor(this)"></button>
+            <button type="button" class="ta2-swatch" data-c="#dc2626" style="background:#dc2626;" onclick="ta2DrawColor(this)"></button>
+            <button type="button" class="ta2-swatch" data-c="#2563eb" style="background:#2563eb;" onclick="ta2DrawColor(this)"></button>
+            <button type="button" class="ta2-swatch" data-c="#16a34a" style="background:#16a34a;" onclick="ta2DrawColor(this)"></button>
+            <button type="button" class="ta2-sm" onclick="ta2DrawWidth(3)">가늘게</button>
+            <button type="button" class="ta2-sm" onclick="ta2DrawWidth(7)">보통</button>
+            <button type="button" class="ta2-sm" onclick="ta2DrawWidth(14)">굵게</button>
+            <button type="button" class="ta2-sm" onclick="ta2DrawEraser()">지우개</button>
+            <button type="button" class="ta2-sm" onclick="ta2DrawUndo()">↩ 되돌리기</button>
+            <button type="button" class="ta2-sm" onclick="ta2DrawClear()">전체 지움</button>
+          </div>
+          <canvas id="ta2Canvas"></canvas>
+          <div style="display:flex;gap:8px;margin-top:8px;justify-content:flex-end;">
+            <button type="button" class="ta2-sm" onclick="ta2CloseDraw()">취소</button>
+            <button type="button" onclick="ta2SaveDraw()" style="border-radius:10px;padding:9px 16px;font-weight:900;">그림 첨부</button>
+          </div>
+        </div>
+      <div style="display:flex;gap:8px;align-items:center;margin-top:14px;">
+        <button type="button" class="danger" id="ta2MpDel" onclick="ta2DelNote()">삭제</button>
+        <span class="ta2-autosave" id="ta2MpAuto" style="margin:0;"></span>
+        <span style="flex:1"></span>
+        <button type="button" class="ta2-sm" onclick="ta2CloseMemoPop()">닫기</button>
+        <button type="button" id="ta2MpAdd" onclick="ta2AddMemo()" style="border-radius:10px;padding:10px 22px;font-weight:900;">등록</button>
       </div>
     </div>
   </div>
@@ -5464,7 +5496,7 @@ async function ta2OpenDetail(id, tab, date) {
 }
 function ta2CloseDetail() {
   el('ta2DetailOverlay').style.display = 'none';
-  ta2CloseDraw(); ta2CloseLightbox(); ta2DpClose();
+  ta2CloseMemoPop(); ta2CloseDraw(); ta2CloseLightbox(); ta2DpClose();
   TA2.leadId = null;
   ta2RenderUpcoming(currentViewMode);
 }
@@ -5512,45 +5544,98 @@ function ta2AttThumbs(atts, noteId, removable) {
 }
 function ta2RenderMemos() {
   const lead = ta2CurLead();
-  let html = TA2.notes.map(n => `
-    <div class="ta2-note"><div class="tm"><span>${ta2FmtTs(n.created_at)}</span>
-      <button type="button" class="ta2-x" onclick="ta2DelNote('${escapeHtml(n.id)}')">삭제</button></div>
-      <textarea class="ta2-memo-edit" placeholder="(내용 없음)" oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px'" onchange="ta2EditMemo('${escapeHtml(n.id)}',this.value)">${escapeHtml(n.content)}</textarea>
-      <div class="ta2-att-grid">${ta2AttThumbs(ta2Atts(n), escapeHtml(n.id), true)}</div>
-      <div class="ta2-photo-bar">
-        <button type="button" class="ta2-sm" onclick="ta2AttachPick('${escapeHtml(n.id)}','cam')">📷 촬영</button>
-        <button type="button" class="ta2-sm" onclick="ta2AttachPick('${escapeHtml(n.id)}','album')">🖼️ 앨범</button>
-        <button type="button" class="ta2-sm" onclick="ta2OpenDraw('${escapeHtml(n.id)}')">✏️ 그림</button></div>
-    </div>`).join('');
-  if (lead) {
-    html += `<div class="ta2-note" style="background:#f8fafc;"><div class="tm"><span>기본 메모 (등록 시 입력)</span></div>
-      <textarea class="ta2-memo-edit" placeholder="기본 메모를 입력하세요" onchange="ta2FText('memo',this.value)">${escapeHtml(lead.memo)}</textarea></div>`;
+  const notes = TA2.notes;
+  const rows = notes.map((n, i) => {
+    const txt = String(n.content || '').trim();
+    const lines = txt.split(/\r?\n/).filter(x => x.trim());
+    const title = lines[0] ? lines[0].slice(0, 60) : '(사진·그림 메모)';
+    const snip = lines.slice(1).join(' ').slice(0, 80);
+    const ac = ta2Atts(n).length;
+    return `<div class="ta2-brow" onclick="ta2OpenMemoPop('${escapeHtml(n.id)}')">
+      <div class="no">${notes.length - i}</div>
+      <div class="bt"><div class="t">${escapeHtml(title)}${ac ? ` <span class="ac">📎 ${ac}</span>` : ''}</div>${snip ? `<div class="s">${escapeHtml(snip)}</div>` : ''}</div>
+      <div class="bd">${ta2FmtTs(n.created_at)}</div></div>`;
+  }).join('');
+  let base = '';
+  if (lead && lead.memo) {
+    const t = String(lead.memo).split(/\r?\n/)[0].slice(0, 60);
+    base = `<div class="ta2-brow pin" onclick="ta2OpenMemoPop('base')"><div class="no">📌</div>
+      <div class="bt"><div class="t">${escapeHtml(t)}</div><div class="s">기본 메모 (안건 등록 시 입력)</div></div>
+      <div class="bd">${ta2FmtTs(lead.createdAt)}</div></div>`;
   }
-  el('ta2MemoList').innerHTML = html || '<div class="ta2-empty">아직 메모가 없습니다.</div>';
-  el('ta2MemoList').querySelectorAll('.ta2-memo-edit').forEach(t => { t.style.height = 'auto'; t.style.height = Math.max(54, t.scrollHeight) + 'px'; });
+  el('ta2MemoList').innerHTML = `
+    <div class="ta2-board-head"><span>메모 <b>${notes.length}</b>건</span>
+      <button type="button" onclick="ta2OpenMemoPop('new')" style="border-radius:10px;padding:8px 16px;font-weight:900;">＋ 메모 작성</button></div>
+    <div class="ta2-board">${base}${rows || '<div class="ta2-empty" style="padding:18px 6px;text-align:center;">등록된 메모가 없습니다. 「메모 작성」을 눌러 첫 메모를 남겨보세요.</div>'}</div>`;
+  // 열려 있는 메모 팝업의 첨부 갱신
+  if (MP.open) ta2RenderMpAtts();
 }
-function ta2RenderPending() {
-  el('ta2Pending').innerHTML = (TA2.pending || []).map((a, i) => `<div class="ta2-att${a.t === 'drawing' ? ' dr' : ''}" onclick="ta2OpenLightboxSrc(${i})">
-    <span class="kd">${a.t === 'drawing' ? '그림' : '사진'}</span><img src="${a.d}" alt="">
-    <button type="button" class="rm" onclick="event.stopPropagation();ta2RemovePending(${i})">×</button></div>`).join('');
+
+// 메모 작성/보기 팝업 (id: 'new' | 메모 id | 'base')
+const MP = { open: false, id: 'new' };
+function ta2OpenMemoPop(id) {
+  MP.open = true; MP.id = id || 'new';
+  ta2CloseDraw();
+  const ta = el('ta2MemoText'), isNew = MP.id === 'new', isBase = MP.id === 'base';
+  let meta = '';
+  if (isNew) { ta.value = ''; TA2.pending = []; meta = '등록 버튼을 누르면 등록 일시가 기록됩니다'; el('ta2MpTitle').textContent = '메모 작성'; }
+  else if (isBase) { const l = ta2CurLead(); ta.value = (l && l.memo) || ''; meta = '등록일시 ' + ta2FmtTs(l && l.createdAt); el('ta2MpTitle').textContent = '기본 메모'; }
+  else { const n = TA2.notes.find(x => x.id === MP.id); if (!n) return; ta.value = n.content || ''; meta = '등록일시 ' + ta2FmtTs(n.created_at); el('ta2MpTitle').textContent = '메모'; }
+  el('ta2MpMeta').textContent = meta;
+  el('ta2MpPhotoBar').style.display = isBase ? 'none' : 'flex';
+  el('ta2MpAdd').style.display = isNew ? '' : 'none';
+  el('ta2MpDel').style.display = (isNew || isBase) ? 'none' : '';
+  el('ta2MpAuto').textContent = isNew ? '' : '수정하면 자동 저장됩니다';
+  ta2RenderMpAtts();
+  el('ta2MemoPop').style.display = 'flex';
+  if (isNew) setTimeout(() => ta.focus(), 50);
 }
-function ta2RemovePending(i) { TA2.pending.splice(i, 1); ta2RenderPending(); }
+function ta2CloseMemoPop() {
+  MP.open = false; ta2CloseDraw(); ta2CloseLightbox();
+  el('ta2MemoPop').style.display = 'none';
+}
+function ta2MpTarget() { return MP.id === 'new' ? 'new' : MP.id; }
+function ta2MpTextChange(v) {
+  if (MP.id === 'new') return;
+  if (MP.id === 'base') ta2FText('memo', v); else ta2EditMemo(MP.id, v);
+}
+function ta2RenderMpAtts() {
+  const box = el('ta2MpAtts'); if (!box) return;
+  if (MP.id === 'new') {
+    box.innerHTML = (TA2.pending || []).map((a, i) => `<div class="ta2-att${a.t === 'drawing' ? ' dr' : ''}" onclick="ta2OpenLightboxSrc(${i})">
+      <span class="kd">${a.t === 'drawing' ? '그림' : '사진'}</span><img src="${a.d}" alt="">
+      <button type="button" class="rm" onclick="event.stopPropagation();ta2RemovePending(${i})">×</button></div>`).join('');
+  } else if (MP.id === 'base') { box.innerHTML = ''; }
+  else {
+    const n = TA2.notes.find(x => x.id === MP.id);
+    box.innerHTML = n ? ta2AttThumbs(ta2Atts(n), escapeHtml(n.id), true) : '';
+  }
+}
+function ta2RenderPending() { if (MP.open) ta2RenderMpAtts(); }
+function ta2RemovePending(i) { TA2.pending.splice(i, 1); ta2RenderMpAtts(); }
 async function ta2AddMemo() {
   const text = el('ta2MemoText').value.trim(), atts = TA2.pending || [];
-  if (!text && !atts.length) return;
+  if (!text && !atts.length) { alert('메모 내용을 입력하거나 사진·그림을 첨부해주세요.'); return; }
   try {
     await ta2NoteAdd({ lead_id: TA2.leadId, kind: 'memo', content: text, image: atts.length ? JSON.stringify(atts) : null });
-    el('ta2MemoText').value = ''; TA2.pending = []; ta2RenderPending();
-    await ta2LoadNotes(); ta2Flash('메모 저장됨 ✓');
+    TA2.pending = [];
+    ta2CloseMemoPop();
+    await ta2LoadNotes(); ta2Flash('메모 등록됨 ✓');
   } catch (e) { alert('메모 저장 실패: ' + (e.message || e)); }
 }
 async function ta2EditMemo(id, v) {
-  try { await ta2NoteUpdate(id, { content: String(v || '').trim() }); const n = TA2.notes.find(x => x.id === id); if (n) n.content = String(v || '').trim(); ta2Flash('저장됨 ✓'); }
-  catch (e) { ta2Flash('저장 실패: ' + (e.message || e), true); }
+  try {
+    await ta2NoteUpdate(id, { content: String(v || '').trim() });
+    const n = TA2.notes.find(x => x.id === id); if (n) n.content = String(v || '').trim();
+    ta2Flash('저장됨 ✓');
+    const t = el('ta2MpAuto'); if (t) t.textContent = '저장됨 ✓';
+    ta2RenderMemos();
+  } catch (e) { ta2Flash('저장 실패: ' + (e.message || e), true); }
 }
 async function ta2DelNote(id) {
+  id = id || MP.id;
   if (!confirm('이 메모를 삭제하시겠습니까? (첨부된 사진·그림도 함께 삭제됩니다)')) return;
-  try { await ta2NoteDel(id); ta2CloseLightbox(); await ta2LoadNotes(); ta2Flash('삭제됨'); }
+  try { await ta2NoteDel(id); ta2CloseMemoPop(); await ta2LoadNotes(); ta2Flash('삭제됨'); }
   catch (e) { alert('삭제 실패: ' + (e.message || e)); }
 }
 
