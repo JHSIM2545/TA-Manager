@@ -482,7 +482,7 @@
   }
   .compact-form-row1 {
     display: grid;
-    grid-template-columns: 1.8fr 1.1fr 1.2fr 1fr 1fr 1fr 1fr;
+    grid-template-columns: repeat(4, 1fr);
     gap: 10px;
   }
   .compact-form-row2 {
@@ -657,6 +657,151 @@
     margin-top: 12px;
     display: none;
   }
+
+  /* ==========================================================================
+     TA 관리 v2 - 컨설턴트 화면 재설계 (ta2-*)
+     ========================================================================== */
+  .ta2-wrap{max-width:1180px;margin:0 auto;color:#1a2333;}
+  .ta2-hero{background:#fff;border-radius:16px;padding:18px 22px;display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;box-shadow:0 2px 10px rgba(10,20,40,.12);border-left:8px solid var(--blue);margin-bottom:14px;}
+  .ta2-eyebrow{font-size:12px;font-weight:700;color:#697386;letter-spacing:.5px;}
+  .ta2-title{margin:2px 0 6px;font-size:28px;font-weight:900;color:#0a1730;letter-spacing:-.5px;line-height:1.15;}
+  .ta2-datebar{display:flex;flex-wrap:wrap;gap:6px 8px;align-items:center;font-size:13.5px;color:#334155;font-weight:700;}
+  .ta2-chip{display:inline-flex;align-items:center;gap:4px;background:#eaf1ff;color:#1d4ed8;border-radius:999px;padding:4px 11px;font-size:12.5px;font-weight:800;white-space:nowrap;}
+  .ta2-chip.amber{background:#fef3c7;color:#92400e;}
+  .ta2-hero-r{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+  .ta2-btn-new{background:var(--blue);color:#fff;border:none;border-radius:12px;padding:13px 22px;font-size:16px;font-weight:900;box-shadow:0 4px 12px rgba(37,99,235,.35);cursor:pointer;white-space:nowrap;}
+  .ta2-btn-new:hover{filter:brightness(1.08);}
+
+  .ta2-kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:12px;}
+  .ta2-kpi{background:#fff;border-radius:14px;padding:14px 16px;box-shadow:0 1px 4px rgba(10,20,40,.1);border-top:4px solid #cbd5e1;min-width:0;}
+  .ta2-kpi.k1{border-top-color:#2563eb;} .ta2-kpi.k2{border-top-color:#0891b2;} .ta2-kpi.k3{border-top-color:#16a34a;} .ta2-kpi.k4{border-top-color:#7c3aed;}
+  .ta2-kpi .l{font-size:12.5px;font-weight:800;color:#697386;}
+  .ta2-kpi .v{font-size:21px;font-weight:900;color:#0a1730;margin-top:6px;letter-spacing:-.3px;word-break:keep-all;}
+  .ta2-kpi .c{font-size:13px;font-weight:800;color:#2563eb;margin-top:2px;}
+  .ta2-kpi .s{font-size:11.5px;color:#8a94a6;margin-top:5px;line-height:1.35;}
+  .ta2-bar{height:6px;background:#e8edf5;border-radius:99px;overflow:hidden;margin-top:7px;}
+  .ta2-bar>i{display:block;height:100%;background:#16a34a;border-radius:99px;}
+
+  .ta2-today{background:linear-gradient(120deg,#0b1f3f,#1e3a8a);color:#fff;border-radius:14px;padding:14px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:14px;box-shadow:0 2px 8px rgba(10,20,40,.2);}
+  .ta2-today .t{font-size:13px;font-weight:800;opacity:.85;}
+  .ta2-today .a{font-size:26px;font-weight:900;letter-spacing:-.5px;margin-top:2px;}
+  .ta2-today .n{font-size:13px;font-weight:700;opacity:.85;margin-left:8px;}
+  .ta2-today button{background:#fff;color:#1e3a8a;border:none;border-radius:10px;padding:10px 18px;font-size:14px;font-weight:900;cursor:pointer;}
+
+  .ta2-card{background:#fff;border-radius:14px;padding:16px 18px;box-shadow:0 1px 4px rgba(10,20,40,.1);margin-bottom:14px;}
+  .ta2-card h2{margin:0 0 10px;font-size:16px;font-weight:900;color:#0a1730;display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+  .ta2-card h2 .cnt{font-size:12.5px;background:#eef1f7;color:#475569;border-radius:99px;padding:2px 10px;font-weight:800;}
+
+  .ta2-upcoming{display:flex;gap:10px;overflow-x:auto;padding-bottom:4px;}
+  .ta2-up-item{flex:0 0 auto;min-width:190px;max-width:260px;background:#f8fafc;border:1px solid #e3e8f0;border-radius:12px;padding:10px 12px;cursor:pointer;}
+  .ta2-up-item:hover{border-color:#2563eb;background:#eff6ff;}
+  .ta2-up-item .d{font-size:12px;font-weight:900;color:#2563eb;}
+  .ta2-up-item .tt{font-size:14px;font-weight:800;color:#0a1730;margin-top:3px;}
+  .ta2-up-item .co{font-size:12px;color:#697386;margin-top:2px;}
+  .ta2-empty{color:#8a94a6;font-size:13px;padding:8px 2px;}
+
+  .ta2-stage-tabs{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;margin-bottom:10px;}
+  .ta2-stage-tab{flex:0 0 auto;background:#eef1f7;color:#475569;border:1px solid transparent;border-radius:999px;padding:8px 15px;font-size:13.5px;font-weight:800;cursor:pointer;white-space:nowrap;}
+  .ta2-stage-tab b{font-weight:900;margin-left:4px;opacity:.75;}
+  .ta2-stage-tab.active{background:#0b1f3f;color:#fff;}
+  .ta2-tools{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;}
+  .ta2-tools input,.ta2-tools select{padding:9px 11px;border:1px solid #d5dbe6;border-radius:10px;font-size:13.5px;font-family:inherit;background:#fff;color:#1a2333;}
+  .ta2-tools input{flex:1;min-width:150px;}
+
+  .ta2-row{display:grid;grid-template-columns:minmax(150px,2.2fr) minmax(100px,1.1fr) 78px 54px minmax(110px,1.3fr) 86px;gap:10px;align-items:center;padding:12px 10px;border-bottom:1px solid #eef1f7;}
+  .ta2-row.head{background:#0b1f3f;color:#fff;border-radius:10px;font-size:12px;font-weight:800;padding:9px 10px;border-bottom:none;}
+  .ta2-row:not(.head):hover{background:#f8fafc;}
+  .ta2-co{font-weight:900;color:#0a1730;font-size:14.5px;word-break:break-word;}
+  .ta2-co small{display:block;font-weight:600;color:#8a94a6;font-size:11.5px;margin-top:2px;}
+  .ta2-amt{text-align:right;font-weight:900;color:#0a1730;white-space:nowrap;font-size:14px;}
+  .ta2-badge{display:inline-block;border-radius:999px;padding:3px 10px;font-size:12px;font-weight:900;white-space:nowrap;}
+  .ta2-conf{display:inline-flex;align-items:center;gap:5px;font-weight:900;font-size:13px;}
+  .ta2-conf i{width:9px;height:9px;border-radius:50%;display:inline-block;}
+  .ta2-sched{font-size:12.5px;font-weight:700;color:#334155;line-height:1.35;}
+  .ta2-sched em{font-style:normal;font-size:11.5px;font-weight:900;border-radius:6px;padding:1px 6px;margin-left:4px;}
+  .ta2-sched em.today{background:#fee2e2;color:#b91c1c;} .ta2-sched em.soon{background:#fef3c7;color:#92400e;} .ta2-sched em.late{background:#e5e7eb;color:#4b5563;}
+  .ta2-detail-btn{background:#eff6ff;color:#1d4ed8;border:1px solid #bfdbfe;border-radius:9px;padding:7px 10px;font-size:12.5px;font-weight:900;cursor:pointer;white-space:nowrap;}
+  .ta2-detail-btn:hover{background:#dbeafe;}
+
+  /* 상세 모달 */
+  .ta2-modal{max-width:760px !important;width:96% !important;max-height:92vh !important;padding:0 !important;display:flex;flex-direction:column;overflow:hidden !important;}
+  .ta2-m-head{padding:18px 22px 12px;border-bottom:1px solid #eef1f7;position:relative;}
+  .ta2-m-head h3{margin:0 40px 6px 0 !important;font-size:20px !important;font-weight:900;color:#0a1730;}
+  .ta2-m-scroll{overflow-y:auto;padding:14px 22px 22px;flex:1;}
+  .ta2-info{display:grid;grid-template-columns:repeat(2,1fr);gap:8px 14px;background:#f8fafc;border:1px solid #e3e8f0;border-radius:12px;padding:12px 14px;}
+  .ta2-info div.k{font-size:11.5px;font-weight:800;color:#8a94a6;}
+  .ta2-info div.vv{font-size:14.5px;font-weight:800;color:#0a1730;margin-top:1px;word-break:break-word;}
+  .ta2-info a{color:#2563eb;text-decoration:none;}
+  .ta2-actions{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0;}
+  .ta2-actions button{border-radius:10px;padding:9px 14px;font-size:13px;font-weight:900;}
+  .ta2-tabs{display:flex;gap:4px;background:#eef1f7;border-radius:12px;padding:4px;margin-bottom:12px;}
+  .ta2-tab{flex:1;background:transparent;color:#475569;border:none;border-radius:9px;padding:9px 4px;font-size:13.5px;font-weight:900;cursor:pointer;}
+  .ta2-tab.active{background:#fff;color:#0a1730;box-shadow:0 1px 3px rgba(0,0,0,.12);}
+  .ta2-warn{background:#fffbeb;border:1px solid #fde68a;color:#92400e;border-radius:10px;padding:8px 12px;font-size:12px;font-weight:700;margin-bottom:10px;line-height:1.45;}
+  .ta2-note-form textarea{width:100%;min-height:84px;border:1.5px solid #d5dbe6;border-radius:10px;padding:10px;font-size:14px;font-family:inherit;resize:vertical;}
+  .ta2-note{border:1px solid #e3e8f0;border-radius:12px;padding:10px 12px;margin-top:8px;background:#fff;}
+  .ta2-note .tm{font-size:11.5px;color:#8a94a6;font-weight:700;display:flex;justify-content:space-between;align-items:center;}
+  .ta2-note .tx{font-size:14px;color:#1a2333;white-space:pre-wrap;word-break:break-word;margin-top:4px;line-height:1.55;}
+  .ta2-x{background:transparent !important;color:#b91c1c !important;border:none !important;padding:2px 6px !important;font-size:12px !important;font-weight:800 !important;cursor:pointer;}
+  .ta2-photo-bar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px;}
+  .ta2-photo-bar button,.ta2-photo-bar label{border-radius:10px;padding:10px 14px;font-size:13.5px;font-weight:900;cursor:pointer;display:inline-block;}
+  .ta2-gallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:8px;}
+  .ta2-thumb{position:relative;border:1px solid #e3e8f0;border-radius:12px;overflow:hidden;background:#f8fafc;cursor:pointer;}
+  .ta2-thumb img{width:100%;height:110px;object-fit:cover;display:block;}
+  .ta2-thumb.dr img{object-fit:contain;background:#fff;}
+  .ta2-thumb .cap{font-size:11.5px;padding:5px 7px;color:#475569;font-weight:700;word-break:break-word;}
+  .ta2-thumb .kd{position:absolute;top:5px;left:5px;background:rgba(10,23,48,.75);color:#fff;font-size:10.5px;font-weight:800;padding:2px 7px;border-radius:99px;}
+  .ta2-draw{border:1.5px solid #d5dbe6;border-radius:12px;padding:10px;margin-bottom:12px;background:#fff;}
+  .ta2-draw canvas{width:100%;height:300px;border:1px dashed #cbd5e1;border-radius:10px;background:#fff;touch-action:none;display:block;cursor:crosshair;}
+  .ta2-draw .tl{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-bottom:8px;}
+  .ta2-swatch{width:26px;height:26px;border-radius:50%;border:3px solid #fff;box-shadow:0 0 0 1.5px #cbd5e1;padding:0 !important;cursor:pointer;}
+  .ta2-swatch.on{box-shadow:0 0 0 2.5px #2563eb;}
+  .ta2-sm{background:#eef1f7 !important;color:#1a2333 !important;border:1px solid #d5dbe6 !important;border-radius:8px !important;padding:6px 11px !important;font-size:12.5px !important;font-weight:800 !important;}
+  .ta2-lightbox{position:fixed;inset:0;background:rgba(5,10,25,.88);z-index:100000;display:none;align-items:center;justify-content:center;flex-direction:column;gap:12px;padding:16px;}
+  .ta2-lightbox img{max-width:100%;max-height:78vh;border-radius:10px;background:#fff;}
+
+  .ta2-cal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
+  .ta2-cal-head b{font-size:15px;font-weight:900;color:#0a1730;}
+  .ta2-cal{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;}
+  .ta2-cal .dw{text-align:center;font-size:11.5px;font-weight:800;color:#8a94a6;padding:3px 0;}
+  .ta2-cal .dw:first-child{color:#dc2626;} .ta2-cal .dw:nth-child(7){color:#2563eb;}
+  .ta2-day{position:relative;height:46px;border:1px solid #eef1f7;border-radius:9px;background:#fff;font-size:13px;font-weight:800;color:#1a2333;cursor:pointer;padding:4px 0 0 !important;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;}
+  .ta2-day.out{visibility:hidden;}
+  .ta2-day.sun{color:#dc2626;} .ta2-day.sat{color:#2563eb;} .ta2-day.hol{color:#dc2626;}
+  .ta2-day.today{box-shadow:inset 0 0 0 2px #2563eb;}
+  .ta2-day.sel{background:#0b1f3f !important;color:#fff !important;}
+  .ta2-day .dot{width:6px;height:6px;border-radius:50%;background:#f59e0b;margin-top:3px;}
+  .ta2-day .dot.exp{background:#16a34a;}
+  .ta2-sched-form{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px;}
+  .ta2-sched-form input,.ta2-sched-form textarea{width:100%;border:1.5px solid #d5dbe6;border-radius:10px;padding:9px 10px;font-size:14px;font-family:inherit;}
+  .ta2-sched-form .full{grid-column:1/-1;}
+  .ta2-sch-item{display:flex;gap:10px;align-items:flex-start;border:1px solid #e3e8f0;border-radius:12px;padding:9px 12px;margin-top:8px;}
+  .ta2-sch-item.done{opacity:.55;text-decoration:line-through;}
+  .ta2-sch-item .tm{font-size:12px;font-weight:900;color:#2563eb;min-width:44px;}
+  .ta2-sch-item .ti{font-size:14px;font-weight:800;color:#0a1730;}
+  .ta2-sch-item .nt{font-size:12.5px;color:#697386;margin-top:2px;white-space:pre-wrap;}
+
+  @media (max-width:768px){
+    .ta2-title{font-size:23px;}
+    .ta2-hero{padding:14px 16px;}
+    .ta2-btn-new{width:100%;padding:13px;font-size:16px;}
+    .ta2-hero-r{width:100%;}
+    .ta2-kpis{grid-template-columns:repeat(2,1fr);gap:10px;}
+    .ta2-kpi .v{font-size:18px;}
+    .ta2-today .a{font-size:22px;}
+    .ta2-row.head{display:none;}
+    .ta2-row{grid-template-columns:1fr auto;grid-template-areas:"co amt" "st conf" "sc btn";gap:6px 10px;padding:12px 6px;}
+    .ta2-row>.c-co{grid-area:co;} .ta2-row>.c-amt{grid-area:amt;}
+    .ta2-row>.c-st{grid-area:st;} .ta2-row>.c-conf{grid-area:conf;text-align:right;justify-self:end;}
+    .ta2-row>.c-sc{grid-area:sc;} .ta2-row>.c-btn{grid-area:btn;justify-self:end;}
+    .ta2-info{grid-template-columns:1fr 1fr;}
+    .ta2-modal{width:100% !important;max-height:96vh !important;border-radius:16px 16px 0 0 !important;}
+    .ta2-m-scroll{padding:12px 14px 22px;}
+    .ta2-draw canvas{height:260px;}
+  }
+
+  #ta2DetailOverlay{align-items:center;}
+  @media (max-width:768px){ #ta2DetailOverlay{align-items:flex-end;padding:0 !important;} }
 </style>
 </head>
 <body>
@@ -941,201 +1086,184 @@
         <!-- ==========================================
          컨설턴트 개별 영업 화면 (viewAgent) - 1번~5번 캡처 100% 매칭
          ========================================== -->
-    <div id="viewAgent" class="agent-view-container">
+        <div id="viewAgent" class="agent-view-container">
+     <div class="ta2-wrap">
 
-      <!-- 1. 간결 헤더 (중복 제거 & 순위 표시 & 상품 선택 & 신규등록 버튼) -->
-      <div class="agent-header-card">
-        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
-          <!-- 상품 종류 선택 기능 (컨설턴트 이름 삭제, 상품 선택만 유지) -->
-          <div class="agent-header-product-picker" id="agentHeaderProductPicker" style="margin-left:0;">
-            <button type="button" class="header-prod-btn active" data-prod="일반알람" onclick="setAgentGlobalProduct('일반알람')">일반알람</button>
-            <button type="button" class="header-prod-btn" data-prod="디지털(정보보안)" onclick="setAgentGlobalProduct('디지털(정보보안)')">디지털(정보보안)</button>
-            <button type="button" class="header-prod-btn" data-prod="안전상품" onclick="setAgentGlobalProduct('안전상품')">안전상품</button>
-            <button type="button" class="header-prod-btn" data-prod="all" onclick="setAgentGlobalProduct('all')">전체</button>
+      <!-- 1. 헤더: 컨설턴트명 + TA 관리 / 오늘 날짜·영업일 / 신규 TA 버튼 -->
+      <section class="ta2-hero">
+        <div>
+          <h1 class="ta2-title"><span id="agentActiveName"></span> TA 관리</h1>
+          <div class="ta2-datebar" id="ta2DateBar"></div>
+        </div>
+        <div class="ta2-hero-r">
+          <button type="button" id="btnBackToMaster" class="ta2-sm" style="display:none;" onclick="switchView('master')">🔙 통합 대시보드</button>
+          <button type="button" class="ta2-btn-new" onclick="openNewAgentLeadModal()">＋ 신규 TA</button>
+        </div>
+      </section>
+
+      <!-- 2. TA 대시보드 (간략) -->
+      <section class="ta2-kpis">
+        <div class="ta2-kpi k1">
+          <div class="l">진행 TA</div>
+          <div class="v" id="ta2KIngAmt">0원</div>
+          <div class="c" id="ta2KIngCnt">0건</div>
+          <div class="s">진행중 전체</div>
+        </div>
+        <div class="ta2-kpi k2">
+          <div class="l">이달 잔여 TA</div>
+          <div class="v" id="ta2KRemAmt">0원</div>
+          <div class="c" id="ta2KRemCnt">0건</div>
+          <div class="s">이달 수주예정 · 미수주</div>
+        </div>
+        <div class="ta2-kpi k3">
+          <div class="l">이달 수주 TA</div>
+          <div class="v" id="ta2KWonAmt">0원</div>
+          <div class="c" id="ta2KWonCnt">0건</div>
+          <div class="ta2-bar" id="ta2KWonBarWrap" style="display:none;"><i id="ta2KWonBar" style="width:0%"></i></div>
+          <div class="s" id="ta2KWonSub"></div>
+        </div>
+        <div class="ta2-kpi k4">
+          <div class="l">TA 평균 단가</div>
+          <div class="v" id="ta2KAvgAmt">0원</div>
+          <div class="c">진행중 기준</div>
+          <div class="s" id="ta2KAvgSub"></div>
+        </div>
+      </section>
+
+      <!-- 금일 수주 예정 -->
+      <section class="ta2-today">
+        <div>
+          <div class="t">금일 수주 예정 금액</div>
+          <div><span class="a" id="ta2TodayAmt">0원</span><span class="n" id="ta2TodayCnt">0건</span></div>
+        </div>
+        <button type="button" onclick="openTodayExpectedModal()">상세리스트</button>
+      </section>
+
+      <!-- 다가오는 일정 -->
+      <section class="ta2-card">
+        <h2>📅 다가오는 고객 일정 <span class="cnt" id="ta2UpCnt">0</span></h2>
+        <div class="ta2-upcoming" id="ta2Upcoming"></div>
+      </section>
+
+      <!-- 3. TA 목록 -->
+      <section class="ta2-card">
+        <h2>TA 목록 <span class="cnt" id="agentLeadCount">0</span></h2>
+        <div class="ta2-stage-tabs" id="ta2StageTabs"></div>
+        <div class="ta2-tools">
+          <input type="search" id="ta2Search" placeholder="서비스제공처 · 담당자 검색" oninput="ta2SetSearch(this.value)">
+          <select id="ta2Period" onchange="ta2SetPeriod(this.value)"></select>
+          <select id="ta2Product" onchange="ta2SetProduct(this.value)">
+            <option value="all">상품 전체</option>
+            <option value="일반알람">일반알람</option>
+            <option value="디지털(정보보안)">디지털(정보보안)</option>
+            <option value="안전상품">안전상품</option>
+          </select>
+        </div>
+        <div>
+          <div class="ta2-row head">
+            <div>서비스제공처</div><div style="text-align:right;">용역료</div><div>단계</div><div>확도</div><div>수주일정</div><div></div>
           </div>
-          <span id="agentActiveName" style="display:none;"></span>
+          <div id="ta2List"></div>
         </div>
-        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
-          <button type="button" class="btn-primary" onclick="openNewAgentLeadModal()" style="display:inline-flex;align-items:center;gap:6px;padding:8px 18px;font-size:14px;font-weight:700;background:var(--blue);color:#fff;border-radius:8px;border:none;cursor:pointer;">
-            ➕ 신규 TA 등록
-          </button>
-          <button type="button" class="small secondary" id="btnBackToMaster" style="background:#0b1f3f;color:#fff;display:none;padding:8px 14px;border-radius:8px;border:none;cursor:pointer;" onclick="switchView('master')">
-            🔙 지사장 대시보드로 돌아가기
-          </button>
+      </section>
+
+     </div>
+    </div>
+  </main>
+</div>
+
+
+<!-- ==========================================================================
+     TA 상세보기 모달 (세부정보 + 메모 / 사진·그림 / 일정 캘린더)
+     ========================================================================== -->
+<div class="modal-overlay" id="ta2DetailOverlay" style="display:none;" onclick="if(event.target===this)ta2CloseDetail()">
+  <div class="modal-card ta2-modal">
+    <div class="ta2-m-head">
+      <button type="button" class="modal-close" onclick="ta2CloseDetail()">&times;</button>
+      <h3 id="ta2DName">-</h3>
+      <div id="ta2DBadges"></div>
+    </div>
+    <div class="ta2-m-scroll">
+      <div class="ta2-info" id="ta2DInfo"></div>
+      <div class="ta2-actions" id="ta2DActions"></div>
+
+      <div class="ta2-tabs">
+        <button type="button" class="ta2-tab active" data-tab="memo" onclick="ta2Tab('memo')">📝 메모</button>
+        <button type="button" class="ta2-tab" data-tab="photo" onclick="ta2Tab('photo')">📷 사진·그림</button>
+        <button type="button" class="ta2-tab" data-tab="cal" onclick="ta2Tab('cal')">📅 일정</button>
+      </div>
+      <div id="ta2StoreWarn"></div>
+
+      <!-- 메모 -->
+      <div id="ta2PaneMemo">
+        <div class="ta2-note-form">
+          <textarea id="ta2MemoText" placeholder="안건 관리 메모 (고객 반응, 경쟁사, 다음 액션 등 자유롭게)"></textarea>
+          <div style="text-align:right;margin-top:6px;"><button type="button" onclick="ta2AddMemo()" style="border-radius:10px;padding:9px 18px;font-weight:900;">메모 저장</button></div>
         </div>
+        <div id="ta2MemoList"></div>
       </div>
 
-      <!-- 2. 상단 TA 현황 & 금일 수주예정 카드 (1번 그림 캡처.PNG) -->
-      <div class="agent-status-panel">
-        <div class="agent-status-header">
-          <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
-            <span style="font-size:17px;font-weight:800;color:#fff;">TA 현황</span>
-            <span class="agent-target-badge-clean" id="agentStatusTargetBadge">
-              이달 목표 (알람 0원 · 디지털 0원 · 안전상품 0원)
-            </span>
-          </div>
-
+      <!-- 사진·그림 -->
+      <div id="ta2PanePhoto" style="display:none;">
+        <div class="ta2-photo-bar">
+          <label style="background:#2563eb;color:#fff;">📷 사진 촬영<input type="file" accept="image/*" capture="environment" style="display:none;" onchange="ta2PickPhoto(this)"></label>
+          <label style="background:#eef1f7;color:#1a2333;border:1px solid #d5dbe6;">🖼️ 앨범에서 선택<input type="file" accept="image/*" multiple style="display:none;" onchange="ta2PickPhoto(this)"></label>
+          <button type="button" style="background:#7c3aed;color:#fff;" onclick="ta2OpenDraw()">✏️ 그림 그리기</button>
         </div>
-
-        <div class="agent-status-body">
-          <!-- 6개 메트릭 카드 (2x3) -->
-          <div class="agent-metrics-grid">
-            <div class="agent-m-card">
-              <div class="m-label">전체 TA</div>
-              <div class="m-val" id="agentMTotalAmt">0원</div>
-              <div class="m-cnt" id="agentMTotalCnt">0건</div>
-            </div>
-            <div class="agent-m-card">
-              <div class="m-label">진행중 TA</div>
-              <div class="m-val highlight-blue" id="agentMIngAmt">0원</div>
-              <div class="m-cnt" id="agentMIngCnt">0건</div>
-            </div>
-            <div class="agent-m-card">
-              <div class="m-label">이달 수주 TA</div>
-              <div class="m-val" id="agentMWonAmt">0원</div>
-              <div class="m-cnt" id="agentMWonCnt">0건</div>
-            </div>
-            <div class="agent-m-card">
-              <div class="m-label">실패 TA</div>
-              <div class="m-val" id="agentMFailAmt">0원</div>
-              <div class="m-cnt" id="agentMFailCnt">0건</div>
-            </div>
-            <div class="agent-m-card">
-              <div class="m-label">진행중 TA 평균단가</div>
-              <div class="m-val highlight-blue" id="agentMAvgIngAmt">0원</div>
-            </div>
-            <div class="agent-m-card">
-              <div class="m-label">이달 수주 단가</div>
-              <div class="m-val highlight-blue" id="agentMAvgWonAmt">0원</div>
-            </div>
+        <div class="ta2-draw" id="ta2DrawBox" style="display:none;">
+          <div class="tl">
+            <button type="button" class="ta2-swatch on" data-c="#111827" style="background:#111827;" onclick="ta2DrawColor(this)"></button>
+            <button type="button" class="ta2-swatch" data-c="#dc2626" style="background:#dc2626;" onclick="ta2DrawColor(this)"></button>
+            <button type="button" class="ta2-swatch" data-c="#2563eb" style="background:#2563eb;" onclick="ta2DrawColor(this)"></button>
+            <button type="button" class="ta2-swatch" data-c="#16a34a" style="background:#16a34a;" onclick="ta2DrawColor(this)"></button>
+            <button type="button" class="ta2-sm" onclick="ta2DrawWidth(3)">가늘게</button>
+            <button type="button" class="ta2-sm" onclick="ta2DrawWidth(7)">보통</button>
+            <button type="button" class="ta2-sm" onclick="ta2DrawWidth(14)">굵게</button>
+            <button type="button" class="ta2-sm" onclick="ta2DrawEraser()">지우개</button>
+            <button type="button" class="ta2-sm" onclick="ta2DrawUndo()">↩ 되돌리기</button>
+            <button type="button" class="ta2-sm" onclick="ta2DrawClear()">전체 지움</button>
           </div>
-
-          <!-- 우측 금일 수주 예정 금액 카드 -->
-          <div class="today-expected-box">
-            <div class="te-title">금일 수주 예정 금액</div>
-            <div class="te-val" id="agentTodayExpAmt">0원</div>
-            <button type="button" class="te-btn" onclick="openTodayExpectedModal()">상세리스트</button>
+          <canvas id="ta2Canvas"></canvas>
+          <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap;">
+            <input type="text" id="ta2DrawCap" placeholder="그림 설명 (선택)" style="flex:1;min-width:140px;border:1.5px solid #d5dbe6;border-radius:10px;padding:9px 10px;font-size:14px;">
+            <button type="button" onclick="ta2SaveDraw()" style="border-radius:10px;padding:9px 16px;font-weight:900;">그림 저장</button>
+            <button type="button" class="ta2-sm" onclick="ta2CloseDraw()">닫기</button>
           </div>
         </div>
+        <div class="ta2-gallery" id="ta2Gallery"></div>
       </div>
 
-      <!-- 3. 달성현황 (2번 그림 캡처1.PNG) -->
-      <div class="panel" style="margin-top:16px;">
-        <h2 style="font-size:17px;font-weight:800;color:var(--navy);margin:0 0 16px;">달성현황</h2>
-        <div class="agent-achieve-grid">
-          <!-- 좌측 프로그레스 바 4개 -->
-          <div class="achieve-bars">
-            <div class="achieve-bar-item">
-              <div class="bar-header">
-                <span class="bar-title">수주 달성율</span>
-                <span class="bar-pct" id="agentAchieveRateVal" style="color:var(--blue);">0%</span>
-              </div>
-              <div class="bar-track-wrap">
-                <div class="bar-fill-track" id="agentAchieveRateTrack" style="width:0%;background:var(--blue);"></div>
-              </div>
-              <div class="bar-sub" id="agentAchieveRateSub">목표 0원</div>
-            </div>
-
-            <div class="achieve-bar-item">
-              <div class="bar-header">
-                <span class="bar-title">보유 TA율</span>
-                <span class="bar-pct" id="agentHoldRateVal" style="color:#0284c7;">0%</span>
-              </div>
-              <div class="bar-track-wrap">
-                <div class="bar-fill-track" id="agentHoldRateTrack" style="width:0%;background:#0284c7;"></div>
-              </div>
-              <div class="bar-sub" id="agentHoldRateSub">이달 수주예정 0원 (0건)</div>
-            </div>
-
-            <div class="achieve-bar-item">
-              <div class="bar-header">
-                <span class="bar-title">TA 수주율</span>
-                <span class="bar-pct" id="agentWinRateVal" style="color:var(--green);">0%</span>
-              </div>
-              <div class="bar-track-wrap">
-                <div class="bar-fill-track" id="agentWinRateTrack" style="width:0%;background:var(--green);"></div>
-              </div>
-              <div class="bar-sub" id="agentWinRateSub">수주 0원</div>
-            </div>
-
-            <div class="achieve-bar-item">
-              <div class="bar-header">
-                <span class="bar-title">수주 실패율</span>
-                <span class="bar-pct" id="agentFailRateVal" style="color:var(--red);">0%</span>
-              </div>
-              <div class="bar-track-wrap">
-                <div class="bar-fill-track" id="agentFailRateTrack" style="width:0%;background:var(--red);"></div>
-              </div>
-              <div class="bar-sub" id="agentFailRateSub">실패 0원</div>
-            </div>
-          </div>
-
-          <!-- 우측 도넛 차트 & 범례 -->
-          <div class="achieve-donut-wrap">
-            <div class="donut" id="agentDonutChart"></div>
-            <div class="legend" id="agentDonutLegend"></div>
-          </div>
+      <!-- 일정 캘린더 -->
+      <div id="ta2PaneCal" style="display:none;">
+        <div class="ta2-cal-head">
+          <button type="button" class="ta2-sm" onclick="ta2CalMove(-1)">◀</button>
+          <b id="ta2CalTitle"></b>
+          <button type="button" class="ta2-sm" onclick="ta2CalMove(1)">▶</button>
         </div>
-      </div>
-
-      <!-- 4. 내 담당 TA 목록 (4번 그림 캡처3.PNG) -->
-      <div class="panel" style="margin-top:16px;">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:10px;">
-          <h2 style="font-size:18px;font-weight:800;color:var(--navy);margin:0;">
-            내 TA 목록 (<span id="agentLeadCount">0</span>건)
-          </h2>
-          <button type="button" class="btn-primary" onclick="openNewAgentLeadModal()" style="display:inline-flex;align-items:center;gap:6px;padding:6px 14px;font-size:13px;font-weight:700;background:var(--blue);color:#fff;border-radius:6px;border:none;cursor:pointer;">
-            ➕ 신규 TA 등록
-          </button>
-        </div>
-
-        <!-- 3단 필터 (단계별, 상품별, 월별) -->
-        <div class="agent-list-filters-box">
-          <!-- 1행: 단계 필터 -->
-          <div class="filter-pills-row" id="agentFilterStageRow">
-            <span class="filter-label">단계:</span>
-            <button type="button" class="filter-pill active" data-stage="all" onclick="setAgentFilterStage('all')">전체</button>
-            <button type="button" class="filter-pill" data-stage="진행중" onclick="setAgentFilterStage('진행중')">진행중</button>
-            <button type="button" class="filter-pill" data-stage="수주完" onclick="setAgentFilterStage('수주完')">수주完</button>
-            <button type="button" class="filter-pill" data-stage="실패" onclick="setAgentFilterStage('실패')">실패</button>
-          </div>
-
-
-
-          <!-- 3행: 월별 필터 (수주예정일 이달+이후 기본, 년월 선택, 전체) -->
-          <div class="filter-pills-row" id="agentFilterMonthRow">
-            <span class="filter-label">월별:</span>
-            <button type="button" class="filter-pill active" id="btnAgentMonthCurFuture" onclick="setAgentFilterMonth('current_and_future')">이달 및 이후 (기본)</button>
-            <select id="agentFilterMonthSelect" class="filter-month-select" onchange="onAgentMonthSelectChange(this.value)">
-              <option value="">년월 선택...</option>
-            </select>
-            <button type="button" class="filter-pill" id="btnAgentMonthAll" onclick="setAgentFilterMonth('all')">전체 기간</button>
-          </div>
-        </div>
-
-        <!-- 안건 테이블 (용역료 우측정렬) -->
-        <div class="table-scroll" style="margin-top:14px;">
-          <table class="lead-table">
-            <thead>
-              <tr>
-                <th style="min-width:170px;">서비스제공처명</th>
-                <th>고객담당자</th>
-                <th style="text-align:right;white-space:nowrap;">용역료(원)</th>
-                <th>단계</th>
-                <th>확도</th>
-                <th>상품종류</th>
-                <th>영업동기</th>
-                <th>일정</th>
-                <th>메모</th>
-                <th>관리</th>
-              </tr>
-            </thead>
-            <tbody id="agentLeadTbody"></tbody>
-          </table>
+        <div class="ta2-cal" id="ta2CalGrid"></div>
+        <div style="font-size:11.5px;color:#8a94a6;margin-top:6px;"><span style="color:#f59e0b;">●</span> 고객 일정 &nbsp; <span style="color:#16a34a;">●</span> 수주예정일</div>
+        <div style="margin-top:12px;font-size:14px;font-weight:900;color:#0a1730;" id="ta2SelDateLabel"></div>
+        <div id="ta2SchedList"></div>
+        <div class="ta2-sched-form">
+          <input type="date" id="ta2SchDate">
+          <input type="time" id="ta2SchTime">
+          <input type="text" id="ta2SchTitle" class="full" placeholder="일정 제목 (예: 현장 방문 미팅, 견적서 전달)">
+          <textarea id="ta2SchNote" class="full" rows="2" placeholder="상세 내용 / 약속 장소 (선택)"></textarea>
+          <button type="button" class="full" onclick="ta2AddSched()" style="border-radius:10px;padding:11px;font-weight:900;">일정 추가</button>
         </div>
       </div>
     </div>
-  </main>
+  </div>
+</div>
+
+<!-- 사진/그림 확대 보기 -->
+<div class="ta2-lightbox" id="ta2Lightbox" onclick="if(event.target===this)ta2CloseLightbox()">
+  <img id="ta2LbImg" alt="">
+  <div id="ta2LbCap" style="color:#fff;font-size:13px;font-weight:700;"></div>
+  <div style="display:flex;gap:8px;">
+    <button type="button" class="ta2-sm" onclick="ta2CloseLightbox()">닫기</button>
+    <button type="button" class="ta2-sm" style="color:#b91c1c !important;" id="ta2LbDel">삭제</button>
+  </div>
 </div>
 
 <!-- 캘린더 일자 상세 모달 -->
@@ -1357,6 +1485,10 @@
           <input type="text" id="afContact" placeholder="담당자 성명">
         </div>
         <div class="form-group" style="margin:0;">
+          <label style="font-size:12px;font-weight:700;">담당자 전화번호</label>
+          <input type="tel" id="afContactPhone" inputmode="tel" placeholder="010-0000-0000">
+        </div>
+        <div class="form-group" style="margin:0;">
           <label style="font-size:12px;font-weight:700;">용역료(원) *</label>
           <input type="text" inputmode="numeric" id="afAmount" required placeholder="예: 50,000,000">
         </div>
@@ -1389,6 +1521,7 @@
           <select id="afStage" onchange="onAgentStageChange(this.value)">
             <option value="진행중">진행중</option>
             <option value="수주完">수주完</option>
+            <option value="보류">보류</option>
             <!-- 수정 모드일 때만 실패 옵션 동적 추가 -->
           </select>
         </div>
@@ -1603,8 +1736,8 @@ document.addEventListener('keydown', (e) => {
 
 const CONSULTANTS = ['최영국', '박광춘', '이수열', '정문재', '임영민'];
 const STAGES = ['진행중', '수주完', '실패'];
-const STAGE_COLOR = { '진행중': '#2563eb', '수주完': '#16a34a', '실패': '#dc2626' };
-const STAGE_BG = { '진행중': '#dbeafe', '수주完': '#dcfce7', '실패': '#fee2e2' };
+const STAGE_COLOR = { '진행중': '#2563eb', '수주完': '#16a34a', '실패': '#dc2626', '보류': '#92400e' };
+const STAGE_BG = { '진행중': '#dbeafe', '수주完': '#dcfce7', '실패': '#fee2e2', '보류': '#fef3c7' };
 const CONF_COLOR = { A: '#16a34a', B: '#d97706', C: '#9ca3af' };
 const CONSULTANT_COLOR = {
   '최영국': '#1e3a8a',
@@ -2206,6 +2339,7 @@ async function loadAllFromSupabase() {
         consultant: r.consultant,
         company: r.company,
         contact: r.contact,
+        contactPhone: r.contact_phone || '',
         amount: Number(r.amount || 0),
         productType: r.product_type,
         motive: r.motive,
@@ -3050,6 +3184,7 @@ function switchView(mode) {
   if (mode === 'master') {
     el('viewMaster').style.display = 'block';
     el('viewAgent').style.display = 'none';
+    if (el('dateBanner')) el('dateBanner').style.display = 'flex';
     el('topbarHeaderTitle').textContent = '영업 TA 통합관리 대시보드';
     if (el('agentRankBadge')) el('agentRankBadge').style.display = 'none';
     applyConsultantTheme(null);
@@ -3057,8 +3192,9 @@ function switchView(mode) {
   } else {
     el('viewMaster').style.display = 'none';
     el('viewAgent').style.display = 'block';
-    el('topbarHeaderTitle').textContent = `${mode}컨설턴트 TA`;
-    if (el('agentRankBadge')) el('agentRankBadge').style.display = 'inline-flex';
+    el('topbarHeaderTitle').textContent = '영업 TA 관리 포털';
+    if (el('agentRankBadge')) el('agentRankBadge').style.display = 'none';
+    if (el('dateBanner')) el('dateBanner').style.display = 'none';
     applyConsultantTheme(mode);
     initAgentView(mode);
   }
@@ -3183,7 +3319,7 @@ function setAgentFilterProduct(prod) {
 window.setAgentFilterProduct = setAgentFilterProduct;
 
 // 2. 컨설턴트 화면 진입 초기화 (initAgentView)
-function initAgentView(agentName) {
+function initAgentView_legacy(agentName) {
   applyConsultantTheme(agentName);
   currentViewMode = agentName;
   el('agentActiveName').textContent = agentName;
@@ -3569,6 +3705,7 @@ function openNewAgentLeadModal() {
   el('agentModalTitle').textContent = '신규 TA 등록';
   el('afCompany').value = '';
   el('afContact').value = '';
+  el('afContactPhone').value = '';
   el('afAmount').value = '';
   el('afProductType').value = '알람';
   el('afMotive').value = '개척';
@@ -3585,6 +3722,7 @@ function openNewAgentLeadModal() {
   el('afStage').innerHTML = `
     <option value="진행중" selected>진행중</option>
     <option value="수주完">수주完</option>
+    <option value="보류">보류</option>
   `;
   el('afWonExtraRow').style.display = 'none';
 
@@ -3634,6 +3772,7 @@ function editAgentLead(id) {
   el('agentModalTitle').textContent = 'TA 안건 수정';
   el('afCompany').value = lead.company;
   el('afContact').value = lead.contact || '';
+  el('afContactPhone').value = lead.contactPhone || '';
   el('afAmount').value = lead.amount ? lead.amount.toLocaleString('ko-KR') : '';
   el('afProductType').value = lead.productType || '알람';
   el('afMotive').value = lead.motive || '개척';
@@ -3642,6 +3781,7 @@ function editAgentLead(id) {
   el('afStage').innerHTML = `
     <option value="진행중">진행중</option>
     <option value="수주完">수주完</option>
+    <option value="보류">보류</option>
     <option value="실패">실패</option>
   `;
   el('afStage').value = lead.stage;
@@ -3682,6 +3822,7 @@ async function handleAgentModalSubmit(e) {
   const payload = {
     company: el('afCompany').value.trim(),
     contact: el('afContact').value.trim(),
+    contactPhone: el('afContactPhone').value.trim(),
     amount: amount,
     productType: el('afProductType').value,
     motive: el('afMotive').value,
@@ -3714,7 +3855,7 @@ async function handleAgentModalSubmit(e) {
       const changes = buildLeadChanges(lead, payload);
       payload.updatedAt = new Date().toISOString();
 
-      const { error } = await db.from('ta_leads').update({
+      const { error } = await leadWriteWithPhone('update', id, payload.contactPhone, {
         company: payload.company,
         contact: payload.contact,
         amount: payload.amount,
@@ -3729,7 +3870,7 @@ async function handleAgentModalSubmit(e) {
         vehicle_number: payload.vehicleNumber || null,
         memo: payload.memo || null,
         updated_at: payload.updatedAt
-      }).eq('id', id);
+      });
 
       if (error) throw error;
       Object.assign(lead, payload);
@@ -3744,7 +3885,7 @@ async function handleAgentModalSubmit(e) {
       payload.updatedAt = payload.createdAt;
       payload.consultant = agentName;
 
-      const { error } = await db.from('ta_leads').insert([{
+      const { error } = await leadWriteWithPhone('insert', payload.id, payload.contactPhone, {
         id: payload.id,
         consultant: agentName,
         company: payload.company,
@@ -3762,7 +3903,7 @@ async function handleAgentModalSubmit(e) {
         memo: payload.memo || null,
         created_at: payload.createdAt,
         updated_at: payload.updatedAt
-      }]);
+      });
 
       if (error) throw error;
       if (!ALL[agentName]) ALL[agentName] = { leads: [] };
@@ -4740,6 +4881,626 @@ async function doSignup() {
 
 window.toggleLoginSignup = toggleLoginSignup;
 window.doSignup = doSignup;
+
+
+// ==========================================================================
+// TA 관리 v2 - 컨설턴트 개별 화면 (대시보드 / 목록 / 상세 / 메모·사진·일정)
+// ==========================================================================
+const TA2 = {
+  stage: 'all', search: '', period: 'current_and_future', product: 'all',
+  leadId: null, tab: 'memo', calYM: '', calSel: '',
+  mode: {},            // { ta_notes: 'remote'|'local', ta_schedules: 'remote'|'local' }
+  notes: [], scheds: []
+};
+const TA2_STAGES = [['all', '전체'], ['진행중', '진행중'], ['수주完', '수주완료'], ['실패', '실패'], ['보류', '보류']];
+const TA2_LS_NOTES = 'S1_TA2_NOTES';
+const TA2_LS_SCHEDS = 'S1_TA2_SCHEDS';
+const TA2_PAD = n => String(n).padStart(2, '0');
+
+function ta2StageLabel(s) { return s === '수주完' ? '수주완료' : (s || '-'); }
+function ta2Leads(name) { return (ALL[name] && ALL[name].leads) || []; }
+function ta2Sum(arr) { return arr.reduce((s, l) => s + Number(l.amount || 0), 0); }
+function ta2DateLabel(ds) {
+  if (!ds) return '-';
+  const d = new Date(ds + 'T00:00:00');
+  if (isNaN(d.getTime())) return ds;
+  return `${d.getMonth() + 1}/${d.getDate()}(${WEEKDAY_KR[d.getDay()]})`;
+}
+function ta2FullDate(ds) {
+  if (!ds) return '-';
+  const d = new Date(ds + 'T00:00:00');
+  if (isNaN(d.getTime())) return ds;
+  return `${d.getFullYear()}.${TA2_PAD(d.getMonth() + 1)}.${TA2_PAD(d.getDate())} (${WEEKDAY_KR[d.getDay()]})`;
+}
+function ta2DayDiff(ds) {
+  const a = new Date(todayStr() + 'T00:00:00'), b = new Date(ds + 'T00:00:00');
+  return Math.round((b - a) / 86400000);
+}
+function ta2Phone(p) {
+  const s = String(p || '').replace(/[^0-9]/g, '');
+  if (!s) return '';
+  try { if (typeof formatPhone === 'function') { const f = formatPhone(s); if (f) return f; } } catch (e) {}
+  return s;
+}
+
+// ---------- 저장소 (Supabase 우선, 테이블 미생성 시 이 기기 임시저장) ----------
+function ta2LsGet(k) { try { return JSON.parse(localStorage.getItem(k) || '[]'); } catch (e) { return []; } }
+function ta2LsSet(k, v) {
+  try { localStorage.setItem(k, JSON.stringify(v)); return true; }
+  catch (e) { alert('이 기기의 저장 공간이 부족합니다. 사진을 지우거나 줄인 뒤 다시 시도해주세요.'); return false; }
+}
+async function ta2Probe(table) {
+  if (TA2.mode[table]) return TA2.mode[table];
+  try {
+    const { error } = await db.from(table).select('id').limit(1);
+    TA2.mode[table] = error ? 'local' : 'remote';
+    if (error) console.warn('[TA2]', table, '사용 불가 → 이 기기 임시저장 모드:', error.message);
+  } catch (e) { TA2.mode[table] = 'local'; }
+  return TA2.mode[table];
+}
+async function ta2NotesList(leadId) {
+  if (await ta2Probe('ta_notes') === 'remote') {
+    const { data, error } = await db.from('ta_notes').select('*').eq('lead_id', leadId).order('created_at', { ascending: false });
+    if (!error) return data || [];
+  }
+  return ta2LsGet(TA2_LS_NOTES).filter(n => n.lead_id === leadId).sort((a, b) => (b.created_at || '').localeCompare(a.created_at || ''));
+}
+async function ta2NoteAdd(n) {
+  const row = { id: crypto.randomUUID(), lead_id: n.lead_id, consultant: currentViewMode, kind: n.kind, content: n.content || '', image: n.image || null, created_at: new Date().toISOString() };
+  if (await ta2Probe('ta_notes') === 'remote') {
+    const { error } = await db.from('ta_notes').insert([row]);
+    if (error) throw error;
+    return row;
+  }
+  const arr = ta2LsGet(TA2_LS_NOTES); arr.push(row);
+  if (!ta2LsSet(TA2_LS_NOTES, arr)) throw new Error('저장 공간 부족');
+  return row;
+}
+async function ta2NoteDel(id) {
+  if (await ta2Probe('ta_notes') === 'remote') {
+    const { error } = await db.from('ta_notes').delete().eq('id', id);
+    if (error) throw error;
+    return;
+  }
+  ta2LsSet(TA2_LS_NOTES, ta2LsGet(TA2_LS_NOTES).filter(n => n.id !== id));
+}
+async function ta2SchedList(leadId) {
+  if (await ta2Probe('ta_schedules') === 'remote') {
+    const { data, error } = await db.from('ta_schedules').select('*').eq('lead_id', leadId).order('sched_date', { ascending: true });
+    if (!error) return data || [];
+  }
+  return ta2LsGet(TA2_LS_SCHEDS).filter(s => s.lead_id === leadId).sort((a, b) => (a.sched_date + (a.sched_time || '')).localeCompare(b.sched_date + (b.sched_time || '')));
+}
+async function ta2SchedMine(name, fromDate) {
+  if (await ta2Probe('ta_schedules') === 'remote') {
+    const { data, error } = await db.from('ta_schedules').select('*').eq('consultant', name).gte('sched_date', fromDate).order('sched_date', { ascending: true }).limit(60);
+    if (!error) return data || [];
+  }
+  return ta2LsGet(TA2_LS_SCHEDS).filter(s => s.consultant === name && s.sched_date >= fromDate)
+    .sort((a, b) => (a.sched_date + (a.sched_time || '')).localeCompare(b.sched_date + (b.sched_time || '')));
+}
+async function ta2SchedAdd(r) {
+  const row = { id: crypto.randomUUID(), lead_id: r.lead_id, consultant: currentViewMode, sched_date: r.sched_date, sched_time: r.sched_time || null, title: r.title, note: r.note || '', done: false, created_at: new Date().toISOString() };
+  if (await ta2Probe('ta_schedules') === 'remote') {
+    const { error } = await db.from('ta_schedules').insert([row]);
+    if (error) throw error;
+    return row;
+  }
+  const arr = ta2LsGet(TA2_LS_SCHEDS); arr.push(row);
+  if (!ta2LsSet(TA2_LS_SCHEDS, arr)) throw new Error('저장 공간 부족');
+  return row;
+}
+async function ta2SchedDelRow(id) {
+  if (await ta2Probe('ta_schedules') === 'remote') {
+    const { error } = await db.from('ta_schedules').delete().eq('id', id);
+    if (error) throw error;
+    return;
+  }
+  ta2LsSet(TA2_LS_SCHEDS, ta2LsGet(TA2_LS_SCHEDS).filter(s => s.id !== id));
+}
+async function ta2SchedSetDone(id, done) {
+  if (await ta2Probe('ta_schedules') === 'remote') {
+    const { error } = await db.from('ta_schedules').update({ done: done }).eq('id', id);
+    if (error) throw error;
+    return;
+  }
+  ta2LsSet(TA2_LS_SCHEDS, ta2LsGet(TA2_LS_SCHEDS).map(s => s.id === id ? Object.assign({}, s, { done: done }) : s));
+}
+
+// ---------- 화면 진입 ----------
+function ta2WorkdayInfo() {
+  const now = new Date(), y = now.getFullYear(), m = now.getMonth();
+  const last = new Date(y, m + 1, 0).getDate();
+  let total = 0, elapsed = 0;
+  for (let d = 1; d <= last; d++) {
+    const ds = `${y}-${TA2_PAD(m + 1)}-${TA2_PAD(d)}`;
+    if (!isHoliday(ds)) { total++; if (d <= now.getDate()) elapsed++; }
+  }
+  return { total, elapsed, left: workingDaysLeftInMonth(), todayWork: !isHoliday(todayStr()) };
+}
+
+function initAgentView(agentName) {
+  applyConsultantTheme(agentName);
+  currentViewMode = agentName;
+  agentGlobalProduct = 'all';      // 금일 수주예정 상세리스트 등 기존 모달이 전체 상품 기준으로 동작
+  if (el('agentActiveName')) el('agentActiveName').textContent = agentName;
+  if (el('topbarHeaderTitle')) el('topbarHeaderTitle').textContent = '영업 TA 관리 포털';
+  if (el('agentRankBadge')) el('agentRankBadge').style.display = 'none';
+  if (el('dateBanner')) el('dateBanner').style.display = 'none';
+  if (el('btnBackToMaster')) el('btnBackToMaster').style.display = isMasterUser() ? 'inline-flex' : 'none';
+  if (currentUser) checkAndShowAgentNotice();
+  ta2RenderAll(agentName);
+}
+
+function ta2RenderAll(name) {
+  ta2RenderHeader();
+  ta2RenderKpi(name);
+  ta2RenderList(name);
+  ta2RenderUpcoming(name);
+}
+
+function ta2RenderHeader() {
+  const w = ta2WorkdayInfo();
+  const chips = [`<span>${todayLabel()}</span>`];
+  chips.push(w.todayWork
+    ? `<span class="ta2-chip">영업일 ${w.elapsed}일차 / ${w.total}일</span>`
+    : `<span class="ta2-chip amber">휴무일</span>`);
+  chips.push(`<span class="ta2-chip amber">잔여 영업일 ${w.left}일</span>`);
+  el('ta2DateBar').innerHTML = chips.join('');
+}
+
+function ta2RenderKpi(name) {
+  const leads = ta2Leads(name), month = currentMonthStr(), today = todayStr();
+  const ing = leads.filter(l => l.stage === '진행중');
+  const rem = ing.filter(l => (l.expectedDate || '').slice(0, 7) === month);
+  const won = leads.filter(l => l.stage === '수주完' && (l.contractDate || '').slice(0, 7) === month);
+  const todayL = ing.filter(l => l.expectedDate === today);
+
+  el('ta2KIngAmt').textContent = formatCurrency(ta2Sum(ing));
+  el('ta2KIngCnt').textContent = ing.length + '건';
+  el('ta2KRemAmt').textContent = formatCurrency(ta2Sum(rem));
+  el('ta2KRemCnt').textContent = rem.length + '건';
+  const wonAmt = ta2Sum(won);
+  el('ta2KWonAmt').textContent = formatCurrency(wonAmt);
+  el('ta2KWonCnt').textContent = won.length + '건';
+
+  const target = getConsultantTarget(name, month, 'all');
+  if (target > 0) {
+    const pct = Math.round(wonAmt / target * 1000) / 10;
+    el('ta2KWonBarWrap').style.display = 'block';
+    el('ta2KWonBar').style.width = Math.min(100, pct) + '%';
+    el('ta2KWonSub').textContent = `목표 ${formatCurrency(target)} 대비 ${pct}%`;
+  } else {
+    el('ta2KWonBarWrap').style.display = 'none';
+    el('ta2KWonSub').textContent = '이달 계약일 기준';
+  }
+
+  const avgIng = ing.length ? Math.round(ta2Sum(ing) / ing.length) : 0;
+  const avgWon = won.length ? Math.round(wonAmt / won.length) : 0;
+  el('ta2KAvgAmt').textContent = formatCurrency(avgIng);
+  el('ta2KAvgSub').textContent = won.length ? `이달 수주 평균 ${formatCurrency(avgWon)}` : '이달 수주 평균 -';
+
+  el('ta2TodayAmt').textContent = formatCurrency(ta2Sum(todayL));
+  el('ta2TodayCnt').textContent = todayL.length + '건';
+}
+
+// ---------- 목록 ----------
+function ta2SetStage(s) { TA2.stage = s; ta2RenderList(currentViewMode); }
+function ta2SetSearch(v) { TA2.search = v || ''; ta2RenderList(currentViewMode); }
+function ta2SetPeriod(v) { TA2.period = v || 'current_and_future'; ta2RenderList(currentViewMode); }
+function ta2SetProduct(v) { TA2.product = v || 'all'; ta2RenderList(currentViewMode); }
+
+function ta2BaseFiltered(name) {
+  let leads = ta2Leads(name).slice();
+  if (TA2.product !== 'all') leads = leads.filter(l => productCategory(l.productType) === TA2.product);
+  const q = TA2.search.trim().toLowerCase();
+  if (q) {
+    leads = leads.filter(l => ((l.company || '') + ' ' + (l.contact || '')).toLowerCase().includes(q));
+    return leads;   // 검색 시에는 기간 제한 없이 전체에서 찾기
+  }
+  const cur = currentMonthStr();
+  if (TA2.period === 'current_and_future') {
+    leads = leads.filter(l => {
+      const expM = (l.expectedDate || '').slice(0, 7), conM = (l.contractDate || '').slice(0, 7);
+      if (l.stage === '진행중' || l.stage === '보류') return true;   // 진행중·보류는 지연 건도 놓치지 않도록 항상 표시
+      if (l.stage === '수주完') return conM >= cur || expM >= cur;
+      return expM >= cur;
+    });
+  } else if (TA2.period !== 'all') {
+    const ym = TA2.period;
+    leads = leads.filter(l => (l.expectedDate || '').slice(0, 7) === ym || (l.contractDate || '').slice(0, 7) === ym);
+  }
+  return leads;
+}
+
+function ta2SchedCell(l) {
+  if (l.stage === '수주完') return `계약 ${ta2DateLabel(l.contractDate || l.expectedDate)}`;
+  if (l.stage === '실패') return `예정 ${ta2DateLabel(l.expectedDate)}`;
+  if (!l.expectedDate) return '<span style="color:#9ca3af;">미정</span>';
+  const diff = ta2DayDiff(l.expectedDate);
+  let em = '';
+  if (diff === 0) em = '<em class="today">오늘</em>';
+  else if (diff > 0 && diff <= 3) em = `<em class="soon">D-${diff}</em>`;
+  else if (diff < 0) em = `<em class="late">${-diff}일 지남</em>`;
+  return `예정 ${ta2DateLabel(l.expectedDate)}${em}`;
+}
+
+function ta2RenderList(name) {
+  // 기간 셀렉트 구성
+  const months = new Set();
+  ta2Leads(name).forEach(l => {
+    if (l.expectedDate && l.expectedDate.length >= 7) months.add(l.expectedDate.slice(0, 7));
+    if (l.contractDate && l.contractDate.length >= 7) months.add(l.contractDate.slice(0, 7));
+  });
+  const sel = el('ta2Period');
+  sel.innerHTML = '<option value="current_and_future">이달 및 이후 (기본)</option><option value="all">전체 기간</option>' +
+    Array.from(months).sort().reverse().map(m => `<option value="${m}">${m.replace('-', '년 ')}월</option>`).join('');
+  sel.value = TA2.period;
+  if (sel.value !== TA2.period) { TA2.period = 'current_and_future'; sel.value = TA2.period; }
+  if (el('ta2Product').value !== TA2.product) el('ta2Product').value = TA2.product;
+
+  const base = ta2BaseFiltered(name);
+  // 단계 탭 (건수 포함)
+  el('ta2StageTabs').innerHTML = TA2_STAGES.map(([v, label]) => {
+    const n = v === 'all' ? base.length : base.filter(l => l.stage === v).length;
+    return `<button type="button" class="ta2-stage-tab${TA2.stage === v ? ' active' : ''}" onclick="ta2SetStage('${v}')">${label}<b>${n}</b></button>`;
+  }).join('');
+
+  let leads = TA2.stage === 'all' ? base.slice() : base.filter(l => l.stage === TA2.stage);
+  const byDateAsc = (a, b) => (a.expectedDate || '9999').localeCompare(b.expectedDate || '9999');
+  if (TA2.stage === '진행중' || TA2.stage === '보류') leads.sort(byDateAsc);
+  else if (TA2.stage === '수주完') leads.sort((a, b) => (b.contractDate || '').localeCompare(a.contractDate || ''));
+  else leads.sort((a, b) => (b.updatedAt || '').localeCompare(a.updatedAt || ''));
+
+  el('agentLeadCount').textContent = leads.length + '건';
+  const box = el('ta2List');
+  if (!leads.length) { box.innerHTML = '<div class="ta2-empty" style="padding:24px 4px;text-align:center;">조건에 맞는 TA가 없습니다.</div>'; return; }
+  box.innerHTML = leads.map(l => `
+    <div class="ta2-row">
+      <div class="c-co ta2-co">${escapeHtml(l.company)}<small>${escapeHtml(l.contact || '담당자 미입력')}${l.productType ? ' · ' + escapeHtml(l.productType) : ''}</small></div>
+      <div class="c-amt ta2-amt">${formatCurrency(l.amount)}</div>
+      <div class="c-st"><span class="ta2-badge" style="background:${STAGE_BG[l.stage] || '#e5e7eb'};color:${STAGE_COLOR[l.stage] || '#374151'};">${ta2StageLabel(l.stage)}</span></div>
+      <div class="c-conf"><span class="ta2-conf"><i style="background:${CONF_COLOR[l.confidence] || '#ccc'};"></i>${escapeHtml(l.confidence || '-')}</span></div>
+      <div class="c-sc ta2-sched">${ta2SchedCell(l)}</div>
+      <div class="c-btn"><button type="button" class="ta2-detail-btn" onclick="ta2OpenDetail('${escapeHtml(l.id)}')">상세보기</button></div>
+    </div>`).join('');
+}
+
+async function ta2RenderUpcoming(name) {
+  const box = el('ta2Upcoming');
+  try {
+    const list = (await ta2SchedMine(name, todayStr())).filter(s => !s.done).slice(0, 10);
+    el('ta2UpCnt').textContent = list.length;
+    if (!list.length) { box.innerHTML = '<div class="ta2-empty">등록된 고객 일정이 없습니다. TA 상세보기 → 일정 탭에서 약속·스케줄을 기록하세요.</div>'; return; }
+    const leads = ta2Leads(name);
+    box.innerHTML = list.map(s => {
+      const lead = leads.find(l => l.id === s.lead_id);
+      const diff = ta2DayDiff(s.sched_date);
+      const dd = diff === 0 ? '오늘' : (diff === 1 ? '내일' : `D-${diff}`);
+      return `<div class="ta2-up-item" onclick="ta2OpenDetail('${escapeHtml(s.lead_id)}','cal','${escapeHtml(s.sched_date)}')">
+        <div class="d">${ta2DateLabel(s.sched_date)}${s.sched_time ? ' ' + escapeHtml(String(s.sched_time).slice(0, 5)) : ''} · ${dd}</div>
+        <div class="tt">${escapeHtml(s.title)}</div>
+        <div class="co">${lead ? escapeHtml(lead.company) : '(삭제된 안건)'}</div></div>`;
+    }).join('');
+  } catch (e) { box.innerHTML = '<div class="ta2-empty">일정을 불러오지 못했습니다.</div>'; }
+}
+
+// ---------- 상세보기 ----------
+function ta2CurLead() { return ta2Leads(currentViewMode).find(l => l.id === TA2.leadId) || null; }
+
+async function ta2OpenDetail(id, tab, date) {
+  const lead = ta2Leads(currentViewMode).find(l => l.id === id);
+  if (!lead) return;
+  TA2.leadId = id; TA2.mode = {}; TA2.notes = []; TA2.scheds = [];
+  TA2.calSel = date || todayStr();
+  TA2.calYM = TA2.calSel.slice(0, 7);
+
+  el('ta2DName').textContent = lead.company || '-';
+  el('ta2DBadges').innerHTML =
+    `<span class="ta2-badge" style="background:${STAGE_BG[lead.stage] || '#e5e7eb'};color:${STAGE_COLOR[lead.stage] || '#374151'};">${ta2StageLabel(lead.stage)}</span> ` +
+    `<span class="ta2-conf" style="margin-left:6px;"><i style="background:${CONF_COLOR[lead.confidence] || '#ccc'};"></i>확도 ${escapeHtml(lead.confidence || '-')}</span>` +
+    (lead.motive ? ` <span style="margin-left:8px;font-size:12px;color:#697386;font-weight:700;">영업동기 ${escapeHtml(lead.motive)}</span>` : '');
+
+  const ph = ta2Phone(lead.contactPhone);
+  const phHtml = ph ? `<a href="tel:${escapeHtml(String(lead.contactPhone).replace(/[^0-9+]/g, ''))}">${escapeHtml(ph)} 📞</a>` : '<span style="color:#9ca3af;">미입력</span>';
+  const info = [
+    ['서비스제공처명', escapeHtml(lead.company)],
+    ['고객 담당자', escapeHtml(lead.contact) || '<span style="color:#9ca3af;">미입력</span>'],
+    ['담당자 전화번호', phHtml],
+    ['용역료', formatCurrency(lead.amount)],
+    ['단계', ta2StageLabel(lead.stage)],
+    ['상품종류', escapeHtml(lead.productType) || '-'],
+    ['등록일자', ta2FullDate(lead.registeredDate || (lead.createdAt || '').slice(0, 10))],
+    ['수주예정일자', ta2FullDate(lead.expectedDate)]
+  ];
+  el('ta2DInfo').innerHTML = info.map(([k, v]) => `<div><div class="k">${k}</div><div class="vv">${v}</div></div>`).join('');
+
+  let act = `<button type="button" style="background:#0b1f3f;color:#fff;" onclick="ta2EditFromDetail()">✏️ 정보 수정</button>`;
+  if (ph) act += `<a href="tel:${escapeHtml(String(lead.contactPhone).replace(/[^0-9+]/g, ''))}" style="text-decoration:none;"><button type="button" style="background:#16a34a;color:#fff;">📞 전화하기</button></a>`;
+  if (isCreatedToday(lead)) act += `<button type="button" class="danger" onclick="ta2DeleteFromDetail()">삭제</button>`;
+  el('ta2DActions').innerHTML = act;
+
+  el('ta2DetailOverlay').style.display = 'flex';
+  el('ta2MemoText').value = '';
+  ta2CloseDraw();
+  ta2Tab(tab || 'memo');
+  const myId = id;
+  await Promise.all([ta2Probe('ta_notes'), ta2Probe('ta_schedules')]);
+  if (TA2.leadId !== myId) return;
+  await ta2LoadNotes();
+  await ta2LoadSched();
+  ta2ShowStoreWarn();
+}
+function ta2CloseDetail() {
+  el('ta2DetailOverlay').style.display = 'none';
+  ta2CloseDraw(); ta2CloseLightbox();
+  TA2.leadId = null;
+  ta2RenderUpcoming(currentViewMode);
+}
+function ta2EditFromDetail() { const id = TA2.leadId; ta2CloseDetail(); editAgentLead(id); }
+function ta2DeleteFromDetail() {
+  const lead = ta2CurLead(); if (!lead) return;
+  const id = lead.id, co = lead.company;
+  ta2CloseDetail(); deleteAgentLead(id, co);
+}
+function ta2Tab(t) {
+  TA2.tab = t;
+  document.querySelectorAll('.ta2-tab').forEach(b => b.classList.toggle('active', b.dataset.tab === t));
+  el('ta2PaneMemo').style.display = t === 'memo' ? 'block' : 'none';
+  el('ta2PanePhoto').style.display = t === 'photo' ? 'block' : 'none';
+  el('ta2PaneCal').style.display = t === 'cal' ? 'block' : 'none';
+  if (t !== 'photo') ta2CloseDraw();
+  if (t === 'cal') { ta2RenderCal(); ta2RenderSchedList(); el('ta2SchDate').value = TA2.calSel; }
+  ta2ShowStoreWarn();
+}
+function ta2ShowStoreWarn() {
+  const table = TA2.tab === 'cal' ? 'ta_schedules' : 'ta_notes';
+  el('ta2StoreWarn').innerHTML = TA2.mode[table] === 'local'
+    ? '<div class="ta2-warn">⚠️ 서버 저장소(' + table + ')가 아직 준비되지 않아 <b>이 기기·브라우저에만 임시 저장</b>됩니다. 지사 관리자가 Supabase에서 안내된 SQL을 1회 실행하면 모든 기기에서 공유됩니다.</div>'
+    : '';
+}
+
+// ---------- 메모 ----------
+async function ta2LoadNotes() {
+  const id = TA2.leadId;
+  const rows = await ta2NotesList(id);
+  if (TA2.leadId !== id) return;
+  TA2.notes = rows;
+  ta2RenderMemos(); ta2RenderGallery();
+}
+function ta2FmtTs(ts) {
+  const d = new Date(ts); if (isNaN(d.getTime())) return '';
+  return `${d.getFullYear()}.${TA2_PAD(d.getMonth() + 1)}.${TA2_PAD(d.getDate())} ${TA2_PAD(d.getHours())}:${TA2_PAD(d.getMinutes())}`;
+}
+function ta2RenderMemos() {
+  const lead = ta2CurLead();
+  const memos = TA2.notes.filter(n => n.kind === 'memo');
+  let html = memos.map(n => `
+    <div class="ta2-note"><div class="tm"><span>${ta2FmtTs(n.created_at)}</span>
+      <button type="button" class="ta2-x" onclick="ta2DelNote('${escapeHtml(n.id)}')">삭제</button></div>
+      <div class="tx">${escapeHtml(n.content)}</div></div>`).join('');
+  if (lead && lead.memo) {
+    html += `<div class="ta2-note" style="background:#f8fafc;"><div class="tm"><span>등록 시 입력한 메모</span></div><div class="tx">${escapeHtml(lead.memo)}</div></div>`;
+  }
+  el('ta2MemoList').innerHTML = html || '<div class="ta2-empty">아직 메모가 없습니다.</div>';
+}
+async function ta2AddMemo() {
+  const text = el('ta2MemoText').value.trim();
+  if (!text) return;
+  try {
+    await ta2NoteAdd({ lead_id: TA2.leadId, kind: 'memo', content: text });
+    el('ta2MemoText').value = '';
+    await ta2LoadNotes();
+  } catch (e) { alert('메모 저장 실패: ' + (e.message || e)); }
+}
+async function ta2DelNote(id) {
+  if (!confirm('삭제하시겠습니까?')) return;
+  try { await ta2NoteDel(id); ta2CloseLightbox(); await ta2LoadNotes(); }
+  catch (e) { alert('삭제 실패: ' + (e.message || e)); }
+}
+
+// ---------- 사진 · 그림 ----------
+function ta2Compress(file, maxDim, q) {
+  maxDim = maxDim || 1100; q = q || 0.72;
+  return new Promise((res, rej) => {
+    const fr = new FileReader();
+    fr.onload = () => {
+      const img = new Image();
+      img.onload = () => {
+        let w = img.naturalWidth, h = img.naturalHeight;
+        const s = Math.min(1, maxDim / Math.max(w, h));
+        w = Math.round(w * s); h = Math.round(h * s);
+        const c = document.createElement('canvas'); c.width = w; c.height = h;
+        const x = c.getContext('2d'); x.fillStyle = '#fff'; x.fillRect(0, 0, w, h); x.drawImage(img, 0, 0, w, h);
+        res(c.toDataURL('image/jpeg', q));
+      };
+      img.onerror = () => rej(new Error('이미지를 읽을 수 없습니다.'));
+      img.src = fr.result;
+    };
+    fr.onerror = () => rej(new Error('파일을 읽을 수 없습니다.'));
+    fr.readAsDataURL(file);
+  });
+}
+async function ta2PickPhoto(input) {
+  const files = Array.from(input.files || []);
+  input.value = '';
+  if (!files.length) return;
+  try {
+    for (const f of files) {
+      const data = await ta2Compress(f);
+      await ta2NoteAdd({ lead_id: TA2.leadId, kind: 'photo', content: '', image: data });
+    }
+    await ta2LoadNotes();
+  } catch (e) { alert('사진 저장 실패: ' + (e.message || e)); }
+}
+function ta2RenderGallery() {
+  const imgs = TA2.notes.filter(n => n.kind === 'photo' || n.kind === 'drawing');
+  el('ta2Gallery').innerHTML = imgs.length ? imgs.map(n => `
+    <div class="ta2-thumb${n.kind === 'drawing' ? ' dr' : ''}" onclick="ta2OpenLightbox('${escapeHtml(n.id)}')">
+      <span class="kd">${n.kind === 'drawing' ? '그림' : '사진'}</span>
+      <img src="${n.image}" alt="" loading="lazy">
+      <div class="cap">${escapeHtml(n.content || ta2FmtTs(n.created_at))}</div></div>`).join('')
+    : '<div class="ta2-empty" style="grid-column:1/-1;">등록된 사진·그림이 없습니다.</div>';
+}
+function ta2OpenLightbox(id) {
+  const n = TA2.notes.find(x => x.id === id); if (!n) return;
+  el('ta2LbImg').src = n.image;
+  el('ta2LbCap').textContent = (n.content ? n.content + ' · ' : '') + ta2FmtTs(n.created_at);
+  el('ta2LbDel').onclick = () => ta2DelNote(id);
+  el('ta2Lightbox').style.display = 'flex';
+}
+function ta2CloseLightbox() { if (el('ta2Lightbox')) { el('ta2Lightbox').style.display = 'none'; el('ta2LbImg').removeAttribute('src'); } }
+
+// 그림 그리기 (손가락/펜/마우스)
+const DR = { strokes: [], cur: null, color: '#111827', width: 7, erase: false, bound: false, w: 0, h: 0 };
+function ta2OpenDraw() {
+  el('ta2DrawBox').style.display = 'block';
+  const c = el('ta2Canvas'), r = c.getBoundingClientRect(), dpr = Math.min(2, window.devicePixelRatio || 1);
+  DR.w = r.width; DR.h = r.height;
+  c.width = Math.round(r.width * dpr); c.height = Math.round(r.height * dpr);
+  c.getContext('2d').setTransform(dpr, 0, 0, dpr, 0, 0);
+  DR.strokes = []; DR.cur = null; DR.erase = false;
+  if (!DR.bound) {
+    DR.bound = true;
+    const pos = e => { const b = c.getBoundingClientRect(); return [e.clientX - b.left, e.clientY - b.top]; };
+    c.addEventListener('pointerdown', e => {
+      e.preventDefault(); c.setPointerCapture(e.pointerId);
+      DR.cur = { color: DR.erase ? '#ffffff' : DR.color, width: DR.erase ? DR.width * 2.5 : DR.width, pts: [pos(e)] };
+      DR.strokes.push(DR.cur); ta2DrawRedraw();
+    });
+    c.addEventListener('pointermove', e => { if (!DR.cur) return; e.preventDefault(); DR.cur.pts.push(pos(e)); ta2DrawRedraw(); });
+    const end = () => { DR.cur = null; };
+    c.addEventListener('pointerup', end); c.addEventListener('pointercancel', end); c.addEventListener('pointerleave', end);
+  }
+  ta2DrawRedraw();
+  el('ta2DrawBox').scrollIntoView({ block: 'nearest' });
+}
+function ta2CloseDraw() { if (el('ta2DrawBox')) el('ta2DrawBox').style.display = 'none'; DR.strokes = []; DR.cur = null; }
+function ta2DrawRedraw() {
+  const c = el('ta2Canvas'), x = c.getContext('2d');
+  x.fillStyle = '#fff'; x.fillRect(0, 0, DR.w, DR.h);
+  x.lineCap = 'round'; x.lineJoin = 'round';
+  DR.strokes.forEach(s => {
+    x.strokeStyle = s.color; x.fillStyle = s.color; x.lineWidth = s.width;
+    if (s.pts.length === 1) { x.beginPath(); x.arc(s.pts[0][0], s.pts[0][1], s.width / 2, 0, Math.PI * 2); x.fill(); return; }
+    x.beginPath(); x.moveTo(s.pts[0][0], s.pts[0][1]);
+    for (let i = 1; i < s.pts.length; i++) x.lineTo(s.pts[i][0], s.pts[i][1]);
+    x.stroke();
+  });
+}
+function ta2DrawColor(btn) {
+  DR.color = btn.dataset.c; DR.erase = false;
+  document.querySelectorAll('.ta2-swatch').forEach(b => b.classList.toggle('on', b === btn));
+}
+function ta2DrawWidth(w) { DR.width = w; }
+function ta2DrawEraser() { DR.erase = true; document.querySelectorAll('.ta2-swatch').forEach(b => b.classList.remove('on')); }
+function ta2DrawUndo() { DR.strokes.pop(); ta2DrawRedraw(); }
+function ta2DrawClear() { DR.strokes = []; ta2DrawRedraw(); }
+async function ta2SaveDraw() {
+  if (!DR.strokes.length) { alert('그림을 먼저 그려주세요.'); return; }
+  const c = el('ta2Canvas');
+  const scale = Math.min(1, 900 / c.width);
+  const t = document.createElement('canvas'); t.width = Math.round(c.width * scale); t.height = Math.round(c.height * scale);
+  const x = t.getContext('2d'); x.fillStyle = '#fff'; x.fillRect(0, 0, t.width, t.height); x.drawImage(c, 0, 0, t.width, t.height);
+  try {
+    await ta2NoteAdd({ lead_id: TA2.leadId, kind: 'drawing', content: el('ta2DrawCap').value.trim(), image: t.toDataURL('image/jpeg', 0.85) });
+    el('ta2DrawCap').value = '';
+    ta2CloseDraw();
+    await ta2LoadNotes();
+  } catch (e) { alert('그림 저장 실패: ' + (e.message || e)); }
+}
+
+// ---------- 일정 캘린더 ----------
+async function ta2LoadSched() {
+  const id = TA2.leadId;
+  const rows = await ta2SchedList(id);
+  if (TA2.leadId !== id) return;
+  TA2.scheds = rows;
+  ta2RenderCal(); ta2RenderSchedList();
+}
+function ta2CalMove(delta) {
+  const [y, m] = TA2.calYM.split('-').map(Number);
+  const d = new Date(y, m - 1 + delta, 1);
+  TA2.calYM = `${d.getFullYear()}-${TA2_PAD(d.getMonth() + 1)}`;
+  ta2RenderCal();
+}
+function ta2SelDate(ds) { TA2.calSel = ds; el('ta2SchDate').value = ds; ta2RenderCal(); ta2RenderSchedList(); }
+function ta2RenderCal() {
+  if (!TA2.calYM) return;
+  const [y, m] = TA2.calYM.split('-').map(Number);
+  const first = new Date(y, m - 1, 1).getDay(), last = new Date(y, m, 0).getDate();
+  const lead = ta2CurLead(), today = todayStr();
+  const withSched = new Set(TA2.scheds.filter(s => !s.done).map(s => s.sched_date));
+  el('ta2CalTitle').textContent = `${y}년 ${m}월`;
+  let h = WEEKDAY_KR.map(d => `<div class="dw">${d}</div>`).join('');
+  for (let i = 0; i < first; i++) h += '<button type="button" class="ta2-day out" tabindex="-1"></button>';
+  for (let d = 1; d <= last; d++) {
+    const ds = `${y}-${TA2_PAD(m)}-${TA2_PAD(d)}`, wd = new Date(y, m - 1, d).getDay();
+    const cls = ['ta2-day'];
+    if (wd === 0) cls.push('sun'); else if (wd === 6) cls.push('sat'); else if (KR_HOLIDAYS.has(ds)) cls.push('hol');
+    if (ds === today) cls.push('today');
+    if (ds === TA2.calSel) cls.push('sel');
+    let dots = '';
+    if (withSched.has(ds)) dots += '<span class="dot"></span>';
+    if (lead && lead.expectedDate === ds) dots += '<span class="dot exp"></span>';
+    h += `<button type="button" class="${cls.join(' ')}" onclick="ta2SelDate('${ds}')">${d}<span style="display:flex;gap:2px;">${dots}</span></button>`;
+  }
+  el('ta2CalGrid').innerHTML = h;
+}
+function ta2SchedItemHtml(s, showDate) {
+  return `<div class="ta2-sch-item${s.done ? ' done' : ''}">
+    <div class="tm">${showDate ? ta2DateLabel(s.sched_date) + '<br>' : ''}${s.sched_time ? escapeHtml(String(s.sched_time).slice(0, 5)) : '종일'}</div>
+    <div style="flex:1;min-width:0;"><div class="ti">${escapeHtml(s.title)}</div>${s.note ? `<div class="nt">${escapeHtml(s.note)}</div>` : ''}</div>
+    <div style="display:flex;flex-direction:column;gap:2px;">
+      <button type="button" class="ta2-x" style="color:#16a34a !important;" onclick="ta2ToggleSched('${escapeHtml(s.id)}',${s.done ? 'false' : 'true'})">${s.done ? '되돌리기' : '완료'}</button>
+      <button type="button" class="ta2-x" onclick="ta2DelSched('${escapeHtml(s.id)}')">삭제</button></div></div>`;
+}
+function ta2RenderSchedList() {
+  const sel = TA2.calSel;
+  el('ta2SelDateLabel').textContent = `${ta2FullDate(sel)} 일정`;
+  const day = TA2.scheds.filter(s => s.sched_date === sel).sort((a, b) => (a.sched_time || '').localeCompare(b.sched_time || ''));
+  let html = day.length ? day.map(s => ta2SchedItemHtml(s, false)).join('') : '<div class="ta2-empty">이 날짜에 등록된 일정이 없습니다.</div>';
+  const others = TA2.scheds.filter(s => s.sched_date !== sel && s.sched_date >= todayStr() && !s.done);
+  if (others.length) {
+    html += '<div style="margin-top:14px;font-size:13px;font-weight:900;color:#475569;">예정된 다른 일정</div>' +
+      others.map(s => `<div onclick="ta2SelDate('${escapeHtml(s.sched_date)}')" style="cursor:pointer;">${ta2SchedItemHtml(s, true)}</div>`).join('');
+  }
+  el('ta2SchedList').innerHTML = html;
+}
+async function ta2AddSched() {
+  const date = el('ta2SchDate').value, title = el('ta2SchTitle').value.trim();
+  if (!date) { alert('날짜를 선택해주세요.'); return; }
+  if (!title) { alert('일정 제목을 입력해주세요.'); return; }
+  try {
+    await ta2SchedAdd({ lead_id: TA2.leadId, sched_date: date, sched_time: el('ta2SchTime').value, title: title, note: el('ta2SchNote').value.trim() });
+    el('ta2SchTitle').value = ''; el('ta2SchNote').value = ''; el('ta2SchTime').value = '';
+    TA2.calSel = date; TA2.calYM = date.slice(0, 7);
+    await ta2LoadSched();
+  } catch (e) { alert('일정 저장 실패: ' + (e.message || e)); }
+}
+async function ta2DelSched(id) {
+  if (!confirm('이 일정을 삭제하시겠습니까?')) return;
+  try { await ta2SchedDelRow(id); await ta2LoadSched(); } catch (e) { alert('삭제 실패: ' + (e.message || e)); }
+}
+async function ta2ToggleSched(id, done) {
+  try { await ta2SchedSetDone(id, done); await ta2LoadSched(); } catch (e) { alert('변경 실패: ' + (e.message || e)); }
+}
+
+// ---------- 연락처 컬럼 대응 (contact_phone 컬럼이 없는 DB에서도 저장 실패 없이 동작) ----------
+let PHONE_COL_OK = null;
+async function leadWriteWithPhone(mode, id, phone, row) {
+  const build = withPhone => (withPhone ? Object.assign({}, row, { contact_phone: phone || null }) : row);
+  const run = r => mode === 'update' ? db.from('ta_leads').update(r).eq('id', id) : db.from('ta_leads').insert([r]);
+  if (PHONE_COL_OK === false) return run(build(false));
+  let res = await run(build(true));
+  if (res.error && /contact_phone/i.test(res.error.message || '')) {
+    PHONE_COL_OK = false;
+    console.warn('[TA2] ta_leads.contact_phone 컬럼이 없어 전화번호는 저장되지 않았습니다. 설정 SQL을 실행하세요.');
+    res = await run(build(false));
+    if (!res.error && phone) setTimeout(() => alert('안건은 저장되었지만 DB에 연락처 컬럼(contact_phone)이 없어 전화번호는 저장되지 않았습니다.\n지사 관리자에게 설정 SQL 실행을 요청해주세요.'), 50);
+  } else if (!res.error) { PHONE_COL_OK = true; }
+  return res;
+}
 
 </script>
 
