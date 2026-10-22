@@ -1148,6 +1148,25 @@
   .ta4-notebtn.has{border-style:solid !important;border-color:var(--accent) !important;background:#f5f8ff !important;}
   .ta4-pg .ta2-draw canvas{height:300px;}
 
+  /* 통일 아이콘 */
+  [data-ic] svg{width:24px;height:24px;display:block;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}
+  [data-ic]{display:inline-flex;}
+  .ta4-pf .tool{padding:11px 0 !important;flex:1;display:flex;justify-content:center;align-items:center;}
+  .ta4-pf .tool [data-ic] svg{width:26px;height:26px;}
+  .ta4-cmf .mic{display:flex;align-items:center;justify-content:center;}
+  .ta4-cmf .mic [data-ic] svg{width:22px;height:22px;}
+  .ta4-dt{display:flex;flex-direction:column;gap:8px;}
+  .ta4-dt .row{display:flex;gap:6px;align-items:center;flex-wrap:wrap;}
+  .ta4-dt .sep{width:1px;height:24px;background:var(--line);margin:0 2px;}
+  .ta4-dt button.ic{width:38px;height:38px;padding:0 !important;border-radius:10px !important;border:1px solid var(--line) !important;background:#fff !important;color:var(--navy) !important;display:inline-flex;align-items:center;justify-content:center;}
+  .ta4-dt button.ic.on{background:var(--navy) !important;color:#fff !important;border-color:var(--navy) !important;}
+  .ta4-dt button.ic [data-ic] svg{width:22px;height:22px;}
+  .ta4-dt .row{gap:4px;}
+  .ta4-dt button.ic{width:36px;height:36px;}
+  .ta4-dt button.ic [data-ic] svg{width:21px;height:21px;}
+  .ta4-dt .row .sep{margin:0 1px;}
+  .ta4-dt button.ic,.ta4-dt .ta2-swatch{transition:none;}
+
 </style>
 <meta name="theme-color" content="#0f2547">
 </head>
@@ -6628,7 +6647,7 @@ function ta4Init() {
   });
   const am = el('afAmount'); if (am) am.addEventListener('input', () => { const n = parseCurrency(am.value); am.value = n ? n.toLocaleString('ko-KR') : ''; });
   const ra = el('rpAmount'); if (ra) ra.addEventListener('input', () => { const n = parseCurrency(ra.value); ra.value = n ? n.toLocaleString('ko-KR') : ''; });
-  ta4EmoInit();
+  ta4EmoInit(); ta4IcInit();
   if (el('afPlaceBtn')) el('afPlaceBtn').innerHTML = ta4PinIcon(26);
   if (el('ta4Cross')) el('ta4Cross').innerHTML = ta4PinSvg('#fff', false);
   const rt = el('rpText'); if (rt) rt.addEventListener('input', () => { if (TA4.rp) TA4.rp.manual = true; });
@@ -7342,6 +7361,32 @@ function ta4ApplyBarTheme() {
   if (m) m.content = pr;
 }
 
+
+// ---------- 통일 아이콘 세트 (라인, 24px, currentColor) ----------
+const TA4_IC = {
+  cam: '<rect x="3" y="7" width="18" height="13" rx="3.5"/><path d="M8.5 7l1-2.2h5l1 2.2"/><circle cx="12" cy="13.5" r="3.6"/><circle cx="17.6" cy="10.2" r=".6" fill="currentColor"/>',
+  album: '<rect x="6" y="3.5" width="15" height="12" rx="2.2"/><path d="M3 8v9.2A2.8 2.8 0 0 0 5.8 20H17"/><circle cx="10.6" cy="7.6" r="1.4" fill="currentColor"/><path d="M6.8 14.2l3.2-3.2 2.4 2.2 2.6-3.6 3.5 4.6"/>',
+  bg: '<rect x="3" y="4" width="18" height="14" rx="2.5"/><circle cx="8.5" cy="9" r="1.6" fill="currentColor"/><path d="M3.8 16l4.6-4.4 3.2 3 3.6-5 5 6.4"/><path d="M17.5 20.5v-3M16 19h3"/>',
+  draw: '<path d="M7 20l1.8-6M17 20l-1.8-6M12 20v-3"/><rect x="3.5" y="3.5" width="17" height="11.5" rx="1.6"/><path d="M6.8 12l3.2-3.6 2.4 2.2 3-4.1 2 2.6"/><circle cx="7.6" cy="6.6" r="1" fill="currentColor"/>',
+  mic: '<rect x="8.5" y="2.8" width="7" height="12" rx="3.5"/><path d="M5 11.5a7 7 0 0 0 14 0M12 18.5v2.7M8.5 21.2h7"/>',
+  emoji: '<circle cx="12" cy="12" r="9"/><path d="M8.2 14.2a4.4 4.4 0 0 0 7.6 0"/><circle cx="9" cy="9.7" r=".9" fill="currentColor"/><circle cx="15" cy="9.7" r=".9" fill="currentColor"/>',
+  eraser: '<path d="M8.2 20.2h11"/><path d="M5.6 15.4l8.9-8.9a2 2 0 0 1 2.8 0l2.2 2.2a2 2 0 0 1 0 2.8l-6.1 6.1H8.6a2 2 0 0 1-1.4-.6l-1.6-1.6a2 2 0 0 1 0-2z"/><path d="M9.4 11.7l5 5"/>',
+  back: '<path d="M9.2 5.5h10.3a1.5 1.5 0 0 1 1.5 1.5v10a1.5 1.5 0 0 1-1.5 1.5H9.2a2 2 0 0 1-1.5-.7L2.8 12.8a1.2 1.2 0 0 1 0-1.6l4.9-5a2 2 0 0 1 1.5-.7z"/><path d="M12.6 9.6l4.4 4.8M17 9.6l-4.4 4.8"/>',
+  trash: '<path d="M4 7h16M9.5 7V4.5h5V7M6.5 7l.9 12.2a1.5 1.5 0 0 0 1.5 1.3h6.2a1.5 1.5 0 0 0 1.5-1.3L17.5 7M10 11v6M14 11v6"/>',
+  w1: '<path d="M4 12h16" stroke-width="1.6"/>', w2: '<path d="M4 12h16" stroke-width="3.6"/>', w3: '<path d="M4 12h16" stroke-width="6.4"/>',
+  pen: '<path d="M4 20l1-4.2L16.6 4.2a2 2 0 0 1 2.8 0l.4.4a2 2 0 0 1 0 2.8L8.2 19z"/><path d="M14.6 6.2l3.2 3.2"/>',
+  line: '<path d="M5 19L19 5"/>', arrow: '<path d="M5 19L19 5M10.5 5H19v8.5"/>',
+  rect: '<rect x="4" y="6" width="16" height="12" rx="1.2"/>', circle: '<circle cx="12" cy="12" r="8"/>',
+  tri: '<path d="M12 4.5l8.6 15H3.4z"/>', diamond: '<path d="M12 3.5l8.5 8.5-8.5 8.5L3.5 12z"/>',
+  fill: '<path d="M5 4h14v16H5z" fill="currentColor" fill-opacity=".28"/><path d="M5 4h14v16H5z"/>'
+};
+function ta4IcInit() {
+  document.querySelectorAll('[data-ic]').forEach(n => {
+    if (n.firstChild) return;
+    const d = TA4_IC[n.dataset.ic]; if (d) n.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true">' + d + '</svg>';
+  });
+}
+
 // ---------- 그림 편집: 바탕 이미지(도면) 지원 ----------
 function ta4DrawSetup() {
   const c = el('ta2Canvas'), r = c.getBoundingClientRect(), dpr = Math.min(2, window.devicePixelRatio || 1);
@@ -7354,22 +7399,40 @@ function ta2OpenDraw(target) {
   el('ta2DrawBox').style.display = 'block';
   el('ta2Canvas').style.height = ''; DR.bg = null; el('ta4BgOff').style.display = 'none';
   ta4DrawSetup();
-  DR.strokes = []; DR.cur = null; DR.erase = false;
+  DR.strokes = []; DR.cur = null; DR.erase = false; DR.tool = 'pen'; DR.fill = false;
+  ta4DrawUi();
   const c = el('ta2Canvas');
   if (!DR.bound) {
     DR.bound = true;
     const pos = e => { const b = c.getBoundingClientRect(); return [e.clientX - b.left, e.clientY - b.top]; };
     c.addEventListener('pointerdown', e => {
       e.preventDefault(); c.setPointerCapture(e.pointerId);
-      DR.cur = { color: DR.color, width: DR.erase ? DR.width * 2.5 : DR.width, er: DR.erase, pts: [pos(e)] };
+      const p = pos(e), t = DR.tool || 'pen';
+      DR.cur = { color: DR.color, width: DR.erase ? DR.width * 2.5 : DR.width, er: DR.erase, pts: [p] };
+      if (!DR.erase && t !== 'pen') { DR.cur.shape = t; DR.cur.fill = !!DR.fill && ['rect', 'circle', 'tri', 'diamond'].includes(t); DR.cur.pts = [p, p]; }
       DR.strokes.push(DR.cur); ta2DrawRedraw();
     });
-    c.addEventListener('pointermove', e => { if (!DR.cur) return; e.preventDefault(); DR.cur.pts.push(pos(e)); ta2DrawRedraw(); });
+    c.addEventListener('pointermove', e => { if (!DR.cur) return; e.preventDefault(); if (DR.cur.shape) DR.cur.pts[1] = pos(e); else DR.cur.pts.push(pos(e)); ta2DrawRedraw(); });
     const end = () => { DR.cur = null; };
     c.addEventListener('pointerup', end); c.addEventListener('pointercancel', end); c.addEventListener('pointerleave', end);
   }
   ta2DrawRedraw();
   el('ta2DrawBox').scrollIntoView({ block: 'nearest' });
+}
+function ta4ShapePath(lx, s) {
+  const [a, b] = s.pts, x0 = a[0], y0 = a[1], x1 = b[0], y1 = b[1], cx = (x0 + x1) / 2, cy = (y0 + y1) / 2;
+  lx.beginPath();
+  if (s.shape === 'line' || s.shape === 'arrow') {
+    lx.moveTo(x0, y0); lx.lineTo(x1, y1);
+    if (s.shape === 'arrow') {
+      const ang = Math.atan2(y1 - y0, x1 - x0), h = Math.max(12, s.width * 3.2);
+      lx.moveTo(x1, y1); lx.lineTo(x1 - h * Math.cos(ang - 0.45), y1 - h * Math.sin(ang - 0.45));
+      lx.moveTo(x1, y1); lx.lineTo(x1 - h * Math.cos(ang + 0.45), y1 - h * Math.sin(ang + 0.45));
+    }
+  } else if (s.shape === 'rect') lx.rect(Math.min(x0, x1), Math.min(y0, y1), Math.abs(x1 - x0), Math.abs(y1 - y0));
+  else if (s.shape === 'circle') lx.ellipse(cx, cy, Math.abs(x1 - x0) / 2, Math.abs(y1 - y0) / 2, 0, 0, Math.PI * 2);
+  else if (s.shape === 'tri') { lx.moveTo(cx, Math.min(y0, y1)); lx.lineTo(Math.max(x0, x1), Math.max(y0, y1)); lx.lineTo(Math.min(x0, x1), Math.max(y0, y1)); lx.closePath(); }
+  else if (s.shape === 'diamond') { lx.moveTo(cx, Math.min(y0, y1)); lx.lineTo(Math.max(x0, x1), cy); lx.lineTo(cx, Math.max(y0, y1)); lx.lineTo(Math.min(x0, x1), cy); lx.closePath(); }
 }
 function ta2DrawRedraw() {
   const c = el('ta2Canvas'), x = c.getContext('2d'), L = DR.layer, lx = L.getContext('2d');
@@ -7378,6 +7441,11 @@ function ta2DrawRedraw() {
   DR.strokes.forEach(s => {
     lx.globalCompositeOperation = s.er ? 'destination-out' : 'source-over';
     lx.strokeStyle = s.color; lx.fillStyle = s.color; lx.lineWidth = s.width;
+    if (s.shape) {
+      ta4ShapePath(lx, s);
+      if (s.fill) { lx.globalAlpha = 0.28; lx.fill(); lx.globalAlpha = 1; }
+      lx.stroke(); return;
+    }
     if (s.pts.length === 1) { lx.beginPath(); lx.arc(s.pts[0][0], s.pts[0][1], s.width / 2, 0, Math.PI * 2); lx.fill(); return; }
     lx.beginPath(); lx.moveTo(s.pts[0][0], s.pts[0][1]);
     for (let i = 1; i < s.pts.length; i++) lx.lineTo(s.pts[i][0], s.pts[i][1]);
@@ -7388,6 +7456,15 @@ function ta2DrawRedraw() {
   if (DR.bg) x.drawImage(DR.bg, 0, 0, c.width, c.height);
   x.drawImage(L, 0, 0);
 }
+function ta4DrawUi() {
+  document.querySelectorAll('#ta2DrawBox [data-tool]').forEach(b => b.classList.toggle('on', !DR.erase && b.dataset.tool === (DR.tool || 'pen')));
+  document.querySelectorAll('#ta2DrawBox [data-w]').forEach(b => b.classList.toggle('on', +b.dataset.w === DR.width));
+  const e = el('ta4TlErase'); if (e) e.classList.toggle('on', !!DR.erase);
+  const f = el('ta4TlFill'); if (f) f.classList.toggle('on', !!DR.fill);
+}
+function ta4DrawTool(t) { DR.tool = t; DR.erase = false; ta4DrawUi(); }
+function ta4DrawFill() { DR.fill = !DR.fill; ta4DrawUi(); }
+function ta2DrawWidth(w) { DR.width = w; ta4DrawUi(); }
 function ta2CloseDraw() { if (el('ta2DrawBox')) el('ta2DrawBox').style.display = 'none'; DR.strokes = []; DR.cur = null; DR.bg = null; }
 function ta4DrawBg() { el('ta4BgFile').click(); }
 function ta4DrawBgClear() { DR.bg = null; el('ta2Canvas').style.height = ''; el('ta4BgOff').style.display = 'none'; ta4DrawSetup(); ta2DrawRedraw(); }
@@ -7402,8 +7479,8 @@ async function ta4DrawBgFile(inp) {
     ta2DrawRedraw(); el('ta2DrawBox').scrollIntoView({ block: 'nearest' });
   } catch (e) { ta3Toast(e.message || '배경 이미지 오류', 3000); }
 }
-function ta2DrawEraser() { DR.erase = true; document.querySelectorAll('.ta2-swatch').forEach(b => b.classList.remove('on')); }
-function ta2DrawColor(btn) { DR.color = btn.dataset.c; DR.erase = false; document.querySelectorAll('.ta2-swatch').forEach(b => b.classList.toggle('on', b === btn)); }
+function ta2DrawEraser() { DR.erase = true; document.querySelectorAll('.ta2-swatch').forEach(b => b.classList.remove('on')); ta4DrawUi(); }
+function ta2DrawColor(btn) { DR.color = btn.dataset.c; DR.erase = false; document.querySelectorAll('.ta2-swatch').forEach(b => b.classList.toggle('on', b === btn)); ta4DrawUi(); }
 async function ta2SaveDraw() {
   if (!DR.strokes.length && !DR.bg) { ta3Toast('그림을 먼저 그려주세요'); return; }
   const c = el('ta2Canvas'), scale = Math.min(1, (DR.bg ? 1400 : 900) / c.width);
@@ -7517,7 +7594,7 @@ function ta4EmoIns(id, ch) {
       <div id="ta4CmList"></div>
       <div class="ta4-emo" id="ta4CmEmo"></div>
       <div class="ta4-cmf"><textarea id="ta4CmText" rows="1" placeholder="댓글"></textarea>
-        <button type="button" class="mic" id="ta4CmMic" onclick="ta4Voice('ta4CmText','ta4CmMic')" aria-label="음성 입력">🎤</button>
+        <button type="button" class="mic" id="ta4CmMic" onclick="ta4Voice('ta4CmText','ta4CmMic')" aria-label="음성 입력"><span data-ic="mic"></span></button>
         <button type="button" onclick="ta4CmAdd()">등록</button></div>
     </div>
   </div></div>
@@ -7539,19 +7616,34 @@ function ta4EmoIns(id, ch) {
       <div class="ta4-emo" id="ta4MemoEmo" style="display:none;"></div>
     </div>
     <div class="ta2-draw" id="ta2DrawBox" style="display:none;">
-      <div class="tl">
-        <button type="button" class="ta2-swatch on" data-c="#111827" style="background:#111827;" onclick="ta2DrawColor(this)"></button>
-        <button type="button" class="ta2-swatch" data-c="#dc2626" style="background:#dc2626;" onclick="ta2DrawColor(this)"></button>
-        <button type="button" class="ta2-swatch" data-c="#2563eb" style="background:#2563eb;" onclick="ta2DrawColor(this)"></button>
-        <button type="button" class="ta2-swatch" data-c="#16a34a" style="background:#16a34a;" onclick="ta2DrawColor(this)"></button>
-        <button type="button" class="ta2-sm" onclick="ta2DrawWidth(3)">가늘게</button>
-        <button type="button" class="ta2-sm" onclick="ta2DrawWidth(7)">보통</button>
-        <button type="button" class="ta2-sm" onclick="ta2DrawWidth(14)">굵게</button>
-        <button type="button" class="ta2-sm" onclick="ta2DrawEraser()">지우개</button>
-        <button type="button" class="ta2-sm" onclick="ta2DrawUndo()">↩</button>
-        <button type="button" class="ta2-sm" onclick="ta2DrawClear()">전체 지움</button>
-        <button type="button" class="ta2-sm" style="background:#eef3ff !important;" onclick="ta4DrawBg()">🖼 도면·배경</button>
-        <button type="button" class="ta2-sm" id="ta4BgOff" style="display:none;" onclick="ta4DrawBgClear()">배경 삭제</button>
+      <div class="tl ta4-dt">
+        <div class="row">
+          <button type="button" class="ta2-swatch on" data-c="#111827" style="background:#111827;" onclick="ta2DrawColor(this)"></button>
+          <button type="button" class="ta2-swatch" data-c="#dc2626" style="background:#dc2626;" onclick="ta2DrawColor(this)"></button>
+          <button type="button" class="ta2-swatch" data-c="#2563eb" style="background:#2563eb;" onclick="ta2DrawColor(this)"></button>
+          <button type="button" class="ta2-swatch" data-c="#16a34a" style="background:#16a34a;" onclick="ta2DrawColor(this)"></button>
+          <span class="sep"></span>
+          <button type="button" class="ic" data-w="3" onclick="ta2DrawWidth(3)" aria-label="가늘게"><span data-ic="w1"></span></button>
+          <button type="button" class="ic on" data-w="7" onclick="ta2DrawWidth(7)" aria-label="보통"><span data-ic="w2"></span></button>
+          <button type="button" class="ic" data-w="14" onclick="ta2DrawWidth(14)" aria-label="굵게"><span data-ic="w3"></span></button>
+          <span class="sep"></span>
+          <button type="button" class="ic" id="ta4TlErase" onclick="ta2DrawEraser()" aria-label="지우개"><span data-ic="eraser"></span></button>
+          <button type="button" class="ic" onclick="ta2DrawUndo()" aria-label="되돌리기"><span data-ic="back"></span></button>
+          <button type="button" class="ic" onclick="ta2DrawClear()" aria-label="전체 지움"><span data-ic="trash"></span></button>
+          <span class="sep"></span>
+          <button type="button" class="ic" onclick="ta4DrawBg()" aria-label="배경 이미지"><span data-ic="bg"></span></button>
+          <button type="button" class="ta2-sm" id="ta4BgOff" style="display:none;" onclick="ta4DrawBgClear()">배경 삭제</button>
+        </div>
+        <div class="row">
+          <button type="button" class="ic on" data-tool="pen" onclick="ta4DrawTool('pen')" aria-label="펜"><span data-ic="pen"></span></button>
+          <button type="button" class="ic" data-tool="line" onclick="ta4DrawTool('line')" aria-label="직선"><span data-ic="line"></span></button>
+          <button type="button" class="ic" data-tool="arrow" onclick="ta4DrawTool('arrow')" aria-label="화살표"><span data-ic="arrow"></span></button>
+          <button type="button" class="ic" data-tool="rect" onclick="ta4DrawTool('rect')" aria-label="사각형"><span data-ic="rect"></span></button>
+          <button type="button" class="ic" data-tool="circle" onclick="ta4DrawTool('circle')" aria-label="원"><span data-ic="circle"></span></button>
+          <button type="button" class="ic" data-tool="tri" onclick="ta4DrawTool('tri')" aria-label="삼각형"><span data-ic="tri"></span></button>
+          <button type="button" class="ic" data-tool="diamond" onclick="ta4DrawTool('diamond')" aria-label="마름모"><span data-ic="diamond"></span></button>
+          <button type="button" class="ic fill" id="ta4TlFill" onclick="ta4DrawFill()" aria-label="도형 채우기"><span data-ic="fill"></span></button>
+        </div>
         <input type="file" id="ta4BgFile" accept="image/*" style="display:none;" onchange="ta4DrawBgFile(this)">
       </div>
       <canvas id="ta2Canvas"></canvas>
@@ -7562,11 +7654,11 @@ function ta4EmoIns(id, ch) {
     </div>
   </div></div>
   <div class="ta4-pf"><div class="in" id="ta2MpPhotoBar">
-    <button type="button" class="tool" onclick="ta2AttachPick(ta2MpTarget(),'cam')">📷 촬영</button>
-    <button type="button" class="tool" onclick="ta2AttachPick(ta2MpTarget(),'album')">🖼️ 앨범</button>
-    <button type="button" class="tool" onclick="ta2OpenDraw(ta2MpTarget())">✏️ 그림</button>
-    <button type="button" class="tool mic" id="ta4MemoMic" onclick="ta4Voice('ta2MemoText','ta4MemoMic')">🎤 음성</button>
-    <button type="button" class="tool" onclick="ta4EmoToggle()">😊</button>
+    <button type="button" class="tool" onclick="ta2AttachPick(ta2MpTarget(),'cam')" aria-label="촬영"><span data-ic="cam"></span></button>
+    <button type="button" class="tool" onclick="ta2AttachPick(ta2MpTarget(),'album')" aria-label="앨범"><span data-ic="album"></span></button>
+    <button type="button" class="tool" onclick="ta2OpenDraw(ta2MpTarget())" aria-label="그림"><span data-ic="draw"></span></button>
+    <button type="button" class="tool mic" id="ta4MemoMic" onclick="ta4Voice('ta2MemoText','ta4MemoMic')" aria-label="음성"><span data-ic="mic"></span></button>
+    <button type="button" class="tool" onclick="ta4EmoToggle()" aria-label="이모지"><span data-ic="emoji"></span></button>
   </div></div>
 </div>
 
