@@ -1110,6 +1110,16 @@
   .ta4-form .won .row2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
   .ta4-rp textarea#rpText{min-height:230px;}
 
+  /* 컨설턴트 고유 컬러 타이틀 바 (지사장은 흰색 유지) */
+  body.ta3-themed .ta3-bar,body.ta3-themed .ta4-ph{background:var(--tb-bg) !important;border-bottom:2px solid var(--tb-bd) !important;backdrop-filter:none;-webkit-backdrop-filter:none;}
+  body.ta3-themed .ta3-bar .tt,body.ta3-themed .ta4-ph .ttl h3{color:#fff !important;}
+  body.ta3-themed .ta3-bar button{background:#fff !important;color:var(--tb-pr) !important;}
+  body.ta3-themed .ta4-ph .back{color:#fff !important;}
+  body.ta3-themed .ta4-ph .sv{color:#d1fae5;}
+  body.ta3-themed .ta4-ph .ttl .bd,body.ta3-themed .ta4-ph .ttl .bd span{color:#e5e7eb;}
+  body.ta3-themed .ta4-ph .ic{background:rgba(255,255,255,.2) !important;color:#fff !important;}
+  body.ta3-themed .ta4-ph .act.ghost{background:rgba(255,255,255,.2) !important;color:#fff !important;}
+
 </style>
 <meta name="theme-color" content="#0f2547">
 </head>
@@ -6212,6 +6222,7 @@ function ta3SetTab(t) {
 }
 function ta3Back() { if (PG.st.length) history.back(); }
 function ta3Refresh() {
+  ta4ApplyBarTheme();
   ta3BuildItems();
   const t = TA3.tab;
   if (t === 'home') ta3RenderHome();
@@ -7242,6 +7253,16 @@ async function ta4OpenRef(id) {
   const q = new URLSearchParams({ sso: '1', name: u.name, phone: String(u.phone).replace(/[^0-9]/g, ''), job: u.job, role: 'user' });
   if (id) q.set('lead', id);
   location.href = REFERRAL_APP_URL.replace(/\/?$/, '/') + '?' + q.toString();
+}
+
+// 컨설턴트 고유 컬러 타이틀 바 (지사장 로그인 시에는 흰색 유지)
+function ta4ApplyBarTheme() {
+  const th = (typeof CONSULTANT_THEMES !== 'undefined' && !isMasterUser()) ? CONSULTANT_THEMES[currentViewMode] : null;
+  const b = document.body, m = document.querySelector('meta[name=theme-color]');
+  if (!th) { b.classList.remove('ta3-themed'); b.style.removeProperty('--tb-bg'); if (m) m.content = '#ffffff'; return; }
+  b.classList.add('ta3-themed');
+  b.style.setProperty('--tb-bg', th.headerBg); b.style.setProperty('--tb-bd', th.headerBorder); b.style.setProperty('--tb-pr', th.primary);
+  if (m) m.content = th.primary;
 }
 
 </script>
