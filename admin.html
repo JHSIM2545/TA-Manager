@@ -1282,6 +1282,10 @@
   .ta4-imgov{position:fixed;inset:0;z-index:2000100;background:rgba(0,0,0,.88);display:none;align-items:center;justify-content:center;padding:14px;}
   .ta4-imgov.on{display:flex;} .ta4-imgov img{max-width:100%;max-height:100%;border-radius:8px;}
 
+  .ct-row .tx b .ct-pth{font-style:normal;font-size:10.5px;font-weight:800;margin-left:6px;padding:1px 7px;border-radius:99px;vertical-align:1px;background:#eef1f7;color:#475569;}
+  .ct-row .tx b .ct-pth.p1{background:#fee2e2;color:#b91c1c;} .ct-row .tx b .ct-pth.p2{background:#dbeafe;color:#1d4ed8;} .ct-row .tx b .ct-pth.p3{background:#dcfce7;color:#15803d;}
+  .ta3-lg{display:flex;gap:12px;align-items:center;font-size:12px;font-weight:800;color:#475569;padding:2px 2px 6px;} .ta3-lg i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:4px;vertical-align:-1px;}
+
 </style>
 <meta name="theme-color" content="#0f2547">
 <style>:root{--bg:#0d1c38;}</style>
@@ -2628,6 +2632,9 @@ async function loadAllFromSupabase() {
         failDate: r.fail_date,
         vehicleNumber: r.vehicle_number,
         memo: r.memo,
+        origin: r.origin || '',
+        referrer: r.referrer || '',
+        referrerPhone: r.referrer_phone || '',
         createdAt: r.created_at,
         updatedAt: r.updated_at
       });
@@ -6116,7 +6123,7 @@ function ta3BuildItems() {
   ta2Leads(currentViewMode).forEach(l => {
     const g = ta3GrpTa(l.stage), pl = TA3.places[l.id];
     out.push({
-      src: 'ta', id: l.id, name: l.company, contact: l.contact, phone: l.contactPhone, amount: Number(l.amount || 0), group: g,
+      src: ta4IsPs(l) ? 'ps' : 'ta', referrer: l.referrer || '', id: l.id, name: l.company, contact: l.contact, phone: l.contactPhone, amount: Number(l.amount || 0), group: g,
       stage: ta2StageLabel(l.stage), conf: l.confidence, product: l.productType, address: (pl && pl.address) || '',
       date: l.stage === '수주完' ? (l.contractDate || l.expectedDate) : l.expectedDate, updated: l.updatedAt || '', raw: l
     });
@@ -6214,9 +6221,10 @@ function ta3MapInit() {
 }
 // 빨간 입체 핀 마커 (구멍 안 색 = 진행 단계, 하단 링 = 위치)
 let TA3_PIN_N = 0;
-function ta4PinSvg(dot, ring) {
-  const id = 'pg' + (++TA3_PIN_N);
-  return `<svg viewBox="0 0 60 86" width="100%" height="100%" aria-hidden="true"><defs><linearGradient id="${id}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ff5252"/><stop offset=".55" stop-color="#f00f0f"/><stop offset="1" stop-color="#c70000"/></linearGradient></defs>`
+const TA3_PIN_TONE = { ta: ['#ff5252', '#f00f0f', '#c70000'], ref: ['#6aa9ff', '#1f6bff', '#0b3fb3'], ps: ['#4ade80', '#16a34a', '#0f6b31'] };   // TA 빨강 · 소개 파랑 · 가망 초록
+function ta4PinSvg(dot, ring, tone) {
+  const id = 'pg' + (++TA3_PIN_N), t = TA3_PIN_TONE[tone] || TA3_PIN_TONE.ta;
+  return `<svg viewBox="0 0 60 86" width="100%" height="100%" aria-hidden="true"><defs><linearGradient id="${id}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${t[0]}"/><stop offset=".55" stop-color="${t[1]}"/><stop offset="1" stop-color="${t[2]}"/></linearGradient></defs>`
     + (ring ? '<ellipse cx="30" cy="80" rx="22" ry="5" fill="rgba(255,255,255,.85)" stroke="#111" stroke-width="2.2"/>' : '')
     + `<path d="M30 3C14.5 3 4 14.5 4 29.5c0 18 20 38 26 48 6-10 26-30 26-48C56 14.5 45.5 3 30 3z" fill="url(#${id})"/>`
     + '<path d="M14 18c4-8 12-12 20-11-9 1-16 6-18 14z" fill="#fff" opacity=".28"/>'
@@ -6224,7 +6232,7 @@ function ta4PinSvg(dot, ring) {
 }
 function ta4PinIcon(px) { return `<span class="ta4-pico" style="width:${(px || 18) * 0.7}px;height:${px || 18}px">${ta4PinSvg('#fff', false)}</span>`; }
 function ta3PinHtml(color, src, label, sel) {
-  return `<div class="ta3-pin2${sel ? ' sel' : ''}">${ta4PinSvg(src === 'ref' ? '#ede9fe' : '#fff', true).replace('fill="#fff" stroke="#fff"', `fill="#fff" stroke="#fff"`).replace(/<circle cx="30" cy="29" r="11.5" fill="[^"]*"/, `<circle cx="30" cy="29" r="11.5" fill="${color}"`)}</div>`;
+  return `<div class="ta3-pin2${sel ? ' sel' : ''}">${ta4PinSvg(color, true, src)}</div>`;
 }
 // 지도 래퍼: setView / addMarker / clear / fit / center / onMove / onClick / invalidate
 function ta3NewMap(container, opts) {
@@ -6385,7 +6393,7 @@ async function ta3Boot() {
   ta3Refresh();
   ta3MapInit().catch(() => {});
   await Promise.all([ta3LoadRefs(), ta3LoadPlaces(), ta3LoadScheds(), ta4LoadMotives(), ta4LoadCmts(), ta4LoadCards(), ta4LoadContacts(), ta4LoadProspects()]);
-  ta4CtSyncAll(); ta3Refresh();
+  ta4CtSyncAll(); ta3Refresh(); ta4PsAutoPlace();
 }
 function ta3SetTab(t) {
   TA3.tab = t;
@@ -6423,8 +6431,8 @@ function ta3SchedLabel(it) {
 function ta3CardHtml(it) {
   const g = TA3_GRP[it.group], tel = String(it.phone || '').replace(/[^0-9]/g, '');
   const pl = TA3.places[it.id];
-  const srcTag = it.src === 'ref' ? '<span class="ta3-tag" style="background:#ede9fe;color:#6d28d9;">소개영업</span>' : '<span class="ta3-tag" style="background:#e0e7ff;color:#3730a3;">TA</span>';
-  const stBg = it.src === 'ta' ? (STAGE_BG[it.raw.stage] || '#eee') : '#eef1f7', stCl = it.src === 'ta' ? (STAGE_COLOR[it.raw.stage] || '#374151') : g.c;
+  const srcTag = it.src === 'ref' ? '<span class="ta3-tag" style="background:#dbeafe;color:#1d4ed8;">소개고객</span>' : it.src === 'ps' ? '<span class="ta3-tag" style="background:#dcfce7;color:#15803d;">가망고객</span>' : '<span class="ta3-tag" style="background:#fee2e2;color:#b91c1c;">TA</span>';
+  const stBg = it.src !== 'ref' ? (STAGE_BG[it.raw.stage] || '#eee') : '#eef1f7', stCl = it.src !== 'ref' ? (STAGE_COLOR[it.raw.stage] || '#374151') : g.c;
   return `<div class="ta3-card" style="--c:${g.c}" onclick="ta3Open('${escapeHtml(it.id)}')">
     <div class="r1"><div class="nm">${escapeHtml(it.name)}</div></div>
     ${it.amount ? `<div class="amt">${formatCurrency(it.amount)}</div>` : ''}
@@ -6483,7 +6491,7 @@ function ta3RenderHome() {
 
   const late = TA3.items.filter(i => i.group === 'ing' && i.date && i.date < today).sort((a, b) => a.date.localeCompare(b.date));
   el('ta3LateCnt').textContent = late.length ? late.length + '건' : '';
-  el('ta3LateList').innerHTML = late.slice(0, 6).map(i => ta3RowHtml(`<span style="color:#b91c1c">${-ta2DayDiff(i.date)}일</span>`, i.name, `${i.src === 'ref' ? '소개영업' : 'TA'} · ${escapeHtml(i.stage)}${i.amount ? ' · ' + formatCurrency(i.amount) : ''}`, `ta3Open('${escapeHtml(i.id)}')`)).join('') + (late.length > 6 ? `<div class="ta3-empty" style="padding:8px;">외 ${late.length - 6}건</div>` : '') || '<div class="ta3-empty">없음</div>';
+  el('ta3LateList').innerHTML = late.slice(0, 6).map(i => ta3RowHtml(`<span style="color:#b91c1c">${-ta2DayDiff(i.date)}일</span>`, i.name, `${i.src === 'ref' ? '소개고객' : i.src === 'ps' ? '가망고객' : 'TA'} · ${escapeHtml(i.stage)}${i.amount ? ' · ' + formatCurrency(i.amount) : ''}`, `ta3Open('${escapeHtml(i.id)}')`)).join('') + (late.length > 6 ? `<div class="ta3-empty" style="padding:8px;">외 ${late.length - 6}건</div>` : '') || '<div class="ta3-empty">없음</div>';
 }
 
 // ---------- 안건 ----------
@@ -6505,7 +6513,7 @@ function ta3Sorted(a) {
   return a.slice().sort((x, y) => ord[x.group] - ord[y.group] || (x.group === 'ing' || x.group === 'hold' ? (x.date || '9999').localeCompare(y.date || '9999') : (y.date || y.updated || '').localeCompare(x.date || x.updated || '')));
 }
 function ta3SegHtml(cur, fn) {
-  return [['all', '전체'], ['ta', 'TA'], ['ref', '소개영업']].map(([v, l]) => `<button type="button" class="${cur === v ? 'on' : ''}" onclick="${fn}('${v}')">${l}</button>`).join('');
+  return [['all', '전체'], ['ta', 'TA'], ['ref', '소개고객'], ['ps', '가망고객']].map(([v, l]) => `<button type="button" class="${cur === v ? 'on' : ''}" onclick="${fn}('${v}')">${l}</button>`).join('');
 }
 function ta3ChipsHtml(base, cur, fn) {
   const cnt = g => g === 'all' ? base.length : base.filter(i => i.group === g).length;
@@ -6534,7 +6542,7 @@ async function ta3RenderMap(noFit) {
   const placed = shown.filter(i => TA3.places[i.id] && TA3.places[i.id].lat);
   const noPlace = shown.filter(i => !(TA3.places[i.id] && TA3.places[i.id].lat));
   const geoable = noPlace.filter(i => i.address);
-  el('ta3MapNote').innerHTML = noPlace.length ? `<div class="ta3-mapnote"><span>📌 위치 미지정 ${noPlace.length}건</span>${geoable.length ? `<button type="button" onclick="ta3BatchGeo()">주소로 일괄 지정</button>` : ''}</div>` : '';
+  el('ta3MapNote').innerHTML = '<div class="ta3-lg" style="background:rgba(255,255,255,.9);border-radius:10px;margin-top:6px;padding:6px 10px;display:inline-flex;box-shadow:0 2px 8px rgba(0,0,0,.15);"><span><i style="background:#e11d1d"></i>TA</span><span><i style="background:#1f6bff"></i>소개</span><span><i style="background:#16a34a"></i>가망</span></div>' + (noPlace.length ? `<div class="ta3-mapnote"><span>📌 위치 미지정 ${noPlace.length}건</span>${geoable.length ? `<button type="button" onclick="ta3BatchGeo()">주소로 일괄 지정</button>` : ''}</div>` : '');
   try { await ta3MapInit(); } catch (e) { el('ta3Map').innerHTML = '<div class="ta3-empty">지도를 불러오지 못했습니다. 네트워크를 확인해주세요.</div>'; return; }
   if (!TA3.map) {
     el('ta3Map').innerHTML = '';
@@ -6545,7 +6553,7 @@ async function ta3RenderMap(noFit) {
   TA3.map.clear();
   placed.forEach(i => {
     const pl = TA3.places[i.id], g = TA3_GRP[i.group];
-    TA3.map.addMarker({ lat: pl.lat, lng: pl.lng, html: ta3PinHtml(g.c, i.src, i.src === 'ref' ? '소' : 'T', TA3.mapSel === i.id), onClick: () => ta3MapPreview(i.id) });
+    TA3.map.addMarker({ lat: pl.lat, lng: pl.lng, html: ta3PinHtml(g.c, i.src, i.src === 'ref' ? '소' : i.src === 'ps' ? '가' : 'T', TA3.mapSel === i.id), onClick: () => ta3MapPreview(i.id) });
   });
   if (!noFit) TA3.map.fit(placed.map(i => [TA3.places[i.id].lat, TA3.places[i.id].lng]));
 }
@@ -6554,7 +6562,7 @@ function ta3MapPreview(id) {
   TA3.mapSel = id; const pl = TA3.places[id], g = TA3_GRP[i.group], tel = String(i.phone || '').replace(/[^0-9]/g, '');
   el('ta3Prev').innerHTML = `<button type="button" class="x" onclick="el('ta3Prev').style.display='none'">×</button>
     <div class="nm">${escapeHtml(i.name)}</div>
-    <div style="margin-top:6px;display:flex;gap:5px;flex-wrap:wrap;"><span class="ta3-tag" style="background:#eef1f7;color:${g.c};">${escapeHtml(i.stage)}</span><span class="ta3-tag" style="background:${i.src === 'ref' ? '#ede9fe' : '#e0e7ff'};color:${i.src === 'ref' ? '#6d28d9' : '#3730a3'};">${i.src === 'ref' ? '소개영업' : 'TA'}</span>${i.amount ? `<span class="ta3-tag" style="background:#f3f4f6;color:#0f2547;">${formatCurrency(i.amount)}</span>` : ''}</div>
+    <div style="margin-top:6px;display:flex;gap:5px;flex-wrap:wrap;"><span class="ta3-tag" style="background:#eef1f7;color:${g.c};">${escapeHtml(i.stage)}</span><span class="ta3-tag" style="background:${i.src === 'ref' ? '#dbeafe' : i.src === 'ps' ? '#dcfce7' : '#fee2e2'};color:${i.src === 'ref' ? '#1d4ed8' : i.src === 'ps' ? '#15803d' : '#b91c1c'};">${i.src === 'ref' ? '소개고객' : i.src === 'ps' ? '가망고객' : 'TA'}</span>${i.amount ? `<span class="ta3-tag" style="background:#f3f4f6;color:#0f2547;">${formatCurrency(i.amount)}</span>` : ''}</div>
     <div class="ad">📍 ${escapeHtml((pl && pl.address) || i.address || '')}</div>
     <div class="bt"><button type="button" style="background:#0f2547;color:#fff;" onclick="ta3Open('${escapeHtml(id)}')">상세보기</button>
       <button type="button" style="background:#03c75a;color:#fff;" onclick="ta3OpenNav('naver','${escapeHtml(i.name).replace(/'/g, '')}',TA3.places['${escapeHtml(id)}'])">길찾기</button>
@@ -6584,7 +6592,7 @@ async function ta3BatchGeo() {
   for (let k = 0; k < todo.length; k++) {
     ta3Toast(`위치 찾는 중 ${k + 1}/${todo.length}`, 4000);
     const i = todo[k], r = await ta3Geocode(i.address);
-    if (r) { try { await ta3PlaceSave(i.id, i.src, { lat: r.lat, lng: r.lng, address: i.address }); ok++; } catch (e) { fail++; } } else fail++;
+    if (r) { try { await ta3PlaceSave(i.id, i.src === 'ref' ? 'ref' : 'ta', { lat: r.lat, lng: r.lng, address: i.address }); ok++; } catch (e) { fail++; } } else fail++;
     if (k % 3 === 2) ta3RenderMap(true);
   }
   TA3_BATCH = false;
@@ -6649,7 +6657,7 @@ async function ta3Reload() {
   ta3Toast('새로고침 중');
   try { await loadAllFromSupabase(); } catch (e) {}
   await Promise.all([ta3LoadRefs(), ta3LoadPlaces(), ta3LoadScheds(), ta4LoadMotives(), ta4LoadCmts(), ta4LoadCards(), ta4LoadContacts(), ta4LoadProspects()]);
-  ta4CtSyncAll(); ta3Refresh(); ta3Toast('갱신 완료');
+  ta4CtSyncAll(); ta3Refresh(); ta4PsAutoPlace(); ta3Toast('갱신 완료');
 }
 // ---------- 위치 선택기 (중앙 핀) ----------
 let TA3_PK_CB = null, TA3_PK_T = null;
@@ -6731,6 +6739,7 @@ function initAgentView(agentName) {
 // ==========================================================================
 const PG = { st: [], hooks: {}, sil: false, inited: false };
 const TA4 = { motives: [], motiveDef: '', cm: [], cmErr: '', rp: null };
+function ta4IsPs(l) { return !!l && (l.origin === '가망' || l.motive === '콜/패밀리넷'); }   // 가망고객(관리자가 문자로 등록한 안건)
 const TA4_DEF_MOTIVES = ['개척', '콜센터', '사내소개', '고객소개', '대리점', '관내이전', '관외이전', '그로스', '기타'];
 const TA4_LS_CM = 'S1_TA4_CMTS', TA4_LS_SEEN = 'S1_TA4_CMSEEN', TA4_LS_REPORTED = 'S1_TA4_REPORTED', TA4_LS_MIG = 'S1_TA4_MIGRATED', TA4_LS_MOT = 'S1_TA4_MOTIVES';
 
@@ -6916,6 +6925,7 @@ function ta2RenderInfo() {
     f('서비스제공처명', `<div class="ta4-nm"><input class="ta2-inp" value="${escapeHtml(l.company)}" onchange="ta2FText('company',this.value)"><button type="button" class="ta4-pin" id="ta4PinBtn" onclick="ta4PlaceOpen()" aria-label="지도에서 위치 지정">${ta4PinIcon(24)}</button></div>`, true),
     f('주소', `<div class="ta4-nm"><input class="ta2-inp" id="ta4AddrInp" placeholder="📍로 지도에서 지정" onchange="ta4AddrSave(this.value)"><button type="button" class="ta4-go" onclick="ta4Nav('naver')">네이버</button><button type="button" class="ta4-go" onclick="ta4Nav('kakao')">카카오</button></div>`, true),
     f('고객 담당자', `<div class="ta4-nm"><input class="ta2-inp" value="${escapeHtml(l.contact)}" placeholder="성명" onchange="ta2FText('contact',this.value)"><button type="button" class="ta4-more${TA4.cards[l.id] ? ' has' : ''}" onclick="ta4CardDetail()" aria-label="명함 세부 정보">⋯</button></div>`),
+    ...(l.referrer || ta4IsPs(l) ? [f('소개자', `<div class="ta4-nm"><input class="ta2-inp" value="${escapeHtml(l.referrer || '')}" placeholder="대리점 영업사원 / 소개한 사람" onchange="ta2FText('referrer',this.value)">${l.referrerPhone ? `<a class="ta4-go" style="display:flex;align-items:center;text-decoration:none;" href="tel:${escapeHtml(String(l.referrerPhone).replace(/\D/g, ''))}">전화</a>` : ''}</div>`)] : []),
     f('담당자 전화', `<input class="ta2-inp" type="tel" inputmode="tel" value="${escapeHtml(ta2Phone(l.contactPhone))}" placeholder="010-0000-0000" onchange="ta2FPhone(this.value)">`),
     f('명함', `<div class="ta4-cardrow"><button type="button" class="ta4-cardbtn" onclick="ta4CardOpen('lead')"><span data-ic="card"></span>명함 인식</button></div>`, true),
     f('용역료(원)', `<input class="ta2-inp num" inputmode="numeric" value="${l.amount ? Number(l.amount).toLocaleString('ko-KR') : ''}" onchange="ta2FAmount(this)">`),
@@ -7071,7 +7081,8 @@ async function ta2SaveFields(patch, rerender, leadArg) {
       product_type: next.productType, motive: next.motive, stage: next.stage, confidence: next.confidence,
       registered_date: next.registeredDate || null, expected_date: next.expectedDate || null,
       contract_date: next.contractDate || null, base_date: next.baseDate || null,
-      vehicle_number: next.vehicleNumber || null, memo: next.memo || null, updated_at: next.updatedAt
+      vehicle_number: next.vehicleNumber || null, memo: next.memo || null, updated_at: next.updatedAt,
+      ...('referrer' in patch ? { referrer: next.referrer || null } : {})
     });
   } catch (e) { res = { error: e }; }
   if (res.error) { ta2Flash('저장 실패: ' + (res.error.message || res.error), true); if (live) ta2RenderInfo(); return false; }
@@ -7450,7 +7461,7 @@ window.handleAgentModalSubmit = handleAgentModalSubmit;
 // ---------- 금일 수주 예정 (전체 화면) ----------
 function openTodayExpectedModal() {
   const today = todayStr();
-  const list = ta3BuildItems().filter(i => i.src === 'ta' && i.group === 'ing' && i.date === today);
+  const list = ta3BuildItems().filter(i => i.src !== 'ref' && i.group === 'ing' && i.date === today);
   el('ta4TodaySum').textContent = formatCurrency(list.reduce((s, i) => s + (i.amount || 0), 0)) + ' · ' + list.length + '건';
   el('ta4TodayList').innerHTML = list.map(ta3CardHtml).join('') || '<div class="ta3-empty">없음</div>';
   ta4Show('ta4TodayPg');
@@ -8029,14 +8040,22 @@ function ta4CtMatch(c) {   // 같은 휴대폰/전화/이메일이면 같은 사
   const ph = [c.mobile, c.tel].map(ta4Digits).filter(d => d.length >= 8), em = String(c.email || '').trim().toLowerCase();
   return TA4.contacts.find(o => (ph.length && [o.mobile, o.tel].map(ta4Digits).some(d => d && ph.includes(d))) || (em && String(o.email || '').trim().toLowerCase() === em));
 }
+const TA4_CT_PATHS = ['직접', 'TA등록', '소개등록', '가망등록'];
+function ta4CtPath(c) { return c.reg_path || ({ '안건 고객': 'TA등록', '소개영업': '소개등록', '가망고객': '가망등록' })[c.group_name] || '직접'; }
+async function ta4CtUpsert(rows) {   // reg_path 컬럼이 아직 없는 서버에서도 저장되도록 한 번 재시도
+  const strip = rs => rs.map(r => { const o = Object.assign({}, r); delete o.reg_path; return o; });
+  let { error } = await db.from('ta_contacts').upsert(TA4.ctNoPath ? strip(rows) : rows, { onConflict: 'id' });
+  if (error && /reg_path/i.test(error.message || '')) { TA4.ctNoPath = true; ({ error } = await db.from('ta_contacts').upsert(strip(rows), { onConflict: 'id' })); }
+  if (error) throw error;
+}
 async function ta4CtSave(c) {
   const now = new Date().toISOString();
   const row = {
     id: c.id || ta4CtNewId(), consultant: currentViewMode, name: c.name || '', title: c.title || '', company: c.company || '', group_name: c.group_name || '',
     mobile: c.mobile || '', tel: c.tel || '', fax: c.fax || '', email: c.email || '', address: c.address || '', memo: c.memo || '',
-    photo: c.photo || '', card_img: c.card_img || '', lead_id: c.lead_id || '', created_at: c.created_at || now, updated_at: now
+    photo: c.photo || '', card_img: c.card_img || '', lead_id: c.lead_id || '', reg_path: ta4CtPath(c), created_at: c.created_at || now, updated_at: now
   };
-  if (await ta2Probe('ta_contacts') === 'remote') { const { error } = await db.from('ta_contacts').upsert([row], { onConflict: 'id' }); if (error) throw error; }
+  if (await ta2Probe('ta_contacts') === 'remote') await ta4CtUpsert([row]);
   else { const arr = ta2LsGet(TA4_LS_CT).filter(r => r.id !== row.id); arr.push(row); if (!ta2LsSet(TA4_LS_CT, arr)) throw new Error('저장 공간 부족'); }
   const i = TA4.contacts.findIndex(o => o.id === row.id); if (i >= 0) TA4.contacts[i] = row; else TA4.contacts.push(row);
   return row;
@@ -8050,7 +8069,7 @@ async function ta4CtDelete(id) {
 async function ta4CtFromCard(c, cardImg, leadId) {
   const old = ta4CtMatch(c) || {}, m = Object.assign({}, old);
   ['name', 'title', 'company', 'mobile', 'tel', 'fax', 'email', 'address'].forEach(k => { if (c[k]) m[k] = ['mobile', 'tel', 'fax'].includes(k) ? (ta4FmtPhone(c[k]) || c[k]) : c[k]; });
-  if (cardImg) m.card_img = cardImg; if (leadId) m.lead_id = leadId;
+  if (cardImg) m.card_img = cardImg; if (leadId) m.lead_id = leadId; if (!m.reg_path && !m.group_name) m.reg_path = leadId ? 'TA등록' : '직접';
   return ta4CtSave(m);
 }
 
@@ -8091,15 +8110,16 @@ function ta4CtRender() {
     box.innerHTML = `<div class="ta3-empty" style="padding:48px 0;">${TA4.contacts.length ? '검색 결과가 없습니다' : '등록된 연락처가 없습니다<br><small>오른쪽 위 명함 버튼으로 명함을 찍어 바로 저장하거나, ＋ 추가를 누르세요</small>'}</div>`;
     el('ctIdx').innerHTML = ''; return;
   }
-  const keyOf = c => by === 'group' ? (c.group_name || '미분류') : by === 'company' ? (c.company || '회사 미지정') : ta4Initial(c.name);
+  const keyOf = c => by === 'path' ? ta4CtPath(c) : by === 'group' ? (c.group_name || '미분류') : by === 'company' ? (c.company || '회사 미지정') : ta4Initial(c.name);
   const map = new Map(); arr.forEach(c => { const k = keyOf(c); if (!map.has(k)) map.set(k, []); map.get(k).push(c); });
   let keys = [...map.keys()];
   if (by === 'name') keys.sort((a, b) => ta4InitialRank(a) - ta4InitialRank(b) || (a < b ? -1 : a > b ? 1 : 0));
+  else if (by === 'path') keys.sort((a, b) => TA4_CT_PATHS.indexOf(a) - TA4_CT_PATHS.indexOf(b));
   else keys.sort((a, b) => (a === '미분류' || a === '회사 미지정') - (b === '미분류' || b === '회사 미지정') || a.localeCompare(b, 'ko'));
   box.innerHTML = keys.map((k, i) => `<div class="ct-sec" id="ctS${i}" data-k="${escapeHtml(k)}">${escapeHtml(k)}<small>${map.get(k).length}</small></div>` +
     map.get(k).map(c => {
-      const no = ta4CtCallNo(c), sub = [c.company, c.title].filter(Boolean).join(' · ') || (c.mobile || c.tel || '');
-      return `<div class="ct-row" onclick="ta4CtView('${escapeHtml(c.id)}')">${ta4CtAvatar(c)}<div class="tx"><b>${escapeHtml(c.name || '(이름 없음)')}</b><small>${escapeHtml(sub)}</small></div>` +
+      const no = ta4CtCallNo(c), sub = [c.company, c.title].filter(Boolean).join(' · ') || (c.mobile || c.tel || ''), pth = ta4CtPath(c);
+      return `<div class="ct-row" onclick="ta4CtView('${escapeHtml(c.id)}')">${ta4CtAvatar(c)}<div class="tx"><b>${escapeHtml(c.name || '(이름 없음)')}<i class="ct-pth p${TA4_CT_PATHS.indexOf(pth)}">${pth}</i></b><small>${escapeHtml(sub)}</small></div>` +
         (c.card_img ? '<span class="cdi" title="명함 있음"><span data-ic="card"></span></span>' : '') +
         (no ? `<a class="call" href="tel:${escapeHtml(no)}" onclick="event.stopPropagation()" aria-label="전화"><span data-ic="phone"></span></a>` : '') + '</div>';
     }).join('')).join('');
@@ -8122,7 +8142,7 @@ function ta4CtDetRender() {
   el('ctDetBody').innerHTML =
     `<div class="ct-hero">${ta4CtAvatar(c, true)}<h2>${escapeHtml(c.name || '(이름 없음)')}</h2><p>${escapeHtml([c.company, c.title].filter(Boolean).join(' · '))}</p>${c.group_name ? `<span class="ct-chip">${escapeHtml(c.group_name)}</span>` : ''}</div>` +
     `<div class="ct-acts">${act('phone', '전화', no ? 'tel:' + escapeHtml(no) : '', '')}${act('sms', '문자', sm ? 'sms:' + escapeHtml(sm) : '', '')}${act('mail', '메일', c.email ? 'mailto:' + escapeHtml(c.email) : '', '')}${act('dl', '내 폰에 저장', '', 'ta4CtToPhone()')}</div>` +
-    `<div class="box ct-info">` + row('휴대폰', lnk('tel', c.mobile)) + row('회사전화', lnk('tel', c.tel)) + row('팩스', escapeHtml(c.fax)) + row('이메일', lnk('mailto', c.email)) + row('주소', escapeHtml(c.address)) + row('회사', escapeHtml(c.company)) + row('메모', escapeHtml(c.memo).replace(/\n/g, '<br>')) + `</div>` +
+    `<div class="box ct-info">` + row('휴대폰', lnk('tel', c.mobile)) + row('회사전화', lnk('tel', c.tel)) + row('팩스', escapeHtml(c.fax)) + row('이메일', lnk('mailto', c.email)) + row('주소', escapeHtml(c.address)) + row('회사', escapeHtml(c.company)) + row('메모', escapeHtml(c.memo).replace(/\n/g, '<br>')) + row('등록일', escapeHtml(String(c.created_at || '').slice(0, 10))) + row('등록경로', escapeHtml(ta4CtPath(c))) + `</div>` +
     (c.card_img ? `<div class="box"><div class="ct-cardhd">명함</div><img class="ct-cardimg" src="${c.card_img}" alt="명함" onclick="ta4CtImgView(this.src)"></div>` : '');
   ta4IcInit();
 }
@@ -8146,7 +8166,7 @@ const TA4_CT_F = { name: 'ctName', title: 'ctTitle', company: 'ctCompany', group
 function ta4CtEdit(id) {
   const c = id ? ta4CtFind(id) : null;
   if (id && !c) return;
-  TA4.ct.ed = { id: c ? c.id : '', photo: c ? c.photo || '' : '', card_img: c ? c.card_img || '' : '', lead_id: c ? c.lead_id || '' : '', created_at: c ? c.created_at : '' };
+  TA4.ct.ed = { reg_path: c ? c.reg_path || '' : '직접', group_name_keep: '', id: c ? c.id : '', photo: c ? c.photo || '' : '', card_img: c ? c.card_img || '' : '', lead_id: c ? c.lead_id || '' : '', created_at: c ? c.created_at : '' };
   Object.keys(TA4_CT_F).forEach(k => { el(TA4_CT_F[k]).value = (c && c[k]) || ''; });
   el('ctEdTtl').textContent = c ? '연락처 수정' : '연락처 추가';
   const gs = [...new Set(TA4.contacts.map(x => x.group_name).filter(Boolean))].sort((a, b) => a.localeCompare(b, 'ko'));
@@ -8203,9 +8223,9 @@ async function ta4CtSaveMany(rows) {
   rows = rows.map(c => ({
     id: c.id || ta4CtNewId(), consultant: currentViewMode, name: c.name || '', title: c.title || '', company: c.company || '', group_name: c.group_name || '',
     mobile: c.mobile || '', tel: c.tel || '', fax: c.fax || '', email: c.email || '', address: c.address || '', memo: c.memo || '',
-    photo: c.photo || '', card_img: c.card_img || '', lead_id: c.lead_id || '', created_at: c.created_at || now, updated_at: now
+    photo: c.photo || '', card_img: c.card_img || '', lead_id: c.lead_id || '', reg_path: ta4CtPath(c), created_at: c.created_at || now, updated_at: now
   }));
-  if (await ta2Probe('ta_contacts') === 'remote') { const { error } = await db.from('ta_contacts').upsert(rows, { onConflict: 'id' }); if (error) throw error; }
+  if (await ta2Probe('ta_contacts') === 'remote') await ta4CtUpsert(rows);
   else { const ids = new Set(rows.map(r => r.id)); const arr = ta2LsGet(TA4_LS_CT).filter(r => !ids.has(r.id)).concat(rows); if (!ta2LsSet(TA4_LS_CT, arr)) throw new Error('저장 공간 부족'); }
   rows.forEach(row => { const i = TA4.contacts.findIndex(o => o.id === row.id); if (i >= 0) TA4.contacts[i] = row; else TA4.contacts.push(row); });
 }
@@ -8214,10 +8234,10 @@ function ta4CtFromLead(src, id, p, skip) {
   const name = String(p.name || '').trim(), phone = ta4FmtPhone(p.phone || '');
   if (!name && !phone) return null;
   if (skip.includes(id)) return null;
-  const grp = src === 'ref' ? '소개영업' : '안건 고객';
+  const grp = src === 'ref' ? '소개영업' : src === 'ps' ? '가망고객' : '안건 고객', path = src === 'ref' ? '소개등록' : src === 'ps' ? '가망등록' : 'TA등록';
   const cand = { name, mobile: /^0?1[016-9]|^01/.test(String(p.phone || '').replace(/\D/g, '')) ? phone : '', tel: /^01/.test(String(p.phone || '').replace(/\D/g, '')) ? '' : phone, company: p.company || '', address: p.address || '' };
   const old = TA4.contacts.find(c => c.lead_id === id) || (phone ? ta4CtMatch({ mobile: phone, tel: phone }) : null);
-  if (!old) return Object.assign({ lead_id: id, group_name: grp }, cand);
+  if (!old) return Object.assign({ lead_id: id, group_name: grp, reg_path: path }, cand, src === 'ps' && !cand.name ? { name: p.company || '' } : {});
   const m = Object.assign({}, old); let ch = false;
   ['name', 'mobile', 'tel', 'company', 'address'].forEach(k => { if (!m[k] && cand[k]) { m[k] = cand[k]; ch = true; } });
   if (!m.lead_id) { m.lead_id = id; ch = true; }
@@ -8227,14 +8247,14 @@ async function ta4CtSyncAll() {
   try {
     const skip = ta4CtSkipGet(), out = [], seen = new Set();
     const ph = new Set(), push = r => { if (!r) return; const k = r.id || r.lead_id, d = ta4Digits(r.mobile || r.tel); if (seen.has(k) || (!r.id && d && ph.has(d))) return; seen.add(k); if (d) ph.add(d); out.push(r); };
-    ta2Leads(currentViewMode).forEach(l => push(ta4CtFromLead('ta', l.id, { name: l.contact, phone: l.contactPhone, company: l.company }, skip)));
+    ta2Leads(currentViewMode).forEach(l => push(ta4CtFromLead(ta4IsPs(l) ? 'ps' : 'ta', l.id, { name: l.contact, phone: l.contactPhone, company: l.company }, skip)));
     (TA3.refs || []).forEach(r => push(ta4CtFromLead('ref', r.lead_id, { name: r.contact_person, phone: r.contact_phone, company: r.customer_name, address: r.address }, skip)));
     if (out.length) { await ta4CtSaveMany(out); if (PG.st.includes('ta4CtPg')) ta4CtRender(); }
   } catch (e) { console.warn('[contacts sync]', e); }
 }
 async function ta4CtSyncLead(l) {
   if (!l) return;
-  try { const r = ta4CtFromLead('ta', l.id, { name: l.contact, phone: l.contactPhone, company: l.company }, ta4CtSkipGet()); if (r) { await ta4CtSaveMany([r]); if (PG.st.includes('ta4CtPg')) ta4CtRender(); } } catch (e) { console.warn('[contacts sync]', e); }
+  try { const r = ta4CtFromLead(ta4IsPs(l) ? 'ps' : 'ta', l.id, { name: l.contact, phone: l.contactPhone, company: l.company }, ta4CtSkipGet()); if (r) { await ta4CtSaveMany([r]); if (PG.st.includes('ta4CtPg')) ta4CtRender(); } } catch (e) { console.warn('[contacts sync]', e); }
 }
 // 안건 고객담당자/연락처를 고치면 연락처에도 반영(빈 칸 채우기 + 같은 안건에 연결된 연락처의 이름·번호 갱신)
 const ta4SaveFieldsOrig = ta2SaveFields;
@@ -8254,37 +8274,15 @@ ta2SaveFields = async function (patch, rerender, leadArg) {
 };
 
 // ==========================================================================
-// 가망고객: 관리자가 문자(신규 가망고객 / 에스원 패밀리넷 배정 알림)를 붙여넣어 입력 → 컨설턴트에게 배정 → 컨설턴트는 TA 안건으로 전환
+// 가망고객: 관리자가 문자(신규 가망고객 / 에스원 패밀리넷 배정·소개 알림)를 붙여넣어 입력하면
+//  → 배정한 컨설턴트의 안건(분류: 가망고객) + 연락처 + 지도 위치로 자동 등록된다.
+//  확도: 용역료가 있는 대리점 계약 요청 = B / 금액 없는 단순 콜 문의 = C
 // ==========================================================================
-const TA4_LS_PS = 'S1_TA4_PROSPECTS';
-TA4.ps = []; TA4.psConv = null; TA4.psMode = 'remote'; TA4.psFilter = 'all'; TA4.psDraft = [];
-
-async function ta4LoadProspects() {
-  TA4.ps = [];
-  try {
-    TA4.psMode = await ta2Probe('ta_prospects');
-    if (TA4.psMode === 'remote') {
-      let q = db.from('ta_prospects').select('*'); if (currentViewMode && currentViewMode !== 'master') q = q.eq('assigned_to', currentViewMode);
-      const { data, error } = await q.order('created_at', { ascending: false }).limit(1000);
-      if (!error) { TA4.ps = data || []; return; }
-    }
-  } catch (e) {}
-  TA4.psMode = 'local';
-  TA4.ps = ta2LsGet(TA4_LS_PS).filter(r => currentViewMode === 'master' || r.assigned_to === currentViewMode);
-}
-async function ta4PsSave(rows) {
-  const now = new Date().toISOString();
-  rows = rows.map(r => Object.assign({}, r, { id: r.id || 'ps' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6), updated_at: now, created_at: r.created_at || now, status: r.status || (r.assigned_to ? '배정' : '미배정') }));
-  if (await ta2Probe('ta_prospects') === 'remote') { const { error } = await db.from('ta_prospects').upsert(rows, { onConflict: 'id' }); if (error) throw error; }
-  else { const ids = new Set(rows.map(r => r.id)); if (!ta2LsSet(TA4_LS_PS, ta2LsGet(TA4_LS_PS).filter(r => !ids.has(r.id)).concat(rows))) throw new Error('저장 공간 부족'); }
-  rows.forEach(r => { const i = TA4.ps.findIndex(o => o.id === r.id); if (i >= 0) TA4.ps[i] = r; else TA4.ps.unshift(r); });
-  return rows;
-}
-async function ta4PsDelete(id) {
-  if (await ta2Probe('ta_prospects') === 'remote') { const { error } = await db.from('ta_prospects').delete().eq('id', id); if (error) throw error; }
-  else ta2LsSet(TA4_LS_PS, ta2LsGet(TA4_LS_PS).filter(r => r.id !== id));
-  TA4.ps = TA4.ps.filter(r => r.id !== id);
-}
+TA4.psDraft = []; TA4.psFilter = 'all';
+// (이전 방식 호환용 빈 함수)
+async function ta4LoadProspects() {}
+function ta4PsRenderHome() {}
+function ta4PsMarkDone() {}
 
 // ---------- 문자 분석 ----------
 // <<PSPARSE
@@ -8317,9 +8315,13 @@ function ta4PsParse(text) {
 }
 // PSPARSE>>
 
+
+const ta4Num = s => String(s || '').replace(/\D/g, '');
+function ta4PsLeads() { return Object.values(ALL).flatMap(a => (a && a.leads) || []).filter(ta4IsPs); }
 function ta4PsDup(p) {
-  return TA4.ps.find(o => (p.prospect_no && o.prospect_no === p.prospect_no) || (!p.prospect_no && p.phone && o.phone === p.phone && (o.name || '') === (p.name || '')));
+  return ta4PsLeads().find(l => (p.prospect_no && String(l.memo || '').includes(p.prospect_no)) || (!p.prospect_no && p.phone && ta4Num(l.contactPhone) === ta4Num(p.phone) && (l.company || '') === (p.name || p.person || '')));
 }
+const TA4_PS_COLS = ['origin', 'referrer', 'referrer_phone', 'contact_phone'];   // 서버에 아직 없을 수 있는 컬럼(없으면 빼고 다시 저장)
 
 // ---------- 관리자 화면 ----------
 function ta4PsAdminShow() {
@@ -8328,37 +8330,41 @@ function ta4PsAdminShow() {
     const d = document.createElement('div'); d.className = 'panel'; d.id = 'ta4PsPanel';
     d.innerHTML = `<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px;"><h2 style="margin:0;">가망고객 <span class="count-tag" id="ta4PsCnt"></span></h2>
       <button type="button" onclick="ta4PsOpenInput()" style="margin-left:auto;background:var(--blue,#2f6bff);color:#fff;border:none;border-radius:8px;padding:9px 16px;font-weight:800;cursor:pointer;">＋ 가망고객 입력</button></div>
-      <div class="filters" id="ta4PsFilters" style="margin-bottom:10px;"></div><div id="ta4PsWarn" style="display:none;margin-bottom:10px;padding:9px 12px;border-radius:8px;background:#fff7ed;color:#9a3412;font-size:13px;font-weight:700;"></div>
-      <div class="table-scroll"><table class="lead-table"><thead><tr><th>등록일</th><th>배정 컨설턴트</th><th>고객 / 경비대상처</th><th>연락처</th><th>주소</th><th>업종·분류</th><th>용역료</th><th>상태</th><th></th></tr></thead><tbody id="ta4PsBody"></tbody></table></div>`;
+      <div style="font-size:12.5px;color:#64748b;margin-bottom:10px;">입력하면 배정한 컨설턴트의 안건(가망고객) · 연락처 · 지도에 자동 등록됩니다.</div>
+      <div class="table-scroll"><table class="lead-table"><thead><tr><th>등록일</th><th>배정 컨설턴트</th><th>고객 / 경비대상처</th><th>연락처</th><th>주소</th><th>소개자</th><th>용역료</th><th>확도</th><th>단계</th><th></th></tr></thead><tbody id="ta4PsBody"></tbody></table></div>`;
     anchor.parentNode.insertBefore(d, anchor);
     const ov = document.createElement('div'); ov.className = 'modal-overlay'; ov.id = 'ta4PsOv'; ov.style.display = 'none';
     ov.innerHTML = `<div style="background:#fff;border-radius:14px;max-width:760px;width:100%;max-height:92vh;overflow:auto;padding:20px;color:#1a2333;">
       <div style="display:flex;align-items:center;margin-bottom:10px;"><h2 style="margin:0;font-size:18px;color:var(--navy,#0f2547);">가망고객 입력</h2><button type="button" onclick="ta4PsCloseInput()" style="margin-left:auto;border:none;background:#eef1f7;border-radius:50%;width:34px;height:34px;cursor:pointer;">✕</button></div>
-      <div style="font-size:13px;color:#64748b;margin-bottom:8px;">받은 문자를 그대로 붙여넣으세요. 여러 건을 한꺼번에 붙여넣어도 건별로 나눠 분석합니다. (신규) 문자 · 에스원 패밀리넷 배정 알림)</div>
+      <div style="font-size:13px;color:#64748b;margin-bottom:8px;">받은 문자를 그대로 붙여넣으세요. 여러 건을 한꺼번에 붙여넣어도 건별로 나눠 분석합니다. (신규) 문자 · 패밀리넷 대리점 계약 요청 · 패밀리넷 소개 가망고객)</div>
       <textarea id="ta4PsText" rows="8" placeholder="[Web발신] 신규)홍길동 01012345678 주소 [영상보안] 메모..." style="width:100%;border:1px solid #cbd5e1;border-radius:10px;padding:10px;font-size:14px;font-family:inherit;box-sizing:border-box;"></textarea>
       <div style="margin:10px 0;display:flex;gap:8px;"><button type="button" onclick="ta4PsAnalyze()" style="background:#0f2547;color:#fff;border:none;border-radius:8px;padding:10px 18px;font-weight:800;cursor:pointer;">분석하기</button><button type="button" onclick="ta4PsAddBlank()" style="background:#eef1f7;color:#0f2547;border:none;border-radius:8px;padding:10px 14px;font-weight:700;cursor:pointer;">직접 입력</button></div>
       <div id="ta4PsDraft"></div>
-      <div id="ta4PsFoot" style="display:none;margin-top:12px;text-align:right;"><button type="button" onclick="ta4PsSaveDraft()" style="background:var(--blue,#2f6bff);color:#fff;border:none;border-radius:8px;padding:11px 22px;font-weight:800;cursor:pointer;">저장</button></div></div>`;
+      <div id="ta4PsFoot" style="display:none;margin-top:12px;text-align:right;"><button type="button" id="ta4PsSaveBtn" onclick="ta4PsSaveDraft()" style="background:var(--blue,#2f6bff);color:#fff;border:none;border-radius:8px;padding:11px 22px;font-weight:800;cursor:pointer;">컨설턴트에게 등록</button></div></div>`;
     document.body.appendChild(ov);
   }
-  ta4LoadProspects().then(ta4PsAdminRender);
+  ta4PsAdminRender();
+  try { db.from('ta_places').select('lead_id,address').limit(3000).then(r => { TA4.psAddr = {}; ((r && r.data) || []).forEach(x => { TA4.psAddr[x.lead_id] = x.address; }); ta4PsAdminRender(); }); } catch (e) {}
 }
 function ta4PsAdminRender() {
   const body = el('ta4PsBody'); if (!body) return;
-  const F = [['all', '전체'], ['미배정', '미배정'], ['배정', '배정'], ['전환', '전환(TA등록)'], ['제외', '제외']];
-  el('ta4PsFilters').innerHTML = F.map(([k, l]) => `<button type="button" class="${TA4.psFilter === k ? 'active' : ''}" style="${TA4.psFilter === k ? '' : 'background:#eef1f7;color:#334155;border-color:#d5dbe6;'}" onclick="TA4.psFilter='${k}';ta4PsAdminRender()">${l}</button>`).join('');
-  const rows = TA4.ps.filter(r => TA4.psFilter === 'all' || r.status === TA4.psFilter);
+  const rows = ta4PsLeads().sort((a, b) => String(b.createdAt || '').localeCompare(String(a.createdAt || '')));
   el('ta4PsCnt').textContent = rows.length + '건';
-  const w = el('ta4PsWarn'); w.style.display = TA4.psMode === 'local' ? 'block' : 'none';
-  w.textContent = '서버에 가망고객 테이블(ta_prospects)이 없어 이 기기에만 저장됩니다. Supabase SQL Editor에서 설정 SQL을 실행하세요. (컨설턴트에게는 보이지 않음)';
-  const e = escapeHtml, sel = r => `<select onchange="ta4PsAssign('${e(r.id)}',this.value)" style="padding:5px;border-radius:6px;border:1px solid #cbd5e1;"><option value="">미배정</option>${CONSULTANTS.map(n => `<option value="${e(n)}"${r.assigned_to === n ? ' selected' : ''}>${e(n)}</option>`).join('')}</select>`;
-  body.innerHTML = rows.length ? rows.map(r => `<tr><td>${e((r.created_at || '').slice(0, 10))}</td><td>${sel(r)}</td><td><b>${e(r.name || '(이름 없음)')}</b>${r.prospect_no ? `<br><small>가망 ${e(r.prospect_no)}</small>` : ''}</td><td>${r.phone ? `<a href="tel:${e(r.phone.replace(/\D/g, ''))}">${e(r.phone)}</a>` : ''}</td><td style="min-width:180px;">${e(r.address)}</td><td>${e(r.category)}${r.memo ? `<br><small>${e(r.memo)}</small>` : ''}</td><td style="text-align:right;">${r.fee ? Number(r.fee).toLocaleString('ko-KR') + '원' : ''}</td><td>${e(r.status || '')}</td><td><button type="button" class="small secondary" onclick="ta4PsDel('${e(r.id)}')" style="background:#fee2e2;color:#b91c1c;border:none;border-radius:6px;padding:5px 9px;cursor:pointer;">삭제</button></td></tr>`).join('') : '<tr><td colspan="9" style="text-align:center;color:#94a3b8;padding:24px;">등록된 가망고객이 없습니다</td></tr>';
+  const e = escapeHtml, sel = l => `<select onchange="ta4PsReassign('${e(l.id)}',this.value)" style="padding:5px;border-radius:6px;border:1px solid #cbd5e1;">${CONSULTANTS.map(n => `<option value="${e(n)}"${l.consultant === n ? ' selected' : ''}>${e(n)}</option>`).join('')}</select>`;
+  body.innerHTML = rows.length ? rows.map(l => `<tr><td>${e(String(l.createdAt || '').slice(0, 10))}</td><td>${sel(l)}</td><td><b>${e(l.company)}</b>${l.contact && l.contact !== l.company ? `<br><small>${e(l.contact)}</small>` : ''}</td><td>${l.contactPhone ? `<a href="tel:${e(ta4Num(l.contactPhone))}">${e(ta4FmtPhone(l.contactPhone))}</a>` : ''}</td><td style="min-width:170px;">${e((TA4.psAddr && TA4.psAddr[l.id]) || '')}</td><td>${e(l.referrer || '')}</td><td style="text-align:right;">${l.amount ? Number(l.amount).toLocaleString('ko-KR') + '원' : ''}</td><td>${e(l.confidence || '')}</td><td>${e(l.stage || '')}</td><td><button type="button" class="small secondary" onclick="ta4PsDel('${e(l.id)}')" style="background:#fee2e2;color:#b91c1c;border:none;border-radius:6px;padding:5px 9px;cursor:pointer;">삭제</button></td></tr>`).join('') : '<tr><td colspan="10" style="text-align:center;color:#94a3b8;padding:24px;">등록된 가망고객이 없습니다</td></tr>';
 }
-async function ta4PsAssign(id, who) {
-  const r = TA4.ps.find(o => o.id === id); if (!r) return;
-  try { await ta4PsSave([Object.assign({}, r, { assigned_to: who, status: r.status === '전환' || r.status === '제외' ? r.status : (who ? '배정' : '미배정') })]); ta4PsAdminRender(); } catch (e) { alert('저장 실패: ' + (e.message || e)); }
+async function ta4PsReassign(id, who) {
+  try {
+    const { error } = await db.from('ta_leads').update({ consultant: who, updated_at: new Date().toISOString() }).eq('id', id); if (error) throw error;
+    try { await db.from('ta_contacts').update({ consultant: who }).eq('lead_id', id); } catch (x) {}
+    try { await db.from('ta_places').update({ consultant: who }).eq('lead_id', id); } catch (x) {}
+    await loadAllFromSupabase(); try { render(); } catch (x) {} ta4PsAdminRender();
+  } catch (e) { alert('변경 실패: ' + (e.message || e)); ta4PsAdminRender(); }
 }
-async function ta4PsDel(id) { if (!confirm('이 가망고객을 삭제할까요?')) return; try { await ta4PsDelete(id); ta4PsAdminRender(); } catch (e) { alert('삭제 실패: ' + (e.message || e)); } }
+async function ta4PsDel(id) {
+  if (!confirm('이 가망고객 안건을 삭제할까요? (컨설턴트의 안건 목록에서도 삭제됩니다)')) return;
+  try { const { error } = await db.from('ta_leads').delete().eq('id', id); if (error) throw error; await loadAllFromSupabase(); try { render(); } catch (x) {} ta4PsAdminRender(); } catch (e) { alert('삭제 실패: ' + (e.message || e)); }
+}
 function ta4PsOpenInput() { el('ta4PsText').value = ''; TA4.psDraft = []; ta4PsDraftRender(); el('ta4PsOv').style.display = 'flex'; }
 function ta4PsCloseInput() { el('ta4PsOv').style.display = 'none'; }
 function ta4PsAnalyze() {
@@ -8367,96 +8373,89 @@ function ta4PsAnalyze() {
   TA4.psDraft = items.map(p => Object.assign(p, { assigned_to: '', dup: !!ta4PsDup(p) })); ta4PsDraftRender();
 }
 function ta4PsAddBlank() { TA4.psDraft.push({ kind: '직접', name: '', person: '', phone: '', address: '', category: '', memo: '', prospect_no: '', agent_name: '', agent_phone: '', area: '', fee: 0, req_date: '', assigned_to: '', raw: '' }); ta4PsDraftRender(); }
+function ta4PsConf(p) { return Number(p.fee) > 0 ? 'B' : 'C'; }
 function ta4PsDraftRender() {
   const e = escapeHtml, box = el('ta4PsDraft');
   box.innerHTML = TA4.psDraft.map((p, i) => {
-    const f = (k, lb, w, type) => `<label style="display:block;font-size:12px;color:#64748b;font-weight:700;flex:${w || 1};min-width:130px;">${lb}<input type="${type || 'text'}" value="${e(p[k] == null ? '' : p[k])}" oninput="TA4.psDraft[${i}].${k}=${k === 'fee' ? 'Number(this.value.replace(/\\D/g,\'\'))||0' : 'this.value'}" style="width:100%;box-sizing:border-box;margin-top:3px;padding:8px;border:1px solid #cbd5e1;border-radius:8px;font-size:14px;"></label>`;
+    const f = (k, lb, w, type) => `<label style="display:block;font-size:12px;color:#64748b;font-weight:700;flex:${w || 1};min-width:130px;">${lb}<input type="${type || 'text'}" value="${e(p[k] == null ? '' : p[k])}" oninput="TA4.psDraft[${i}].${k}=${k === 'fee' ? 'Number(this.value.replace(/\\D/g,\'\'))||0' : 'this.value'};${k === 'fee' ? `ta4PsConfUi(${i})` : ''}" style="width:100%;box-sizing:border-box;margin-top:3px;padding:8px;border:1px solid #cbd5e1;border-radius:8px;font-size:14px;"></label>`;
+    const rf = /소개/.test(p.kind);
     return `<div style="border:1px solid ${p.dup ? '#f59e0b' : '#e2e8f0'};border-radius:12px;padding:12px;margin-bottom:10px;background:#f8fafc;">
       <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;"><span style="background:#e0e7ff;color:#3730a3;border-radius:99px;padding:2px 10px;font-size:12px;font-weight:800;">${e(p.kind)}</span>${p.dup ? '<span style="color:#b45309;font-size:12px;font-weight:800;">이미 등록된 가망고객 — 저장 시 제외됩니다</span>' : ''}<button type="button" onclick="TA4.psDraft.splice(${i},1);ta4PsDraftRender()" style="margin-left:auto;border:none;background:none;color:#b91c1c;font-weight:800;cursor:pointer;">제거</button></div>
       <div style="display:flex;flex-wrap:wrap;gap:8px;">${f('name', '고객 / 경비대상처', 2)}${f('phone', '전화번호', 1, 'tel')}${f('category', '업종·분류', 1)}${f('fee', '용역료(원)', 1)}</div>
       <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:8px;">${f('address', '주소', 3)}${f('prospect_no', '가망고객번호', 1)}</div>
-      <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:8px;">${f('memo', '메모', 3)}${p.agent_name || p.agent_phone ? f('agent_name', /소개/.test(p.kind) ? '소개자' : '대리점 영업사원', 1) + f('agent_phone', /소개/.test(p.kind) ? '소개자 전화' : '영업사원 전화', 1, 'tel') : ''}</div>
-      <div style="margin-top:8px;font-size:12px;color:#64748b;font-weight:700;">배정 컨설턴트 <select onchange="TA4.psDraft[${i}].assigned_to=this.value" style="margin-left:6px;padding:7px;border-radius:8px;border:1px solid #cbd5e1;font-size:14px;"><option value="">선택(나중에 배정)</option>${CONSULTANTS.map(n => `<option value="${e(n)}"${p.assigned_to === n ? ' selected' : ''}>${e(n)}</option>`).join('')}</select>${p.hint ? `<span style="margin-left:8px;color:#94a3b8;">문자 속 이름: ${e(p.hint)}</span>` : ''}</div></div>`;
+      <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:8px;">${f('memo', '메모', 3)}${f('agent_name', rf ? '소개자' : '대리점 영업사원 / 소개자', 1)}${f('agent_phone', '소개자 전화', 1, 'tel')}</div>
+      <div style="margin-top:8px;font-size:12px;color:#64748b;font-weight:700;">배정 컨설턴트 <select onchange="TA4.psDraft[${i}].assigned_to=this.value" style="margin-left:6px;padding:7px;border-radius:8px;border:1px solid #cbd5e1;font-size:14px;"><option value="">선택</option>${CONSULTANTS.map(n => `<option value="${e(n)}"${p.assigned_to === n ? ' selected' : ''}>${e(n)}</option>`).join('')}</select>
+        <span style="margin-left:10px;">수주확도 <b id="ta4PsConf${i}" style="color:#0f2547;">${ta4PsConf(p)}</b> <span style="color:#94a3b8;">(용역료 있으면 B, 없으면 C)</span></span>${p.hint ? `<span style="margin-left:8px;color:#94a3b8;">문자 속 이름: ${e(p.hint)}</span>` : ''}</div></div>`;
   }).join('');
   el('ta4PsFoot').style.display = TA4.psDraft.length ? 'block' : 'none';
 }
-async function ta4PsSaveDraft() {
-  const rows = TA4.psDraft.filter(p => !p.dup && (p.name || p.phone)).map(p => ({ kind: p.kind, assigned_to: p.assigned_to || '', name: p.name, person: p.person, phone: p.phone, address: p.address, category: p.category, memo: p.memo, prospect_no: p.prospect_no, agent_name: p.agent_name, agent_phone: p.agent_phone, area: p.area, fee: p.fee || 0, req_date: p.req_date, raw: p.raw, created_by: (currentUser && currentUser.name) || '' }));
-  if (!rows.length) { alert('저장할 가망고객이 없습니다 (이름이나 전화번호를 입력하세요)'); return; }
-  try { await ta4PsSave(rows); ta4PsCloseInput(); ta4PsAdminRender(); } catch (e) { alert('저장 실패: ' + (e.message || e)); }
-}
+function ta4PsConfUi(i) { const b = el('ta4PsConf' + i); if (b) b.textContent = ta4PsConf(TA4.psDraft[i]); }
 
-// ---------- 컨설턴트 화면: 내 가망고객 ----------
-function ta4PsRenderHome() {
-  const box = el('ta4PsBox'); if (!box) return;
-  const mine = TA4.ps.filter(r => r.assigned_to === currentViewMode && r.status === '배정');
-  if (!mine.length) { box.innerHTML = ''; return; }
-  const e = escapeHtml;
-  box.innerHTML = `<div class="ta3-h"><b>내 가망고객 · 콜/패밀리넷</b><span>${mine.length}건</span></div><div class="ta3-list">` + mine.slice(0, 8).map(r =>
-    `<div class="ct-row" onclick="ta4PsView('${e(r.id)}')"><div class="ct-av" style="background:#f08c1f">★</div><div class="tx"><b>${e(r.name || '(이름 없음)')}</b><small>${e([r.category, r.address].filter(Boolean).join(' · '))}</small></div>${r.phone ? `<a class="call" href="tel:${e(r.phone.replace(/\D/g, ''))}" onclick="event.stopPropagation()" aria-label="전화"><span data-ic="phone"></span></a>` : ''}</div>`).join('') + '</div>';
-  ta4IcInit();
-}
-function ta4PsView(id) {
-  const r = TA4.ps.find(o => o.id === id); if (!r) return;
-  TA4.psCur = id; const e = escapeHtml, row = (k, v) => v ? `<div class="r"><span>${k}</span><b>${v}</b></div>` : '';
-  el('ta4PsDetBody').innerHTML = row('고객', e(r.name)) + row('전화', r.phone ? `<a href="tel:${e(r.phone.replace(/\D/g, ''))}">${e(r.phone)}</a>` : '') + row('주소', e(r.address)) + row('업종·분류', e(r.category)) + row('용역료', r.fee ? Number(r.fee).toLocaleString('ko-KR') + '원' : '') + row('가망번호', e(r.prospect_no)) +
-    row(/소개/.test(r.kind || '') ? '소개자' : '대리점', e([r.agent_name, r.agent_phone].filter(Boolean).join(' '))) + row('설계요청일', e(r.req_date)) + row('메모', e(r.memo));
-  el('ta4PsDet').classList.add('on');
-}
-function ta4PsDetClose() { el('ta4PsDet').classList.remove('on'); }
-async function ta4PsToTA(quick) {
-  const r = TA4.ps.find(o => o.id === TA4.psCur); if (!r) return;
-  ta4PsDetClose(); openNewAgentLeadModal();
-  el('afCompany').value = r.name || ''; el('afContact').value = r.person || ''; el('afContactPhone').value = r.phone || '';
-  if (r.fee) el('afAmount').value = Number(r.fee).toLocaleString('ko-KR');
-  if (r.address) el('afAddress').value = r.address;
-  const memo = ['[콜/패밀리넷 가망고객] ' + (r.kind || ''), r.category, r.memo, r.prospect_no && '가망고객번호 ' + r.prospect_no, r.agent_name && (/소개/.test(r.kind || '') ? '소개자 ' : '대리점 영업사원 ') + r.agent_name + (r.agent_phone ? ' ' + r.agent_phone : '')].filter(Boolean).join('\n');
-  TA4.formNote = { text: memo, atts: [] }; try { ta4FormNoteRender(); } catch (x) {}
-  ta4FillMotive('afMotive', '콜/패밀리넷');
-  TA4.psConv = r.id;
-  if (quick === true) { try { await handleAgentModalSubmit({ preventDefault() {} }); } catch (x) { ta3Toast('등록 실패: ' + (x.message || x), 3500); } }
-}
-async function ta4PsExclude() {
-  const r = TA4.ps.find(o => o.id === TA4.psCur); if (!r) return;
-  if (!confirm('이 가망고객을 제외(목록에서 숨김)할까요?')) return;
-  try { await ta4PsSave([Object.assign({}, r, { status: '제외' })]); ta4PsDetClose(); ta4PsRenderHome(); ta3Toast('제외됨'); } catch (e) { ta3Toast('저장 실패: ' + (e.message || e), 3500); }
-}
-async function ta4PsMarkDone(id, leadId) {
-  const r = TA4.ps.find(o => o.id === id); if (!r) return;
-  try { await ta4PsSave([Object.assign({}, r, { status: '전환', lead_id: leadId })]); ta4PsRenderHome(); } catch (e) { console.warn(e); }
-}
-
-// ---------- 컨설턴트 안건 탭: TA / 소개고객 / 가망고객 분류 ----------
-function ta4PsMine() { return TA4.ps.filter(r => r.assigned_to === currentViewMode && r.status === '배정'); }
-const ta3SegHtmlOrig = ta3SegHtml;
-ta3SegHtml = function (cur, fn) {
-  const map = fn === 'ta3MapSrcSet';
-  const L = [['all', '전체'], ['ta', 'TA'], ['ref', '소개고객']].concat(map ? [] : [['ps', '가망고객' + (ta4PsMine().length ? ' ' + ta4PsMine().length : '')]]);
-  return L.map(([v, l]) => `<button type="button" class="${cur === v ? 'on' : ''}" onclick="${fn}('${v}')">${l}</button>`).join('');
-};
-function ta4PsCardHtml(r) {
-  const e = escapeHtml, tel = String(r.phone || '').replace(/\D/g, '');
-  return `<div class="ta3-card" style="--c:#f08c1f" onclick="ta4PsView('${e(r.id)}')">
-    <div class="r1"><div class="nm">${e(r.name || '(이름 없음)')}</div></div>
-    ${r.fee ? `<div class="amt">${formatCurrency(Number(r.fee))}</div>` : ''}
-    <div class="r2"><span class="ta3-tag" style="background:#ffedd5;color:#c2410c;">가망고객</span><span class="ta3-tag" style="background:#eef1f7;color:#374151;">콜/패밀리넷</span>${r.category ? `<span class="ta3-tag" style="background:#f3f4f6;color:#374151;">${e(r.category)}</span>` : ''}</div>
-    <div class="r3">${r.req_date ? '📅 설계요청 ' + e(r.req_date) + '<br>' : ''}📌 ${r.address ? e(r.address) : '주소 없음'}</div>
-    ${tel ? `<button type="button" class="ta3-call" onclick="event.stopPropagation();location.href='tel:${tel}'" aria-label="전화">📞</button>` : ''}
-  </div>`;
-}
-const ta3RenderItemsOrig = ta3RenderItems;
-ta3RenderItems = function () {
-  const ps = ta4PsMine(), q = String(TA3.f.q || '').trim().toLowerCase();
-  const fl = ps.filter(r => !q || [r.name, r.phone, r.address, r.category, r.memo].join(' ').toLowerCase().includes(q));
-  if (TA3.f.src === 'ps') {
-    el('ta3Src').innerHTML = ta3SegHtml(TA3.f.src, 'ta3SetSrc'); if (el('ta3Q').value !== TA3.f.q) el('ta3Q').value = TA3.f.q;
-    el('ta3Groups').innerHTML = '';
-    el('ta3Items').innerHTML = (TA4.psMode === 'local' ? '<div class="ta3-mapnote" style="margin-bottom:10px;"><span>가망고객 서버 저장소(ta_prospects)가 없어 이 기기 데이터만 보입니다.</span></div>' : '') + (fl.map(ta4PsCardHtml).join('') || '<div class="ta3-empty">배정된 가망고객이 없습니다</div>');
-    return;
+// ---------- 등록: 안건 + 첫 노트 + 연락처 + 지도 ----------
+async function ta4PsInsertLead(row) {
+  let r = Object.assign({}, row); const dropped = [];
+  for (let n = 0; n < 6; n++) {
+    const { error } = await db.from('ta_leads').insert([r]);
+    if (!error) return { dropped };
+    const m = /find the '([^']+)' column/i.exec(error.message || '') || /column "?([a-z_]+)"? .*does not exist/i.exec(error.message || '');
+    if (m && m[1] in r && TA4_PS_COLS.includes(m[1])) { delete r[m[1]]; dropped.push(m[1]); continue; }
+    throw error;
   }
-  ta3RenderItemsOrig();
-  if (TA3.f.src === 'all' && fl.length) el('ta3Items').insertAdjacentHTML('afterbegin', `<div class="ta3-h" style="margin:2px 0 8px;"><b>가망고객</b><span>${fl.length}건</span></div>` + fl.map(ta4PsCardHtml).join('') + '<div class="ta3-h" style="margin:14px 0 8px;"><b>TA · 소개고객</b></div>');
-};
+  throw new Error('저장 실패');
+}
+async function ta4PsCreate(p) {
+  const now = new Date().toISOString(), today = todayStr(), d = new Date(); d.setDate(d.getDate() + 14);
+  const exp = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+  const id = crypto.randomUUID(), who = p.assigned_to, company = (p.name || p.person || p.phone || '가망고객').trim(), phone = ta4Num(p.phone);
+  const row = { id, consultant: who, company, contact: p.person || '', amount: Number(p.fee) || 0, product_type: /정보보안/.test(p.category || '') ? '정보보안' : '알람', motive: '콜/패밀리넷', stage: '진행중', confidence: ta4PsConf(p),
+    registered_date: today, expected_date: exp, memo: p.prospect_no ? '가망고객번호 ' + p.prospect_no : null, created_at: now, updated_at: now,
+    origin: '가망', referrer: p.agent_name || null, referrer_phone: ta4Num(p.agent_phone) || null, contact_phone: phone || null };
+  const { dropped } = await ta4PsInsertLead(row);
+  // 첫 노트 (문자 내용 요약)
+  const note = ['[가망고객 · ' + (p.kind || '') + '] 관리자 등록', p.category && '업종/분류: ' + p.category, p.prospect_no && '가망고객번호: ' + p.prospect_no, p.agent_name && (/소개/.test(p.kind) ? '소개자: ' : '대리점 영업사원/소개자: ') + p.agent_name + (p.agent_phone ? ' ' + p.agent_phone : ''), p.req_date && '설계요청일: ' + p.req_date, p.memo && p.memo, dropped.length ? '(참고) 서버에 소개자/분류 컬럼이 없어 일부가 저장되지 않았습니다. 설정 SQL을 실행하세요.' : ''].filter(Boolean).join('\n');
+  try { await db.from('ta_notes').insert([{ id: crypto.randomUUID(), lead_id: id, consultant: who, kind: 'memo', content: note, image: null, created_at: now }]); } catch (e) {}
+  // 연락처 (이미 같은 번호가 있으면 만들지 않음)
+  try {
+    let dup = false;
+    if (phone) { const { data } = await db.from('ta_contacts').select('id,mobile,tel').eq('consultant', who).limit(3000); dup = (data || []).some(c => [c.mobile, c.tel].some(x => ta4Num(x) === phone)); }
+    if (!dup) {
+      const mobile = /^01/.test(phone) ? ta4FmtPhone(phone) : '', tel = mobile ? '' : ta4FmtPhone(phone);
+      const cr = { id: ta4CtNewId(), consultant: who, name: p.person || company, title: '', company, group_name: '가망고객', mobile, tel, fax: '', email: '', address: p.address || '', memo: '', photo: '', card_img: '', lead_id: id, reg_path: '가망등록', created_at: now, updated_at: now };
+      let { error } = await db.from('ta_contacts').insert([cr]);
+      if (error && /reg_path/i.test(error.message || '')) { delete cr.reg_path; ({ error } = await db.from('ta_contacts').insert([cr])); }
+    }
+  } catch (e) { console.warn('[가망 연락처]', e); }
+  // 지도 위치 (주소 → 좌표). 실패하면 컨설턴트 화면에서 자동으로 다시 시도
+  if (p.address) {
+    let pl = { lead_id: id, src: 'ta', consultant: who, address: p.address, updated_at: now };
+    try { const g = await Promise.race([ta3Geocode(p.address), new Promise(r => setTimeout(() => r(null), 7000))]); if (g) { pl.lat = g.lat; pl.lng = g.lng; } } catch (e) {}
+    try { await db.from('ta_places').upsert([pl], { onConflict: 'lead_id' }); } catch (e) {}
+  }
+  return id;
+}
+async function ta4PsSaveDraft() {
+  const rows = TA4.psDraft.filter(p => !p.dup && (p.name || p.phone || p.person));
+  if (!rows.length) { alert('등록할 가망고객이 없습니다 (이름이나 전화번호를 입력하세요)'); return; }
+  if (rows.some(p => !p.assigned_to)) { alert('모든 건에 배정 컨설턴트를 선택해 주세요'); return; }
+  const btn = el('ta4PsSaveBtn'); btn.disabled = true; btn.textContent = '등록 중...';
+  let ok = 0, fail = [];
+  for (const p of rows) { try { await ta4PsCreate(p); ok++; } catch (e) { fail.push((p.name || p.phone) + ': ' + (e.message || e)); } }
+  btn.disabled = false; btn.textContent = '컨설턴트에게 등록';
+  try { await loadAllFromSupabase(); try { await ta3LoadPlaces(); } catch (x) {} try { render(); } catch (x) {} } catch (e) {}
+  ta4PsAdminShow();
+  if (fail.length) alert(`${ok}건 등록, ${fail.length}건 실패\n` + fail.join('\n')); else { ta4PsCloseInput(); alert(`${ok}건을 컨설턴트 안건·연락처·지도에 등록했습니다.`); }
+}
+
+// ---------- 컨설턴트: 가망고객 안건의 위치 자동 지정 ----------
+let TA4_PS_GEO = false;
+async function ta4PsAutoPlace() {
+  if (TA4_PS_GEO) return;
+  const todo = (ta2Leads(currentViewMode) || []).filter(l => ta4IsPs(l)).filter(l => { const pl = TA3.places[l.id]; return pl && pl.address && !pl.lat; });
+  if (!todo.length) return;
+  TA4_PS_GEO = true;
+  try { for (const l of todo) { const pl = TA3.places[l.id], g = await ta3Geocode(pl.address); if (g) await ta3PlaceSave(l.id, 'ta', { lat: g.lat, lng: g.lng, address: pl.address }); } } catch (e) {}
+  TA4_PS_GEO = false; try { if (TA3.tab === 'map') ta3RenderMap(true); } catch (e) {}
+}
 
 </script>
 
@@ -8725,7 +8724,7 @@ ta3RenderItems = function () {
     <button type="button" class="act" onclick="ta4CtEdit('')">＋ 추가</button></div>
   <div class="ct-tools">
     <div class="ta3-search"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg><input id="ctQ" type="search" placeholder="이름 · 회사 · 전화번호 검색" oninput="ta4CtQ(this.value)"></div>
-    <div class="ct-seg"><button type="button" data-by="name" class="on" onclick="ta4CtBy('name')">가나다</button><button type="button" data-by="group" onclick="ta4CtBy('group')">그룹</button><button type="button" data-by="company" onclick="ta4CtBy('company')">회사</button></div>
+    <div class="ct-seg"><button type="button" data-by="name" class="on" onclick="ta4CtBy('name')">가나다</button><button type="button" data-by="group" onclick="ta4CtBy('group')">그룹</button><button type="button" data-by="company" onclick="ta4CtBy('company')">회사</button><button type="button" data-by="path" onclick="ta4CtBy('path')">경로</button></div>
   </div>
   <div class="ta4-pb"><div class="in"><div id="ctList"></div><div style="text-align:center;padding:14px 0 4px;"><button type="button" class="ta4-cardbtn" onclick="ta4CtExportAll()"><span data-ic="dl"></span>전체를 내 폰 연락처로 내보내기(.vcf)</button></div></div></div>
   <div class="ct-idx" id="ctIdx"></div>
