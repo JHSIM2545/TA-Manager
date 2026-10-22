@@ -4596,6 +4596,7 @@ function clearUserSession() {
   try {
     sessionStorage.removeItem(SESSION_KEY);
     sessionStorage.removeItem('s1_user');
+    localStorage.removeItem('S1_TA_SSO_SESSION');
     localStorage.removeItem(SESSION_KEY);
     localStorage.removeItem('S1_PORTAL_AUTH_SESSION');
   } catch (e) {}
@@ -4691,7 +4692,8 @@ window.addEventListener('DOMContentLoaded', function() {
       };
       saveUserSession(ssoUser, ssoRole === 'master' ? 'master' : ssoName);
     } else {
-      var ssoStorage = localStorage.getItem('S1_TA_SSO_SESSION');
+      var ssoStorage = (sessionStorage.getItem(SESSION_KEY) || sessionStorage.getItem('s1_user')) ? null : localStorage.getItem('S1_TA_SSO_SESSION');
+      try { localStorage.removeItem('S1_TA_SSO_SESSION'); } catch (e) {}
       if (ssoStorage) {
         var ssoData = JSON.parse(ssoStorage);
         if (ssoData && ssoData.phone && ssoData.name) {
@@ -8419,6 +8421,38 @@ async function ta4PsMarkDone(id, leadId) {
   const r = TA4.ps.find(o => o.id === id); if (!r) return;
   try { await ta4PsSave([Object.assign({}, r, { status: '전환', lead_id: leadId })]); ta4PsRenderHome(); } catch (e) { console.warn(e); }
 }
+
+// ---------- 컨설턴트 안건 탭: TA / 소개고객 / 가망고객 분류 ----------
+function ta4PsMine() { return TA4.ps.filter(r => r.assigned_to === currentViewMode && r.status === '배정'); }
+const ta3SegHtmlOrig = ta3SegHtml;
+ta3SegHtml = function (cur, fn) {
+  const map = fn === 'ta3MapSrcSet';
+  const L = [['all', '전체'], ['ta', 'TA'], ['ref', '소개고객']].concat(map ? [] : [['ps', '가망고객' + (ta4PsMine().length ? ' ' + ta4PsMine().length : '')]]);
+  return L.map(([v, l]) => `<button type="button" class="${cur === v ? 'on' : ''}" onclick="${fn}('${v}')">${l}</button>`).join('');
+};
+function ta4PsCardHtml(r) {
+  const e = escapeHtml, tel = String(r.phone || '').replace(/\D/g, '');
+  return `<div class="ta3-card" style="--c:#f08c1f" onclick="ta4PsView('${e(r.id)}')">
+    <div class="r1"><div class="nm">${e(r.name || '(이름 없음)')}</div></div>
+    ${r.fee ? `<div class="amt">${formatCurrency(Number(r.fee))}</div>` : ''}
+    <div class="r2"><span class="ta3-tag" style="background:#ffedd5;color:#c2410c;">가망고객</span><span class="ta3-tag" style="background:#eef1f7;color:#374151;">콜/패밀리넷</span>${r.category ? `<span class="ta3-tag" style="background:#f3f4f6;color:#374151;">${e(r.category)}</span>` : ''}</div>
+    <div class="r3">${r.req_date ? '📅 설계요청 ' + e(r.req_date) + '<br>' : ''}📌 ${r.address ? e(r.address) : '주소 없음'}</div>
+    ${tel ? `<button type="button" class="ta3-call" onclick="event.stopPropagation();location.href='tel:${tel}'" aria-label="전화">📞</button>` : ''}
+  </div>`;
+}
+const ta3RenderItemsOrig = ta3RenderItems;
+ta3RenderItems = function () {
+  const ps = ta4PsMine(), q = String(TA3.f.q || '').trim().toLowerCase();
+  const fl = ps.filter(r => !q || [r.name, r.phone, r.address, r.category, r.memo].join(' ').toLowerCase().includes(q));
+  if (TA3.f.src === 'ps') {
+    el('ta3Src').innerHTML = ta3SegHtml(TA3.f.src, 'ta3SetSrc'); if (el('ta3Q').value !== TA3.f.q) el('ta3Q').value = TA3.f.q;
+    el('ta3Groups').innerHTML = '';
+    el('ta3Items').innerHTML = (TA4.psMode === 'local' ? '<div class="ta3-mapnote" style="margin-bottom:10px;"><span>가망고객 서버 저장소(ta_prospects)가 없어 이 기기 데이터만 보입니다.</span></div>' : '') + (fl.map(ta4PsCardHtml).join('') || '<div class="ta3-empty">배정된 가망고객이 없습니다</div>');
+    return;
+  }
+  ta3RenderItemsOrig();
+  if (TA3.f.src === 'all' && fl.length) el('ta3Items').insertAdjacentHTML('afterbegin', `<div class="ta3-h" style="margin:2px 0 8px;"><b>가망고객</b><span>${fl.length}건</span></div>` + fl.map(ta4PsCardHtml).join('') + '<div class="ta3-h" style="margin:14px 0 8px;"><b>TA · 소개고객</b></div>');
+};
 
 </script>
 
