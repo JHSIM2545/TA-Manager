@@ -1605,6 +1605,7 @@ if ('serviceWorker' in navigator) window.addEventListener('load', () => { naviga
           <button type="button" onclick="openTodayExpectedModal()">상세리스트</button></div>
 
         <div id="ta3CmtBox"></div>
+        <div id="ta4PsBox"></div>
 
         <div class="ta3-h"><b>오늘 일정</b><span id="ta3TodayCnt"></span></div>
         <div class="ta3-list" id="ta3TodayList"></div>
@@ -3490,6 +3491,7 @@ function switchView(mode) {
   if (mode === 'master') {
     document.body.classList.remove('ta3-on');
     el('viewMaster').style.display = 'block';
+    try { ta4PsAdminShow(); } catch (x) { console.warn(x); }
     el('viewAgent').style.display = 'none';
     if (el('dateBanner')) el('dateBanner').style.display = 'flex';
     el('topbarHeaderTitle').textContent = '영업 TA 통합관리 대시보드';
@@ -6404,8 +6406,8 @@ async function ta3Boot() {
   ta4Init();
   ta3Refresh();
   ta3MapInit().catch(() => {});
-  await Promise.all([ta3LoadRefs(), ta3LoadPlaces(), ta3LoadScheds(), ta4LoadMotives(), ta4LoadCmts(), ta4LoadCards(), ta4LoadContacts()]);
-  ta3Refresh();
+  await Promise.all([ta3LoadRefs(), ta3LoadPlaces(), ta3LoadScheds(), ta4LoadMotives(), ta4LoadCmts(), ta4LoadCards(), ta4LoadContacts(), ta4LoadProspects()]);
+  ta4CtSyncAll(); ta3Refresh();
 }
 function ta3SetTab(t) {
   TA3.tab = t;
@@ -6490,7 +6492,7 @@ function ta3RenderHome() {
   TA3.items.filter(i => i.date === today && i.group === 'ing').forEach(i => rows.push(ta3RowHtml(i.src === 'ref' ? '소개' : '수주', `${i.name} — 계약 예정`, i.amount ? formatCurrency(i.amount) : '', `ta3Open('${escapeHtml(i.id)}')`)));
   el('ta3TodayCnt').textContent = rows.length ? rows.length + '건' : '';
   el('ta3TodayList').innerHTML = rows.join('') || '<div class="ta3-empty">없음</div>';
-  ta4RenderCmtBox();
+  ta4RenderCmtBox(); ta4PsRenderHome();
 
   const wk = []; const end = new Date(today + 'T00:00:00'); end.setDate(end.getDate() + 7);
   const endStr = `${end.getFullYear()}-${TA2_PAD(end.getMonth() + 1)}-${TA2_PAD(end.getDate())}`;
@@ -6668,8 +6670,8 @@ function ta3RenderMy() {
 async function ta3Reload() {
   ta3Toast('새로고침 중');
   try { await loadAllFromSupabase(); } catch (e) {}
-  await Promise.all([ta3LoadRefs(), ta3LoadPlaces(), ta3LoadScheds(), ta4LoadMotives(), ta4LoadCmts(), ta4LoadCards(), ta4LoadContacts()]);
-  ta3Refresh(); ta3Toast('갱신 완료');
+  await Promise.all([ta3LoadRefs(), ta3LoadPlaces(), ta3LoadScheds(), ta4LoadMotives(), ta4LoadCmts(), ta4LoadCards(), ta4LoadContacts(), ta4LoadProspects()]);
+  ta4CtSyncAll(); ta3Refresh(); ta3Toast('갱신 완료');
 }
 // ---------- 위치 선택기 (중앙 핀) ----------
 let TA3_PK_CB = null, TA3_PK_T = null;
@@ -6820,6 +6822,7 @@ async function ta4LoadMotives() {
     try { const c = JSON.parse(localStorage.getItem(TA4_LS_MOT) || 'null'); if (c && c.list && c.list.length) { list = c.list; def = c.def || ''; } } catch (e) {}
   }
   TA4.motives = (list && list.length) ? list : TA4_DEF_MOTIVES.slice();
+  if (!TA4.motives.includes('콜/패밀리넷')) TA4.motives.push('콜/패밀리넷');   // 관리자가 전달한 가망고객 구분
   TA4.motiveDef = def || '';
   ta4FillMotive('afMotive', el('afMotive') && el('afMotive').value);
 }
@@ -7400,7 +7403,7 @@ function openNewAgentLeadModal() {
   el('afRegisteredDate').value = todayStr(); el('afExpectedDate').value = todayStr();
   el('afVehicleNumber').value = '없음';
   el('afSubmitBtn').textContent = 'TA 등록'; el('afSubmitBtn').disabled = false;
-  TA4.formNote = null; ta4FormNoteRender(); TA4.formCard = null; ta4FormCardRender();
+  TA4.formNote = null; ta4FormNoteRender(); TA4.formCard = null; ta4FormCardRender(); TA4.psConv = null; try { el('afAddress').value = ''; } catch (x) {}
   el('afStage').innerHTML = '<option value="진행중" selected>진행중</option><option value="수주完">수주완료</option><option value="보류">보류</option>';
   el('afWonExtraRow').style.display = 'none';
   ta3FormReset();
@@ -7449,6 +7452,7 @@ async function handleAgentModalSubmit(e) {
     if (error) throw error;
     if (!ALL[agentName]) ALL[agentName] = { leads: [] };
     ALL[agentName].leads.unshift(payload);
+    ta4CtSyncLead(payload); if (TA4.psConv) { ta4PsMarkDone(TA4.psConv, payload.id); TA4.psConv = null; }   // 고객담당자를 연락처에 자동 등록
     try { await recordActivityLog(agentName, '신규 등록', payload.company, payload.id, [`서비스제공처명: ${payload.company}`, `용역료: ${formatCurrency(payload.amount)}`, `영업단계: ${payload.stage}`]); } catch (x) {}
     // 등록 시 노트 = 노트 게시판의 첫 노트 (글 + 사진 + 그림)
     if (fn) { try { await ta4NoteInsert({ lead_id: payload.id, kind: 'memo', content: fn.text, image: fn.atts.length ? JSON.stringify(fn.atts) : null, created_at: payload.createdAt }); TA4.formNote = null; } catch (x) { ta3Toast('안건은 저장됐지만 노트 저장 실패: ' + (x.message || x), 4000); } }
@@ -8152,7 +8156,7 @@ function ta4CtToPhone() { const c = ta4CtFind(TA4.ct.cur); if (!c) return; ta4Vc
 async function ta4CtDeleteCur() {
   const c = ta4CtFind(TA4.ct.cur); if (!c) return;
   if (!confirm((c.name || '이 연락처') + ' 연락처를 삭제할까요?')) return;
-  try { await ta4CtDelete(c.id); ta4Close('ta4CtDet'); ta4CtRender(); ta3Toast('삭제됨'); } catch (e) { ta3Toast('삭제 실패: ' + (e.message || e), 3500); }
+  try { ta4CtSkipAdd(c.lead_id); await ta4CtDelete(c.id); ta4Close('ta4CtDet'); ta4CtRender(); ta3Toast('삭제됨'); } catch (e) { ta3Toast('삭제 실패: ' + (e.message || e), 3500); }
 }
 function ta4CtExportAll() {
   if (!TA4.contacts.length) { ta3Toast('내보낼 연락처가 없습니다'); return; }
@@ -8212,6 +8216,235 @@ async function ta4CtSaveEd() {
     const row = await ta4CtSave(c); TA4.ct.cur = row.id;
     ta4Close('ta4CtEd'); ta4CtRender(); if (PG.st.includes('ta4CtDet')) ta4CtDetRender(); ta3Toast('저장됨');
   } catch (er) { ta3Toast('저장 실패: ' + (er.message || er), 3500); }
+}
+
+// ---------- 안건 · 소개영업의 고객담당자를 연락처에 자동 등록 ----------
+const TA4_LS_CTSKIP = 'S1_TA4_CTSKIP';   // 연락처에서 직접 삭제한 안건은 다시 만들지 않음
+function ta4CtSkipGet() { try { return JSON.parse(localStorage.getItem(TA4_LS_CTSKIP) || '[]'); } catch (e) { return []; } }
+function ta4CtSkipAdd(id) { if (!id) return; const a = ta4CtSkipGet(); if (!a.includes(id)) { a.push(id); try { localStorage.setItem(TA4_LS_CTSKIP, JSON.stringify(a.slice(-3000))); } catch (e) {} } }
+async function ta4CtSaveMany(rows) {
+  if (!rows.length) return;
+  const now = new Date().toISOString();
+  rows = rows.map(c => ({
+    id: c.id || ta4CtNewId(), consultant: currentViewMode, name: c.name || '', title: c.title || '', company: c.company || '', group_name: c.group_name || '',
+    mobile: c.mobile || '', tel: c.tel || '', fax: c.fax || '', email: c.email || '', address: c.address || '', memo: c.memo || '',
+    photo: c.photo || '', card_img: c.card_img || '', lead_id: c.lead_id || '', created_at: c.created_at || now, updated_at: now
+  }));
+  if (await ta2Probe('ta_contacts') === 'remote') { const { error } = await db.from('ta_contacts').upsert(rows, { onConflict: 'id' }); if (error) throw error; }
+  else { const ids = new Set(rows.map(r => r.id)); const arr = ta2LsGet(TA4_LS_CT).filter(r => !ids.has(r.id)).concat(rows); if (!ta2LsSet(TA4_LS_CT, arr)) throw new Error('저장 공간 부족'); }
+  rows.forEach(row => { const i = TA4.contacts.findIndex(o => o.id === row.id); if (i >= 0) TA4.contacts[i] = row; else TA4.contacts.push(row); });
+}
+// 안건/소개영업 1건 → 연락처 변경분(새로 만들거나 빈 칸만 채움). 변경 없으면 null
+function ta4CtFromLead(src, id, p, skip) {
+  const name = String(p.name || '').trim(), phone = ta4FmtPhone(p.phone || '');
+  if (!name && !phone) return null;
+  if (skip.includes(id)) return null;
+  const grp = src === 'ref' ? '소개영업' : '안건 고객';
+  const cand = { name, mobile: /^0?1[016-9]|^01/.test(String(p.phone || '').replace(/\D/g, '')) ? phone : '', tel: /^01/.test(String(p.phone || '').replace(/\D/g, '')) ? '' : phone, company: p.company || '', address: p.address || '' };
+  const old = TA4.contacts.find(c => c.lead_id === id) || (phone ? ta4CtMatch({ mobile: phone, tel: phone }) : null);
+  if (!old) return Object.assign({ lead_id: id, group_name: grp }, cand);
+  const m = Object.assign({}, old); let ch = false;
+  ['name', 'mobile', 'tel', 'company', 'address'].forEach(k => { if (!m[k] && cand[k]) { m[k] = cand[k]; ch = true; } });
+  if (!m.lead_id) { m.lead_id = id; ch = true; }
+  return ch ? m : null;
+}
+async function ta4CtSyncAll() {
+  try {
+    const skip = ta4CtSkipGet(), out = [], seen = new Set();
+    const ph = new Set(), push = r => { if (!r) return; const k = r.id || r.lead_id, d = ta4Digits(r.mobile || r.tel); if (seen.has(k) || (!r.id && d && ph.has(d))) return; seen.add(k); if (d) ph.add(d); out.push(r); };
+    ta2Leads(currentViewMode).forEach(l => push(ta4CtFromLead('ta', l.id, { name: l.contact, phone: l.contactPhone, company: l.company }, skip)));
+    (TA3.refs || []).forEach(r => push(ta4CtFromLead('ref', r.lead_id, { name: r.contact_person, phone: r.contact_phone, company: r.customer_name, address: r.address }, skip)));
+    if (out.length) { await ta4CtSaveMany(out); if (PG.st.includes('ta4CtPg')) ta4CtRender(); }
+  } catch (e) { console.warn('[contacts sync]', e); }
+}
+async function ta4CtSyncLead(l) {
+  if (!l) return;
+  try { const r = ta4CtFromLead('ta', l.id, { name: l.contact, phone: l.contactPhone, company: l.company }, ta4CtSkipGet()); if (r) { await ta4CtSaveMany([r]); if (PG.st.includes('ta4CtPg')) ta4CtRender(); } } catch (e) { console.warn('[contacts sync]', e); }
+}
+// 안건 고객담당자/연락처를 고치면 연락처에도 반영(빈 칸 채우기 + 같은 안건에 연결된 연락처의 이름·번호 갱신)
+const ta4SaveFieldsOrig = ta2SaveFields;
+ta2SaveFields = async function (patch, rerender, leadArg) {
+  const lead = leadArg || ta2CurLead(), res = await ta4SaveFieldsOrig.apply(this, arguments);
+  try {
+    if (res !== false && lead && !lead._ref && patch && ('contact' in patch || 'contactPhone' in patch)) {
+      const cur = ta2Leads(currentViewMode).find(x => x.id === lead.id) || lead, link = TA4.contacts.find(c => c.lead_id === lead.id);
+      if (link && !link.card_img) {   // 명함으로 만든 연락처는 건드리지 않고, 자동 등록된 것만 최신으로 맞춤
+        const m = Object.assign({}, link); if (cur.contact) m.name = cur.contact;
+        const ph = ta4FmtPhone(cur.contactPhone || ''); if (ph) { if (/^01/.test(ph.replace(/\D/g, ''))) m.mobile = ph; else m.tel = ph; }
+        await ta4CtSaveMany([m]);
+      } else ta4CtSyncLead(cur);
+    }
+  } catch (e) { console.warn('[contacts sync]', e); }
+  return res;
+};
+
+// ==========================================================================
+// 가망고객: 관리자가 문자(신규 가망고객 / 에스원 패밀리넷 배정 알림)를 붙여넣어 입력 → 컨설턴트에게 배정 → 컨설턴트는 TA 안건으로 전환
+// ==========================================================================
+const TA4_LS_PS = 'S1_TA4_PROSPECTS';
+TA4.ps = []; TA4.psConv = null; TA4.psMode = 'remote'; TA4.psFilter = 'all'; TA4.psDraft = [];
+
+async function ta4LoadProspects() {
+  TA4.ps = [];
+  try {
+    TA4.psMode = await ta2Probe('ta_prospects');
+    if (TA4.psMode === 'remote') {
+      let q = db.from('ta_prospects').select('*'); if (currentViewMode && currentViewMode !== 'master') q = q.eq('assigned_to', currentViewMode);
+      const { data, error } = await q.order('created_at', { ascending: false }).limit(1000);
+      if (!error) { TA4.ps = data || []; return; }
+    }
+  } catch (e) {}
+  TA4.psMode = 'local';
+  TA4.ps = ta2LsGet(TA4_LS_PS).filter(r => currentViewMode === 'master' || r.assigned_to === currentViewMode);
+}
+async function ta4PsSave(rows) {
+  const now = new Date().toISOString();
+  rows = rows.map(r => Object.assign({}, r, { id: r.id || 'ps' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6), updated_at: now, created_at: r.created_at || now, status: r.status || (r.assigned_to ? '배정' : '미배정') }));
+  if (await ta2Probe('ta_prospects') === 'remote') { const { error } = await db.from('ta_prospects').upsert(rows, { onConflict: 'id' }); if (error) throw error; }
+  else { const ids = new Set(rows.map(r => r.id)); if (!ta2LsSet(TA4_LS_PS, ta2LsGet(TA4_LS_PS).filter(r => !ids.has(r.id)).concat(rows))) throw new Error('저장 공간 부족'); }
+  rows.forEach(r => { const i = TA4.ps.findIndex(o => o.id === r.id); if (i >= 0) TA4.ps[i] = r; else TA4.ps.unshift(r); });
+  return rows;
+}
+async function ta4PsDelete(id) {
+  if (await ta2Probe('ta_prospects') === 'remote') { const { error } = await db.from('ta_prospects').delete().eq('id', id); if (error) throw error; }
+  else ta2LsSet(TA4_LS_PS, ta2LsGet(TA4_LS_PS).filter(r => r.id !== id));
+  TA4.ps = TA4.ps.filter(r => r.id !== id);
+}
+
+// ---------- 문자 분석 ----------
+// <<PSPARSE
+function ta4PsParse(text) {
+  const out = [];
+  const chunks = String(text || '').split(/\[\s*Web\s*발신\s*\]/i).map(s => s.trim()).filter(Boolean);
+  const onlyNum = s => String(s || '').replace(/[^0-9]/g, '');
+  const fmt = s => { let d = onlyNum(s); if (d.startsWith('82') && d.length >= 11) d = '0' + d.slice(2); if (d.startsWith('02')) return d.length === 9 ? `02-${d.slice(2, 5)}-${d.slice(5)}` : `02-${d.slice(2, 6)}-${d.slice(6)}`; if (d.length === 11) return `${d.slice(0, 3)}-${d.slice(3, 7)}-${d.slice(7)}`; if (d.length === 10) return `${d.slice(0, 3)}-${d.slice(3, 6)}-${d.slice(6)}`; return d; };
+  chunks.forEach(raw => {
+    if (/가망고객번호|패밀리넷/.test(raw)) {   // 형식 2: 에스원 패밀리넷 배정 알림 (-항목: 값)
+      const g = {}; raw.split(/\r?\n/).forEach(ln => { const m = /^\s*[-·•]\s*([^:：]+?)\s*[:：]\s*(.*)$/.exec(ln); if (m) g[m[1].replace(/\s+/g, '')] = m[2].trim(); });
+      const agent = (/영업사원\s*\[([^\]]+)\]/.exec(raw) || [])[1] || '', type = (/\[([^\]]*대리점[^\]]*)\]/.exec(raw) || [])[1] || '';
+      const assign = (/\]\s*(\S+?)\s*님께\s*배정/.exec(raw) || [])[1] || '';
+      const addr = (g['고객주소'] || '').replace(/^\(\s*\d{4,6}\s*\)\s*/, '').trim();
+      const fee = Number(onlyNum(g['용역료'])) || 0;
+      const memo = [g['면적'] && '면적 ' + g['면적'].replace(/\s+/g, ''), g['기타'], type && '구분 ' + type].filter(Boolean).join(' / ');
+      out.push({ kind: '패밀리넷', name: g['경비대상처'] || '', person: '', phone: fmt(g['전화번호']), address: addr, category: [g['업종'], g['제공서비스']].filter(Boolean).join(' / '), memo, prospect_no: g['가망고객번호'] || '', agent_name: agent, agent_phone: fmt(g['대리점영업사원전화번호']), area: g['면적'] || '', fee, req_date: g['설계요청일'] || '', hint: assign, raw });
+      return;
+    }
+    const m = /신규\)\s*(\S+)\s+(\+?[0-9][0-9\-\s]{8,14}[0-9])\s*([^\[]*?)\s*\[([^\]]+)\]\s*([\s\S]*)$/.exec(raw);   // 형식 1: 신규)이름 전화 주소 [분류] 메모
+    if (m) { out.push({ kind: '신규문자', name: m[1], person: m[1], phone: fmt(m[2]), address: m[3].trim(), category: m[4].trim(), memo: m[5].trim().replace(/\s+/g, ' '), prospect_no: '', agent_name: '', agent_phone: '', area: '', fee: 0, req_date: '', hint: '', raw }); return; }
+    const ph = /0\d{1,2}[-\s]?\d{3,4}[-\s]?\d{4}/.exec(raw);   // 알 수 없는 형식: 번호만이라도 추출
+    if (raw.length > 5) out.push({ kind: '기타', name: '', person: '', phone: ph ? fmt(ph[0]) : '', address: '', category: '', memo: raw.replace(/\s+/g, ' ').slice(0, 300), prospect_no: '', agent_name: '', agent_phone: '', area: '', fee: 0, req_date: '', hint: '', raw });
+  });
+  return out;
+}
+// PSPARSE>>
+
+function ta4PsDup(p) {
+  return TA4.ps.find(o => (p.prospect_no && o.prospect_no === p.prospect_no) || (!p.prospect_no && p.phone && o.phone === p.phone && (o.name || '') === (p.name || '')));
+}
+
+// ---------- 관리자 화면 ----------
+function ta4PsAdminShow() {
+  if (!el('ta4PsPanel')) {
+    const anchor = el('fConsultant') && el('fConsultant').closest('.panel'); if (!anchor) return;
+    const d = document.createElement('div'); d.className = 'panel'; d.id = 'ta4PsPanel';
+    d.innerHTML = `<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px;"><h2 style="margin:0;">가망고객 <span class="count-tag" id="ta4PsCnt"></span></h2>
+      <button type="button" onclick="ta4PsOpenInput()" style="margin-left:auto;background:var(--blue,#2f6bff);color:#fff;border:none;border-radius:8px;padding:9px 16px;font-weight:800;cursor:pointer;">＋ 가망고객 입력</button></div>
+      <div class="filters" id="ta4PsFilters" style="margin-bottom:10px;"></div><div id="ta4PsWarn" style="display:none;margin-bottom:10px;padding:9px 12px;border-radius:8px;background:#fff7ed;color:#9a3412;font-size:13px;font-weight:700;"></div>
+      <div class="table-scroll"><table class="lead-table"><thead><tr><th>등록일</th><th>배정 컨설턴트</th><th>고객 / 경비대상처</th><th>연락처</th><th>주소</th><th>업종·분류</th><th>용역료</th><th>상태</th><th></th></tr></thead><tbody id="ta4PsBody"></tbody></table></div>`;
+    anchor.parentNode.insertBefore(d, anchor);
+    const ov = document.createElement('div'); ov.className = 'modal-overlay'; ov.id = 'ta4PsOv'; ov.style.display = 'none';
+    ov.innerHTML = `<div style="background:#fff;border-radius:14px;max-width:760px;width:100%;max-height:92vh;overflow:auto;padding:20px;color:#1a2333;">
+      <div style="display:flex;align-items:center;margin-bottom:10px;"><h2 style="margin:0;font-size:18px;color:var(--navy,#0f2547);">가망고객 입력</h2><button type="button" onclick="ta4PsCloseInput()" style="margin-left:auto;border:none;background:#eef1f7;border-radius:50%;width:34px;height:34px;cursor:pointer;">✕</button></div>
+      <div style="font-size:13px;color:#64748b;margin-bottom:8px;">받은 문자를 그대로 붙여넣으세요. 여러 건을 한꺼번에 붙여넣어도 건별로 나눠 분석합니다. (신규) 문자 · 에스원 패밀리넷 배정 알림)</div>
+      <textarea id="ta4PsText" rows="8" placeholder="[Web발신] 신규)홍길동 01012345678 주소 [영상보안] 메모..." style="width:100%;border:1px solid #cbd5e1;border-radius:10px;padding:10px;font-size:14px;font-family:inherit;box-sizing:border-box;"></textarea>
+      <div style="margin:10px 0;display:flex;gap:8px;"><button type="button" onclick="ta4PsAnalyze()" style="background:#0f2547;color:#fff;border:none;border-radius:8px;padding:10px 18px;font-weight:800;cursor:pointer;">분석하기</button><button type="button" onclick="ta4PsAddBlank()" style="background:#eef1f7;color:#0f2547;border:none;border-radius:8px;padding:10px 14px;font-weight:700;cursor:pointer;">직접 입력</button></div>
+      <div id="ta4PsDraft"></div>
+      <div id="ta4PsFoot" style="display:none;margin-top:12px;text-align:right;"><button type="button" onclick="ta4PsSaveDraft()" style="background:var(--blue,#2f6bff);color:#fff;border:none;border-radius:8px;padding:11px 22px;font-weight:800;cursor:pointer;">저장</button></div></div>`;
+    document.body.appendChild(ov);
+  }
+  ta4LoadProspects().then(ta4PsAdminRender);
+}
+function ta4PsAdminRender() {
+  const body = el('ta4PsBody'); if (!body) return;
+  const F = [['all', '전체'], ['미배정', '미배정'], ['배정', '배정'], ['전환', '전환(TA등록)'], ['제외', '제외']];
+  el('ta4PsFilters').innerHTML = F.map(([k, l]) => `<button type="button" class="${TA4.psFilter === k ? 'active' : ''}" onclick="TA4.psFilter='${k}';ta4PsAdminRender()">${l}</button>`).join('');
+  const rows = TA4.ps.filter(r => TA4.psFilter === 'all' || r.status === TA4.psFilter);
+  el('ta4PsCnt').textContent = rows.length + '건';
+  const w = el('ta4PsWarn'); w.style.display = TA4.psMode === 'local' ? 'block' : 'none';
+  w.textContent = '서버에 가망고객 테이블(ta_prospects)이 없어 이 기기에만 저장됩니다. Supabase SQL Editor에서 설정 SQL을 실행하세요. (컨설턴트에게는 보이지 않음)';
+  const e = escapeHtml, sel = r => `<select onchange="ta4PsAssign('${e(r.id)}',this.value)" style="padding:5px;border-radius:6px;border:1px solid #cbd5e1;"><option value="">미배정</option>${CONSULTANTS.map(n => `<option value="${e(n)}"${r.assigned_to === n ? ' selected' : ''}>${e(n)}</option>`).join('')}</select>`;
+  body.innerHTML = rows.length ? rows.map(r => `<tr><td>${e((r.created_at || '').slice(0, 10))}</td><td>${sel(r)}</td><td><b>${e(r.name || '(이름 없음)')}</b>${r.prospect_no ? `<br><small>가망 ${e(r.prospect_no)}</small>` : ''}</td><td>${r.phone ? `<a href="tel:${e(r.phone.replace(/\D/g, ''))}">${e(r.phone)}</a>` : ''}</td><td style="min-width:180px;">${e(r.address)}</td><td>${e(r.category)}${r.memo ? `<br><small>${e(r.memo)}</small>` : ''}</td><td style="text-align:right;">${r.fee ? Number(r.fee).toLocaleString('ko-KR') + '원' : ''}</td><td>${e(r.status || '')}</td><td><button type="button" class="small secondary" onclick="ta4PsDel('${e(r.id)}')" style="background:#fee2e2;color:#b91c1c;border:none;border-radius:6px;padding:5px 9px;cursor:pointer;">삭제</button></td></tr>`).join('') : '<tr><td colspan="9" style="text-align:center;color:#94a3b8;padding:24px;">등록된 가망고객이 없습니다</td></tr>';
+}
+async function ta4PsAssign(id, who) {
+  const r = TA4.ps.find(o => o.id === id); if (!r) return;
+  try { await ta4PsSave([Object.assign({}, r, { assigned_to: who, status: r.status === '전환' || r.status === '제외' ? r.status : (who ? '배정' : '미배정') })]); ta4PsAdminRender(); } catch (e) { alert('저장 실패: ' + (e.message || e)); }
+}
+async function ta4PsDel(id) { if (!confirm('이 가망고객을 삭제할까요?')) return; try { await ta4PsDelete(id); ta4PsAdminRender(); } catch (e) { alert('삭제 실패: ' + (e.message || e)); } }
+function ta4PsOpenInput() { el('ta4PsText').value = ''; TA4.psDraft = []; ta4PsDraftRender(); el('ta4PsOv').style.display = 'flex'; }
+function ta4PsCloseInput() { el('ta4PsOv').style.display = 'none'; }
+function ta4PsAnalyze() {
+  const items = ta4PsParse(el('ta4PsText').value);
+  if (!items.length) { alert('분석할 문자를 붙여넣어 주세요'); return; }
+  TA4.psDraft = items.map(p => Object.assign(p, { assigned_to: '', dup: !!ta4PsDup(p) })); ta4PsDraftRender();
+}
+function ta4PsAddBlank() { TA4.psDraft.push({ kind: '직접', name: '', person: '', phone: '', address: '', category: '', memo: '', prospect_no: '', agent_name: '', agent_phone: '', area: '', fee: 0, req_date: '', assigned_to: '', raw: '' }); ta4PsDraftRender(); }
+function ta4PsDraftRender() {
+  const e = escapeHtml, box = el('ta4PsDraft');
+  box.innerHTML = TA4.psDraft.map((p, i) => {
+    const f = (k, lb, w, type) => `<label style="display:block;font-size:12px;color:#64748b;font-weight:700;flex:${w || 1};min-width:130px;">${lb}<input type="${type || 'text'}" value="${e(p[k] == null ? '' : p[k])}" oninput="TA4.psDraft[${i}].${k}=${k === 'fee' ? 'Number(this.value.replace(/\\D/g,\'\'))||0' : 'this.value'}" style="width:100%;box-sizing:border-box;margin-top:3px;padding:8px;border:1px solid #cbd5e1;border-radius:8px;font-size:14px;"></label>`;
+    return `<div style="border:1px solid ${p.dup ? '#f59e0b' : '#e2e8f0'};border-radius:12px;padding:12px;margin-bottom:10px;background:#f8fafc;">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;"><span style="background:#e0e7ff;color:#3730a3;border-radius:99px;padding:2px 10px;font-size:12px;font-weight:800;">${e(p.kind)}</span>${p.dup ? '<span style="color:#b45309;font-size:12px;font-weight:800;">이미 등록된 가망고객 — 저장 시 제외됩니다</span>' : ''}<button type="button" onclick="TA4.psDraft.splice(${i},1);ta4PsDraftRender()" style="margin-left:auto;border:none;background:none;color:#b91c1c;font-weight:800;cursor:pointer;">제거</button></div>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;">${f('name', '고객 / 경비대상처', 2)}${f('phone', '전화번호', 1, 'tel')}${f('category', '업종·분류', 1)}${f('fee', '용역료(원)', 1)}</div>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:8px;">${f('address', '주소', 3)}${f('prospect_no', '가망고객번호', 1)}</div>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:8px;">${f('memo', '메모', 3)}${p.agent_name || p.agent_phone ? f('agent_name', '대리점 영업사원', 1) + f('agent_phone', '영업사원 전화', 1, 'tel') : ''}</div>
+      <div style="margin-top:8px;font-size:12px;color:#64748b;font-weight:700;">배정 컨설턴트 <select onchange="TA4.psDraft[${i}].assigned_to=this.value" style="margin-left:6px;padding:7px;border-radius:8px;border:1px solid #cbd5e1;font-size:14px;"><option value="">선택(나중에 배정)</option>${CONSULTANTS.map(n => `<option value="${e(n)}"${p.assigned_to === n ? ' selected' : ''}>${e(n)}</option>`).join('')}</select>${p.hint ? `<span style="margin-left:8px;color:#94a3b8;">문자 속 이름: ${e(p.hint)}</span>` : ''}</div></div>`;
+  }).join('');
+  el('ta4PsFoot').style.display = TA4.psDraft.length ? 'block' : 'none';
+}
+async function ta4PsSaveDraft() {
+  const rows = TA4.psDraft.filter(p => !p.dup && (p.name || p.phone)).map(p => ({ kind: p.kind, assigned_to: p.assigned_to || '', name: p.name, person: p.person, phone: p.phone, address: p.address, category: p.category, memo: p.memo, prospect_no: p.prospect_no, agent_name: p.agent_name, agent_phone: p.agent_phone, area: p.area, fee: p.fee || 0, req_date: p.req_date, raw: p.raw, created_by: (currentUser && currentUser.name) || '' }));
+  if (!rows.length) { alert('저장할 가망고객이 없습니다 (이름이나 전화번호를 입력하세요)'); return; }
+  try { await ta4PsSave(rows); ta4PsCloseInput(); ta4PsAdminRender(); } catch (e) { alert('저장 실패: ' + (e.message || e)); }
+}
+
+// ---------- 컨설턴트 화면: 내 가망고객 ----------
+function ta4PsRenderHome() {
+  const box = el('ta4PsBox'); if (!box) return;
+  const mine = TA4.ps.filter(r => r.assigned_to === currentViewMode && r.status === '배정');
+  if (!mine.length) { box.innerHTML = ''; return; }
+  const e = escapeHtml;
+  box.innerHTML = `<div class="ta3-h"><b>내 가망고객 · 콜/패밀리넷</b><span>${mine.length}건</span></div><div class="ta3-list">` + mine.slice(0, 8).map(r =>
+    `<div class="ct-row" onclick="ta4PsView('${e(r.id)}')"><div class="ct-av" style="background:#f08c1f">★</div><div class="tx"><b>${e(r.name || '(이름 없음)')}</b><small>${e([r.category, r.address].filter(Boolean).join(' · '))}</small></div>${r.phone ? `<a class="call" href="tel:${e(r.phone.replace(/\D/g, ''))}" onclick="event.stopPropagation()" aria-label="전화"><span data-ic="phone"></span></a>` : ''}</div>`).join('') + '</div>';
+  ta4IcInit();
+}
+function ta4PsView(id) {
+  const r = TA4.ps.find(o => o.id === id); if (!r) return;
+  TA4.psCur = id; const e = escapeHtml, row = (k, v) => v ? `<div class="r"><span>${k}</span><b>${v}</b></div>` : '';
+  el('ta4PsDetBody').innerHTML = row('고객', e(r.name)) + row('전화', r.phone ? `<a href="tel:${e(r.phone.replace(/\D/g, ''))}">${e(r.phone)}</a>` : '') + row('주소', e(r.address)) + row('업종·분류', e(r.category)) + row('용역료', r.fee ? Number(r.fee).toLocaleString('ko-KR') + '원' : '') + row('가망번호', e(r.prospect_no)) +
+    row('대리점', e([r.agent_name, r.agent_phone].filter(Boolean).join(' '))) + row('설계요청일', e(r.req_date)) + row('메모', e(r.memo));
+  el('ta4PsDet').classList.add('on');
+}
+function ta4PsDetClose() { el('ta4PsDet').classList.remove('on'); }
+async function ta4PsToTA(quick) {
+  const r = TA4.ps.find(o => o.id === TA4.psCur); if (!r) return;
+  ta4PsDetClose(); openNewAgentLeadModal();
+  el('afCompany').value = r.name || ''; el('afContact').value = r.person || ''; el('afContactPhone').value = r.phone || '';
+  if (r.fee) el('afAmount').value = Number(r.fee).toLocaleString('ko-KR');
+  if (r.address) el('afAddress').value = r.address;
+  const memo = ['[콜/패밀리넷 가망고객] ' + (r.kind || ''), r.category, r.memo, r.prospect_no && '가망고객번호 ' + r.prospect_no, r.agent_name && '대리점 영업사원 ' + r.agent_name + (r.agent_phone ? ' ' + r.agent_phone : '')].filter(Boolean).join('\n');
+  TA4.formNote = { text: memo, atts: [] }; try { ta4FormNoteRender(); } catch (x) {}
+  ta4FillMotive('afMotive', '콜/패밀리넷');
+  TA4.psConv = r.id;
+  if (quick === true) { try { await handleAgentModalSubmit({ preventDefault() {} }); } catch (x) { ta3Toast('등록 실패: ' + (x.message || x), 3500); } }
+}
+async function ta4PsExclude() {
+  const r = TA4.ps.find(o => o.id === TA4.psCur); if (!r) return;
+  if (!confirm('이 가망고객을 제외(목록에서 숨김)할까요?')) return;
+  try { await ta4PsSave([Object.assign({}, r, { status: '제외' })]); ta4PsDetClose(); ta4PsRenderHome(); ta3Toast('제외됨'); } catch (e) { ta3Toast('저장 실패: ' + (e.message || e), 3500); }
+}
+async function ta4PsMarkDone(id, leadId) {
+  const r = TA4.ps.find(o => o.id === id); if (!r) return;
+  try { await ta4PsSave([Object.assign({}, r, { status: '전환', lead_id: leadId })]); ta4PsRenderHome(); } catch (e) { console.warn(e); }
 }
 
 </script>
@@ -8456,6 +8689,14 @@ async function ta4CtSaveEd() {
     <details class="cd-raw"><summary>인식된 원문</summary><pre id="cdRaw"></pre></details>
   </div></div>
   <div class="ta4-pf"><div class="in"><button type="button" class="go" id="cdApply" onclick="ta4CardApply()">고객 정보에 적용</button></div></div>
+</div>
+
+<div class="ta4-sheet" id="ta4PsDet" onclick="if(event.target===this)ta4PsDetClose()">
+  <div class="in">
+    <div class="hd"><b>가망고객 정보</b><button type="button" onclick="ta4PsDetClose()" aria-label="닫기">✕</button></div>
+    <div class="bd" id="ta4PsDetBody"></div>
+    <div class="ft" style="display:flex;gap:8px;"><button type="button" class="ta4-cardbtn" style="flex:none;color:#b91c1c;" onclick="ta4PsExclude()">제외</button><button type="button" class="ta4-cardbtn" style="flex:none;" onclick="ta4PsToTA()">수정 후 등록</button><button type="button" class="ta4-cardbtn" style="flex:1;justify-content:center;background:var(--navy);color:#fff;" onclick="ta4PsToTA(true)">바로 등록</button></div>
+  </div>
 </div>
 
 <div class="ta4-sheet" id="ta4CdDet" onclick="if(event.target===this)ta4CardDetailClose()">
