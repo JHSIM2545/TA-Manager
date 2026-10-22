@@ -8345,7 +8345,7 @@ function ta4PsDup(p) {
 // ---------- 관리자 화면 ----------
 function ta4PsAdminShow() {
   if (!el('ta4PsPanel')) {
-    const anchor = el('fConsultant') && el('fConsultant').closest('.panel'); if (!anchor) return;
+    const tp = el('todayListCount') && el('todayListCount').closest('.panel'), anchor = tp ? tp.nextElementSibling : (el('fConsultant') && el('fConsultant').closest('.panel')); if (!anchor) return;   // 금일 수주 예정 바로 아래
     const d = document.createElement('div'); d.className = 'panel'; d.id = 'ta4PsPanel';
     d.innerHTML = `<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px;"><h2 style="margin:0;">가망고객 <span class="count-tag" id="ta4PsCnt"></span></h2>
       <button type="button" onclick="ta4PsOpenInput()" style="margin-left:auto;background:var(--blue,#2f6bff);color:#fff;border:none;border-radius:8px;padding:9px 16px;font-weight:800;cursor:pointer;">＋ 가망고객 입력</button></div>
@@ -8367,7 +8367,7 @@ function ta4PsAdminShow() {
 function ta4PsAdminRender() {
   const body = el('ta4PsBody'); if (!body) return;
   const F = [['all', '전체'], ['미배정', '미배정'], ['배정', '배정'], ['전환', '전환(TA등록)'], ['제외', '제외']];
-  el('ta4PsFilters').innerHTML = F.map(([k, l]) => `<button type="button" class="${TA4.psFilter === k ? 'active' : ''}" onclick="TA4.psFilter='${k}';ta4PsAdminRender()">${l}</button>`).join('');
+  el('ta4PsFilters').innerHTML = F.map(([k, l]) => `<button type="button" class="${TA4.psFilter === k ? 'active' : ''}" style="${TA4.psFilter === k ? '' : 'background:#eef1f7;color:#334155;border-color:#d5dbe6;'}" onclick="TA4.psFilter='${k}';ta4PsAdminRender()">${l}</button>`).join('');
   const rows = TA4.ps.filter(r => TA4.psFilter === 'all' || r.status === TA4.psFilter);
   el('ta4PsCnt').textContent = rows.length + '건';
   const w = el('ta4PsWarn'); w.style.display = TA4.psMode === 'local' ? 'block' : 'none';
