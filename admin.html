@@ -1195,6 +1195,19 @@
   .cd-live video{width:100%;height:100%;object-fit:cover;display:block;}
   .cd-frame{position:absolute;left:7%;right:7%;top:16%;bottom:16%;border:2.5px dashed rgba(255,255,255,.9);border-radius:10px;box-shadow:0 0 0 999px rgba(0,0,0,.28);pointer-events:none;}
 
+  .ta4-more{flex:none;width:48px;height:48px;border-radius:13px !important;border:1px solid var(--line) !important;background:#fff !important;color:var(--navy) !important;font-size:22px;font-weight:900;padding:0 !important;line-height:1;}
+  .ta4-more.has{background:#eef3ff !important;border-color:#bcd0ff !important;}
+  .ta4-sheet{position:fixed;inset:0;background:rgba(15,23,42,.45);z-index:200000;display:none;align-items:flex-end;justify-content:center;}
+  .ta4-sheet.on{display:flex;}
+  .ta4-sheet .in{width:100%;max-width:560px;background:#fff;border-radius:20px 20px 0 0;padding:6px 18px calc(18px + env(safe-area-inset-bottom));max-height:80vh;overflow:auto;}
+  .ta4-sheet .hd{display:flex;align-items:center;justify-content:space-between;padding:12px 0 8px;font-size:17px;}
+  .ta4-sheet .hd button{border:none;background:#eef1f7;border-radius:50%;width:34px;height:34px;font-size:15px;color:var(--navy);}
+  .ta4-sheet .r{display:flex;gap:12px;padding:11px 0;border-bottom:1px solid var(--line);font-size:15px;}
+  .ta4-sheet .r span{flex:none;width:76px;color:var(--mute);font-weight:700;}
+  .ta4-sheet .r b{font-weight:700;color:var(--ink);word-break:break-all;}
+  .ta4-sheet .r a{color:var(--navy);text-decoration:none;}
+  .ta4-sheet .ft{padding-top:14px;}
+
 </style>
 <meta name="theme-color" content="#0f2547">
 </head>
@@ -6824,9 +6837,9 @@ function ta2RenderInfo() {
   el('ta2DInfo').innerHTML = [
     f('서비스제공처명', `<div class="ta4-nm"><input class="ta2-inp" value="${escapeHtml(l.company)}" onchange="ta2FText('company',this.value)"><button type="button" class="ta4-pin" id="ta4PinBtn" onclick="ta4PlaceOpen()" aria-label="지도에서 위치 지정">${ta4PinIcon(24)}</button></div>`, true),
     f('주소', `<div class="ta4-nm"><input class="ta2-inp" id="ta4AddrInp" placeholder="📍로 지도에서 지정" onchange="ta4AddrSave(this.value)"><button type="button" class="ta4-go" onclick="ta4Nav('naver')">네이버</button><button type="button" class="ta4-go" onclick="ta4Nav('kakao')">카카오</button></div>`, true),
-    f('고객 담당자', `<input class="ta2-inp" value="${escapeHtml(l.contact)}" placeholder="성명" onchange="ta2FText('contact',this.value)">`),
+    f('고객 담당자', `<div class="ta4-nm"><input class="ta2-inp" value="${escapeHtml(l.contact)}" placeholder="성명" onchange="ta2FText('contact',this.value)"><button type="button" class="ta4-more${TA4.cards[l.id] ? ' has' : ''}" onclick="ta4CardDetail()" aria-label="명함 세부 정보">⋯</button></div>`),
     f('담당자 전화', `<input class="ta2-inp" type="tel" inputmode="tel" value="${escapeHtml(ta2Phone(l.contactPhone))}" placeholder="010-0000-0000" onchange="ta2FPhone(this.value)">`),
-    f('명함', `<div class="ta4-cardrow"><button type="button" class="ta4-cardbtn" onclick="ta4CardOpen('lead')"><span data-ic="card"></span>명함 인식</button></div><div class="ta4-cardsum">${ta4CardSummary(l.id)}</div>`, true),
+    f('명함', `<div class="ta4-cardrow"><button type="button" class="ta4-cardbtn" onclick="ta4CardOpen('lead')"><span data-ic="card"></span>명함 인식</button></div>`, true),
     f('용역료(원)', `<input class="ta2-inp num" inputmode="numeric" value="${l.amount ? Number(l.amount).toLocaleString('ko-KR') : ''}" onchange="ta2FAmount(this)">`),
     f('단계', `<select class="ta2-inp" onchange="ta2FSelect('stage',this.value)">${ta2OptHtml(TA2_EDIT_STAGES, l.stage)}</select>`),
     f('상품종류', `<select class="ta2-inp" onchange="ta2FSelect('productType',this.value)">${ta2OptHtml(TA2_PRODUCTS, l.productType)}</select>`),
@@ -7626,6 +7639,18 @@ function ta4FormCardRender() {
   const c = TA4.formCard, e = el('afCardInfo'); if (!e) return;
   e.textContent = c ? ['📇', c.name, c.title, c.email, c.fax && ('팩스 ' + c.fax)].filter(Boolean).join(' · ') : ''; e.style.display = c ? '' : 'none';
 }
+function ta4CardDetail() {
+  const l = ta2CurLead(); if (!l) return;
+  const c = TA4.cards[l.id], tel = s => escapeHtml(String(s).replace(/[^0-9+]/g, ''));
+  const row = (k, v) => v ? `<div class="r"><span>${k}</span><b>${v}</b></div>` : '';
+  let h;
+  if (c) h = row('이름', escapeHtml(c.name || l.contact)) + row('직책/부서', escapeHtml(c.title)) + row('회사', escapeHtml(c.company)) +
+    row('휴대폰', c.mobile ? `<a href="tel:${tel(c.mobile)}">${escapeHtml(c.mobile)}</a>` : '') + row('회사전화', c.tel ? `<a href="tel:${tel(c.tel)}">${escapeHtml(c.tel)}</a>` : '') +
+    row('팩스', escapeHtml(c.fax)) + row('이메일', c.email ? `<a href="mailto:${escapeHtml(c.email)}">${escapeHtml(c.email)}</a>` : '') + row('주소', escapeHtml(c.address));
+  else h = '<div class="ta3-empty" style="padding:18px 0;">저장된 명함 정보 없음</div>';
+  el('ta4CdDetBody').innerHTML = h; el('ta4CdDet').classList.add('on');
+}
+function ta4CardDetailClose() { el('ta4CdDet').classList.remove('on'); }
 function ta4CardSummary(id) {
   const c = TA4.cards[id]; if (!c) return '';
   const row = (k, v) => v ? `<div class="r"><span>${k}</span>${v}</div>` : '';
@@ -8080,6 +8105,14 @@ function ta4EmoIns(id, ch) {
     <details class="cd-raw"><summary>인식된 원문</summary><pre id="cdRaw"></pre></details>
   </div></div>
   <div class="ta4-pf"><div class="in"><button type="button" class="go" onclick="ta4CardApply()">고객 정보에 적용</button></div></div>
+</div>
+
+<div class="ta4-sheet" id="ta4CdDet" onclick="if(event.target===this)ta4CardDetailClose()">
+  <div class="in">
+    <div class="hd"><b>명함 세부 정보</b><button type="button" onclick="ta4CardDetailClose()" aria-label="닫기">✕</button></div>
+    <div class="bd" id="ta4CdDetBody"></div>
+    <div class="ft"><button type="button" class="ta4-cardbtn" onclick="ta4CardDetailClose();ta4CardOpen('lead')"><span data-ic="card"></span>명함 인식 / 수정</button></div>
+  </div>
 </div>
 
 <!-- 위치 지정 (중앙 핀 방식) -->
