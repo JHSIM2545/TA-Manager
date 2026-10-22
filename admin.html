@@ -1143,6 +1143,11 @@
   .ta3-pin2.sel{transform:scale(1.3);}
   .ta4-pico{display:inline-block;vertical-align:middle;line-height:0;}
 
+  .ta4-notebtn{width:100%;text-align:left;background:#fff !important;color:var(--ink) !important;border:1.5px dashed #c5cde0 !important;border-radius:12px !important;padding:12px 14px !important;font-size:15px !important;font-weight:700 !important;display:flex;flex-direction:column;gap:2px;}
+  .ta4-notebtn small{font-size:12px;font-weight:600;color:var(--soft);}
+  .ta4-notebtn.has{border-style:solid !important;border-color:var(--accent) !important;background:#f5f8ff !important;}
+  .ta4-pg .ta2-draw canvas{height:300px;}
+
 </style>
 <meta name="theme-color" content="#0f2547">
 </head>
@@ -6585,7 +6590,7 @@ function initAgentView(agentName) {
 
 
 // ==========================================================================
-// TA 수첩 v4 — 전체화면 페이지 전환 / 댓글 / 수주보고 / 통합 메모 / 영업동기(영업일보 설정)
+// TA 수첩 v4 — 전체화면 페이지 전환 / 댓글 / 수주보고 / 통합 노트 / 영업동기(영업일보 설정)
 // ==========================================================================
 const PG = { st: [], hooks: {}, sil: false, inited: false };
 const TA4 = { motives: [], motiveDef: '', cm: [], cmErr: '', rp: null };
@@ -7000,7 +7005,7 @@ async function ta2AddSched() {
   } catch (e) { ta3Toast('일정 저장 실패: ' + (e.message || e), 3500); }
 }
 
-// ---------- 메모 게시판 (등록 시 메모 = 관리 중 메모 : 하나의 메모) ----------
+// ---------- 노트 게시판 (등록 시 노트 = 관리 중 노트 : 하나의 노트) ----------
 async function ta2LoadNotes() {
   const id = TA2.leadId; const rows = await ta2NotesList(id);
   if (TA2.leadId !== id) return;
@@ -7017,7 +7022,7 @@ function ta2RenderMemos() {
       <div class="bt"><div class="t">${escapeHtml(title)}${ac ? ` <span class="ac">📎 ${ac}</span>` : ''}</div>${snip ? `<div class="s">${escapeHtml(snip)}</div>` : ''}</div>
       <div class="bd">${ta2FmtTs(n.created_at)}</div></div>`;
   }).join('');
-  el('ta2MemoList').innerHTML = `<div class="ta2-board-head" style="justify-content:flex-end;"><button type="button" onclick="ta2OpenMemoPop('new')">＋ 메모</button></div>
+  el('ta2MemoList').innerHTML = `<div class="ta2-board-head" style="justify-content:flex-end;"><button type="button" onclick="ta2OpenMemoPop('new')">＋ 노트</button></div>
     <div class="ta2-board">${rows}</div>`;
   if (MP.open) ta2RenderMpAtts();
 }
@@ -7032,7 +7037,7 @@ async function ta4MigrateMemo(id) {
     done[id] = 1; ta4LsMapSet(TA4_LS_MIG, done);
     try { await leadWriteWithPhone('update', id, lead.contactPhone, { memo: null }); lead.memo = ''; } catch (e) {}
     await ta2LoadNotes();
-  } catch (e) { console.warn('[TA4] 메모 이관 실패', e); }
+  } catch (e) { console.warn('[TA4] 노트 이관 실패', e); }
 }
 async function ta4NoteInsert(n) {
   const row = { id: crypto.randomUUID(), lead_id: n.lead_id, consultant: currentViewMode, kind: n.kind || 'memo', content: n.content || '', image: n.image || null, created_at: n.created_at || new Date().toISOString() };
@@ -7046,37 +7051,56 @@ const MP = { open: false, id: 'new', draft: null };
 function ta2OpenMemoPop(id) {
   MP.id = id || 'new'; MP.open = true;
   ta2CloseDraw();
-  const ta = el('ta2MemoText'), isNew = MP.id === 'new';
-  if (isNew) {
+  const ta = el('ta2MemoText'), isForm = MP.id === 'form', isNew = MP.id === 'new' || isForm;
+  if (isForm) {
+    const d = TA4.formNote; ta.value = d ? d.text : ''; TA2.pending = d ? d.atts.slice() : [];
+    el('ta2MpTitle').textContent = '노트'; el('ta2MpMeta').textContent = '';
+  } else if (isNew) {
     const d = MP.draft && MP.draft.lead === TA2.leadId ? MP.draft : null;
     ta.value = d ? d.text : ''; TA2.pending = d ? d.atts : [];
-    el('ta2MpTitle').textContent = '새 메모'; el('ta2MpMeta').textContent = '';
+    el('ta2MpTitle').textContent = '새 노트'; el('ta2MpMeta').textContent = '';
   } else {
     const n = TA2.notes.find(x => x.id === MP.id); if (!n) { MP.open = false; return; }
-    ta.value = n.content || ''; el('ta2MpTitle').textContent = '메모'; el('ta2MpMeta').textContent = ta2FmtTs(n.created_at);
+    ta.value = n.content || ''; el('ta2MpTitle').textContent = '노트'; el('ta2MpMeta').textContent = ta2FmtTs(n.created_at);
   }
   el('ta2MpAdd').style.display = isNew ? '' : 'none';
   el('ta2MpDel').style.display = isNew ? 'none' : '';
   el('ta2MpAuto').textContent = ''; el('ta2MpAuto').className = 'sv';
   ta2RenderMpAtts();
   ta4Show('ta2MemoPop', ta4MemoHook);
+  el('ta2MpAdd').textContent = isForm ? '완료' : '등록';
   if (isNew) setTimeout(() => ta.focus(), 120);
 }
+// 신규 등록 화면의 노트 (등록 시 노트 게시판의 첫 노트로 저장)
+TA4.formNote = null;
+function ta4FormNote() { ta2OpenMemoPop('form'); }
+function ta4FormNoteSave() {
+  const t = el('ta2MemoText').value.trim(), a = (TA2.pending || []).slice();
+  TA4.formNote = (t || a.length) ? { text: t, atts: a } : null;
+  ta4FormNoteRender();
+}
+function ta4FormNoteRender() {
+  const n = TA4.formNote, tx = el('afNoteTx'), sub = el('afNoteSub'), b = el('afNoteBtn'); if (!tx) return;
+  if (!n) { tx.textContent = '＋ 노트 작성'; sub.textContent = '글 · 사진 · 그림 · 음성'; b.classList.remove('has'); return; }
+  const first = (n.text.split(/\r?\n/).find(x => x.trim()) || '(사진·그림)').slice(0, 40);
+  tx.textContent = first; sub.textContent = (n.text ? n.text.length + '자' : '') + (n.atts.length ? ` · 첨부 ${n.atts.length}` : ''); b.classList.add('has');
+}
 function ta4MemoHook() {
-  const wasNew = MP.id === 'new';
+  const wasNew = MP.id === 'new', wasForm = MP.id === 'form';
   if (MP.open) {
-    if (wasNew) { const t = el('ta2MemoText').value; MP.draft = (t.trim() || (TA2.pending || []).length) ? { lead: TA2.leadId, text: t, atts: TA2.pending || [] } : null; }
+    if (wasForm) { ta4FormNoteSave(); }
+    else if (wasNew) { const t = el('ta2MemoText').value; MP.draft = (t.trim() || (TA2.pending || []).length) ? { lead: TA2.leadId, text: t, atts: TA2.pending || [] } : null; }
     else { const n = TA2.notes.find(x => x.id === MP.id), v = el('ta2MemoText').value.trim(); if (n && String(n.content || '').trim() !== v) ta2EditMemo(MP.id, v); }
   }
   MP.open = false; ta4SubClose(); ta4VoiceStop();
   const em = el('ta4MemoEmo'); if (em) em.style.display = 'none';
 }
 function ta2CloseMemoPop() { ta4Close('ta2MemoPop'); }
-function ta2MpTarget() { return MP.id === 'new' ? 'new' : MP.id; }
-function ta2MpTextChange(v) { if (MP.id !== 'new') ta2EditMemo(MP.id, v); }
+function ta2MpTarget() { return (MP.id === 'new' || MP.id === 'form') ? 'new' : MP.id; }
+function ta2MpTextChange(v) { if (MP.id !== 'new' && MP.id !== 'form') ta2EditMemo(MP.id, v); }
 function ta2RenderMpAtts() {
   const box = el('ta2MpAtts'); if (!box) return;
-  if (MP.id === 'new') {
+  if (MP.id === 'new' || MP.id === 'form') {
     box.innerHTML = (TA2.pending || []).map((a, i) => `<div class="ta2-att${a.t === 'drawing' ? ' dr' : ''}" onclick="ta2OpenLightboxSrc(${i})">
       <span class="kd">${a.t === 'drawing' ? '그림' : '사진'}</span><img src="${a.d}" alt="">
       <button type="button" class="rm" onclick="event.stopPropagation();ta2RemovePending(${i})">×</button></div>`).join('');
@@ -7086,6 +7110,7 @@ function ta2RenderMpAtts() {
   }
 }
 async function ta2AddMemo() {
+  if (MP.id === 'form') { ta4FormNoteSave(); ta4Close('ta2MemoPop'); return; }
   const text = el('ta2MemoText').value.trim(), atts = TA2.pending || [];
   if (!text && !atts.length) { ta3Toast('내용을 입력하세요'); return; }
   try {
@@ -7093,7 +7118,7 @@ async function ta2AddMemo() {
     TA2.pending = []; MP.draft = null; el('ta2MemoText').value = '';
     ta4Close('ta2MemoPop');
     await ta2LoadNotes(); ta2Flash('등록됨 ✓');
-  } catch (e) { ta3Toast('메모 저장 실패: ' + (e.message || e), 3500); }
+  } catch (e) { ta3Toast('노트 저장 실패: ' + (e.message || e), 3500); }
 }
 async function ta2EditMemo(id, v) {
   try {
@@ -7105,7 +7130,7 @@ async function ta2EditMemo(id, v) {
 }
 async function ta2DelNote(id) {
   id = id || MP.id;
-  if (!confirm('메모를 삭제할까요?')) return;
+  if (!confirm('노트를 삭제할까요?')) return;
   try { await ta2NoteDel(id); MP.open = false; ta4Close('ta2MemoPop'); await ta2LoadNotes(); ta2Flash('삭제됨'); }
   catch (e) { ta3Toast('삭제 실패: ' + (e.message || e), 3500); }
 }
@@ -7209,13 +7234,14 @@ function openNewAgentLeadModal() {
   if (currentUser) saveUserSession(currentUser, currentViewMode, 'newLead');
   el('afEditingId').value = '';
   el('agentModalTitle').textContent = '신규 TA 등록';
-  ['afCompany', 'afContact', 'afContactPhone', 'afAmount', 'afMemo', 'afContractDate', 'afBaseDate'].forEach(i => { el(i).value = ''; });
+  ['afCompany', 'afContact', 'afContactPhone', 'afAmount', 'afContractDate', 'afBaseDate'].forEach(i => { el(i).value = ''; });
   el('afProductType').value = '알람';
   ta4FillMotive('afMotive', '');
   el('afConfidence').value = 'B';
   el('afRegisteredDate').value = todayStr(); el('afExpectedDate').value = todayStr();
   el('afVehicleNumber').value = '없음';
   el('afSubmitBtn').textContent = 'TA 등록'; el('afSubmitBtn').disabled = false;
+  TA4.formNote = null; ta4FormNoteRender();
   el('afStage').innerHTML = '<option value="진행중" selected>진행중</option><option value="수주完">수주완료</option><option value="보류">보류</option>';
   el('afWonExtraRow').style.display = 'none';
   ta3FormReset();
@@ -7242,7 +7268,7 @@ async function handleAgentModalSubmit(e) {
     baseDate = el('afBaseDate').value || contractDate;
     vehicleNumber = el('afVehicleNumber').value || '없음';
   }
-  const memoText = el('afMemo').value.trim();
+  const fn = TA4.formNote;
   const payload = {
     company: el('afCompany').value.trim(), contact: el('afContact').value.trim(), contactPhone: el('afContactPhone').value.trim(),
     amount: parseCurrency(el('afAmount').value), productType: el('afProductType').value, motive: el('afMotive').value, stage: stage,
@@ -7265,8 +7291,8 @@ async function handleAgentModalSubmit(e) {
     if (!ALL[agentName]) ALL[agentName] = { leads: [] };
     ALL[agentName].leads.unshift(payload);
     try { await recordActivityLog(agentName, '신규 등록', payload.company, payload.id, [`서비스제공처명: ${payload.company}`, `용역료: ${formatCurrency(payload.amount)}`, `영업단계: ${payload.stage}`]); } catch (x) {}
-    // 등록 시 메모 = 메모 게시판의 첫 메모
-    if (memoText) { try { await ta4NoteInsert({ lead_id: payload.id, kind: 'memo', content: memoText, image: null, created_at: payload.createdAt }); } catch (x) { ta3Toast('안건은 저장됐지만 메모 저장 실패: ' + (x.message || x), 4000); } }
+    // 등록 시 노트 = 노트 게시판의 첫 노트 (글 + 사진 + 그림)
+    if (fn) { try { await ta4NoteInsert({ lead_id: payload.id, kind: 'memo', content: fn.text, image: fn.atts.length ? JSON.stringify(fn.atts) : null, created_at: payload.createdAt }); TA4.formNote = null; } catch (x) { ta3Toast('안건은 저장됐지만 노트 저장 실패: ' + (x.message || x), 4000); } }
     // 위치
     const p = TA3.formPlace, addr = el('afAddress').value.trim();
     if (p || addr) { try { await ta3PlaceSave(payload.id, 'ta', { lat: p ? p.lat : null, lng: p ? p.lng : null, address: addr || (p && p.address) || '' }); } catch (x) { ta3Toast('위치 저장 실패: ' + (x.message || x), 4000); } }
@@ -7314,6 +7340,78 @@ function ta4ApplyBarTheme() {
   b.classList.add('ta3-themed');
   b.style.setProperty('--tb-bg', `linear-gradient(120deg, ${ta4Shade(pr, 0.62)}, ${pr})`); b.style.setProperty('--tb-bd', ta4Shade(pr, 0.8)); b.style.setProperty('--tb-pr', pr);
   if (m) m.content = pr;
+}
+
+// ---------- 그림 편집: 바탕 이미지(도면) 지원 ----------
+function ta4DrawSetup() {
+  const c = el('ta2Canvas'), r = c.getBoundingClientRect(), dpr = Math.min(2, window.devicePixelRatio || 1);
+  DR.w = r.width; DR.h = r.height; DR.dpr = dpr;
+  c.width = Math.round(r.width * dpr); c.height = Math.round(r.height * dpr);
+  DR.layer = document.createElement('canvas'); DR.layer.width = c.width; DR.layer.height = c.height;
+}
+function ta2OpenDraw(target) {
+  DR.target = target || 'new';
+  el('ta2DrawBox').style.display = 'block';
+  el('ta2Canvas').style.height = ''; DR.bg = null; el('ta4BgOff').style.display = 'none';
+  ta4DrawSetup();
+  DR.strokes = []; DR.cur = null; DR.erase = false;
+  const c = el('ta2Canvas');
+  if (!DR.bound) {
+    DR.bound = true;
+    const pos = e => { const b = c.getBoundingClientRect(); return [e.clientX - b.left, e.clientY - b.top]; };
+    c.addEventListener('pointerdown', e => {
+      e.preventDefault(); c.setPointerCapture(e.pointerId);
+      DR.cur = { color: DR.color, width: DR.erase ? DR.width * 2.5 : DR.width, er: DR.erase, pts: [pos(e)] };
+      DR.strokes.push(DR.cur); ta2DrawRedraw();
+    });
+    c.addEventListener('pointermove', e => { if (!DR.cur) return; e.preventDefault(); DR.cur.pts.push(pos(e)); ta2DrawRedraw(); });
+    const end = () => { DR.cur = null; };
+    c.addEventListener('pointerup', end); c.addEventListener('pointercancel', end); c.addEventListener('pointerleave', end);
+  }
+  ta2DrawRedraw();
+  el('ta2DrawBox').scrollIntoView({ block: 'nearest' });
+}
+function ta2DrawRedraw() {
+  const c = el('ta2Canvas'), x = c.getContext('2d'), L = DR.layer, lx = L.getContext('2d');
+  lx.setTransform(1, 0, 0, 1, 0, 0); lx.clearRect(0, 0, L.width, L.height); lx.setTransform(DR.dpr, 0, 0, DR.dpr, 0, 0);
+  lx.lineCap = 'round'; lx.lineJoin = 'round';
+  DR.strokes.forEach(s => {
+    lx.globalCompositeOperation = s.er ? 'destination-out' : 'source-over';
+    lx.strokeStyle = s.color; lx.fillStyle = s.color; lx.lineWidth = s.width;
+    if (s.pts.length === 1) { lx.beginPath(); lx.arc(s.pts[0][0], s.pts[0][1], s.width / 2, 0, Math.PI * 2); lx.fill(); return; }
+    lx.beginPath(); lx.moveTo(s.pts[0][0], s.pts[0][1]);
+    for (let i = 1; i < s.pts.length; i++) lx.lineTo(s.pts[i][0], s.pts[i][1]);
+    lx.stroke();
+  });
+  lx.globalCompositeOperation = 'source-over';
+  x.setTransform(1, 0, 0, 1, 0, 0); x.fillStyle = '#fff'; x.fillRect(0, 0, c.width, c.height);
+  if (DR.bg) x.drawImage(DR.bg, 0, 0, c.width, c.height);
+  x.drawImage(L, 0, 0);
+}
+function ta2CloseDraw() { if (el('ta2DrawBox')) el('ta2DrawBox').style.display = 'none'; DR.strokes = []; DR.cur = null; DR.bg = null; }
+function ta4DrawBg() { el('ta4BgFile').click(); }
+function ta4DrawBgClear() { DR.bg = null; el('ta2Canvas').style.height = ''; el('ta4BgOff').style.display = 'none'; ta4DrawSetup(); ta2DrawRedraw(); }
+async function ta4DrawBgFile(inp) {
+  const f = inp.files && inp.files[0]; inp.value = ''; if (!f) return;
+  try {
+    const url = await ta2Compress(f, 1800, 0.88);
+    const img = new Image(); await new Promise((res, rej) => { img.onload = res; img.onerror = () => rej(new Error('이미지를 읽을 수 없습니다')); img.src = url; });
+    const c = el('ta2Canvas'), w = c.getBoundingClientRect().width;
+    c.style.height = Math.round(Math.min(Math.max(w * img.naturalHeight / img.naturalWidth, 200), 1100)) + 'px';
+    DR.bg = img; ta4DrawSetup(); el('ta4BgOff').style.display = '';
+    ta2DrawRedraw(); el('ta2DrawBox').scrollIntoView({ block: 'nearest' });
+  } catch (e) { ta3Toast(e.message || '배경 이미지 오류', 3000); }
+}
+function ta2DrawEraser() { DR.erase = true; document.querySelectorAll('.ta2-swatch').forEach(b => b.classList.remove('on')); }
+function ta2DrawColor(btn) { DR.color = btn.dataset.c; DR.erase = false; document.querySelectorAll('.ta2-swatch').forEach(b => b.classList.toggle('on', b === btn)); }
+async function ta2SaveDraw() {
+  if (!DR.strokes.length && !DR.bg) { ta3Toast('그림을 먼저 그려주세요'); return; }
+  const c = el('ta2Canvas'), scale = Math.min(1, (DR.bg ? 1400 : 900) / c.width);
+  const t = document.createElement('canvas'); t.width = Math.round(c.width * scale); t.height = Math.round(c.height * scale);
+  const x = t.getContext('2d'); x.fillStyle = '#fff'; x.fillRect(0, 0, t.width, t.height); x.drawImage(c, 0, 0, t.width, t.height);
+  const target = DR.target;
+  ta2CloseDraw();
+  await ta2AppendAtts(target, [{ t: 'drawing', d: t.toDataURL('image/jpeg', 0.85) }]);
 }
 
 // ---------- 음성 입력 (브라우저 음성인식, 한국어) ----------
@@ -7389,7 +7487,7 @@ function ta4EmoIns(id, ch) {
     <div class="ta2-actions" id="ta2DActions"></div>
 
     <div class="ta4-tabs">
-      <button type="button" class="ta4-tab on" data-tab="memo" onclick="ta2Tab('memo')">메모<b id="ta4CntMemo"></b></button>
+      <button type="button" class="ta4-tab on" data-tab="memo" onclick="ta2Tab('memo')">노트<b id="ta4CntMemo"></b></button>
       <button type="button" class="ta4-tab" data-tab="cal" onclick="ta2Tab('cal')">일정<b id="ta4CntCal"></b></button>
     </div>
     <div id="ta2StoreWarn"></div>
@@ -7425,18 +7523,18 @@ function ta4EmoIns(id, ch) {
   </div></div>
 </div>
 
-<!-- 메모 에디터 (내용 + 사진 + 그림을 한 화면에서) -->
+<!-- 노트 에디터 (내용 + 사진 + 그림을 한 화면에서) -->
 <div class="ta4-pg" id="ta2MemoPop" style="z-index:100001;">
   <div class="ta4-ph">
     <button type="button" class="back" onclick="ta2CloseMemoPop()" aria-label="뒤로">‹</button>
-    <div class="ttl"><h3 id="ta2MpTitle">메모</h3><div class="bd"><span id="ta2MpMeta" style="font-size:11.5px;color:var(--soft);font-weight:600;"></span></div></div>
+    <div class="ttl"><h3 id="ta2MpTitle">노트</h3><div class="bd"><span id="ta2MpMeta" style="font-size:11.5px;color:var(--soft);font-weight:600;"></span></div></div>
     <span class="sv" id="ta2MpAuto"></span>
     <button type="button" class="act dg" id="ta2MpDel" onclick="ta2DelNote()">삭제</button>
     <button type="button" class="act" id="ta2MpAdd" onclick="ta2AddMemo()">등록</button>
   </div>
   <div class="ta4-pb"><div class="in">
     <div class="ta4-ed">
-      <textarea id="ta2MemoText" class="ta2-mp-text" placeholder="메모" onchange="ta2MpTextChange(this.value)"></textarea>
+      <textarea id="ta2MemoText" class="ta2-mp-text" placeholder="노트" onchange="ta2MpTextChange(this.value)"></textarea>
       <div class="ta2-att-grid" id="ta2MpAtts"></div>
       <div class="ta4-emo" id="ta4MemoEmo" style="display:none;"></div>
     </div>
@@ -7452,6 +7550,9 @@ function ta4EmoIns(id, ch) {
         <button type="button" class="ta2-sm" onclick="ta2DrawEraser()">지우개</button>
         <button type="button" class="ta2-sm" onclick="ta2DrawUndo()">↩</button>
         <button type="button" class="ta2-sm" onclick="ta2DrawClear()">전체 지움</button>
+        <button type="button" class="ta2-sm" style="background:#eef3ff !important;" onclick="ta4DrawBg()">🖼 도면·배경</button>
+        <button type="button" class="ta2-sm" id="ta4BgOff" style="display:none;" onclick="ta4DrawBgClear()">배경 삭제</button>
+        <input type="file" id="ta4BgFile" accept="image/*" style="display:none;" onchange="ta4DrawBgFile(this)">
       </div>
       <canvas id="ta2Canvas"></canvas>
       <div style="display:flex;gap:8px;margin-top:8px;justify-content:flex-end;">
@@ -7510,7 +7611,7 @@ function ta4EmoIns(id, ch) {
         <div><label>등록일</label><input type="date" id="afRegisteredDate"></div>
         <div><label>계약예정일 *</label><input type="date" id="afExpectedDate" required onchange="onAgentExpectedDateChange(this.value)"></div>
       </div>
-      <div class="f"><label>메모</label><textarea id="afMemo" placeholder="메모"></textarea></div>
+      <div class="f"><label>노트</label><button type="button" class="ta4-notebtn" id="afNoteBtn" onclick="ta4FormNote()"><span id="afNoteTx">＋ 노트 작성</span><small id="afNoteSub">글 · 사진 · 그림 · 음성</small></button></div>
     </form>
   </div></div>
   <div class="ta4-pf"><div class="in"><button type="submit" form="agentModalLeadForm" id="afSubmitBtn" class="go">TA 등록</button></div></div>
