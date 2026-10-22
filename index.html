@@ -6449,7 +6449,7 @@ function ta3RenderMy() {
   el('ta3Av').textContent = (name || '·').slice(0, 1);
   el('ta3MyName').textContent = name;
   el('ta3MyJob').textContent = (currentUser && currentUser.job) || '컨설턴트';
-  let m = `<button type="button" onclick="window.open(REFERRAL_APP_URL,'_blank')">소개영업 앱 열기</button>
+  let m = `<button type="button" onclick="ta4OpenRef('')">소개영업 앱 열기</button>
     <button type="button" onclick="ta3Reload()">데이터 새로고침</button>`;
   if (master) {
     m += `<button type="button" onclick="location.href='admin.html?admin=1'">통합 대시보드(관리자)</button>`;
@@ -7230,7 +7230,19 @@ function openTodayExpectedModal() {
 function closeTodayExpectedModal() { ta4Close('ta4TodayPg'); }
 function showPortalAlertToast(m) { ta3Toast(m); }
 
-function ta4OpenRef(id) { window.open(REFERRAL_APP_URL.replace(/\/?$/, '/') + '?lead=' + encodeURIComponent(id), '_blank'); }
+// 소개영업 앱 이동: 현재 화면의 컨설턴트 계정으로 자동 로그인(SSO) + 안건 코드가 있으면 해당 안건 상세로
+async function ta4OpenRef(id) {
+  let u = { name: currentViewMode, phone: '', job: '컨설턴트' };
+  const me = currentUser || {};
+  if (!isMasterUser() || me.name === currentViewMode) { u = { name: me.name || currentViewMode, phone: me.phone || '', job: '컨설턴트' }; }
+  else {
+    try { const { data } = await db.from('app_users').select('*').eq('name', currentViewMode).limit(1); if (data && data[0]) u.phone = data[0].phone || ''; } catch (e) {}
+  }
+  if (!u.phone) { ta3Toast(`${currentViewMode} 컨설턴트의 가입 정보(전화번호)를 찾지 못했습니다`, 3500); return; }
+  const q = new URLSearchParams({ sso: '1', name: u.name, phone: String(u.phone).replace(/[^0-9]/g, ''), job: u.job, role: 'user' });
+  if (id) q.set('lead', id);
+  location.href = REFERRAL_APP_URL.replace(/\/?$/, '/') + '?' + q.toString();
+}
 
 </script>
 
