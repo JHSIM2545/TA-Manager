@@ -7256,13 +7256,15 @@ async function ta4OpenRef(id) {
 }
 
 // 컨설턴트 고유 컬러 타이틀 바 (지사장 로그인 시에는 흰색 유지)
+const TA4_COLORS = { '최영국': '#1d4ed8', '이수열': '#15803d', '박광춘': '#0891b2', '정문재': '#7c3aed', '임영민': '#ea580c' };
+function ta4Shade(hex, k) { const n = parseInt(hex.slice(1), 16); const f = c => Math.round(c * k); return '#' + [(n >> 16) & 255, (n >> 8) & 255, n & 255].map(c => f(c).toString(16).padStart(2, '0')).join(''); }
 function ta4ApplyBarTheme() {
-  const th = (typeof CONSULTANT_THEMES !== 'undefined' && !isMasterUser()) ? CONSULTANT_THEMES[currentViewMode] : null;
+  const pr = !isMasterUser() ? TA4_COLORS[currentViewMode] : null;
   const b = document.body, m = document.querySelector('meta[name=theme-color]');
-  if (!th) { b.classList.remove('ta3-themed'); b.style.removeProperty('--tb-bg'); if (m) m.content = '#ffffff'; return; }
+  if (!pr) { b.classList.remove('ta3-themed'); b.style.removeProperty('--tb-bg'); if (m) m.content = '#ffffff'; return; }
   b.classList.add('ta3-themed');
-  b.style.setProperty('--tb-bg', th.headerBg); b.style.setProperty('--tb-bd', th.headerBorder); b.style.setProperty('--tb-pr', th.primary);
-  if (m) m.content = th.primary;
+  b.style.setProperty('--tb-bg', `linear-gradient(120deg, ${ta4Shade(pr, 0.62)}, ${pr})`); b.style.setProperty('--tb-bd', ta4Shade(pr, 0.8)); b.style.setProperty('--tb-pr', pr);
+  if (m) m.content = pr;
 }
 
 </script>
