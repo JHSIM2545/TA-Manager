@@ -1208,10 +1208,52 @@
   .ta4-sheet .r a{color:var(--navy);text-decoration:none;}
   .ta4-sheet .ft{padding-top:14px;}
 
+  .ta4-busy,.ta4-voice{position:fixed;inset:0;z-index:2000000;display:none;align-items:center;justify-content:center;flex-direction:column;background:rgba(240,244,252,.55);-webkit-backdrop-filter:blur(9px);backdrop-filter:blur(9px);}
+  .ta4-busy.on,.ta4-voice.on{display:flex;}
+  .ta4-busy .bx{display:flex;flex-direction:column;align-items:center;gap:16px;padding:26px 30px;border-radius:22px;background:rgba(255,255,255,.92);box-shadow:0 10px 40px rgba(15,37,71,.18);}
+  .ta4-busy b{font-size:17px;font-weight:800;color:var(--navy);text-align:center;}
+  .ta4-busy .sp{width:38px;height:38px;border-radius:50%;border:4px solid #dbe5f7;border-top-color:var(--navy);animation:ta4spin .9s linear infinite;display:block;}
+  .ta4-busy .dots u{text-decoration:none;animation:ta4dot 1.2s infinite;opacity:.2;} .ta4-busy .dots u:nth-child(2){animation-delay:.2s;} .ta4-busy .dots u:nth-child(3){animation-delay:.4s;}
+  @keyframes ta4spin{to{transform:rotate(360deg);}} @keyframes ta4dot{0%,100%{opacity:.2;}50%{opacity:1;}}
+  .ta4-voice{background:rgba(15,37,71,.55);}
+  .ta4-voice .bx{display:flex;align-items:center;gap:14px;}
+  .ta4-voice .mc{width:104px;height:104px;border-radius:50%;background:#fff;color:#dc2626;display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 0 rgba(220,38,38,.5);animation:ta4pulse 1.5s infinite;}
+  .ta4-voice .mc [data-ic] svg{width:50px;height:50px;stroke-width:1.7;}
+  .ta4-voice .wv{display:flex;align-items:center;gap:6px;height:80px;}
+  .ta4-voice .wv i{display:block;width:6px;height:16px;border-radius:3px;background:#fff;animation:ta4wave 1s ease-in-out infinite;}
+  .ta4-voice .wv.l i:nth-child(1){animation-delay:.4s;} .ta4-voice .wv.l i:nth-child(2){animation-delay:.3s;} .ta4-voice .wv.l i:nth-child(3){animation-delay:.2s;} .ta4-voice .wv.l i:nth-child(4){animation-delay:.1s;}
+  .ta4-voice .wv.r i:nth-child(2){animation-delay:.1s;} .ta4-voice .wv.r i:nth-child(3){animation-delay:.2s;} .ta4-voice .wv.r i:nth-child(4){animation-delay:.3s;} .ta4-voice .wv.r i:nth-child(5){animation-delay:.4s;}
+  @keyframes ta4wave{0%,100%{height:12px;opacity:.55;}50%{height:70px;opacity:1;}}
+  @keyframes ta4pulse{0%{box-shadow:0 0 0 0 rgba(220,38,38,.55);}70%{box-shadow:0 0 0 26px rgba(220,38,38,0);}100%{box-shadow:0 0 0 0 rgba(220,38,38,0);}}
+  .ta4-voice .tx{margin:26px 28px 0;max-width:520px;min-height:48px;text-align:center;color:#fff;font-size:18px;font-weight:700;line-height:1.5;word-break:keep-all;}
+  .ta4-voice .hint{position:absolute;bottom:calc(60px + env(safe-area-inset-bottom));color:rgba(255,255,255,.85);font-size:14px;font-weight:700;}
+
 </style>
+<link rel="manifest" href="manifest.json">
+<link rel="icon" type="image/png" href="favicon.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="TA 관리">
+<style>#ta4Splash{position:fixed;inset:0;z-index:2147483000;background:#eef4fc url(splash.jpg) center/cover no-repeat;transition:opacity .45s ease;}#ta4Splash.out{opacity:0;pointer-events:none;}</style>
 <meta name="theme-color" content="#0f2547">
 </head>
 <body>
+<div id="ta4Splash" aria-hidden="true"></div>
+<script>
+// ---------- 스플래시 / 설치형 앱 ----------
+(function () {
+  const sp = document.getElementById('ta4Splash'); if (!sp) return;
+  let seen = false; try { seen = sessionStorage.getItem('S1_SPLASH') === '1'; sessionStorage.setItem('S1_SPLASH', '1'); } catch (e) {}
+  if (seen) { sp.remove(); return; }
+  const hide = () => { sp.classList.add('out'); setTimeout(() => sp.remove(), 600); };
+  const t0 = Date.now(), min = 1400;
+  const go = () => setTimeout(hide, Math.max(0, min - (Date.now() - t0)));
+  if (document.readyState === 'complete') go(); else window.addEventListener('load', go);
+  setTimeout(hide, 3500);
+})();
+if ('serviceWorker' in navigator) window.addEventListener('load', () => { navigator.serviceWorker.register('sw.js').catch(() => {}); });
+</script>
 
 <!-- 1. 로그인 오버레이 -->
 <div id="loginOverlay">
@@ -7552,9 +7594,10 @@ async function ta4CardShoot() {
   ta4CardCamStop(); ta4CardProcess(new File([blob], 'card.jpg', { type: 'image/jpeg' }));
 }
 function ta4CardPick(inp) { const f = inp.files && inp.files[0]; inp.value = ''; if (f) { ta4CardCamStop(); ta4CardProcess(f); } }
+function ta4BusyUi(on) { if (!on) TA4.card.busy = false; const e = el('ta4Busy'); if (e) e.classList.toggle('on', !!on); }
 async function ta4CardProcess(f) {
   if (!f || TA4.card.busy) return;
-  TA4.card.busy = true; ta4CardStatus('이미지 처리 중…', 'busy');
+  TA4.card.busy = true; ta4BusyUi(true); ta4CardStatus('이미지 처리 중…', 'busy');
   try {
     const url = await ta2Compress(f, 1800, 0.88); TA4.card.img = url;
     const img = new Image(); await new Promise((res, rej) => { img.onload = res; img.onerror = () => rej(new Error('이미지를 읽을 수 없습니다')); img.src = url; });
@@ -7575,7 +7618,7 @@ async function ta4CardProcess(f) {
     if (!c) {
       let text = '';
       try { ta4CardStatus('기본 인식으로 처리 중…', 'busy'); const w = await ta4OcrWorker(); const r = await w.recognize(ta4CardPrep(img)); text = (r && r.data && r.data.text) || ''; }
-      catch (e) { ta4CardStatus('자동 인식을 사용할 수 없습니다(인터넷 연결 확인). 아래에 직접 입력해 주세요.', 'err'); TA4.card.busy = false; return; }
+      catch (e) { ta4CardStatus('자동 인식을 사용할 수 없습니다(인터넷 연결 확인). 아래에 직접 입력해 주세요.', 'err'); ta4BusyUi(false); return; }
       el('cdRaw').textContent = text.trim(); c = ta4CardParse(text); via = 'ocr';
     }
     const F = ta4CardFields();
@@ -7583,7 +7626,7 @@ async function ta4CardProcess(f) {
     const n = Object.values(c).filter(Boolean).length;
     ta4CardStatus(n ? `인식 완료${via === 'ocr' ? '(기본 인식)' : ' (AI)'} — ${n}개 항목. 잘못된 곳은 고쳐주세요.${via === 'ocr' && why ? '\nAI 인식 실패 사유: ' + why : ''}` : '글자를 찾지 못했습니다. 다시 촬영하거나 직접 입력해 주세요.', n ? 'ok' : 'err');
   } catch (e) { ta4CardStatus(e.message || '인식 오류', 'err'); }
-  TA4.card.busy = false;
+  ta4BusyUi(false);
 }
 // 내 전화기 연락처 저장: 웹은 연락처에 직접 쓸 수 없어 vCard를 공유/열기 → 연락처 앱에서 저장 1탭
 function ta4Vcard(c, company) {
@@ -7807,7 +7850,8 @@ async function ta4Mode(m) {
   }
 }
 const VO = { rec: null, on: false, btn: null };
-function ta4VoiceStop() { try { if (VO.stopReq) VO.stopReq(); if (VO.rec) VO.rec.stop(); } catch (e) {} }
+function ta4VoiceUi(on) { const e = el('ta4VoiceOv'); if (!e) return; e.classList.toggle('on', !!on); if (on) { const t = el('ta4VoiceTx'); if (t) t.textContent = ''; } }
+function ta4VoiceStop() { try { if (VO.stopReq) VO.stopReq(); if (VO.rec) VO.rec.stop(); } catch (e) {} setTimeout(() => { if (!VO.on) ta4VoiceUi(false); }, 1200); }
 async function ta4MicPerm() {
   // 마이크 권한 요청: 허용 전이면 브라우저/OS 권한 창이 뜸. 반환 true=허용, false=거부
   try {
@@ -7835,7 +7879,7 @@ async function ta4Voice(targetId, btnId) {
     const r = new SR(); r.lang = 'ko-KR'; r.interimResults = true; r.continuous = false; r.maxAlternatives = 1; cur = '';
     r.onresult = e => {
       let t = ''; for (let i = 0; i < e.results.length; i++) t += e.results[i][0].transcript;
-      cur = t.trim(); show(cur);
+      cur = t.trim(); show(cur); { const tx = el('ta4VoiceTx'); if (tx) tx.textContent = cur; }
     };
     r.onerror = e => {
       if (e.error === 'not-allowed' || e.error === 'service-not-allowed') { want = false; ta4MicHelp(); }
@@ -7843,13 +7887,13 @@ async function ta4Voice(targetId, btnId) {
     };
     r.onend = () => {
       if (cur) { base += cur + ' '; cur = ''; show(''); }
-      if (want && VO.on) { setTimeout(() => { if (want && VO.on) { try { run(); } catch (e) { fin(); } } }, 120); return; }
+      if (want && VO.on) { setTimeout(() => { if (want && VO.on) { try { run(); } catch (e) { fin(); } } else fin(); }, 120); return; }
       fin();
     };
     r.start(); VO.rec = r;
   };
-  const fin = () => { if (btnId === 'ta4ModeMic') ta4ModeUi('kb'); VO.on = false; VO.rec = null; VO.stopReq = null; if (btn) btn.classList.remove('rec'); ta.value = ta.value.trim(); ta.dispatchEvent(new Event('change')); };
-  try { VO.on = true; if (btn) btn.classList.add('rec'); run(); } catch (e) { VO.on = false; if (btn) btn.classList.remove('rec'); ta3Toast('음성 인식을 시작하지 못했습니다'); }
+  const fin = () => { ta4VoiceUi(false); if (btnId === 'ta4ModeMic') ta4ModeUi('kb'); VO.on = false; VO.rec = null; VO.stopReq = null; if (btn) btn.classList.remove('rec'); ta.value = ta.value.trim(); ta.dispatchEvent(new Event('change')); };
+  try { VO.on = true; if (btn) btn.classList.add('rec'); ta4VoiceUi(true); run(); } catch (e) { VO.on = false; ta4VoiceUi(false); if (btn) btn.classList.remove('rec'); ta3Toast('음성 인식을 시작하지 못했습니다'); }
 }
 
 // ---------- 이모지 ----------
@@ -8134,6 +8178,16 @@ function ta4EmoIns(id, ch) {
   <div class="ta3-plist" id="ta3IpList"></div>
 </div>
 
+<div class="ta4-busy" id="ta4Busy"><div class="bx"><i class="sp"></i><b>AI가 명함을 인식하고 있습니다<span class="dots"><u>.</u><u>.</u><u>.</u></span></b></div></div>
+<div class="ta4-voice" id="ta4VoiceOv" onclick="ta4VoiceStop()">
+  <div class="bx">
+    <div class="wv l"><i></i><i></i><i></i><i></i><i></i></div>
+    <div class="mc"><span data-ic="mic"></span></div>
+    <div class="wv r"><i></i><i></i><i></i><i></i><i></i></div>
+  </div>
+  <div class="tx" id="ta4VoiceTx"></div>
+  <div class="hint">음성 인식 중입니다 · 화면을 터치하면 완료됩니다</div>
+</div>
 <div class="ta3-toast" id="ta3Toast"></div>
 
 </body>
