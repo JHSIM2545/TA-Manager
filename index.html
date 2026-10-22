@@ -6744,7 +6744,7 @@ function ta2RenderActions() {
     a += `<a href="${ta2TelHref(l)}" style="text-decoration:none;"><button type="button" style="background:#16a34a;color:#fff;">📞 ${escapeHtml(ta2Phone(l.contactPhone))}</button></a>`;
     a += `<button type="button" style="background:#0f2547;color:#fff;" onclick="ta2SaveContact()">연락처 저장</button>`;
   }
-  if (l._ref) a += `<button type="button" style="background:#6d28d9;color:#fff;" onclick="window.open(REFERRAL_APP_URL,'_blank')">소개영업 앱에서 처리</button>`;
+  if (l._ref) a += `<button type="button" style="background:#6d28d9;color:#fff;" onclick="ta4OpenRef('${escapeHtml(l.id)}')">소개영업 앱에서 열기</button>`;
   if (!l._ref && isCreatedToday(l)) a += `<button type="button" class="danger" onclick="ta2DeleteFromDetail()">삭제</button>`;
   el('ta2DActions').innerHTML = a;
 }
@@ -7229,6 +7229,8 @@ function openTodayExpectedModal() {
 }
 function closeTodayExpectedModal() { ta4Close('ta4TodayPg'); }
 function showPortalAlertToast(m) { ta3Toast(m); }
+
+function ta4OpenRef(id) { window.open(REFERRAL_APP_URL.replace(/\/?$/, '/') + '?lead=' + encodeURIComponent(id), '_blank'); }
 
 </script>
 
