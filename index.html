@@ -1120,6 +1120,19 @@
   body.ta3-themed .ta4-ph .ic{background:rgba(255,255,255,.2) !important;color:#fff !important;}
   body.ta3-themed .ta4-ph .act.ghost{background:rgba(255,255,255,.2) !important;color:#fff !important;}
 
+  /* v5: 하단 댓글 섹션 · 이모지 · 음성 */
+  .ta4-cmsec{margin-top:22px;padding-top:6px;}
+  .ta4-cmh{font-size:15px;font-weight:800;color:var(--ink);margin:0 2px 10px;display:flex;gap:6px;align-items:center;}
+  .ta4-cmh b{color:var(--accent);font-size:13px;}
+  .ta4-emo{display:flex;gap:2px;overflow-x:auto;padding:6px 2px;margin-top:6px;}
+  .ta4-emo button{flex:none;background:#fff !important;border:1px solid var(--line) !important;border-radius:10px !important;width:38px;height:36px;font-size:19px;padding:0 !important;line-height:1;}
+  .ta4-cmf .mic{background:#fff !important;color:var(--ink) !important;border:1px solid var(--line) !important;padding:0 !important;width:46px;font-size:18px;}
+  .mic.rec{background:#fee2e2 !important;border-color:#fca5a5 !important;color:#b91c1c !important;animation:ta4rec 1s infinite;}
+  @keyframes ta4rec{50%{opacity:.55;}}
+  .ta4-ed .ta4-emo{padding:8px 0 2px;}
+  .ta4-pf .tool{white-space:nowrap;padding-left:10px !important;padding-right:10px !important;font-size:13px !important;}
+  #ta2MpPhotoBar{overflow-x:auto;}
+
 </style>
 <meta name="theme-color" content="#0f2547">
 </head>
@@ -6589,6 +6602,7 @@ function ta4Init() {
   });
   const am = el('afAmount'); if (am) am.addEventListener('input', () => { const n = parseCurrency(am.value); am.value = n ? n.toLocaleString('ko-KR') : ''; });
   const ra = el('rpAmount'); if (ra) ra.addEventListener('input', () => { const n = parseCurrency(ra.value); ra.value = n ? n.toLocaleString('ko-KR') : ''; });
+  ta4EmoInit();
   const rt = el('rpText'); if (rt) rt.addEventListener('input', () => { if (TA4.rp) TA4.rp.manual = true; });
 }
 function ta4MeName() { return (currentUser && currentUser.name) || currentViewMode || ''; }
@@ -6675,7 +6689,8 @@ function ta4RenderCmtBox() {
 function ta4RenderCmts() {
   const id = TA2.leadId, list = ta4CmFor(id).slice().sort((a, b) => String(a.created_at).localeCompare(String(b.created_at)));
   const me = ta4MeName();
-  el('ta4CmList').innerHTML = list.map(c => `<div class="ta4-cm${c.author_role === '지사장' ? ' mgr' : ''}">
+  const warn = TA2.mode.ta_comments === 'local' ? '<div class="ta2-warn">⚠️ 서버 저장소(ta_comments) 미설정 — 이 기기에만 저장됩니다</div>' : '';
+  el('ta4CmList').innerHTML = warn + list.map(c => `<div class="ta4-cm${c.author_role === '지사장' ? ' mgr' : ''}">
     <div class="h"><b>${escapeHtml(c.author || '')}</b>${c.author_role ? `<span class="rl">${escapeHtml(c.author_role)}</span>` : ''}<span class="tm">${ta2FmtTs(c.created_at)}</span>
       ${(c.author === me || isMasterUser()) ? `<button type="button" class="dl" onclick="ta4CmDel('${escapeHtml(c.id)}')">삭제</button>` : ''}</div>
     <div class="tx">${escapeHtml(c.content)}</div></div>`).join('');
@@ -6804,8 +6819,10 @@ async function ta2OpenDetail(id, tab, date) {
   TA2.calSel = date || todayStr(); TA2.calYM = TA2.calSel.slice(0, 7);
   ta2RenderHead(); ta2RenderInfo(); ta4RenderAddr(); ta4RenderWon(); ta4RenderCmts(); ta4Counts();
   el('ta4PlBtn').style.display = '';
-  ta4Show('ta2DetailOverlay', () => { ta4SubClose(); TA2.leadId = null; MP.open = false; ta3Refresh(); });
-  ta2Tab(['cal', 'cmt', 'memo'].includes(tab) ? tab : 'memo');
+  ta4Show('ta2DetailOverlay', () => { ta4SubClose(); ta4VoiceStop(); TA2.leadId = null; MP.open = false; ta3Refresh(); });
+  ta2Tab(tab === 'cal' ? 'cal' : 'memo');
+  ta4MarkSeen(id);
+  if (tab === 'cmt') setTimeout(() => { const c = el('ta4PaneCmt'); if (c) c.scrollIntoView({ block: 'start' }); }, 250);
   await Promise.all([ta2Probe('ta_notes'), ta2Probe('ta_schedules'), ta2Probe('ta_comments')]);
   if (TA2.leadId !== id) return;
   await ta2LoadNotes(); await ta2LoadSched();
@@ -6836,14 +6853,12 @@ function ta2Tab(t) {
   document.querySelectorAll('.ta4-tab').forEach(b => b.classList.toggle('on', b.dataset.tab === t));
   el('ta2PaneMemo').style.display = t === 'memo' ? 'block' : 'none';
   el('ta2PaneCal').style.display = t === 'cal' ? 'block' : 'none';
-  el('ta4PaneCmt').style.display = t === 'cmt' ? 'block' : 'none';
   if (t !== 'memo') ta2CloseDraw();
   if (t === 'cal') { ta2RenderCal(); ta2RenderSchedList(); ta2SetSchDate(TA2.calSel); }
-  if (t === 'cmt') { ta4RenderCmts(); ta4MarkSeen(TA2.leadId); }
   ta2ShowStoreWarn();
 }
 function ta2ShowStoreWarn() {
-  const table = TA2.tab === 'cal' ? 'ta_schedules' : TA2.tab === 'cmt' ? 'ta_comments' : 'ta_notes';
+  const table = TA2.tab === 'cal' ? 'ta_schedules' : 'ta_notes';
   el('ta2StoreWarn').innerHTML = TA2.mode[table] === 'local' ? `<div class="ta2-warn">⚠️ 서버 저장소(${table}) 미설정 — 이 기기에만 저장됩니다</div>` : '';
 }
 function ta4Counts() {
@@ -7020,7 +7035,8 @@ function ta4MemoHook() {
     if (wasNew) { const t = el('ta2MemoText').value; MP.draft = (t.trim() || (TA2.pending || []).length) ? { lead: TA2.leadId, text: t, atts: TA2.pending || [] } : null; }
     else { const n = TA2.notes.find(x => x.id === MP.id), v = el('ta2MemoText').value.trim(); if (n && String(n.content || '').trim() !== v) ta2EditMemo(MP.id, v); }
   }
-  MP.open = false; ta4SubClose();
+  MP.open = false; ta4SubClose(); ta4VoiceStop();
+  const em = el('ta4MemoEmo'); if (em) em.style.display = 'none';
 }
 function ta2CloseMemoPop() { ta4Close('ta2MemoPop'); }
 function ta2MpTarget() { return MP.id === 'new' ? 'new' : MP.id; }
@@ -7267,6 +7283,43 @@ function ta4ApplyBarTheme() {
   if (m) m.content = pr;
 }
 
+// ---------- 음성 입력 (브라우저 음성인식, 한국어) ----------
+const VO = { rec: null, on: false, btn: null };
+function ta4VoiceStop() { try { if (VO.rec) VO.rec.stop(); } catch (e) {} }
+function ta4Voice(targetId, btnId) {
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) { ta3Toast('이 브라우저는 음성입력을 지원하지 않습니다. 키보드의 🎤를 사용하세요', 3800); return; }
+  if (VO.on) { ta4VoiceStop(); return; }
+  const ta = el(targetId), btn = el(btnId); if (!ta) return;
+  let base = ta.value + (ta.value && !/\s$/.test(ta.value) ? ' ' : '');
+  const r = new SR(); r.lang = 'ko-KR'; r.interimResults = true; r.continuous = true;
+  r.onresult = e => {
+    let interim = '';
+    for (let i = e.resultIndex; i < e.results.length; i++) {
+      const t = e.results[i][0].transcript;
+      if (e.results[i].isFinal) base += t.trim() + ' '; else interim += t;
+    }
+    ta.value = base + interim;
+    ta.scrollTop = ta.scrollHeight;
+  };
+  r.onerror = e => { if (e.error === 'not-allowed' || e.error === 'service-not-allowed') ta3Toast('마이크 권한을 허용해주세요', 3500); else if (e.error !== 'no-speech' && e.error !== 'aborted') ta3Toast('음성 인식 오류: ' + e.error, 3000); };
+  r.onend = () => { VO.on = false; VO.rec = null; if (btn) btn.classList.remove('rec'); ta.value = ta.value.trim(); ta.dispatchEvent(new Event('change')); };
+  try { r.start(); VO.rec = r; VO.on = true; if (btn) btn.classList.add('rec'); } catch (e) { ta3Toast('음성 인식을 시작하지 못했습니다'); }
+}
+
+// ---------- 이모지 ----------
+const TA4_EMOJI = ['👍', '👏', '🙏', '😊', '😄', '🤝', '🔥', '💪', '🎉', '✅', '❤️', '😢', '😮', '❓', '⚠️', '📞', '📍', '💰', '⭐', '🚀'];
+function ta4EmoHtml(target) { return TA4_EMOJI.map(e => `<button type="button" onmousedown="event.preventDefault()" onclick="ta4EmoIns('${target}','${e}')">${e}</button>`).join(''); }
+function ta4EmoInit() { if (el('ta4CmEmo')) el('ta4CmEmo').innerHTML = ta4EmoHtml('ta4CmText'); if (el('ta4MemoEmo')) el('ta4MemoEmo').innerHTML = ta4EmoHtml('ta2MemoText'); }
+function ta4EmoToggle() { const e = el('ta4MemoEmo'); e.style.display = e.style.display === 'none' ? 'flex' : 'none'; }
+function ta4EmoIns(id, ch) {
+  const ta = el(id); if (!ta) return;
+  const a = ta.selectionStart == null ? ta.value.length : ta.selectionStart, b = ta.selectionEnd == null ? a : ta.selectionEnd;
+  ta.value = ta.value.slice(0, a) + ch + ta.value.slice(b);
+  const p = a + ch.length; try { ta.setSelectionRange(p, p); } catch (e) {}
+  ta.focus(); ta.dispatchEvent(new Event('input'));
+}
+
 </script>
 
 <!-- ========================================== -->
@@ -7305,7 +7358,6 @@ function ta4ApplyBarTheme() {
     <div class="ta4-tabs">
       <button type="button" class="ta4-tab on" data-tab="memo" onclick="ta2Tab('memo')">메모<b id="ta4CntMemo"></b></button>
       <button type="button" class="ta4-tab" data-tab="cal" onclick="ta2Tab('cal')">일정<b id="ta4CntCal"></b></button>
-      <button type="button" class="ta4-tab" data-tab="cmt" onclick="ta2Tab('cmt')">댓글<b id="ta4CntCmt"></b></button>
     </div>
     <div id="ta2StoreWarn"></div>
 
@@ -7329,9 +7381,13 @@ function ta4ApplyBarTheme() {
       </div>
     </div>
 
-    <div id="ta4PaneCmt" style="display:none;">
+    <div class="ta4-cmsec" id="ta4PaneCmt">
+      <div class="ta4-cmh">댓글<b id="ta4CntCmt"></b></div>
       <div id="ta4CmList"></div>
-      <div class="ta4-cmf"><textarea id="ta4CmText" rows="1" placeholder="댓글"></textarea><button type="button" onclick="ta4CmAdd()">등록</button></div>
+      <div class="ta4-emo" id="ta4CmEmo"></div>
+      <div class="ta4-cmf"><textarea id="ta4CmText" rows="1" placeholder="댓글"></textarea>
+        <button type="button" class="mic" id="ta4CmMic" onclick="ta4Voice('ta4CmText','ta4CmMic')" aria-label="음성 입력">🎤</button>
+        <button type="button" onclick="ta4CmAdd()">등록</button></div>
     </div>
   </div></div>
 </div>
@@ -7349,6 +7405,7 @@ function ta4ApplyBarTheme() {
     <div class="ta4-ed">
       <textarea id="ta2MemoText" class="ta2-mp-text" placeholder="메모" onchange="ta2MpTextChange(this.value)"></textarea>
       <div class="ta2-att-grid" id="ta2MpAtts"></div>
+      <div class="ta4-emo" id="ta4MemoEmo" style="display:none;"></div>
     </div>
     <div class="ta2-draw" id="ta2DrawBox" style="display:none;">
       <div class="tl">
@@ -7374,6 +7431,8 @@ function ta4ApplyBarTheme() {
     <button type="button" class="tool" onclick="ta2AttachPick(ta2MpTarget(),'cam')">📷 촬영</button>
     <button type="button" class="tool" onclick="ta2AttachPick(ta2MpTarget(),'album')">🖼️ 앨범</button>
     <button type="button" class="tool" onclick="ta2OpenDraw(ta2MpTarget())">✏️ 그림</button>
+    <button type="button" class="tool mic" id="ta4MemoMic" onclick="ta4Voice('ta2MemoText','ta4MemoMic')">🎤 음성</button>
+    <button type="button" class="tool" onclick="ta4EmoToggle()">😊</button>
   </div></div>
 </div>
 
