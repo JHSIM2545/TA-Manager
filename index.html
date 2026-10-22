@@ -7514,7 +7514,7 @@ async function ta4CardPick(inp) {
     // 1순위: Claude 이미지 인식(Supabase 함수 card-ocr) / 실패 시 2순위: 브라우저 OCR
     let c = null, via = '', why = '';
     try {
-      ta4CardStatus('Claude가 명함을 읽는 중…', 'busy');
+      ta4CardStatus('AI가 명함을 읽는 중…', 'busy');
       const r = await Promise.race([db.functions.invoke('card-ocr', { body: { image: url } }), new Promise((_, rej) => setTimeout(() => rej(new Error('응답 시간 초과(30초)')), 30000))]);
       if (r && !r.error && r.data && !r.data.error) { c = r.data; via = 'claude'; el('cdRaw').textContent = JSON.stringify(c, null, 1); }
       else {
@@ -7533,7 +7533,7 @@ async function ta4CardPick(inp) {
     const F = ta4CardFields();
     Object.keys(F).forEach(k => { if (c[k]) el(F[k]).value = String(c[k]).trim(); });
     const n = Object.values(c).filter(Boolean).length;
-    ta4CardStatus(n ? `인식 완료${via === 'ocr' ? '(기본 인식)' : ' (Claude)'} — ${n}개 항목. 잘못된 곳은 고쳐주세요.${via === 'ocr' && why ? '\nClaude 인식 실패 사유: ' + why : ''}` : '글자를 찾지 못했습니다. 다시 촬영하거나 직접 입력해 주세요.', n ? 'ok' : 'err');
+    ta4CardStatus(n ? `인식 완료${via === 'ocr' ? '(기본 인식)' : ' (AI)'} — ${n}개 항목. 잘못된 곳은 고쳐주세요.${via === 'ocr' && why ? '\nAI 인식 실패 사유: ' + why : ''}` : '글자를 찾지 못했습니다. 다시 촬영하거나 직접 입력해 주세요.', n ? 'ok' : 'err');
   } catch (e) { ta4CardStatus(e.message || '인식 오류', 'err'); }
   TA4.card.busy = false;
 }
