@@ -1915,6 +1915,7 @@ function appRoute(mode) {
   const q = new URLSearchParams(location.search).get('view');
   if (APP_MODE === 'agent') {
     if (!isMasterUser()) return null;
+    return { go: 'admin.html?admin=1' };   // 지사관리자는 로그인하면 통합 대시보드(관리자 화면)로
     if (q && CONSULTANTS.includes(q)) return { mode: q };
     if (CONSULTANTS.includes(mode)) return { mode: mode };
     let lv = ''; try { lv = localStorage.getItem('S1_TA3_LASTVIEW') || ''; } catch (e) {}
