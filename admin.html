@@ -8295,13 +8295,17 @@ function ta4PsParse(text) {
   const fmt = s => { let d = onlyNum(s); if (d.startsWith('82') && d.length >= 11) d = '0' + d.slice(2); if (d.startsWith('02')) return d.length === 9 ? `02-${d.slice(2, 5)}-${d.slice(5)}` : `02-${d.slice(2, 6)}-${d.slice(6)}`; if (d.length === 11) return `${d.slice(0, 3)}-${d.slice(3, 7)}-${d.slice(7)}`; if (d.length === 10) return `${d.slice(0, 3)}-${d.slice(3, 6)}-${d.slice(6)}`; return d; };
   chunks.forEach(raw => {
     if (/가망고객번호|패밀리넷/.test(raw)) {   // 형식 2: 에스원 패밀리넷 배정 알림 (-항목: 값)
-      const g = {}; raw.split(/\r?\n/).forEach(ln => { const m = /^\s*[-·•]\s*([^:：]+?)\s*[:：]\s*(.*)$/.exec(ln); if (m) g[m[1].replace(/\s+/g, '')] = m[2].trim(); });
-      const agent = (/영업사원\s*\[([^\]]+)\]/.exec(raw) || [])[1] || '', type = (/\[([^\]]*대리점[^\]]*)\]/.exec(raw) || [])[1] || '';
+      const g = {}; raw.split(/\r?\n/).forEach(ln => { const m = /^\s*[-·•]?\s*([^:：\n]{1,20}?)\s*[:：]\s*(.*)$/.exec(ln); if (m && !/^※/.test(ln.trim())) { const k = m[1].replace(/\s+/g, ''); if (!(k in g)) g[k] = m[2].trim(); } });
+      const intro = /소개자/.test(raw) || /\]\s*가망고객\s*등록\s*알림/.test(raw);
+      const refM = /^(.*?)\s*\(?\s*(0\d[\d\-\s]{8,12}\d)\s*\)?\s*$/.exec(g['소개자'] || '');
+      const agent = intro ? (refM ? refM[1].trim() : (g['소개자'] || '')) : ((/영업사원\s*\[([^\]]+)\]/.exec(raw) || [])[1] || '');
+      const agentPhone = intro ? (refM ? fmt(refM[2]) : '') : fmt(g['대리점영업사원전화번호']);
+      const type = (/\[([^\]]*대리점[^\]]*)\]/.exec(raw) || [])[1] || '';
       const assign = (/\]\s*(\S+?)\s*님께\s*배정/.exec(raw) || [])[1] || '';
       const addr = (g['고객주소'] || '').replace(/^\(\s*\d{4,6}\s*\)\s*/, '').trim();
       const fee = Number(onlyNum(g['용역료'])) || 0;
-      const memo = [g['면적'] && '면적 ' + g['면적'].replace(/\s+/g, ''), g['기타'], type && '구분 ' + type].filter(Boolean).join(' / ');
-      out.push({ kind: '패밀리넷', name: g['경비대상처'] || '', person: '', phone: fmt(g['전화번호']), address: addr, category: [g['업종'], g['제공서비스']].filter(Boolean).join(' / '), memo, prospect_no: g['가망고객번호'] || '', agent_name: agent, agent_phone: fmt(g['대리점영업사원전화번호']), area: g['면적'] || '', fee, req_date: g['설계요청일'] || '', hint: assign, raw });
+      const memo = [g['영업동기'] && '영업동기 ' + g['영업동기'], g['이용목적'] && '이용목적 ' + g['이용목적'], g['타사정보'] && '타사정보 ' + g['타사정보'], g['면적'] && '면적 ' + g['면적'].replace(/\s+/g, ''), g['기타'], type && '구분 ' + type].filter(Boolean).join(' / ');
+      out.push({ kind: intro ? '패밀리넷(소개)' : '패밀리넷', name: g['경비대상처'] || g['고객명'] || '', person: g['고객명'] || '', phone: fmt(g['전화번호']), address: addr, category: [g['업종'] || g['형태'], g['제공서비스']].filter(Boolean).join(' / '), memo, prospect_no: g['가망고객번호'] || '', agent_name: agent, agent_phone: agentPhone, area: g['면적'] || '', fee, req_date: g['설계요청일'] || '', hint: assign, raw });
       return;
     }
     const m = /신규\)\s*(\S+)\s+(\+?[0-9][0-9\-\s]{8,14}[0-9])\s*([^\[]*?)\s*\[([^\]]+)\]\s*([\s\S]*)$/.exec(raw);   // 형식 1: 신규)이름 전화 주소 [분류] 메모
@@ -8371,7 +8375,7 @@ function ta4PsDraftRender() {
       <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;"><span style="background:#e0e7ff;color:#3730a3;border-radius:99px;padding:2px 10px;font-size:12px;font-weight:800;">${e(p.kind)}</span>${p.dup ? '<span style="color:#b45309;font-size:12px;font-weight:800;">이미 등록된 가망고객 — 저장 시 제외됩니다</span>' : ''}<button type="button" onclick="TA4.psDraft.splice(${i},1);ta4PsDraftRender()" style="margin-left:auto;border:none;background:none;color:#b91c1c;font-weight:800;cursor:pointer;">제거</button></div>
       <div style="display:flex;flex-wrap:wrap;gap:8px;">${f('name', '고객 / 경비대상처', 2)}${f('phone', '전화번호', 1, 'tel')}${f('category', '업종·분류', 1)}${f('fee', '용역료(원)', 1)}</div>
       <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:8px;">${f('address', '주소', 3)}${f('prospect_no', '가망고객번호', 1)}</div>
-      <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:8px;">${f('memo', '메모', 3)}${p.agent_name || p.agent_phone ? f('agent_name', '대리점 영업사원', 1) + f('agent_phone', '영업사원 전화', 1, 'tel') : ''}</div>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:8px;">${f('memo', '메모', 3)}${p.agent_name || p.agent_phone ? f('agent_name', /소개/.test(p.kind) ? '소개자' : '대리점 영업사원', 1) + f('agent_phone', /소개/.test(p.kind) ? '소개자 전화' : '영업사원 전화', 1, 'tel') : ''}</div>
       <div style="margin-top:8px;font-size:12px;color:#64748b;font-weight:700;">배정 컨설턴트 <select onchange="TA4.psDraft[${i}].assigned_to=this.value" style="margin-left:6px;padding:7px;border-radius:8px;border:1px solid #cbd5e1;font-size:14px;"><option value="">선택(나중에 배정)</option>${CONSULTANTS.map(n => `<option value="${e(n)}"${p.assigned_to === n ? ' selected' : ''}>${e(n)}</option>`).join('')}</select>${p.hint ? `<span style="margin-left:8px;color:#94a3b8;">문자 속 이름: ${e(p.hint)}</span>` : ''}</div></div>`;
   }).join('');
   el('ta4PsFoot').style.display = TA4.psDraft.length ? 'block' : 'none';
@@ -8396,7 +8400,7 @@ function ta4PsView(id) {
   const r = TA4.ps.find(o => o.id === id); if (!r) return;
   TA4.psCur = id; const e = escapeHtml, row = (k, v) => v ? `<div class="r"><span>${k}</span><b>${v}</b></div>` : '';
   el('ta4PsDetBody').innerHTML = row('고객', e(r.name)) + row('전화', r.phone ? `<a href="tel:${e(r.phone.replace(/\D/g, ''))}">${e(r.phone)}</a>` : '') + row('주소', e(r.address)) + row('업종·분류', e(r.category)) + row('용역료', r.fee ? Number(r.fee).toLocaleString('ko-KR') + '원' : '') + row('가망번호', e(r.prospect_no)) +
-    row('대리점', e([r.agent_name, r.agent_phone].filter(Boolean).join(' '))) + row('설계요청일', e(r.req_date)) + row('메모', e(r.memo));
+    row(/소개/.test(r.kind || '') ? '소개자' : '대리점', e([r.agent_name, r.agent_phone].filter(Boolean).join(' '))) + row('설계요청일', e(r.req_date)) + row('메모', e(r.memo));
   el('ta4PsDet').classList.add('on');
 }
 function ta4PsDetClose() { el('ta4PsDet').classList.remove('on'); }
@@ -8406,7 +8410,7 @@ async function ta4PsToTA(quick) {
   el('afCompany').value = r.name || ''; el('afContact').value = r.person || ''; el('afContactPhone').value = r.phone || '';
   if (r.fee) el('afAmount').value = Number(r.fee).toLocaleString('ko-KR');
   if (r.address) el('afAddress').value = r.address;
-  const memo = ['[콜/패밀리넷 가망고객] ' + (r.kind || ''), r.category, r.memo, r.prospect_no && '가망고객번호 ' + r.prospect_no, r.agent_name && '대리점 영업사원 ' + r.agent_name + (r.agent_phone ? ' ' + r.agent_phone : '')].filter(Boolean).join('\n');
+  const memo = ['[콜/패밀리넷 가망고객] ' + (r.kind || ''), r.category, r.memo, r.prospect_no && '가망고객번호 ' + r.prospect_no, r.agent_name && (/소개/.test(r.kind || '') ? '소개자 ' : '대리점 영업사원 ') + r.agent_name + (r.agent_phone ? ' ' + r.agent_phone : '')].filter(Boolean).join('\n');
   TA4.formNote = { text: memo, atts: [] }; try { ta4FormNoteRender(); } catch (x) {}
   ta4FillMotive('afMotive', '콜/패밀리넷');
   TA4.psConv = r.id;
