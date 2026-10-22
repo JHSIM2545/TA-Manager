@@ -7510,14 +7510,23 @@ async function ta4CardPick(inp) {
     const url = await ta2Compress(f, 1800, 0.88); TA4.card.img = url;
     const img = new Image(); await new Promise((res, rej) => { img.onload = res; img.onerror = () => rej(new Error('이미지를 읽을 수 없습니다')); img.src = url; });
     el('cdImg').src = url; el('cdImg').style.display = 'block';
-    let text = '';
-    try { const w = await ta4OcrWorker(); const r = await w.recognize(ta4CardPrep(img)); text = (r && r.data && r.data.text) || ''; }
-    catch (e) { ta4CardStatus('자동 인식을 사용할 수 없습니다(인터넷 연결 확인). 아래에 직접 입력해 주세요.', 'err'); TA4.card.busy = false; return; }
-    el('cdRaw').textContent = text.trim();
-    const c = ta4CardParse(text), cur = ta4CardRead(), F = ta4CardFields();
-    Object.keys(F).forEach(k => { if (c[k]) el(F[k]).value = c[k]; });
+    // 1순위: Claude 이미지 인식(Supabase 함수 card-ocr) / 실패 시 2순위: 브라우저 OCR
+    let c = null, via = '';
+    try {
+      ta4CardStatus('Claude가 명함을 읽는 중…', 'busy');
+      const r = await Promise.race([db.functions.invoke('card-ocr', { body: { image: url } }), new Promise((_, rej) => setTimeout(() => rej(new Error('timeout')), 30000))]);
+      if (r && !r.error && r.data && !r.data.error) { c = r.data; via = 'claude'; el('cdRaw').textContent = JSON.stringify(c, null, 1); }
+    } catch (e) { console.warn('[card-ocr]', e && e.message); }
+    if (!c) {
+      let text = '';
+      try { ta4CardStatus('기본 인식으로 처리 중…', 'busy'); const w = await ta4OcrWorker(); const r = await w.recognize(ta4CardPrep(img)); text = (r && r.data && r.data.text) || ''; }
+      catch (e) { ta4CardStatus('자동 인식을 사용할 수 없습니다(인터넷 연결 확인). 아래에 직접 입력해 주세요.', 'err'); TA4.card.busy = false; return; }
+      el('cdRaw').textContent = text.trim(); c = ta4CardParse(text); via = 'ocr';
+    }
+    const F = ta4CardFields();
+    Object.keys(F).forEach(k => { if (c[k]) el(F[k]).value = String(c[k]).trim(); });
     const n = Object.values(c).filter(Boolean).length;
-    ta4CardStatus(n ? `인식 완료 — ${n}개 항목. 잘못된 곳은 고쳐주세요.` : '글자를 찾지 못했습니다. 다시 촬영하거나 직접 입력해 주세요.', n ? 'ok' : 'err');
+    ta4CardStatus(n ? `인식 완료${via === 'ocr' ? '(기본 인식)' : ''} — ${n}개 항목. 잘못된 곳은 고쳐주세요.` : '글자를 찾지 못했습니다. 다시 촬영하거나 직접 입력해 주세요.', n ? 'ok' : 'err');
   } catch (e) { ta4CardStatus(e.message || '인식 오류', 'err'); }
   TA4.card.busy = false;
 }
