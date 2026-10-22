@@ -858,88 +858,94 @@
   @media (max-width:768px){ #ta2DetailOverlay{align-items:flex-end;padding:0 !important;} }
 
   /* ==========================================================================
-     TA 수첩 v3 — 모바일 우선 앱 셸 (ta3-*)
-     컨셉: 영업사원의 전자 수첩 · 종이 느낌의 밝은 배경 + 짙은 남색 잉크 + 하단 탭바
+     TA 수첩 v4 — 모바일 우선 앱 (ta3-* / ta4-*)
+     컨셉: 군더더기 없는 화이트 서피스 · 남색 포인트 · 얇은 라인 · 큰 숫자
      ========================================================================== */
-  body.ta3-on{background:#f3f1ea !important;color:#1a2333;-webkit-tap-highlight-color:transparent;}
+  :root{--bg:#f4f5f8;--sf:#fff;--ink:#111827;--navy:#0f2547;--accent:#2f6bff;--mute:#6b7280;--soft:#9aa3b2;--line:#e8ebf1;--r:16px;--bar-h:56px;--tab-h:64px;
+        --sh:0 1px 2px rgba(16,24,40,.05),0 6px 20px rgba(16,24,40,.06);}
+  body.ta3-on{background:var(--bg) !important;color:var(--ink);-webkit-tap-highlight-color:transparent;font-family:'Pretendard','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',system-ui,sans-serif;-webkit-font-smoothing:antialiased;}
   body.ta3-on header.topbar, body.ta3-on #dateBanner, body.ta3-on #dbErrorBanner{display:none !important;}
   body.ta3-on main{max-width:none !important;width:100% !important;padding:0 !important;margin:0 !important;}
   body.ta3-on #viewMaster{display:none !important;}
-  body.ta3-on button{font-family:inherit;}
-  :root{--ink:#0f2547;--paper:#f3f1ea;--line:#e4e0d4;--accent:#2563eb;--bar-h:54px;--tab-h:62px;}
+  body.ta3-on button, body.ta3-on input, body.ta3-on select, body.ta3-on textarea{font-family:inherit;}
+  /* 스크롤바 숨김 + 페이지가 열리면 바탕 스크롤 잠금 → 스크롤은 항상 1개 */
+  body.ta3-on *{scrollbar-width:none;-ms-overflow-style:none;}
+  body.ta3-on *::-webkit-scrollbar{display:none;width:0;height:0;}
+  body.ta3-lock{overflow:hidden !important;}
 
-  .ta3-app{min-height:100vh;min-height:100dvh;padding-bottom:calc(var(--tab-h) + env(safe-area-inset-bottom) + 14px);}
-  .ta3-bar{position:sticky;top:0;z-index:60;background:var(--ink);color:#fff;height:calc(var(--bar-h) + env(safe-area-inset-top));padding:env(safe-area-inset-top) 14px 0;display:flex;align-items:center;justify-content:space-between;gap:10px;box-shadow:0 2px 10px rgba(15,37,71,.25);}
-  .ta3-bar .tt{font-size:16.5px;font-weight:900;letter-spacing:-.3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-  .ta3-bar .tt small{display:block;font-size:10.5px;font-weight:700;opacity:.65;letter-spacing:.4px;margin-bottom:-1px;}
-  .ta3-bar button{background:rgba(255,255,255,.14);color:#fff;border:none;border-radius:12px;height:38px;min-width:38px;padding:0 12px;font-size:14px;font-weight:800;}
-  .ta3-bar .pl{background:#2563eb;padding:0 14px;box-shadow:0 2px 8px rgba(37,99,235,.5);}
+  .ta3-app{min-height:100vh;min-height:100dvh;padding-bottom:calc(var(--tab-h) + env(safe-area-inset-bottom) + 16px);}
+  .ta3-bar{position:sticky;top:0;z-index:60;background:rgba(255,255,255,.88);backdrop-filter:saturate(180%) blur(14px);-webkit-backdrop-filter:saturate(180%) blur(14px);height:calc(var(--bar-h) + env(safe-area-inset-top));padding:env(safe-area-inset-top) 16px 0;display:flex;align-items:center;justify-content:space-between;gap:10px;border-bottom:1px solid var(--line);}
+  .ta3-bar .tt{font-size:17px;font-weight:800;letter-spacing:-.4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--navy);}
+  .ta3-bar .tt small{display:block;font-size:10.5px;font-weight:700;color:var(--soft);letter-spacing:.2px;margin-bottom:-1px;}
+  .ta3-bar button{background:var(--navy);color:#fff;border:none;border-radius:50%;height:36px;width:36px;font-size:14px;font-weight:800;padding:0;flex:none;}
 
-  .ta3-screen{display:none;padding:12px 14px 6px;max-width:760px;margin:0 auto;}
+  .ta3-screen{display:none;padding:14px 16px 6px;max-width:760px;margin:0 auto;}
   .ta3-screen.on{display:block;}
-  .ta3-h{display:flex;align-items:baseline;justify-content:space-between;margin:16px 2px 8px;}
-  .ta3-h b{font-size:15.5px;font-weight:900;color:var(--ink);}
-  .ta3-h span,.ta3-h a{font-size:12.5px;font-weight:800;color:#697386;}
-  .ta3-h button{background:none;border:none;color:var(--accent);font-size:13px;font-weight:800;padding:4px;}
+  .ta3-h{display:flex;align-items:baseline;justify-content:space-between;margin:22px 2px 9px;}
+  .ta3-h b{font-size:15px;font-weight:800;color:var(--ink);letter-spacing:-.2px;}
+  .ta3-h span{font-size:12.5px;font-weight:700;color:var(--soft);}
+  .ta3-h button{background:none;border:none;color:var(--accent);font-size:13px;font-weight:700;padding:4px;}
 
   /* 하단 탭바 */
-  .ta3-tabbar{position:fixed;left:0;right:0;bottom:0;z-index:70;background:#fff;border-top:1px solid var(--line);height:calc(var(--tab-h) + env(safe-area-inset-bottom));padding-bottom:env(safe-area-inset-bottom);display:grid;grid-template-columns:repeat(5,1fr);box-shadow:0 -4px 16px rgba(15,37,71,.08);}
-  .ta3-tab{background:none !important;border:none;color:#8a94a6 !important;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font-size:11px;font-weight:800;padding:0 !important;border-radius:0 !important;}
-  .ta3-tab svg{width:23px;height:23px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
-  .ta3-tab.on{color:var(--accent) !important;}
-  .ta3-tab.add{color:#fff !important;}
-  .ta3-tab.add i{width:50px;height:50px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;margin-top:-22px;box-shadow:0 4px 14px rgba(37,99,235,.5);border:4px solid #f3f1ea;}
-  .ta3-tab.add svg{stroke:#fff;width:26px;height:26px;}
-  .ta3-tab.add span{color:#8a94a6;margin-top:-1px;}
+  .ta3-tabbar{position:fixed;left:0;right:0;bottom:0;z-index:70;background:rgba(255,255,255,.92);backdrop-filter:saturate(180%) blur(14px);-webkit-backdrop-filter:saturate(180%) blur(14px);border-top:1px solid var(--line);height:calc(var(--tab-h) + env(safe-area-inset-bottom));padding-bottom:env(safe-area-inset-bottom);display:grid;grid-template-columns:repeat(5,1fr);}
+  .ta3-tab{background:none !important;border:none;color:var(--soft) !important;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font-size:10.5px;font-weight:700;padding:0 !important;border-radius:0 !important;}
+  .ta3-tab svg{width:23px;height:23px;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;}
+  .ta3-tab.on{color:var(--navy) !important;}
+  .ta3-tab.on svg{stroke-width:2.3;}
+  .ta3-tab.add i{width:48px;height:48px;border-radius:16px;background:linear-gradient(135deg,#1e3a8a,var(--accent));display:flex;align-items:center;justify-content:center;margin-top:-18px;box-shadow:0 6px 16px rgba(47,107,255,.42);}
+  .ta3-tab.add svg{stroke:#fff;width:24px;height:24px;stroke-width:2.4;}
+  .ta3-tab.add span{margin-top:0;}
 
   /* 홈 */
-  .ta3-hello{background:#fff;border:1px solid var(--line);border-radius:18px;padding:16px 16px 14px;position:relative;overflow:hidden;}
-  .ta3-hello:before{content:"";position:absolute;left:0;top:0;bottom:0;width:8px;background:repeating-linear-gradient(to bottom,#cfc9b8 0 10px,transparent 10px 18px);opacity:.7;}
-  .ta3-hello .d{font-size:21px;font-weight:900;color:var(--ink);letter-spacing:-.4px;padding-left:8px;}
-  .ta3-hello .c{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;padding-left:8px;}
-  .ta3-pill{display:inline-flex;align-items:center;background:#eaf1ff;color:#1d4ed8;border-radius:999px;padding:4px 11px;font-size:12.5px;font-weight:800;white-space:nowrap;}
-  .ta3-pill.am{background:#fef3c7;color:#92400e;} .ta3-pill.gr{background:#dcfce7;color:#15803d;} .ta3-pill.rd{background:#fee2e2;color:#b91c1c;} .ta3-pill.pu{background:#ede9fe;color:#6d28d9;} .ta3-pill.gy{background:#eceff3;color:#475569;}
-  .ta3-kpi{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px;}
-  .ta3-k{background:#fff;border:1px solid var(--line);border-radius:16px;padding:12px 14px;min-width:0;}
-  .ta3-k .l{font-size:12px;font-weight:800;color:#8a94a6;}
-  .ta3-k .v{font-size:19px;font-weight:900;color:var(--ink);margin-top:3px;letter-spacing:-.4px;white-space:nowrap;}
-  .ta3-k .n{font-size:12.5px;font-weight:800;color:var(--accent);}
+  .ta3-hello{display:flex;align-items:center;gap:10px;padding:2px 2px 0;white-space:nowrap;overflow:hidden;}
+  .ta3-hello .d{font-size:20px;font-weight:800;color:var(--ink);letter-spacing:-.5px;flex:none;}
+  .ta3-hello .c{font-size:13px;font-weight:700;color:var(--mute);overflow:hidden;text-overflow:ellipsis;}
+  .ta3-hello .c b{color:var(--accent);font-weight:800;}
+  .ta3-pill{display:inline-flex;align-items:center;background:#eef3ff;color:#2347c9;border-radius:999px;padding:3px 10px;font-size:12px;font-weight:700;white-space:nowrap;}
+  .ta3-pill.pu{background:#f1ecff;color:#6d28d9;}
+  select.ta3-pill{border:0;appearance:none;-webkit-appearance:none;padding-right:10px;}
+  .ta3-kpi{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px;}
+  .ta3-k{background:var(--sf);border:1px solid var(--line);border-radius:var(--r);padding:14px 15px;min-width:0;box-shadow:var(--sh);}
+  .ta3-k .l{font-size:12px;font-weight:700;color:var(--mute);}
+  .ta3-k .v{font-size:20px;font-weight:800;color:var(--ink);margin-top:5px;letter-spacing:-.5px;white-space:nowrap;font-variant-numeric:tabular-nums;}
+  .ta3-k .n{font-size:12px;font-weight:700;color:var(--accent);margin-top:2px;}
   .ta3-k.wide{grid-column:1/-1;display:flex;align-items:center;justify-content:space-between;gap:10px;cursor:pointer;}
-  .ta3-bar2{height:6px;background:#e8e5da;border-radius:99px;overflow:hidden;margin-top:7px;} .ta3-bar2 i{display:block;height:100%;background:#16a34a;}
-  .ta3-today{background:linear-gradient(120deg,#0f2547,#1e3a8a);color:#fff;border-radius:16px;padding:14px 16px;display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:10px;}
-  .ta3-today .t{font-size:12px;font-weight:800;opacity:.8;} .ta3-today .a{font-size:23px;font-weight:900;letter-spacing:-.5px;}
-  .ta3-today button{background:#fff;color:#1e3a8a;border:none;border-radius:11px;padding:10px 14px;font-size:13px;font-weight:900;}
-  .ta3-list{background:#fff;border:1px solid var(--line);border-radius:16px;overflow:hidden;}
-  .ta3-row{display:flex;gap:10px;align-items:center;padding:12px 14px;border-bottom:1px solid #f0ede3;cursor:pointer;}
-  .ta3-row:last-child{border-bottom:none;} .ta3-row:active{background:#f1f6ff;}
-  .ta3-row .tm{min-width:50px;font-size:12.5px;font-weight:900;color:var(--accent);}
-  .ta3-row .ti{font-size:14.5px;font-weight:800;color:var(--ink);} .ta3-row .su{font-size:12px;color:#8a94a6;margin-top:1px;}
-  .ta3-empty{color:#8a94a6;font-size:13px;padding:16px 8px;text-align:center;line-height:1.6;}
+  .ta3-bar2{height:5px;background:#eceff5;border-radius:99px;overflow:hidden;margin-top:8px;} .ta3-bar2 i{display:block;height:100%;background:linear-gradient(90deg,#34d399,#16a34a);border-radius:99px;}
+  .ta3-today{background:linear-gradient(135deg,#0f2547 0%,#1e3a8a 100%);color:#fff;border-radius:var(--r);padding:16px 18px;display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:10px;box-shadow:0 8px 24px rgba(15,37,71,.28);}
+  .ta3-today .t{font-size:12px;font-weight:700;opacity:.75;} .ta3-today .a{font-size:24px;font-weight:800;letter-spacing:-.6px;margin-top:2px;font-variant-numeric:tabular-nums;}
+  .ta3-today button{background:rgba(255,255,255,.16);color:#fff;border:1px solid rgba(255,255,255,.28);border-radius:12px;padding:9px 14px;font-size:13px;font-weight:700;}
+  .ta3-list{background:var(--sf);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;box-shadow:var(--sh);}
+  .ta3-row{display:flex;gap:12px;align-items:center;padding:13px 15px;border-bottom:1px solid #f0f2f6;cursor:pointer;}
+  .ta3-row:last-child{border-bottom:none;} .ta3-row:active{background:#f5f8ff;}
+  .ta3-row .tm{min-width:46px;font-size:12.5px;font-weight:800;color:var(--accent);}
+  .ta3-row .ti{font-size:14.5px;font-weight:700;color:var(--ink);} .ta3-row .su{font-size:12px;color:var(--soft);margin-top:2px;font-weight:600;}
+  .ta3-empty{color:var(--soft);font-size:13px;padding:18px 8px;text-align:center;font-weight:600;}
 
   /* 안건 목록 */
   .ta3-search{position:relative;margin-bottom:10px;}
-  .ta3-search input{width:100%;height:46px;border:1.5px solid var(--line);border-radius:14px;background:#fff;padding:0 14px 0 40px;font-size:16px;font-family:inherit;color:var(--ink);}
+  .ta3-search input{width:100%;height:46px;border:1px solid var(--line);border-radius:14px;background:var(--sf);padding:0 14px 0 42px;font-size:16px;color:var(--ink);box-shadow:var(--sh);}
   .ta3-search input:focus{outline:none;border-color:var(--accent);}
-  .ta3-search svg{position:absolute;left:13px;top:13px;width:20px;height:20px;stroke:#8a94a6;fill:none;stroke-width:2;stroke-linecap:round;}
-  .ta3-chips{display:flex;gap:7px;overflow-x:auto;padding:2px 0 8px;scrollbar-width:none;}
-  .ta3-chips::-webkit-scrollbar{display:none;}
-  .ta3-chip{flex:0 0 auto;background:#fff !important;color:#475569 !important;border:1.5px solid var(--line) !important;border-radius:999px !important;padding:8px 14px !important;font-size:13.5px !important;font-weight:800 !important;white-space:nowrap;}
-  .ta3-chip b{margin-left:4px;opacity:.7;font-weight:900;}
-  .ta3-chip.on{background:var(--ink) !important;color:#fff !important;border-color:var(--ink) !important;}
-  .ta3-seg{display:inline-flex;background:#e8e5da;border-radius:12px;padding:3px;margin-bottom:8px;}
-  .ta3-seg button{background:none !important;color:#697386 !important;border:none;border-radius:9px !important;padding:7px 14px !important;font-size:13px !important;font-weight:900 !important;}
-  .ta3-seg button.on{background:#fff !important;color:var(--ink) !important;box-shadow:0 1px 3px rgba(0,0,0,.12);}
-  .ta3-card{background:#fff;border:1px solid var(--line);border-left:6px solid var(--c,#2563eb);border-radius:16px;padding:12px 14px;margin-bottom:10px;position:relative;box-shadow:0 1px 3px rgba(15,37,71,.05);}
-  .ta3-card:active{background:#f6f9ff;}
-  .ta3-card .r1{display:flex;justify-content:space-between;gap:8px;align-items:flex-start;padding-right:46px;}
-  .ta3-card .nm{font-size:16px;font-weight:900;color:var(--ink);letter-spacing:-.3px;word-break:break-word;}
-  .ta3-card .amt{position:absolute;right:14px;top:12px;font-size:15px;font-weight:900;color:var(--ink);white-space:nowrap;}
-  .ta3-card .r2{display:flex;gap:5px;flex-wrap:wrap;margin-top:7px;align-items:center;}
-  .ta3-card .r3{font-size:12.5px;color:#697386;font-weight:700;margin-top:7px;line-height:1.5;}
-  .ta3-card .r3 em{font-style:normal;font-weight:900;border-radius:6px;padding:1px 6px;margin-left:4px;font-size:11.5px;}
-  .ta3-card .r3 em.today{background:#fee2e2;color:#b91c1c;} .ta3-card .r3 em.soon{background:#fef3c7;color:#92400e;} .ta3-card .r3 em.late{background:#e5e7eb;color:#4b5563;}
-  .ta3-call{position:absolute;right:10px;bottom:10px;width:40px;height:40px;border-radius:50%;background:#16a34a !important;color:#fff !important;border:none;display:flex;align-items:center;justify-content:center;padding:0 !important;font-size:17px;box-shadow:0 2px 8px rgba(22,163,74,.35);}
-  .ta3-tag{display:inline-block;border-radius:7px;padding:2px 8px;font-size:11.5px;font-weight:900;white-space:nowrap;}
+  .ta3-search svg{position:absolute;left:14px;top:13px;width:20px;height:20px;stroke:var(--soft);fill:none;stroke-width:2;stroke-linecap:round;}
+  .ta3-chips{display:flex;gap:7px;overflow-x:auto;padding:2px 0 10px;}
+  .ta3-chip{flex:0 0 auto;background:var(--sf) !important;color:var(--mute) !important;border:1px solid var(--line) !important;border-radius:999px !important;padding:8px 14px !important;font-size:13px !important;font-weight:700 !important;white-space:nowrap;}
+  .ta3-chip b{margin-left:5px;opacity:.6;font-weight:800;}
+  .ta3-chip.on{background:var(--navy) !important;color:#fff !important;border-color:var(--navy) !important;}
+  .ta3-seg{display:inline-flex;background:#e9ecf2;border-radius:12px;padding:3px;margin-bottom:8px;}
+  .ta3-seg button{background:none !important;color:var(--mute) !important;border:none;border-radius:9px !important;padding:7px 15px !important;font-size:13px !important;font-weight:700 !important;}
+  .ta3-seg button.on{background:#fff !important;color:var(--ink) !important;box-shadow:0 1px 3px rgba(16,24,40,.12);}
+  .ta3-card{background:var(--sf);border:1px solid var(--line);border-radius:var(--r);padding:15px 16px 14px;margin-bottom:10px;position:relative;box-shadow:var(--sh);}
+  .ta3-card:active{background:#f8faff;}
+  .ta3-card .r1{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;}
+  .ta3-card .nm{font-size:16px;font-weight:800;color:var(--ink);letter-spacing:-.3px;word-break:break-word;min-width:0;}
+  .ta3-card .amt{font-size:16px;font-weight:800;color:var(--navy);white-space:nowrap;text-align:right;font-variant-numeric:tabular-nums;flex:none;}
+  .ta3-card .r2{display:flex;gap:5px;flex-wrap:wrap;margin-top:9px;align-items:center;}
+  .ta3-card .r3{font-size:12.5px;color:var(--mute);font-weight:600;margin-top:9px;line-height:1.6;padding-right:46px;}
+  .ta3-card .r3 em{font-style:normal;font-weight:800;border-radius:6px;padding:1px 6px;margin-left:4px;font-size:11.5px;}
+  .ta3-card .r3 em.today{background:#fee2e2;color:#b91c1c;} .ta3-card .r3 em.soon{background:#fef3c7;color:#92400e;} .ta3-card .r3 em.late{background:#eceff3;color:#4b5563;}
+  .ta3-call{position:absolute;right:12px;bottom:12px;width:38px;height:38px;border-radius:50%;background:#ecfdf3 !important;color:#16a34a !important;border:none;display:flex;align-items:center;justify-content:center;padding:0 !important;font-size:16px;}
+  .ta3-tag{display:inline-block;border-radius:7px;padding:3px 8px;font-size:11.5px;font-weight:700;white-space:nowrap;}
+  .ta3-cmt{display:inline-flex;align-items:center;gap:3px;background:#fff4e5;color:#b45309;border-radius:7px;padding:3px 8px;font-size:11.5px;font-weight:800;}
+  .ta3-cmt.new{background:#ffe4e6;color:#be123c;}
 
   /* 지도 */
   #ta3ScrMap{padding:0;max-width:none;}
@@ -948,89 +954,161 @@
   .ta3-maptop{position:absolute;left:10px;right:10px;top:10px;z-index:500;display:flex;flex-direction:column;gap:6px;pointer-events:none;}
   .ta3-maptop>*{pointer-events:auto;}
   .ta3-maptop .ta3-chips{padding:0;}
-  .ta3-mapbtn{position:absolute;right:12px;z-index:500;width:46px;height:46px;border-radius:50%;background:#fff !important;color:var(--ink) !important;border:none;box-shadow:0 2px 10px rgba(0,0,0,.25);display:flex;align-items:center;justify-content:center;padding:0 !important;font-size:20px;}
-  .ta3-mapnote{background:#fffbeb;border:1px solid #fde68a;color:#92400e;border-radius:12px;padding:8px 12px;font-size:12.5px;font-weight:800;display:flex;justify-content:space-between;gap:8px;align-items:center;box-shadow:0 2px 8px rgba(0,0,0,.12);}
-  .ta3-mapnote button{background:#92400e !important;color:#fff !important;border:none;border-radius:9px !important;padding:6px 10px !important;font-size:12px !important;font-weight:900 !important;white-space:nowrap;}
-  .ta3-prev{position:absolute;left:10px;right:10px;bottom:10px;z-index:510;background:#fff;border-radius:18px;padding:14px 14px 12px;box-shadow:0 6px 24px rgba(0,0,0,.28);display:none;}
-  .ta3-prev .nm{font-size:16.5px;font-weight:900;color:var(--ink);padding-right:28px;} .ta3-prev .ad{font-size:12.5px;color:#697386;margin-top:4px;font-weight:700;}
-  .ta3-prev .bt{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:10px;}
-  .ta3-prev .bt button,.ta3-btn{border-radius:12px !important;padding:11px 6px !important;font-size:13.5px !important;font-weight:900 !important;border:none;}
-  .ta3-prev .x{position:absolute;right:8px;top:8px;background:none !important;color:#8a94a6 !important;border:none;font-size:22px;padding:4px 10px !important;}
-  .ta3-pin{width:30px;height:30px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);background:var(--c,#2563eb);border:3px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,.4);display:flex;align-items:center;justify-content:center;}
-  .ta3-pin span{transform:rotate(45deg);color:#fff;font-size:11px;font-weight:900;line-height:1;}
+  .ta3-mapbtn{position:absolute;right:12px;z-index:500;width:44px;height:44px;border-radius:50%;background:#fff !important;color:var(--navy) !important;border:none;box-shadow:0 2px 12px rgba(0,0,0,.22);display:flex;align-items:center;justify-content:center;padding:0 !important;font-size:19px;}
+  .ta3-mapnote{background:#fffbeb;border:1px solid #fde68a;color:#92400e;border-radius:12px;padding:8px 12px;font-size:12.5px;font-weight:700;display:flex;justify-content:space-between;gap:8px;align-items:center;box-shadow:0 2px 8px rgba(0,0,0,.1);}
+  .ta3-mapnote button{background:#92400e !important;color:#fff !important;border:none;border-radius:9px !important;padding:6px 10px !important;font-size:12px !important;font-weight:700 !important;white-space:nowrap;}
+  .ta3-prev{position:absolute;left:10px;right:10px;bottom:10px;z-index:510;background:#fff;border-radius:18px;padding:15px 15px 13px;box-shadow:0 10px 30px rgba(16,24,40,.28);display:none;}
+  .ta3-prev .nm{font-size:16.5px;font-weight:800;color:var(--ink);padding-right:28px;} .ta3-prev .ad{font-size:12.5px;color:var(--mute);margin-top:5px;font-weight:600;}
+  .ta3-prev .bt{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:11px;}
+  .ta3-prev .bt button,.ta3-btn{border-radius:12px !important;padding:11px 6px !important;font-size:13.5px !important;font-weight:700 !important;border:none;}
+  .ta3-prev .x{position:absolute;right:8px;top:8px;background:none !important;color:var(--soft) !important;border:none;font-size:22px;padding:4px 10px !important;}
+  .ta3-pin{width:30px;height:30px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);background:var(--c,#2f6bff);border:3px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,.4);display:flex;align-items:center;justify-content:center;}
+  .ta3-pin span{transform:rotate(45deg);color:#fff;font-size:11px;font-weight:800;line-height:1;}
   .ta3-pin.ref{border-radius:8px;transform:rotate(45deg);} .ta3-pin.ref span{transform:rotate(-45deg);}
   .ta3-pin.sel{width:38px;height:38px;border-color:#facc15;}
-  .ta3-me{width:16px;height:16px;border-radius:50%;background:#2563eb;border:3px solid #fff;box-shadow:0 0 0 6px rgba(37,99,235,.25);}
+  .ta3-me{width:16px;height:16px;border-radius:50%;background:#2f6bff;border:3px solid #fff;box-shadow:0 0 0 6px rgba(47,107,255,.25);}
 
   /* 캘린더 */
-  .ta3-calbox{background:#fff;border:1px solid var(--line);border-radius:18px;padding:12px;}
+  .ta3-calbox{background:var(--sf);border:1px solid var(--line);border-radius:var(--r);padding:14px;box-shadow:var(--sh);}
   .ta3-calhead{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
-  .ta3-calhead b{font-size:17px;font-weight:900;color:var(--ink);}
-  .ta3-calhead button{background:#f3f1ea !important;color:var(--ink) !important;border:none;border-radius:11px !important;width:40px;height:36px;padding:0 !important;font-size:15px;font-weight:900;}
+  .ta3-calhead b{font-size:17px;font-weight:800;color:var(--ink);}
+  .ta3-calhead button{background:#f1f3f8 !important;color:var(--navy) !important;border:none;border-radius:11px !important;width:40px;height:36px;padding:0 !important;font-size:14px;font-weight:800;}
   .ta3-cal{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;}
-  .ta3-cal .dw{text-align:center;font-size:11.5px;font-weight:800;color:#8a94a6;padding:3px 0;} .ta3-cal .dw:first-child{color:#dc2626;} .ta3-cal .dw:nth-child(7){color:#2563eb;}
-  .ta3-d{height:50px;border:1px solid #f0ede3;border-radius:11px;background:#fff !important;color:var(--ink) !important;font-size:14px !important;font-weight:800 !important;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding:5px 0 0 !important;gap:3px;position:relative;}
+  .ta3-cal .dw{text-align:center;font-size:11.5px;font-weight:700;color:var(--soft);padding:3px 0;} .ta3-cal .dw:first-child{color:#dc2626;} .ta3-cal .dw:nth-child(7){color:#2563eb;}
+  .ta3-d{height:48px;border:none;border-radius:12px;background:#fff !important;color:var(--ink) !important;font-size:14px !important;font-weight:700 !important;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding:7px 0 0 !important;gap:3px;position:relative;}
   .ta3-d.out{visibility:hidden;} .ta3-d.sun,.ta3-d.hol{color:#dc2626 !important;} .ta3-d.sat{color:#2563eb !important;}
-  .ta3-d.today{box-shadow:inset 0 0 0 2px var(--accent);}
-  .ta3-d.sel{background:var(--ink) !important;color:#fff !important;}
-  .ta3-d .dots{display:flex;gap:3px;} .ta3-d .dots i{width:6px;height:6px;border-radius:50%;background:#f59e0b;display:block;} .ta3-d .dots i.e{background:#16a34a;} .ta3-d .dots i.r{background:#8b5cf6;}
+  .ta3-d.today{box-shadow:inset 0 0 0 1.5px var(--accent);}
+  .ta3-d.sel{background:var(--navy) !important;color:#fff !important;}
+  .ta3-d .dots{display:flex;gap:3px;} .ta3-d .dots i{width:5px;height:5px;border-radius:50%;background:#f59e0b;display:block;} .ta3-d .dots i.e{background:#16a34a;} .ta3-d .dots i.r{background:#8b5cf6;}
 
   /* MY */
-  .ta3-me-card{background:#fff;border:1px solid var(--line);border-radius:18px;padding:16px;display:flex;gap:14px;align-items:center;}
-  .ta3-av{width:54px;height:54px;border-radius:50%;background:var(--ink);color:#fff;display:flex;align-items:center;justify-content:center;font-size:21px;font-weight:900;}
-  .ta3-menu{background:#fff;border:1px solid var(--line);border-radius:16px;overflow:hidden;margin-top:12px;}
-  .ta3-menu button{width:100%;text-align:left;background:#fff !important;color:var(--ink) !important;border:none;border-bottom:1px solid #f0ede3;border-radius:0 !important;padding:16px 16px !important;font-size:15px !important;font-weight:800 !important;display:flex;justify-content:space-between;align-items:center;}
-  .ta3-menu button:last-child{border-bottom:none;} .ta3-menu button small{color:#8a94a6;font-weight:700;font-size:12px;}
-  .ta3-field{margin:10px 0;} .ta3-field label{display:block;font-size:12.5px;font-weight:800;color:#697386;margin-bottom:5px;}
-  .ta3-field input,.ta3-field select{width:100%;height:46px;border:1.5px solid #d5dbe6;border-radius:12px;padding:0 12px;font-size:16px;font-family:inherit;}
+  .ta3-me-card{background:var(--sf);border:1px solid var(--line);border-radius:var(--r);padding:18px;display:flex;gap:14px;align-items:center;box-shadow:var(--sh);}
+  .ta3-av{width:54px;height:54px;border-radius:50%;background:var(--navy);color:#fff;display:flex;align-items:center;justify-content:center;font-size:21px;font-weight:800;}
+  .ta3-menu{background:var(--sf);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;margin-top:12px;box-shadow:var(--sh);}
+  .ta3-menu button{width:100%;text-align:left;background:#fff !important;color:var(--ink) !important;border:none;border-bottom:1px solid #f0f2f6;border-radius:0 !important;padding:17px 18px !important;font-size:15px !important;font-weight:700 !important;display:flex;justify-content:space-between;align-items:center;}
+  .ta3-menu button:last-child{border-bottom:none;}
+
+  /* ===== 전체화면 페이지 (팝업 대신) ===== */
+  .ta4-pg{position:fixed;inset:0;z-index:100000;background:var(--bg);display:none;flex-direction:column;}
+  .ta4-pg.ta4-on{display:flex;}
+  .ta4-ph{flex:none;display:flex;align-items:center;gap:6px;min-height:calc(var(--bar-h) + env(safe-area-inset-top));padding:env(safe-area-inset-top) 8px 0 4px;background:rgba(255,255,255,.96);border-bottom:1px solid var(--line);}
+  .ta4-ph .back{background:none !important;border:none;color:var(--navy) !important;width:42px;height:44px;font-size:30px;line-height:1;padding:0 0 3px !important;flex:none;border-radius:12px !important;}
+  .ta4-ph .ttl{flex:1;min-width:0;}
+  .ta4-ph .ttl h3{margin:0;font-size:17px;font-weight:800;color:var(--ink);letter-spacing:-.4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .ta4-ph .ttl .bd{display:flex;gap:5px;align-items:center;margin-top:3px;flex-wrap:nowrap;overflow:hidden;}
+  .ta4-ph .act{background:var(--accent) !important;color:#fff !important;border:none;border-radius:12px !important;padding:9px 16px !important;font-size:14px;font-weight:800;flex:none;}
+  .ta4-ph .act.ghost{background:#eef1f7 !important;color:var(--navy) !important;}
+  .ta4-ph .act.dg{background:#fee2e2 !important;color:#b91c1c !important;}
+  .ta4-ph .ic{background:#eef3ff !important;color:var(--accent) !important;border:none;border-radius:12px !important;width:38px;height:38px;font-size:17px;padding:0 !important;flex:none;}
+  .ta4-ph .sv{font-size:11.5px;font-weight:800;color:#16a34a;min-width:0;white-space:nowrap;}
+  .ta4-ph .sv.err{color:#dc2626;}
+  .ta4-pb{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px 16px calc(24px + env(safe-area-inset-bottom));}
+  .ta4-pb>.in{max-width:760px;margin:0 auto;}
+  .ta4-pf{flex:none;padding:10px 16px calc(10px + env(safe-area-inset-bottom));background:rgba(255,255,255,.96);border-top:1px solid var(--line);display:flex;gap:8px;align-items:center;}
+  .ta4-pf>.in{max-width:760px;margin:0 auto;width:100%;display:flex;gap:8px;align-items:center;}
+  .ta4-pf button{border-radius:12px !important;padding:13px 14px !important;font-size:15px !important;font-weight:800 !important;border:none;}
+  .ta4-pf .go{flex:1;background:var(--navy) !important;color:#fff !important;}
+  .ta4-pf .tool{background:#eef1f7 !important;color:var(--navy) !important;padding:12px 14px !important;font-size:14px !important;font-weight:700 !important;}
+
+  /* 상세 페이지 */
+  .ta4-addr{display:flex;gap:8px;align-items:center;margin:0 0 10px;font-size:13px;font-weight:600;color:var(--mute);}
+  .ta4-addr .tx{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .ta4-addr button{background:#fff !important;border:1px solid var(--line) !important;color:var(--navy) !important;border-radius:9px !important;padding:5px 9px !important;font-size:12px !important;font-weight:700 !important;white-space:nowrap;}
+  .ta4-pg .ta2-info{background:var(--sf);border:1px solid var(--line);border-radius:var(--r);padding:14px 16px;gap:12px 16px;box-shadow:var(--sh);}
+  .ta4-pg .ta2-info div.k{font-size:11.5px;font-weight:700;color:var(--soft);}
+  .ta4-pg .ta2-info div.vv{font-size:15px;font-weight:700;color:var(--ink);}
+  .ta4-pg .ta2-inp{font-size:15px;font-weight:700;color:var(--ink);}
+  .ta4-pg .ta2-inp.num{text-align:right;}
+  .ta4-pg input.ta2-inp[type=date]{padding:4px 7px;min-height:30px;}
+  .ta4-pg .ta2-actions{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0 4px;}
+  .ta4-pg .ta2-actions button{border-radius:11px;padding:10px 14px;font-size:13px;font-weight:700;border:none;}
+  .ta4-won{margin:12px 0 2px;}
+  .ta4-won button{width:100%;background:linear-gradient(135deg,#0f2547,#1e3a8a) !important;color:#fff !important;border:none;border-radius:14px !important;padding:14px !important;font-size:15px !important;font-weight:800 !important;display:flex;justify-content:center;align-items:center;gap:8px;box-shadow:0 6px 18px rgba(15,37,71,.28);}
+  .ta4-won .done{background:#ecfdf3;color:#15803d;border-radius:14px;padding:12px 14px;font-size:13.5px;font-weight:700;display:flex;justify-content:space-between;align-items:center;gap:8px;}
+  .ta4-won .done button{width:auto;background:#fff !important;color:#15803d !important;border:1px solid #bbf7d0 !important;box-shadow:none;padding:7px 12px !important;font-size:12.5px !important;}
+  .ta4-tabs{display:flex;gap:4px;background:#e9ecf2;border-radius:13px;padding:3px;margin:16px 0 12px;}
+  .ta4-tab{flex:1;background:transparent !important;color:var(--mute) !important;border:none;border-radius:10px !important;padding:10px 4px !important;font-size:13.5px !important;font-weight:700 !important;}
+  .ta4-tab.on{background:#fff !important;color:var(--ink) !important;box-shadow:0 1px 3px rgba(16,24,40,.12);}
+  .ta4-tab b{color:var(--accent);margin-left:3px;font-weight:800;}
+  .ta4-pg .ta2-board{border:1px solid var(--line);border-radius:var(--r);background:#fff;box-shadow:var(--sh);}
+  .ta4-pg .ta2-board-head{font-size:13px;font-weight:700;color:var(--mute);}
+  .ta4-pg .ta2-board-head button{border-radius:11px !important;padding:8px 14px !important;font-size:13px !important;font-weight:700 !important;background:var(--navy) !important;color:#fff !important;border:none;}
+  .ta4-pg .ta2-cal{gap:3px;}
+  .ta4-pg .ta2-warn{background:#fffbeb;border:1px solid #fde68a;color:#92400e;border-radius:10px;padding:7px 11px;font-size:12px;font-weight:700;margin-bottom:10px;}
+  .ta4-pg .ta2-sched-form{background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:12px;margin-top:12px;}
+
+  /* 코멘트 */
+  .ta4-cm{background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:12px 14px;margin-bottom:9px;box-shadow:var(--sh);}
+  .ta4-cm.mgr{border-color:#c7d7ff;background:#f5f8ff;}
+  .ta4-cm .h{display:flex;align-items:center;gap:6px;font-size:12.5px;font-weight:700;color:var(--mute);}
+  .ta4-cm .h b{color:var(--ink);font-size:13.5px;font-weight:800;}
+  .ta4-cm .h .rl{background:var(--navy);color:#fff;border-radius:6px;padding:1px 7px;font-size:11px;font-weight:700;}
+  .ta4-cm .h .tm{margin-left:auto;font-weight:600;color:var(--soft);}
+  .ta4-cm .tx{font-size:14.5px;line-height:1.6;color:var(--ink);margin-top:6px;white-space:pre-wrap;word-break:break-word;font-weight:500;}
+  .ta4-cm .dl{background:none !important;border:none;color:var(--soft) !important;font-size:12px;padding:0 0 0 6px !important;}
+  .ta4-cmf{display:flex;gap:8px;align-items:flex-end;margin-top:10px;}
+  .ta4-cmf textarea{flex:1;min-height:46px;max-height:140px;border:1px solid var(--line);border-radius:14px;padding:11px 13px;font-size:16px;resize:none;background:#fff;}
+  .ta4-cmf textarea:focus{outline:none;border-color:var(--accent);}
+  .ta4-cmf button{background:var(--accent) !important;color:#fff !important;border:none;border-radius:13px !important;height:46px;padding:0 16px !important;font-size:14px;font-weight:800;}
+
+  /* 신규 TA 등록 폼 */
+  .ta4-form .f{margin-bottom:14px;}
+  .ta4-form label{display:block;font-size:12.5px;font-weight:700;color:var(--mute);margin:0 0 6px 2px;}
+  .ta4-form input,.ta4-form select,.ta4-form textarea{width:100%;height:48px;border:1px solid var(--line);border-radius:13px;background:#fff;padding:0 14px;font-size:16px;font-weight:600;color:var(--ink);box-sizing:border-box;}
+  .ta4-form textarea{height:auto;min-height:110px;padding:12px 14px;line-height:1.55;resize:vertical;font-weight:500;}
+  .ta4-form input:focus,.ta4-form select:focus,.ta4-form textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(47,107,255,.12);}
+  .ta4-form input.num{text-align:right;}
+  .ta4-form .row2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+  .ta4-form .nm{display:flex;gap:8px;}
+  .ta4-form .nm button{flex:none;width:48px;height:48px;border-radius:13px !important;border:1px solid var(--line) !important;background:#fff !important;font-size:20px;padding:0 !important;}
+  .ta4-form .nm button.set{background:#ecfdf3 !important;border-color:#86efac !important;}
+  .ta4-form .chip{display:none;margin:7px 2px 0;font-size:12.5px;font-weight:700;color:#15803d;}
+  .ta4-form .chip.on{display:block;}
+  .ta4-form .won{display:none;background:#f1f6ff;border-radius:14px;padding:12px;margin-bottom:14px;}
+  .ta4-form .won.on{display:block;}
+
+  /* 메모 에디터 */
+  .ta4-ed{background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:6px 6px 10px;box-shadow:var(--sh);}
+  .ta4-ed textarea.ta2-mp-text{width:100%;min-height:42vh;border:none;outline:none;resize:none;padding:12px 12px 8px;font-size:16.5px;line-height:1.65;color:var(--ink);font-weight:500;background:transparent;box-sizing:border-box;}
+  .ta4-ed .ta2-att-grid{padding:4px 10px 0;}
+  .ta4-pg .ta2-att{width:96px;height:96px;border-radius:12px;}
+  .ta4-pg .ta2-draw{background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:10px;margin-top:12px;}
 
   /* 위치 선택기 / 안건 선택 / 토스트 */
-  .ta3-full{position:fixed;inset:0;z-index:100010;background:#fff;display:none;flex-direction:column;}
-  .ta3-full.on{display:flex;}
-  .ta3-fhead{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:calc(10px + env(safe-area-inset-top)) 12px 10px;background:var(--ink);color:#fff;}
-  .ta3-fhead b{font-size:16px;font-weight:900;} .ta3-fhead button{background:rgba(255,255,255,.15);color:#fff;border:none;border-radius:11px;padding:9px 14px;font-size:14px;font-weight:800;}
-  .ta3-fhead button.ok{background:var(--accent);}
+  .ta3-fhead{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:calc(8px + env(safe-area-inset-top)) 10px 8px;background:rgba(255,255,255,.96);border-bottom:1px solid var(--line);color:var(--ink);}
+  .ta3-fhead b{font-size:16px;font-weight:800;} .ta3-fhead button{background:#eef1f7;color:var(--navy);border:none;border-radius:12px;padding:10px 14px;font-size:14px;font-weight:700;}
+  .ta3-fhead button.ok{background:var(--accent);color:#fff;}
   .ta3-pk{position:relative;flex:1;}
   #ta3PkMap{position:absolute;inset:0;}
   .ta3-cross{position:absolute;left:50%;top:50%;z-index:600;width:38px;height:46px;margin:-46px 0 0 -19px;pointer-events:none;}
   .ta3-cross:before{content:"";position:absolute;left:4px;top:0;width:30px;height:30px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);background:#dc2626;border:3px solid #fff;box-shadow:0 3px 8px rgba(0,0,0,.4);}
   .ta3-pksearch{position:absolute;left:10px;right:10px;top:10px;z-index:620;display:flex;gap:6px;}
-  .ta3-pksearch input{flex:1;height:46px;border:none;border-radius:13px;padding:0 14px;font-size:16px;box-shadow:0 2px 10px rgba(0,0,0,.25);}
-  .ta3-pksearch button{height:46px;border-radius:13px;border:none;background:var(--accent);color:#fff;font-weight:900;padding:0 16px;font-size:14px;}
-  .ta3-pkaddr{position:absolute;left:10px;right:10px;bottom:calc(10px + env(safe-area-inset-bottom));z-index:620;background:#fff;border-radius:15px;padding:12px 14px;box-shadow:0 4px 18px rgba(0,0,0,.3);font-size:14px;font-weight:800;color:var(--ink);}
-  .ta3-pkaddr small{display:block;color:#8a94a6;font-size:11.5px;margin-top:2px;font-weight:700;}
-  .ta3-pkgps{position:absolute;right:12px;bottom:calc(92px + env(safe-area-inset-bottom));z-index:620;width:46px;height:46px;border-radius:50%;background:#fff !important;color:var(--ink) !important;border:none;box-shadow:0 2px 10px rgba(0,0,0,.3);padding:0 !important;font-size:20px;}
-  .ta3-plist{flex:1;overflow-y:auto;padding:10px 14px;background:var(--paper);}
-  .ta3-toast{position:fixed;left:50%;bottom:calc(var(--tab-h) + env(safe-area-inset-bottom) + 18px);transform:translateX(-50%);z-index:100020;background:rgba(15,37,71,.94);color:#fff;border-radius:999px;padding:10px 18px;font-size:13.5px;font-weight:800;display:none;max-width:90vw;text-align:center;}
+  .ta3-pksearch input{flex:1;height:46px;border:none;border-radius:13px;padding:0 14px;font-size:16px;box-shadow:0 2px 12px rgba(0,0,0,.22);}
+  .ta3-pksearch button{height:46px;border-radius:13px;border:none;background:var(--navy);color:#fff;font-weight:700;padding:0 16px;font-size:14px;}
+  .ta3-pkaddr{position:absolute;left:10px;right:10px;bottom:calc(10px + env(safe-area-inset-bottom));z-index:620;background:#fff;border-radius:15px;padding:12px 14px;box-shadow:0 6px 20px rgba(0,0,0,.28);font-size:14px;font-weight:700;color:var(--ink);}
+  .ta3-pkaddr small{display:block;color:var(--soft);font-size:11.5px;margin-top:2px;font-weight:600;}
+  .ta3-pkgps{position:absolute;right:12px;bottom:calc(92px + env(safe-area-inset-bottom));z-index:620;width:46px;height:46px;border-radius:50%;background:#fff !important;color:var(--navy) !important;border:none;box-shadow:0 2px 12px rgba(0,0,0,.28);padding:0 !important;font-size:20px;}
+  .ta3-plist{flex:1;overflow-y:auto;padding:12px 16px;background:var(--bg);}
+  .ta3-toast{position:fixed;left:50%;bottom:calc(var(--tab-h) + env(safe-area-inset-bottom) + 18px);transform:translateX(-50%);z-index:100020;background:rgba(17,24,39,.94);color:#fff;border-radius:999px;padding:10px 18px;font-size:13.5px;font-weight:700;display:none;max-width:90vw;text-align:center;}
 
-  /* 상세 시트: 위치 탭 */
-  .ta3-mini{height:190px;border-radius:14px;overflow:hidden;border:1px solid #e3e8f0;background:#e9ecef;margin:8px 0;position:relative;}
-  .ta3-btnrow{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px;margin-top:8px;}
-  .ta3-btnrow button{border-radius:12px !important;padding:12px 8px !important;font-size:13.5px !important;font-weight:900 !important;}
-  .ta3-pladdr{width:100%;height:46px;border:1.5px solid #d5dbe6;border-radius:12px;padding:0 12px;font-size:16px;font-family:inherit;font-weight:700;}
-  .ta3-plstat{font-size:12.5px;font-weight:800;color:#697386;margin-top:6px;}
+  /* 수주보고 */
+  .ta4-rp .box{background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:14px;box-shadow:var(--sh);margin-bottom:12px;}
+  .ta4-rp textarea{width:100%;min-height:190px;border:1px solid var(--line);border-radius:13px;padding:12px 14px;font-size:16px;line-height:1.7;font-weight:600;color:var(--ink);box-sizing:border-box;resize:vertical;background:#fafbfd;}
+  .ta4-rp .ck{display:flex;align-items:center;gap:10px;padding:10px 2px;font-size:14.5px;font-weight:700;color:var(--ink);}
+  .ta4-rp .ck input{width:20px;height:20px;accent-color:var(--navy);}
+  .ta4-rp .ck small{color:var(--soft);font-weight:600;margin-left:auto;font-size:12px;}
 
-  /* 상세/신규 입력 시트 모바일 최적화 */
-  #agentLeadModalOverlay,#ta2DetailOverlay{align-items:flex-end !important;padding:0 !important;}
-  #agentLeadModalOverlay .modal-card{max-width:620px !important;width:100% !important;max-height:94vh !important;max-height:94dvh !important;border-radius:22px 22px 0 0 !important;padding:18px 16px calc(18px + env(safe-area-inset-bottom)) !important;}
-  #ta2DetailOverlay .ta2-modal{max-width:680px !important;max-height:96vh !important;max-height:96dvh !important;border-radius:22px 22px 0 0 !important;}
-  @media (min-width:769px){ #agentLeadModalOverlay,#ta2DetailOverlay{align-items:center !important;} #agentLeadModalOverlay .modal-card,#ta2DetailOverlay .ta2-modal{border-radius:20px !important;} }
-  @media (max-width:768px){
-    .compact-form-row1,.compact-form-row2,.compact-form-row-won{grid-template-columns:1fr 1fr !important;}
-    .compact-form-row2{grid-template-columns:1fr !important;}
-    #agentLeadModalOverlay input,#agentLeadModalOverlay select,#ta2DetailOverlay input,#ta2DetailOverlay select,#ta2DetailOverlay textarea,#ta2MemoPop textarea,#ta2DpOverlay input{font-size:16px !important;}
-    #agentLeadModalOverlay input,#agentLeadModalOverlay select{height:46px;}
-    #afSubmitBtn{width:100%;height:50px !important;font-size:16px !important;}
-    .ta2-info{grid-template-columns:1fr 1fr;}
-    .ta2-tab{padding:12px 4px;font-size:13px;}
-  }
-  .ta3-formplace{background:#f8fafc;border:1px solid #e3e8f0;border-radius:12px;padding:10px;margin-top:8px;}
-  .ta3-formplace label{font-size:12px;font-weight:800;color:#475569;}
-  .ta3-formplace input{width:100%;margin-top:4px;}
-  .ta3-formplace .row{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:8px;}
-  .ta3-formplace .row button{border-radius:10px !important;padding:10px 4px !important;font-size:12.5px !important;font-weight:900 !important;background:#eef1f7 !important;color:#1a2333 !important;border:1px solid #d5dbe6 !important;}
-  .ta3-pin2{width:26px;height:26px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);background:#dc2626;border:3px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.4);}
-#afAddress{border-radius:10px !important;border:1px solid #d5dbe6 !important;padding:11px 12px !important;width:100%;box-sizing:border-box;}
+  /* v4 보정 */
+  .ta4-sw{height:34px;border:1px solid var(--line);border-radius:999px;background:#fff;color:var(--navy);font-weight:800;font-size:13px;padding:0 10px;max-width:110px;}
+  .ta2-lightbox{z-index:100500 !important;}
+  #portalAlertOverlay,.portal-alert-overlay{z-index:100600 !important;}
+  #agentNoticeModalOverlay{z-index:100400 !important;}
+  .ta4-pg .ta2-sch-item input[type=date]{min-width:128px;}
+  .ta4-pg{align-items:stretch !important;justify-content:flex-start !important;padding:0 !important;border-radius:0 !important;width:auto;height:auto;}
+  .ta4-form input[type=date],.ta4-form select{min-width:0;width:100%;max-width:100%;}
+  .ta4-form .row2>div{min-width:0;}
+  .ta4-form .won .row2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+  .ta4-rp textarea#rpText{min-height:230px;}
 
 </style>
 <meta name="theme-color" content="#0f2547">
@@ -1317,34 +1395,36 @@
     <div id="viewAgent" class="agent-view-container">
      <div class="ta3-app">
       <header class="ta3-bar">
-        <div class="tt"><small>에스원 북서울지사</small><span id="ta3Title">영업 TA 관리 포털</span></div>
-        <div style="display:flex;gap:8px;align-items:center;">
-          <button type="button" class="pl" onclick="openNewAgentLeadModal()">＋ 신규 TA</button>
+        <div class="tt" id="ta3Title">영업 TA 관리 포털</div>
+        <div style="display:flex;gap:8px;align-items:center;flex:none;">
+          <span id="ta3Sw"></span>
           <button type="button" onclick="ta3SetTab('my')" aria-label="내 정보"><span id="ta3Ini">·</span></button>
         </div>
       </header>
 
       <!-- 홈 -->
       <section class="ta3-screen on" id="ta3ScrHome">
-        <div class="ta3-hello"><div class="d" id="ta3HDate"></div><div class="c" id="ta3HChips"></div></div>
+        <div class="ta3-hello"><span class="d" id="ta3HDate"></span><span class="c" id="ta3HChips"></span></div>
         <div class="ta3-kpi" id="ta3Kpi"></div>
-        <div class="ta3-today"><div><div class="t">금일 수주 예정 금액</div><div class="a" id="ta3TodayAmt">0원</div></div>
+        <div class="ta3-today"><div><div class="t">금일 수주 예정</div><div class="a" id="ta3TodayAmt">0원</div></div>
           <button type="button" onclick="openTodayExpectedModal()">상세리스트</button></div>
 
-        <div class="ta3-h"><b>📒 오늘의 수첩</b><span id="ta3TodayCnt"></span></div>
+        <div id="ta3CmtBox"></div>
+
+        <div class="ta3-h"><b>오늘 일정</b><span id="ta3TodayCnt"></span></div>
         <div class="ta3-list" id="ta3TodayList"></div>
 
-        <div class="ta3-h"><b>📅 앞으로 7일</b><button type="button" onclick="ta3SetTab('cal')">전체 일정 ›</button></div>
+        <div class="ta3-h"><b>앞으로 7일</b><button type="button" onclick="ta3SetTab('cal')">전체 ›</button></div>
         <div class="ta3-list" id="ta3WeekList"></div>
 
-        <div class="ta3-h"><b>⏰ 일정이 지난 진행 안건</b><span id="ta3LateCnt"></span></div>
+        <div class="ta3-h"><b>일정이 지난 진행 안건</b><span id="ta3LateCnt"></span></div>
         <div class="ta3-list" id="ta3LateList"></div>
       </section>
 
       <!-- 안건 -->
       <section class="ta3-screen" id="ta3ScrItems">
         <div class="ta3-search"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
-          <input id="ta3Q" type="search" placeholder="서비스처 · 고객담당자 · 연락처 · 주소 검색" oninput="ta3SetQ(this.value)"></div>
+          <input id="ta3Q" type="search" placeholder="서비스처 · 담당자 · 연락처 · 주소" oninput="ta3SetQ(this.value)"></div>
         <div class="ta3-seg" id="ta3Src"></div>
         <div class="ta3-chips" id="ta3Groups"></div>
         <div id="ta3Items"></div>
@@ -1355,12 +1435,12 @@
         <div class="ta3-mapwrap">
           <div id="ta3Map"></div>
           <div class="ta3-maptop">
-            <div class="ta3-seg" id="ta3MapSrc" style="align-self:flex-start;box-shadow:0 2px 8px rgba(0,0,0,.2);margin:0;"></div>
+            <div class="ta3-seg" id="ta3MapSrc" style="align-self:flex-start;box-shadow:0 2px 8px rgba(0,0,0,.18);margin:0;"></div>
             <div class="ta3-chips" id="ta3MapGroups"></div>
             <div id="ta3MapNote"></div>
           </div>
           <button type="button" class="ta3-mapbtn" style="bottom:16px;" onclick="ta3MapMyLoc()" aria-label="내 위치">◎</button>
-          <button type="button" class="ta3-mapbtn" style="bottom:70px;font-size:15px;font-weight:900;" onclick="ta3MapFit()" aria-label="전체 보기">⤢</button>
+          <button type="button" class="ta3-mapbtn" style="bottom:68px;font-size:15px;font-weight:800;" onclick="ta3MapFit()" aria-label="전체 보기">⤢</button>
           <div class="ta3-prev" id="ta3Prev"></div>
         </div>
       </section>
@@ -1370,7 +1450,6 @@
         <div class="ta3-calbox">
           <div class="ta3-calhead"><button type="button" onclick="ta3CalMove(-1)">◀</button><b id="ta3CalTitle"></b><button type="button" onclick="ta3CalMove(1)">▶</button></div>
           <div class="ta3-cal" id="ta3CalGrid"></div>
-          <div style="font-size:11.5px;color:#8a94a6;margin-top:8px;"><span style="color:#f59e0b;">●</span> 고객 일정 &nbsp;<span style="color:#16a34a;">●</span> TA 수주예정 &nbsp;<span style="color:#8b5cf6;">●</span> 소개영업 예상계약</div>
         </div>
         <div class="ta3-h"><b id="ta3CalSel"></b><button type="button" onclick="ta3CalAdd()">＋ 일정 추가</button></div>
         <div class="ta3-list" id="ta3CalList"></div>
@@ -1378,16 +1457,8 @@
 
       <!-- MY -->
       <section class="ta3-screen" id="ta3ScrMy">
-        <div class="ta3-me-card"><div class="ta3-av" id="ta3Av"></div><div><div style="font-size:19px;font-weight:900;color:var(--ink);" id="ta3MyName"></div><div style="font-size:12.5px;color:#8a94a6;font-weight:700;margin-top:2px;" id="ta3MyJob"></div></div></div>
+        <div class="ta3-me-card"><div class="ta3-av" id="ta3Av"></div><div><div style="font-size:19px;font-weight:800;color:var(--ink);" id="ta3MyName"></div><div style="font-size:12.5px;color:var(--soft);font-weight:600;margin-top:2px;" id="ta3MyJob"></div></div></div>
         <div class="ta3-menu" id="ta3MyMenu"></div>
-        <div class="ta3-h"><b>🗺️ 지도 설정</b></div>
-        <div class="ta3-menu" style="padding:6px 14px 14px;">
-          <div class="ta3-field"><label>카카오맵 JavaScript 키</label><input id="ta3KeyInp" placeholder="미입력 시 OpenStreetMap 지도 사용" autocomplete="off"></div>
-          <button type="button" onclick="ta3SaveKey()" style="display:block;width:100%;margin-top:4px;padding:13px 0 !important;border-radius:12px;background:#0f2547 !important;color:#fff !important;font-weight:800;font-size:15px;justify-content:center;text-align:center;">저장하고 지도 다시 불러오기</button>
-          <div class="ta3-plstat" id="ta3MapStat"></div>
-        </div>
-        <div class="ta3-h"><b>소개영업 연동</b></div>
-        <div class="ta3-menu"><div style="padding:12px 16px;font-size:13px;color:#475569;line-height:1.6;font-weight:700;" id="ta3RefStat"></div></div>
       </section>
 
       <nav class="ta3-tabbar">
@@ -1403,121 +1474,6 @@
 </div>
 
 
-<!-- ==========================================================================
-     TA 상세보기 모달 (세부정보 + 메모 / 사진·그림 / 일정 캘린더)
-     ========================================================================== -->
-<div class="modal-overlay" id="ta2DetailOverlay" style="display:none;" onclick="if(event.target===this)ta2CloseDetail()">
-  <div class="modal-card ta2-modal">
-    <div class="ta2-m-head">
-      <button type="button" class="modal-close" onclick="ta2CloseDetail()">&times;</button>
-      <h3 id="ta2DName">-</h3>
-      <div id="ta2DBadges"></div>
-      <div class="ta2-autosave" id="ta2Saved">항목을 눌러 바로 수정하면 자동 저장됩니다</div>
-    </div>
-    <div class="ta2-m-scroll">
-      <div class="ta2-info" id="ta2DInfo"></div>
-      <div class="ta2-actions" id="ta2DActions"></div>
-
-      <div class="ta2-tabs">
-        <button type="button" class="ta2-tab active" data-tab="memo" onclick="ta2Tab('memo')">📝 메모 · 사진</button>
-        <button type="button" class="ta2-tab" data-tab="cal" onclick="ta2Tab('cal')">📅 일정</button>
-        <button type="button" class="ta2-tab" data-tab="place" onclick="ta2Tab('place')">📍 위치</button>
-      </div>
-      <div id="ta2StoreWarn"></div>
-
-      <!-- 메모 게시판 -->
-      <div id="ta2PaneMemo">
-        <div id="ta2MemoList"></div>
-      </div>
-
-<!-- 위치 -->
-      <div id="ta2PanePlace" style="display:none;">
-        <label style="font-size:12.5px;font-weight:800;color:#697386;">주소 / 위치 메모</label>
-        <input class="ta3-pladdr" id="ta3PlAddr" placeholder="예) 강북구 번동 123, 2층 사무실" onchange="ta3PlAddrChange(this.value)">
-        <div class="ta3-mini" id="ta3PlMap"></div>
-        <div class="ta3-plstat" id="ta3PlStat"></div>
-        <div class="ta3-btnrow">
-          <button type="button" onclick="ta3PlGps()" style="background:#2563eb;color:#fff;">📍 현재 위치로 기록</button>
-          <button type="button" onclick="ta3PlPick()" style="background:#0f2547;color:#fff;">🗺️ 지도에서 지정</button>
-          <button type="button" onclick="ta3PlFind()" style="background:#eef1f7;color:#1a2333;border:1px solid #d5dbe6;">🔎 주소로 찾기</button>
-        </div>
-        <div class="ta3-btnrow">
-          <button type="button" onclick="ta3PlNav('naver')" style="background:#03c75a;color:#fff;">🧭 네이버지도 길찾기</button>
-          <button type="button" onclick="ta3PlNav('kakao')" style="background:#fee500;color:#191600;">🧭 카카오맵 길찾기</button>
-        </div>
-      </div>
-
-      
-
-      <!-- 일정 캘린더 -->
-      <div id="ta2PaneCal" style="display:none;">
-        <div class="ta2-cal-head">
-          <button type="button" class="ta2-sm" onclick="ta2CalMove(-1)">◀</button>
-          <b id="ta2CalTitle"></b>
-          <button type="button" class="ta2-sm" onclick="ta2CalMove(1)">▶</button>
-        </div>
-        <div class="ta2-cal" id="ta2CalGrid"></div>
-        <div style="font-size:11.5px;color:#8a94a6;margin-top:6px;"><span style="color:#f59e0b;">●</span> 고객 일정 &nbsp; <span style="color:#16a34a;">●</span> 수주예정일</div>
-        <div style="margin-top:12px;font-size:14px;font-weight:900;color:#0a1730;" id="ta2SelDateLabel"></div>
-        <div id="ta2SchedList"></div>
-        <div class="ta2-sched-form">
-          <input type="hidden" id="ta2SchDate">
-          <button type="button" class="ta2-datebtn" id="ta2SchDateBtn" onclick="ta2PickDate(el('ta2SchDate').value, ta2SetSchDate)">📅 날짜 선택</button>
-          <input type="time" id="ta2SchTime">
-          <input type="text" id="ta2SchTitle" class="full" placeholder="일정 제목 (예: 현장 방문 미팅, 견적서 전달)">
-          <textarea id="ta2SchNote" class="full" rows="2" placeholder="상세 내용 / 약속 장소 (선택)"></textarea>
-          <button type="button" class="full" onclick="ta2AddSched()" style="border-radius:10px;padding:11px;font-weight:900;">일정 추가</button>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- 메모 작성 / 보기 팝업 -->
-<div class="modal-overlay" id="ta2MemoPop" style="display:none;z-index:100001;" onclick="if(event.target===this)ta2CloseMemoPop()">
-  <div class="modal-card ta2-modal" style="max-width:640px !important;">
-    <div class="ta2-m-head">
-      <button type="button" class="modal-close" onclick="ta2CloseMemoPop()">&times;</button>
-      <h3 id="ta2MpTitle">메모 작성</h3>
-      <div class="ta2-autosave" id="ta2MpMeta" style="margin-top:2px;"></div>
-    </div>
-    <div class="ta2-m-scroll">
-      <textarea id="ta2MemoText" class="ta2-mp-text" placeholder="제목(첫 줄)과 내용을 자유롭게 작성하세요. 고객 반응, 경쟁사, 다음 액션 등" onchange="ta2MpTextChange(this.value)"></textarea>
-      <div class="ta2-att-grid" id="ta2MpAtts"></div>
-      <div class="ta2-photo-bar" id="ta2MpPhotoBar">
-        <button type="button" class="ta2-sm" onclick="ta2AttachPick(ta2MpTarget(),'cam')">📷 촬영</button>
-        <button type="button" class="ta2-sm" onclick="ta2AttachPick(ta2MpTarget(),'album')">🖼️ 앨범</button>
-        <button type="button" class="ta2-sm" onclick="ta2OpenDraw(ta2MpTarget())">✏️ 그림</button>
-      </div>
-      <div class="ta2-draw" id="ta2DrawBox" style="display:none;">
-          <div class="tl">
-            <button type="button" class="ta2-swatch on" data-c="#111827" style="background:#111827;" onclick="ta2DrawColor(this)"></button>
-            <button type="button" class="ta2-swatch" data-c="#dc2626" style="background:#dc2626;" onclick="ta2DrawColor(this)"></button>
-            <button type="button" class="ta2-swatch" data-c="#2563eb" style="background:#2563eb;" onclick="ta2DrawColor(this)"></button>
-            <button type="button" class="ta2-swatch" data-c="#16a34a" style="background:#16a34a;" onclick="ta2DrawColor(this)"></button>
-            <button type="button" class="ta2-sm" onclick="ta2DrawWidth(3)">가늘게</button>
-            <button type="button" class="ta2-sm" onclick="ta2DrawWidth(7)">보통</button>
-            <button type="button" class="ta2-sm" onclick="ta2DrawWidth(14)">굵게</button>
-            <button type="button" class="ta2-sm" onclick="ta2DrawEraser()">지우개</button>
-            <button type="button" class="ta2-sm" onclick="ta2DrawUndo()">↩ 되돌리기</button>
-            <button type="button" class="ta2-sm" onclick="ta2DrawClear()">전체 지움</button>
-          </div>
-          <canvas id="ta2Canvas"></canvas>
-          <div style="display:flex;gap:8px;margin-top:8px;justify-content:flex-end;">
-            <button type="button" class="ta2-sm" onclick="ta2CloseDraw()">취소</button>
-            <button type="button" onclick="ta2SaveDraw()" style="border-radius:10px;padding:9px 16px;font-weight:900;">그림 첨부</button>
-          </div>
-        </div>
-      <div style="display:flex;gap:8px;align-items:center;margin-top:14px;">
-        <button type="button" class="danger" id="ta2MpDel" onclick="ta2DelNote()">삭제</button>
-        <span class="ta2-autosave" id="ta2MpAuto" style="margin:0;"></span>
-        <span style="flex:1"></span>
-        <button type="button" class="ta2-sm" onclick="ta2CloseMemoPop()">닫기</button>
-        <button type="button" id="ta2MpAdd" onclick="ta2AddMemo()" style="border-radius:10px;padding:10px 22px;font-weight:900;">등록</button>
-      </div>
-    </div>
-  </div>
-</div>
 
 <input type="file" id="ta2FileCam" accept="image/*" capture="environment" style="display:none;" onchange="ta2OnFiles(this)">
 <input type="file" id="ta2FileAlbum" accept="image/*" multiple style="display:none;" onchange="ta2OnFiles(this)">
@@ -1743,172 +1699,7 @@
   </div>
 </div>
 
-<!-- ==========================================================================
-     컨설턴트 신규 TA 등록 / 수정 모달 (3번 그림 캡처2.PNG 매칭)
-     ========================================================================== -->
-<div class="modal-overlay" id="agentLeadModalOverlay" style="display:none;">
-  <div class="modal-card" style="max-width:960px;width:95%;">
-    <button type="button" class="modal-close" onclick="closeAgentLeadModal()">&times;</button>
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
-      <h3 id="agentModalTitle" style="margin:0;font-size:18px;font-weight:800;color:var(--navy);">신규 TA 등록</h3>
-      <span class="count-tag" style="background:#eff6ff;color:#1d4ed8;font-weight:700;">컨설턴트 영업</span>
-    </div>
 
-    <form id="agentModalLeadForm" onsubmit="handleAgentModalSubmit(event)" class="agent-compact-form">
-      <input type="hidden" id="afEditingId" name="editingId"><input type="hidden" id="agentEditingId">
-      
-      <!-- 1행: 기본 인적/영업 정보 7개 필드 가로 정렬 -->
-      <div class="compact-form-row1">
-        <div class="form-group" style="margin:0;">
-          <label style="font-size:12px;font-weight:700;">서비스제공처명 *</label>
-          <input type="text" id="afCompany" required placeholder="현장 정식 명칭">
-        </div>
-        <div class="form-group" style="margin:0;">
-          <label style="font-size:12px;font-weight:700;">고객담당자</label>
-          <input type="text" id="afContact" placeholder="담당자 성명">
-        </div>
-        <div class="form-group" style="margin:0;">
-          <label style="font-size:12px;font-weight:700;">담당자 전화번호</label>
-          <input type="tel" id="afContactPhone" inputmode="tel" placeholder="010-0000-0000">
-        </div>
-        <div class="form-group" style="margin:0;">
-          <label style="font-size:12px;font-weight:700;">용역료(원) *</label>
-          <input type="text" inputmode="numeric" id="afAmount" required placeholder="예: 50,000,000">
-        </div>
-        <div class="form-group" style="margin:0;">
-          <label style="font-size:12px;font-weight:700;">상품종류 *</label>
-          <select id="afProductType">
-            <option value="알람">알람</option>
-            <option value="휴엔">휴엔</option>
-            <option value="정보보안">정보보안</option>
-            <option value="블루스캔">블루스캔</option>
-            <option value="유지보수">유지보수</option>
-            <option value="안전상품">안전상품</option>
-          </select>
-        </div>
-        <div class="form-group" style="margin:0;">
-          <label style="font-size:12px;font-weight:700;">영업동기 *</label>
-          <select id="afMotive">
-            <option value="개척">개척</option>
-            <option value="콜센터">콜센터</option>
-            <option value="사내소개">사내소개</option>
-            <option value="고객소개">고객소개</option>
-            <option value="대리점">대리점</option>
-            <option value="관내이전">관내이전</option>
-            <option value="관외이전">관외이전</option>
-            <option value="기타">기타</option>
-          </select>
-        </div>
-        <div class="form-group" style="margin:0;">
-          <label style="font-size:12px;font-weight:700;">영업단계 *</label>
-          <select id="afStage" onchange="onAgentStageChange(this.value)">
-            <option value="진행중">진행중</option>
-            <option value="수주完">수주完</option>
-            <option value="보류">보류</option>
-            <!-- 수정 모드일 때만 실패 옵션 동적 추가 -->
-          </select>
-        </div>
-        <div class="form-group" style="margin:0;">
-          <label style="font-size:12px;font-weight:700;">수주확도 *</label>
-          <select id="afConfidence">
-            <option value="A">A (상)</option>
-            <option value="B" selected>B (중)</option>
-            <option value="C">C (하)</option>
-          </select>
-        </div>
-      </div>
-
-      <!-- 1.5행: 수주完 선택 시 추가 정보 (계약일, 기산일, 차량번호) -->
-      <div id="afWonExtraRow" class="compact-form-row-won" style="display:none;">
-        <div class="form-group" style="margin:0;">
-          <label style="font-size:12px;font-weight:700;color:#1e40af;">계약일 (수주完 시) *</label>
-          <input type="date" id="afContractDate">
-        </div>
-        <div class="form-group" style="margin:0;">
-          <label style="font-size:12px;font-weight:700;color:#1e40af;">기산일 *</label>
-          <input type="date" id="afBaseDate">
-        </div>
-        <div class="form-group" style="margin:0;">
-          <label style="font-size:12px;font-weight:700;color:#1e40af;">차량번호</label>
-          <select id="afVehicleNumber">
-            <option value="없음">없음</option>
-            <option value="26호">26호</option>
-            <option value="27호">27호</option>
-            <option value="28호">28호</option>
-            <option value="127호">127호</option>
-            <option value="160호">160호</option>
-          </select>
-        </div>
-      </div>
-
-<div class="ta3-formplace">
-        <label>📍 위치 / 주소 (선택)</label>
-        <input type="text" id="afAddress" placeholder="주소를 입력하거나 아래 버튼으로 기록">
-        <div class="row">
-          <button type="button" onclick="ta3FormGps()">현재 위치</button>
-          <button type="button" onclick="ta3FormPick()">지도에서 지정</button>
-          <button type="button" onclick="ta3FormGeo()">주소로 찾기</button>
-        </div>
-        <div id="afPlaceInfo" style="font-size:12px;font-weight:800;color:#15803d;margin-top:6px;"></div>
-      </div>
-
-      
-
-      <!-- 2행: 등록일, 계약예정일, 메모, 등록 버튼 -->
-      <div class="compact-form-row2" style="margin-top:6px;">
-        <div class="form-group" style="margin:0;">
-          <label style="font-size:12px;font-weight:700;">등록일</label>
-          <input type="date" id="afRegisteredDate">
-        </div>
-        <div class="form-group" style="margin:0;">
-          <label style="font-size:12px;font-weight:700;">계약예정일 *</label>
-          <input type="date" id="afExpectedDate" required onchange="onAgentExpectedDateChange(this.value)">
-        </div>
-        <div class="form-group" style="margin:0;">
-          <label style="font-size:12px;font-weight:700;">메모</label>
-          <input type="text" id="afMemo" placeholder="특이사항, 다음 액션 등">
-        </div>
-        <div>
-          <button type="submit" id="afSubmitBtn" style="padding:10px 24px;background:#2563eb;color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;white-space:nowrap;height:42px;">
-            TA 등록
-          </button>
-        </div>
-      </div>
-    </form>
-  </div>
-</div>
-
-<!-- ==========================================================================
-     금일 수주 예정 금액 상세리스트 모달
-     ========================================================================== -->
-<div class="modal-overlay" id="todayExpectedModalOverlay" style="display:none;">
-  <div class="modal-card" style="max-width:850px;width:95%;">
-    <button type="button" class="modal-close" onclick="closeTodayExpectedModal()">&times;</button>
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
-      <h3 style="margin:0;font-size:18px;font-weight:800;color:var(--navy);">
-        📅 금일 수주 예정 TA 상세목록
-      </h3>
-      <span class="count-tag" id="todayExpectedModalDateTag" style="background:#eff6ff;color:#1d4ed8;font-weight:700;"></span>
-    </div>
-    <div style="overflow-x:auto;">
-      <table class="modal-table">
-        <thead>
-          <tr>
-            <th class="company-cell">서비스제공처명</th>
-            <th>고객담당자</th>
-            <th style="text-align:right;">용역료(원)</th>
-            <th>상품종류</th>
-            <th>영업동기</th>
-            <th>확도</th>
-            <th>메모</th>
-            <th>관리</th>
-          </tr>
-        </thead>
-        <tbody id="todayExpectedModalTbody"></tbody>
-      </table>
-    </div>
-  </div>
-</div>
 
 <!-- ==========================================================================
      컨설턴트 로그인 시 지사장 공지사항 팝업 모달
@@ -4037,7 +3828,6 @@ function renderAgentLeadTable(agentName) {
 function openNewAgentLeadModal() {
   if (currentUser) saveUserSession(currentUser, currentViewMode, 'newLead');
   el('afEditingId').value = '';
-  try { ta3FormReset(); } catch (e) {}
   el('agentModalTitle').textContent = '신규 TA 등록';
   el('afCompany').value = '';
   el('afContact').value = '';
@@ -4244,7 +4034,6 @@ async function handleAgentModalSubmit(e) {
       if (error) throw error;
       if (!ALL[agentName]) ALL[agentName] = { leads: [] };
       ALL[agentName].leads.unshift(payload);
-      try { await ta3AfterCreate(payload.id); } catch (e) { console.warn(e); }
       await recordActivityLog(agentName, '신규 등록', payload.company, payload.id, [
         `서비스제공처명: ${payload.company}`,
         `용역료: ${formatCurrency(payload.amount)}`,
@@ -5549,7 +5338,7 @@ async function ta2SchedUpdate(id, patch) {
 }
 
 // ---------- 상세보기 ----------
-function ta2CurLead() { return ta3FindLead(TA2.leadId); }
+function ta2CurLead() { return ta2Leads(currentViewMode).find(l => l.id === TA2.leadId) || null; }
 let TA2_FT = null;
 function ta2Flash(msg, err) {
   const e = el('ta2Saved'); if (!e) return;
@@ -5567,7 +5356,6 @@ function ta2OptHtml(pairs, cur) {
 function ta2RenderHead() {
   const l = ta2CurLead(); if (!l) return;
   el('ta2DName').textContent = l.company || '-';
-  if (l._ref) { el('ta2DBadges').innerHTML = '<span class="ta3-tag" style="background:#ede9fe;color:#6d28d9;">소개영업</span> <span class="ta2-badge" style="background:#eef1f7;color:#0f2547;">' + escapeHtml(l.stage) + '</span>'; return; }
   el('ta2DBadges').innerHTML =
     `<span class="ta2-badge" style="background:${STAGE_BG[l.stage] || '#e5e7eb'};color:${STAGE_COLOR[l.stage] || '#374151'};">${ta2StageLabel(l.stage)}</span> ` +
     `<span class="ta2-conf" style="margin-left:6px;"><i style="background:${CONF_COLOR[l.confidence] || '#ccc'};"></i>확도 ${escapeHtml(l.confidence || '-')}</span>`;
@@ -5577,7 +5365,6 @@ function ta2DateBtn(field, ds) {
 }
 function ta2RenderInfo() {
   const l = ta2CurLead(); if (!l) return;
-  if (l._ref) { ta3RenderRefInfo(l); return; }
   const f = (k, v) => `<div><div class="k">${k}</div><div class="vv">${v}</div></div>`;
   const regDate = l.registeredDate || (l.createdAt || '').slice(0, 10);
   el('ta2DInfo').innerHTML = [
@@ -5605,8 +5392,7 @@ function ta2RenderActions() {
   } else {
     a += `<span style="font-size:12.5px;color:#8a94a6;font-weight:700;align-self:center;">전화번호를 입력하면 바로 전화·연락처 저장을 할 수 있습니다.</span>`;
   }
-  if (l._ref) a += `<button type="button" style="background:#6d28d9;color:#fff;" onclick="window.open(REFERRAL_APP_URL,'_blank')">소개영업 앱에서 처리</button>`;
-  if (!l._ref && isCreatedToday(l)) a += `<button type="button" class="danger" onclick="ta2DeleteFromDetail()">삭제</button>`;
+  if (isCreatedToday(l)) a += `<button type="button" class="danger" onclick="ta2DeleteFromDetail()">삭제</button>`;
   el('ta2DActions').innerHTML = a;
 }
 
@@ -5645,7 +5431,7 @@ async function ta2SaveFields(patch, rerender) {
   ta2Flash('저장됨 ✓');
   ta2RenderHead();
   if (rerender) ta2RenderInfo(); else ta2RenderActions();
-  ta3Refresh();
+  ta2RenderKpi(currentViewMode); ta2RenderList(currentViewMode);
   if (TA2.tab === 'cal') ta2RenderCal();
   return true;
 }
@@ -5711,7 +5497,7 @@ function ta2DpRender() {
 }
 
 async function ta2OpenDetail(id, tab, date) {
-  const lead = ta3FindLead(id);
+  const lead = ta2Leads(currentViewMode).find(l => l.id === id);
   if (!lead) return;
   TA2.leadId = id; TA2.mode = {}; TA2.notes = []; TA2.scheds = []; TA2.pending = [];
   TA2.calSel = date || todayStr();
@@ -5721,7 +5507,7 @@ async function ta2OpenDetail(id, tab, date) {
   el('ta2MemoText').value = '';
   ta2RenderPending(); ta2CloseDraw();
   ta2Flash('항목을 눌러 바로 수정하면 자동 저장됩니다'); el('ta2Saved').className = 'ta2-autosave';
-  ta2Tab(tab === 'cal' ? 'cal' : tab === 'place' ? 'place' : 'memo');
+  ta2Tab(tab === 'cal' ? 'cal' : 'memo');
   const myId = id;
   await Promise.all([ta2Probe('ta_notes'), ta2Probe('ta_schedules')]);
   if (TA2.leadId !== myId) return;
@@ -5733,7 +5519,7 @@ function ta2CloseDetail() {
   el('ta2DetailOverlay').style.display = 'none';
   ta2CloseMemoPop(); ta2CloseDraw(); ta2CloseLightbox(); ta2DpClose();
   TA2.leadId = null;
-  ta3Refresh();
+  ta2RenderUpcoming(currentViewMode);
 }
 function ta2DeleteFromDetail() {
   const lead = ta2CurLead(); if (!lead) return;
@@ -5745,8 +5531,6 @@ function ta2Tab(t) {
   document.querySelectorAll('.ta2-tab').forEach(b => b.classList.toggle('active', b.dataset.tab === t));
   el('ta2PaneMemo').style.display = t === 'memo' ? 'block' : 'none';
   el('ta2PaneCal').style.display = t === 'cal' ? 'block' : 'none';
-  el('ta2PanePlace').style.display = t === 'place' ? 'block' : 'none';
-  if (t === 'place') ta3PlRender();
   if (t !== 'memo') ta2CloseDraw();
   if (t === 'cal') { ta2RenderCal(); ta2RenderSchedList(); ta2SetSchDate(TA2.calSel); }
   ta2ShowStoreWarn();
@@ -5809,7 +5593,7 @@ function ta2RenderMemos() {
 }
 
 // 메모 작성/보기 팝업 (id: 'new' | 메모 id | 'base')
-const MP = { open: false, id: 'new' };
+
 function ta2OpenMemoPop(id) {
   MP.open = true; MP.id = id || 'new';
   ta2CloseDraw();
@@ -6112,7 +5896,7 @@ async function leadWriteWithPhone(mode, id, phone, row) {
 
 
 // ==========================================================================
-// TA 수첩 v3 — 모바일 앱 셸 (홈 / 안건 / 지도 / 일정 / MY) + 소개영업 연동 + 위치 기록
+// TA 수첩 v4 — 모바일 앱 셸 (홈 / 안건 / 지도 / 일정 / MY) + 소개영업 연동 + 위치 기록
 // ==========================================================================
 const KAKAO_MAP_KEY = '4ab1f892386fe4e3375fc2823082d2de';                                   // ← 카카오 JavaScript 키 (비워두면 OpenStreetMap 사용)
 const NAVER_MAP_KEY = '';                                   // ← 네이버 지도 JavaScript Client ID (비워두면 OpenStreetMap 사용)
@@ -6411,9 +6195,10 @@ async function ta3Boot() {
   el('ta3Ini').textContent = (name || '·').slice(0, 1);
   try { const t = sessionStorage.getItem('S1_TA3_TAB'); if (t && !TA3.booted) TA3.tab = t; } catch (e) {}
   TA3.booted = true;
+  ta4Init();
   ta3Refresh();
-  await ta3MapInit().catch(() => {});
-  await Promise.all([ta3LoadRefs(), ta3LoadPlaces(), ta3LoadScheds()]);
+  ta3MapInit().catch(() => {});
+  await Promise.all([ta3LoadRefs(), ta3LoadPlaces(), ta3LoadScheds(), ta4LoadMotives(), ta4LoadCmts()]);
   ta3Refresh();
 }
 function ta3SetTab(t) {
@@ -6425,6 +6210,7 @@ function ta3SetTab(t) {
   window.scrollTo(0, 0);
   ta3Refresh();
 }
+function ta3Back() { if (PG.st.length) history.back(); }
 function ta3Refresh() {
   ta3BuildItems();
   const t = TA3.tab;
@@ -6455,8 +6241,8 @@ function ta3CardHtml(it) {
   return `<div class="ta3-card" style="--c:${g.c}" onclick="ta3Open('${escapeHtml(it.id)}')">
     <div class="r1"><div class="nm">${escapeHtml(it.name)}</div></div>
     ${it.amount ? `<div class="amt">${formatCurrency(it.amount)}</div>` : ''}
-    <div class="r2">${srcTag}<span class="ta3-tag" style="background:${stBg};color:${stCl};">${escapeHtml(it.stage)}</span>${it.conf ? `<span class="ta3-tag" style="background:#f3f4f6;color:#374151;">확도 ${escapeHtml(it.conf)}</span>` : ''}${it.product ? `<span class="ta3-tag" style="background:#f3f4f6;color:#374151;">${escapeHtml(it.product)}</span>` : ''}</div>
-    <div class="r3">📅 ${ta3SchedLabel(it)}${it.contact ? ' · 👤 ' + escapeHtml(it.contact) : ''}<br>${pl && pl.lat ? '📍 ' : '📌 '}${it.address ? escapeHtml(it.address) : '<span style="color:#b6bcc8;">위치 미등록</span>'}</div>
+    <div class="r2">${srcTag}<span class="ta3-tag" style="background:${stBg};color:${stCl};">${escapeHtml(it.stage)}</span>${it.conf ? `<span class="ta3-tag" style="background:#f3f4f6;color:#374151;">확도 ${escapeHtml(it.conf)}</span>` : ''}${it.product ? `<span class="ta3-tag" style="background:#f3f4f6;color:#374151;">${escapeHtml(it.product)}</span>` : ''}${ta4CmBadge(it.id)}</div>
+    <div class="r3">📅 ${ta3SchedLabel(it)}${it.contact ? ' · 👤 ' + escapeHtml(it.contact) : ''}<br>${pl && pl.lat ? '📍 ' : '📌 '}${it.address ? escapeHtml(it.address) : '<span style="color:#b6bcc8;">위치 미지정</span>'}</div>
     ${tel ? `<button type="button" class="ta3-call" onclick="event.stopPropagation();location.href='tel:${tel}'" aria-label="전화">📞</button>` : ''}
   </div>`;
 }
@@ -6468,8 +6254,8 @@ function ta3RowHtml(timeLabel, title, sub, onclick) {
 function ta3RenderHome() {
   const name = currentViewMode, w = ta2WorkdayInfo(), month = currentMonthStr(), today = todayStr();
   el('ta3HDate').textContent = todayLabel();
-  const sw = isMasterUser() ? `<select class="ta3-pill" style="border:0;font-weight:800;" onchange="switchView(this.value)">${CONSULTANTS.map(n => `<option value="${n}"${n === name ? ' selected' : ''}>${n} 컨설턴트</option>`).join('')}</select>` : '';
-  el('ta3HChips').innerHTML = sw + (w.todayWork ? `<span class="ta3-pill">영업일 ${w.elapsed}일차 / ${w.total}일</span>` : '<span class="ta3-pill am">휴무일</span>') + `<span class="ta3-pill am">잔여 영업일 ${w.left}일</span>`;
+  el('ta3Sw').innerHTML = isMasterUser() ? `<select class="ta4-sw" onchange="switchView(this.value)">${CONSULTANTS.map(n => `<option value="${n}"${n === name ? ' selected' : ''}>${n}</option>`).join('')}</select>` : '';
+  el('ta3HChips').innerHTML = w.todayWork ? `<span class="ta3-pill">영업일 ${w.elapsed}/${w.total}</span><span class="ta3-pill am">잔여 ${w.left}일</span>` : `<span class="ta3-pill am">휴무</span><span class="ta3-pill am">잔여 ${w.left}일</span>`;
 
   const leads = ta2Leads(name), ing = leads.filter(l => l.stage === '진행중');
   const rem = ing.filter(l => (l.expectedDate || '').slice(0, 7) === month);
@@ -6482,7 +6268,7 @@ function ta3RenderHome() {
     <div class="ta3-k"><div class="l">진행 TA</div><div class="v">${formatCurrency(ta2Sum(ing))}</div><div class="n">${ing.length}건</div></div>
     <div class="ta3-k"><div class="l">이달 잔여 TA</div><div class="v">${formatCurrency(ta2Sum(rem))}</div><div class="n">${rem.length}건</div></div>
     <div class="ta3-k"><div class="l">이달 수주 TA</div><div class="v">${formatCurrency(wonAmt)}</div><div class="n">${won.length}건${pct !== null ? ` · 목표 ${pct}%` : ''}</div>${pct !== null ? `<div class="ta3-bar2"><i style="width:${Math.min(100, pct)}%"></i></div>` : ''}</div>
-    <div class="ta3-k"><div class="l">TA 평균 단가</div><div class="v">${formatCurrency(avg)}</div><div class="n">진행중 기준</div></div>
+    <div class="ta3-k"><div class="l">TA 평균 단가</div><div class="v">${formatCurrency(avg)}</div><div class="n">진행중</div></div>
     <div class="ta3-k wide" onclick="TA3.f.src='ref';TA3.f.group='all';ta3SetTab('items')"><div><div class="l">소개영업 안건</div><div class="v" style="font-size:17px;">진행 ${refIng}건 · 계약완료 ${refWon}건</div></div><span class="ta3-pill pu">${TA3.refErr ? '불러오기 실패' : '전체 ' + TA3.refs.length + '건 ›'}</span></div>`;
 
   const todayExp = ing.filter(l => l.expectedDate === today);
@@ -6496,7 +6282,8 @@ function ta3RenderHome() {
   });
   TA3.items.filter(i => i.date === today && i.group === 'ing').forEach(i => rows.push(ta3RowHtml(i.src === 'ref' ? '소개' : '수주', `${i.name} — 계약 예정`, i.amount ? formatCurrency(i.amount) : '', `ta3Open('${escapeHtml(i.id)}')`)));
   el('ta3TodayCnt').textContent = rows.length ? rows.length + '건' : '';
-  el('ta3TodayList').innerHTML = rows.join('') || '<div class="ta3-empty">오늘 예정된 일정이 없습니다.<br>「일정」 탭에서 고객 약속을 기록해보세요.</div>';
+  el('ta3TodayList').innerHTML = rows.join('') || '<div class="ta3-empty">없음</div>';
+  ta4RenderCmtBox();
 
   const wk = []; const end = new Date(today + 'T00:00:00'); end.setDate(end.getDate() + 7);
   const endStr = `${end.getFullYear()}-${TA2_PAD(end.getMonth() + 1)}-${TA2_PAD(end.getDate())}`;
@@ -6505,11 +6292,11 @@ function ta3RenderHome() {
   });
   TA3.items.filter(i => i.group === 'ing' && i.date > today && i.date <= endStr).forEach(i => wk.push({ d: i.date + 'z', h: ta3RowHtml(ta2DateLabel(i.date), `${i.name} — ${i.src === 'ref' ? '예상 계약' : '수주 예정'}`, i.amount ? formatCurrency(i.amount) : '', `ta3Open('${escapeHtml(i.id)}')`) }));
   wk.sort((a, b) => a.d.localeCompare(b.d));
-  el('ta3WeekList').innerHTML = wk.map(x => x.h).join('') || '<div class="ta3-empty">앞으로 7일간 예정이 없습니다.</div>';
+  el('ta3WeekList').innerHTML = wk.map(x => x.h).join('') || '<div class="ta3-empty">없음</div>';
 
   const late = TA3.items.filter(i => i.group === 'ing' && i.date && i.date < today).sort((a, b) => a.date.localeCompare(b.date));
   el('ta3LateCnt').textContent = late.length ? late.length + '건' : '';
-  el('ta3LateList').innerHTML = late.slice(0, 6).map(i => ta3RowHtml(`<span style="color:#b91c1c">${-ta2DayDiff(i.date)}일</span>`, i.name, `${i.src === 'ref' ? '소개영업' : 'TA'} · ${escapeHtml(i.stage)}${i.amount ? ' · ' + formatCurrency(i.amount) : ''}`, `ta3Open('${escapeHtml(i.id)}')`)).join('') + (late.length > 6 ? `<div class="ta3-empty" style="padding:8px;">외 ${late.length - 6}건 — 안건 탭에서 확인</div>` : '') || '<div class="ta3-empty">일정이 지난 진행 안건이 없습니다 👍</div>';
+  el('ta3LateList').innerHTML = late.slice(0, 6).map(i => ta3RowHtml(`<span style="color:#b91c1c">${-ta2DayDiff(i.date)}일</span>`, i.name, `${i.src === 'ref' ? '소개영업' : 'TA'} · ${escapeHtml(i.stage)}${i.amount ? ' · ' + formatCurrency(i.amount) : ''}`, `ta3Open('${escapeHtml(i.id)}')`)).join('') + (late.length > 6 ? `<div class="ta3-empty" style="padding:8px;">외 ${late.length - 6}건</div>` : '') || '<div class="ta3-empty">없음</div>';
 }
 
 // ---------- 안건 ----------
@@ -6545,7 +6332,7 @@ function ta3RenderItems() {
   const list = ta3Sorted(TA3.f.group === 'all' ? base : base.filter(i => i.group === TA3.f.group));
   let note = '';
   if (TA3.f.src !== 'ta' && TA3.refErr) note = `<div class="ta3-mapnote" style="margin-bottom:10px;"><span>소개영업 안건을 불러오지 못했습니다.<br><small style="font-weight:600">${escapeHtml(TA3.refErr)}</small></span><button type="button" onclick="ta3LoadRefs().then(ta3Refresh)">다시 시도</button></div>`;
-  el('ta3Items').innerHTML = note + (list.map(ta3CardHtml).join('') || '<div class="ta3-empty">조건에 맞는 안건이 없습니다.</div>');
+  el('ta3Items').innerHTML = note + (list.map(ta3CardHtml).join('') || '<div class="ta3-empty">없음</div>');
 }
 
 // ---------- 지도 ----------
@@ -6560,7 +6347,7 @@ async function ta3RenderMap(noFit) {
   const placed = shown.filter(i => TA3.places[i.id] && TA3.places[i.id].lat);
   const noPlace = shown.filter(i => !(TA3.places[i.id] && TA3.places[i.id].lat));
   const geoable = noPlace.filter(i => i.address);
-  el('ta3MapNote').innerHTML = noPlace.length ? `<div class="ta3-mapnote"><span>📌 위치 미등록 ${noPlace.length}건${geoable.length ? ` (주소 있음 ${geoable.length}건)` : ''}</span>${geoable.length ? `<button type="button" onclick="ta3BatchGeo()">주소로 자동 등록</button>` : `<button type="button" onclick="ta3SetTab('items')">안건에서 등록</button>`}</div>` : '';
+  el('ta3MapNote').innerHTML = noPlace.length ? `<div class="ta3-mapnote"><span>📌 위치 미지정 ${noPlace.length}건</span>${geoable.length ? `<button type="button" onclick="ta3BatchGeo()">주소로 일괄 지정</button>` : ''}</div>` : '';
   try { await ta3MapInit(); } catch (e) { el('ta3Map').innerHTML = '<div class="ta3-empty">지도를 불러오지 못했습니다. 네트워크를 확인해주세요.</div>'; return; }
   if (!TA3.map) {
     el('ta3Map').innerHTML = '';
@@ -6584,7 +6371,7 @@ function ta3MapPreview(id) {
     <div class="ad">📍 ${escapeHtml((pl && pl.address) || i.address || '')}</div>
     <div class="bt"><button type="button" style="background:#0f2547;color:#fff;" onclick="ta3Open('${escapeHtml(id)}')">상세보기</button>
       <button type="button" style="background:#03c75a;color:#fff;" onclick="ta3OpenNav('naver','${escapeHtml(i.name).replace(/'/g, '')}',TA3.places['${escapeHtml(id)}'])">길찾기</button>
-      ${tel ? `<button type="button" style="background:#16a34a;color:#fff;" onclick="location.href='tel:${tel}'">전화</button>` : `<button type="button" style="background:#eef1f7;color:#1a2333;" onclick="ta3Open('${escapeHtml(id)}','place')">위치 수정</button>`}</div>`;
+      ${tel ? `<button type="button" style="background:#16a34a;color:#fff;" onclick="location.href='tel:${tel}'">전화</button>` : `<button type="button" style="background:#eef1f7;color:#1a2333;" onclick="ta4PlaceOpen('${escapeHtml(id)}')">위치 수정</button>`}</div>`;
   el('ta3Prev').style.display = 'block';
   ta3RenderMap(true);
 }
@@ -6608,13 +6395,13 @@ async function ta3BatchGeo() {
   if (!todo.length) return;
   TA3_BATCH = true; let ok = 0, fail = 0;
   for (let k = 0; k < todo.length; k++) {
-    ta3Toast(`주소로 위치 찾는 중... ${k + 1}/${todo.length}`, 4000);
+    ta3Toast(`위치 찾는 중 ${k + 1}/${todo.length}`, 4000);
     const i = todo[k], r = await ta3Geocode(i.address);
     if (r) { try { await ta3PlaceSave(i.id, i.src, { lat: r.lat, lng: r.lng, address: i.address }); ok++; } catch (e) { fail++; } } else fail++;
     if (k % 3 === 2) ta3RenderMap(true);
   }
   TA3_BATCH = false;
-  ta3Toast(`위치 등록 ${ok}건 완료${fail ? ` · ${fail}건은 주소를 찾지 못했습니다` : ''}`, 4000);
+  ta3Toast(`위치 ${ok}건 지정${fail ? ` · ${fail}건 실패` : ''}`, 4000);
   ta3RenderMap();
 }
 
@@ -6646,15 +6433,15 @@ function ta3RenderCal() {
     rows.push(ta3RowHtml(s.sched_time ? String(s.sched_time).slice(0, 5) : '종일', (s.done ? '✓ ' : '') + s.title, it ? escapeHtml(it.name) : '', `ta3Open('${escapeHtml(s.lead_id)}','cal','${sel}')`));
   });
   TA3.items.filter(i => i.date === sel && i.group === 'ing').forEach(i => rows.push(ta3RowHtml(i.src === 'ref' ? '소개' : '수주', `${i.name} — ${i.src === 'ref' ? '예상 계약' : '수주 예정'}`, i.amount ? formatCurrency(i.amount) : '', `ta3Open('${escapeHtml(i.id)}')`)));
-  el('ta3CalList').innerHTML = rows.join('') || '<div class="ta3-empty">이 날짜에 일정이 없습니다.<br>「＋ 일정 추가」로 고객과의 약속을 기록하세요.</div>';
+  el('ta3CalList').innerHTML = rows.join('') || '<div class="ta3-empty">없음</div>';
 }
-function ta3CalAdd() { TA3.ipPick = TA3.cal.sel; el('ta3IpQ').value = ''; ta3IpRender(); el('ta3ItemPick').classList.add('on'); }
-function ta3IpClose() { el('ta3ItemPick').classList.remove('on'); }
+function ta3CalAdd() { TA3.ipPick = TA3.cal.sel; el('ta3IpQ').value = ''; ta3IpRender(); ta4Show('ta3ItemPick'); }
+function ta3IpClose() { ta4Close('ta3ItemPick'); }
 function ta3IpRender() {
   const list = ta3Sorted(ta3FilterItems('all', el('ta3IpQ').value)).filter(i => i.group === 'ing' || i.group === 'hold').slice(0, 80);
-  el('ta3IpList').innerHTML = list.map(ta3CardHtml).join('').replace(/onclick="ta3Open\('([^']*)'\)"/g, (m, id) => `onclick="ta3IpGo('${id}')"`) || '<div class="ta3-empty">안건이 없습니다.</div>';
+  el('ta3IpList').innerHTML = list.map(ta3CardHtml).join('').replace(/onclick="ta3Open\('([^']*)'\)"/g, (m, id) => `onclick="ta3IpGo('${id}')"`) || '<div class="ta3-empty">없음</div>';
 }
-function ta3IpGo(id) { ta3IpClose(); ta3Open(id, 'cal', TA3.ipPick); }
+function ta3IpGo(id) { ta3IpClose(); setTimeout(() => ta3Open(id, 'cal', TA3.ipPick), 320); }
 
 // ---------- MY ----------
 function ta3RenderMy() {
@@ -6662,62 +6449,26 @@ function ta3RenderMy() {
   el('ta3Av').textContent = (name || '·').slice(0, 1);
   el('ta3MyName').textContent = name;
   el('ta3MyJob').textContent = (currentUser && currentUser.job) || '컨설턴트';
-  let m = `<button type="button" onclick="window.open(REFERRAL_APP_URL,'_blank')">소개영업 앱 열기 <small>접수·면담·견적 처리</small></button>
-    <button type="button" onclick="ta3Reload()">데이터 새로고침 <small>TA · 소개영업 · 위치 · 일정</small></button>`;
+  let m = `<button type="button" onclick="window.open(REFERRAL_APP_URL,'_blank')">소개영업 앱 열기</button>
+    <button type="button" onclick="ta3Reload()">데이터 새로고침</button>`;
   if (master) {
-    m += `<button type="button" onclick="location.href='admin.html?admin=1'">📊 통합 대시보드(관리자) <small>나중에 보완 예정</small></button>`;
-    CONSULTANTS.filter(n => n !== name).forEach(n => { m += `<button type="button" onclick="switchView('${n}')">${n} 컨설턴트 화면 보기</button>`; });
+    m += `<button type="button" onclick="location.href='admin.html?admin=1'">통합 대시보드(관리자)</button>`;
+    CONSULTANTS.filter(n => n !== name).forEach(n => { m += `<button type="button" onclick="switchView('${n}')">${n} 컨설턴트 화면</button>`; });
   }
   m += `<button type="button" onclick="doLogout()" style="color:#b91c1c !important;">로그아웃</button>`;
   el('ta3MyMenu').innerHTML = m;
-  el('ta3KeyInp').value = (function () { try { return localStorage.getItem('S1_KAKAO_MAP_KEY') || ''; } catch (e) { return ''; } })();
-  el('ta3MapStat').textContent = MAPK.kind === 'kakao' ? '현재: 카카오맵 사용 중' : (ta3KakaoKey() ? '현재: OpenStreetMap (카카오맵 로드 실패 — 키 종류(JavaScript 키), 웹 도메인 등록, 카카오맵 사용 설정을 확인하세요)' : '현재: OpenStreetMap 사용 중 (키를 입력하면 카카오맵으로 전환)');
-  el('ta3RefStat').innerHTML = TA3.refErr ? `⚠️ 소개영업 데이터를 불러오지 못했습니다.<br><span style="color:#8a94a6;font-weight:600">${escapeHtml(TA3.refErr)}</span>` : `소개영업 안건 중 <b>담당 컨설턴트가 ${escapeHtml(name)}</b>인 건 <b>${TA3.refs.length}건</b>을 함께 조회합니다. (읽기 전용 · 단계 처리는 소개영업 앱에서)`;
 }
 async function ta3Reload() {
-  ta3Toast('새로고침 중...');
+  ta3Toast('새로고침 중');
   try { await loadAllFromSupabase(); } catch (e) {}
-  await Promise.all([ta3LoadRefs(), ta3LoadPlaces(), ta3LoadScheds()]);
-  ta3Refresh(); ta3Toast('최신 데이터로 갱신했습니다');
+  await Promise.all([ta3LoadRefs(), ta3LoadPlaces(), ta3LoadScheds(), ta4LoadMotives(), ta4LoadCmts()]);
+  ta3Refresh(); ta3Toast('갱신 완료');
 }
-function ta3SaveKey() {
-  const v = el('ta3KeyInp').value.trim();
-  try { if (v) localStorage.setItem('S1_KAKAO_MAP_KEY', v); else localStorage.removeItem('S1_KAKAO_MAP_KEY'); } catch (e) {}
-  ta3Toast('저장했습니다. 지도를 다시 불러옵니다...'); setTimeout(() => location.reload(), 700);
-}
-
-// ---------- 새 TA 등록 시 위치 ----------
-function ta3FormReset() { TA3.formPlace = null; if (el('afAddress')) el('afAddress').value = ''; if (el('afPlaceInfo')) el('afPlaceInfo').textContent = ''; }
-function ta3FormInfo() { const p = TA3.formPlace; el('afPlaceInfo').textContent = p && p.lat ? `✓ 위치 지정됨 (${p.lat.toFixed(5)}, ${p.lng.toFixed(5)})` : ''; }
-async function ta3FormGps() {
-  try {
-    ta3Toast('현재 위치 확인 중...'); const p = await ta3Gps(); const a = await ta3Reverse(p.lat, p.lng);
-    TA3.formPlace = { lat: p.lat, lng: p.lng, address: a }; if (a) el('afAddress').value = a; ta3FormInfo();
-  } catch (e) { ta3Toast(e.message, 3500); }
-}
-function ta3FormPick() {
-  const cur = TA3.formPlace;
-  ta3PickOnMap(cur, async r => { TA3.formPlace = r; if (r.address) el('afAddress').value = r.address; ta3FormInfo(); });
-}
-async function ta3FormGeo() {
-  const q = el('afAddress').value.trim(); if (!q) { ta3Toast('주소를 먼저 입력하세요'); return; }
-  ta3Toast('주소로 위치 찾는 중...'); const r = await ta3Geocode(q);
-  if (!r) { ta3Toast('주소를 찾지 못했습니다. 지도에서 직접 지정해보세요.', 3500); return; }
-  TA3.formPlace = { lat: r.lat, lng: r.lng, address: q }; ta3FormInfo();
-}
-async function ta3AfterCreate(id) {
-  const addr = (el('afAddress') && el('afAddress').value.trim()) || '';
-  const p = TA3.formPlace;
-  if (!p && !addr) return;
-  try { await ta3PlaceSave(id, 'ta', { lat: p ? p.lat : null, lng: p ? p.lng : null, address: addr || (p && p.address) || '' }); } catch (e) { ta3Toast('안건은 저장됐지만 위치 저장에 실패했습니다: ' + (e.message || e), 4000); }
-  TA3.formPlace = null; ta3Refresh();
-}
-
 // ---------- 위치 선택기 (중앙 핀) ----------
 let TA3_PK_CB = null, TA3_PK_T = null;
 async function ta3PickOnMap(init, cb) {
-  TA3_PK_CB = cb; el('ta3Picker').classList.add('on');
-  el('ta3PkQ').value = ''; el('ta3PkAddr').textContent = '지도를 움직여 핀 위치를 맞추세요'; el('ta3PkCoord').textContent = '';
+  TA3_PK_CB = cb; ta4Show('ta3Picker', () => { TA3_PK_CB = null; });
+  el('ta3PkQ').value = (init && init.q) || ''; el('ta3PkAddr').textContent = ''; el('ta3PkCoord').textContent = '';
   try { await ta3MapInit(); } catch (e) { ta3Toast('지도를 불러오지 못했습니다'); ta3PkClose(); return; }
   const c = (init && init.lat) ? init : null;
   if (!TA3.pkMap) {
@@ -6727,69 +6478,31 @@ async function ta3PickOnMap(init, cb) {
   }
   TA3.pkMap.invalidate();
   if (c) TA3.pkMap.setView(c.lat, c.lng, 17);
+  else if (init && init.q) TA3.pkMap.setView(TA3_DEFAULT_CENTER.lat, TA3_DEFAULT_CENTER.lng, 14);
   else { try { const p = await ta3Gps(); TA3.pkMap.setView(p.lat, p.lng, 17); } catch (e) { TA3.pkMap.setView(TA3_DEFAULT_CENTER.lat, TA3_DEFAULT_CENTER.lng, 14); } }
   setTimeout(ta3PkUpdate, 500);
+  if (!c && init && init.q) ta3PkSearch(true);
 }
 async function ta3PkUpdate() {
-  if (!TA3.pkMap || !el('ta3Picker').classList.contains('on')) return;
+  if (!TA3.pkMap || !el('ta3Picker').classList.contains('ta4-on')) return;
   const c = TA3.pkMap.center(); el('ta3PkCoord').textContent = `${c.lat.toFixed(5)}, ${c.lng.toFixed(5)}`;
-  el('ta3PkAddr').textContent = '주소 확인 중...';
+  el('ta3PkAddr').textContent = '…';
   const a = await ta3Reverse(c.lat, c.lng); TA3.pkAddr = a;
-  el('ta3PkAddr').textContent = a || '주소를 확인할 수 없는 위치입니다 (좌표만 저장됩니다)';
+  el('ta3PkAddr').textContent = a || '주소 없음';
 }
-async function ta3PkSearch() {
+async function ta3PkSearch(quiet) {
   const q = el('ta3PkQ').value.trim(); if (!q) return;
-  ta3Toast('검색 중...'); const r = await ta3Geocode(q);
-  if (!r) { ta3Toast('검색 결과가 없습니다. 도로명/지번 주소로 다시 시도해보세요.', 3500); return; }
+  if (!quiet) ta3Toast('검색 중');
+  const r = await ta3Geocode(q);
+  if (!r) { if (!quiet) ta3Toast('검색 결과 없음', 3000); return; }
   TA3.pkMap.setView(r.lat, r.lng, 17);
 }
 async function ta3PkGps() { try { const p = await ta3Gps(); TA3.pkMap.setView(p.lat, p.lng, 17); } catch (e) { ta3Toast(e.message, 3500); } }
-function ta3PkClose() { el('ta3Picker').classList.remove('on'); TA3_PK_CB = null; }
+function ta3PkClose() { ta4Close('ta3Picker'); }
 function ta3PkOk() {
   if (!TA3.pkMap) return; const c = TA3.pkMap.center(), cb = TA3_PK_CB, a = TA3.pkAddr || '';
-  el('ta3Picker').classList.remove('on'); TA3_PK_CB = null;
+  ta4Close('ta3Picker');
   if (cb) cb({ lat: c.lat, lng: c.lng, address: a });
-}
-
-// ---------- 상세 시트: 위치 탭 ----------
-function ta3PlCur() { const l = ta2CurLead(); return l ? { l, p: TA3.places[l.id] } : null; }
-async function ta3PlRender() {
-  const cur = ta3PlCur(); if (!cur) return;
-  const { l, p } = cur;
-  el('ta3PlAddr').value = (p && p.address) || (l._ref ? (l.raw.address || '') : '') || '';
-  el('ta3PlStat').textContent = p && p.lat ? `📍 위치 기록됨 (${Number(p.lat).toFixed(5)}, ${Number(p.lng).toFixed(5)})` : '아직 지도 위치가 기록되지 않았습니다.';
-  try { await ta3MapInit(); } catch (e) { el('ta3PlMap').innerHTML = '<div class="ta3-empty">지도를 불러오지 못했습니다.</div>'; return; }
-  if (!TA3.plMap) { el('ta3PlMap').innerHTML = ''; TA3.plMap = ta3NewMap(el('ta3PlMap'), {}); }
-  TA3.plMap.invalidate(); TA3.plMap.clear();
-  if (p && p.lat) { TA3.plMap.setView(p.lat, p.lng, 16); TA3.plMap.addMarker({ lat: p.lat, lng: p.lng, html: ta3PinHtml('#dc2626', l._ref ? 'ref' : 'ta', '●', false) }); }
-  else TA3.plMap.setView(TA3_DEFAULT_CENTER.lat, TA3_DEFAULT_CENTER.lng, 12);
-}
-async function ta3PlSaveSet(r) {
-  const cur = ta3PlCur(); if (!cur) return;
-  try { await ta3PlaceSave(cur.l.id, cur.l._ref ? 'ref' : 'ta', r); ta2Flash('위치 저장됨 ✓'); }
-  catch (e) { ta2Flash('위치 저장 실패: ' + (e.message || e), true); return; }
-  ta3PlRender(); ta3BuildItems();
-}
-async function ta3PlGps() {
-  try { ta2Flash('현재 위치 확인 중...'); const p = await ta3Gps(); const a = await ta3Reverse(p.lat, p.lng); await ta3PlSaveSet({ lat: p.lat, lng: p.lng, address: a || el('ta3PlAddr').value.trim() }); }
-  catch (e) { ta2Flash(e.message, true); }
-}
-function ta3PlPick() { const cur = ta3PlCur(); ta3PickOnMap(cur && cur.p, r => ta3PlSaveSet({ lat: r.lat, lng: r.lng, address: r.address || el('ta3PlAddr').value.trim() })); }
-async function ta3PlFind() {
-  const q = el('ta3PlAddr').value.trim(); if (!q) { ta2Flash('주소를 먼저 입력하세요', true); return; }
-  ta2Flash('주소로 위치 찾는 중...'); const r = await ta3Geocode(q);
-  if (!r) { ta2Flash('주소를 찾지 못했습니다. 「지도에서 지정」을 이용해보세요.', true); return; }
-  ta3PlSaveSet({ lat: r.lat, lng: r.lng, address: q });
-}
-async function ta3PlAddrChange(v) {
-  const cur = ta3PlCur(); if (!cur) return;
-  try { await ta3PlaceSave(cur.l.id, cur.l._ref ? 'ref' : 'ta', { address: String(v || '').trim() }); ta2Flash('주소 저장됨 ✓'); ta3BuildItems(); } catch (e) { ta2Flash('저장 실패: ' + (e.message || e), true); }
-}
-function ta3PlNav(kind) {
-  const cur = ta3PlCur(); if (!cur) return;
-  const pl = cur.p || { address: el('ta3PlAddr').value.trim() };
-  if (!pl.lat && !pl.address) { ta2Flash('위치나 주소를 먼저 기록하세요', true); return; }
-  ta3OpenNav(kind, cur.l.company, pl);
 }
 
 // ---------- 소개영업 안건 상세(읽기 전용) ----------
@@ -6825,6 +6538,698 @@ function initAgentView(agentName) {
   ta3SetTab(TA3.tab || 'home');
 }
 
+
+// ==========================================================================
+// TA 수첩 v4 — 전체화면 페이지 전환 / 댓글 / 수주보고 / 통합 메모 / 영업동기(영업일보 설정)
+// ==========================================================================
+const PG = { st: [], hooks: {}, sil: false, inited: false };
+const TA4 = { motives: [], motiveDef: '', cm: [], cmErr: '', rp: null };
+const TA4_DEF_MOTIVES = ['개척', '콜센터', '사내소개', '고객소개', '대리점', '관내이전', '관외이전', '그로스', '기타'];
+const TA4_LS_CM = 'S1_TA4_CMTS', TA4_LS_SEEN = 'S1_TA4_CMSEEN', TA4_LS_REPORTED = 'S1_TA4_REPORTED', TA4_LS_MIG = 'S1_TA4_MIGRATED', TA4_LS_MOT = 'S1_TA4_MOTIVES';
+
+// ---------- 페이지 스택 (팝업 없이 화면 전체 전환, 뒤로가기 지원) ----------
+function ta4Show(id, onClose) {
+  const e = el(id); if (!e || PG.st.includes(id)) return;
+  PG.st.push(id); if (onClose) PG.hooks[id] = onClose;
+  e.style.zIndex = 100000 + PG.st.length * 10;
+  e.classList.add('ta4-on');
+  e.scrollTop = 0; const pb = e.querySelector('.ta4-pb'); if (pb) pb.scrollTop = 0;
+  document.body.classList.add('ta3-lock');
+  try { history.pushState({ ta4: PG.st.length }, ''); } catch (x) {}
+}
+function ta4Hooked(id) {
+  const e = el(id); if (e) e.classList.remove('ta4-on');
+  const h = PG.hooks[id]; delete PG.hooks[id];
+  if (h) { try { h(); } catch (x) { console.warn(x); } }
+  if (!PG.st.length) document.body.classList.remove('ta3-lock');
+}
+function ta4Close(id) {
+  const i = PG.st.lastIndexOf(id); if (i < 0) return;
+  const closing = PG.st.splice(i);
+  closing.reverse().forEach(ta4Hooked);
+  PG.sil = true; setTimeout(() => { PG.sil = false; }, 700);
+  try { history.go(-closing.length); } catch (x) { PG.sil = false; }
+}
+function ta4Init() {
+  if (PG.inited) return; PG.inited = true;
+  window.addEventListener('popstate', () => {
+    if (PG.sil) { PG.sil = false; return; }
+    const id = PG.st.pop(); if (id) ta4Hooked(id);
+  });
+  const am = el('afAmount'); if (am) am.addEventListener('input', () => { const n = parseCurrency(am.value); am.value = n ? n.toLocaleString('ko-KR') : ''; });
+  const ra = el('rpAmount'); if (ra) ra.addEventListener('input', () => { const n = parseCurrency(ra.value); ra.value = n ? n.toLocaleString('ko-KR') : ''; });
+  const rt = el('rpText'); if (rt) rt.addEventListener('input', () => { if (TA4.rp) TA4.rp.manual = true; });
+}
+function ta4MeName() { return (currentUser && currentUser.name) || currentViewMode || ''; }
+function ta4LsMap(k) { try { return JSON.parse(localStorage.getItem(k) || '{}') || {}; } catch (e) { return {}; } }
+function ta4LsMapSet(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
+
+// 서버에 id 컬럼이 없는 테이블(ta_places)도 올바르게 판별
+async function ta2Probe(table) {
+  if (TA2.mode[table]) return TA2.mode[table];
+  try {
+    const { error } = await db.from(table).select('*').limit(1);
+    TA2.mode[table] = error ? 'local' : 'remote';
+    if (error) console.warn('[TA]', table, '사용 불가 → 이 기기 임시저장:', error.message);
+  } catch (e) { TA2.mode[table] = 'local'; }
+  return TA2.mode[table];
+}
+
+// ---------- 영업동기: 영업일보 설정(editable_settings) 참조 ----------
+async function ta4LoadMotives() {
+  let list = null, def = '';
+  try {
+    const { data, error } = await db.from('editable_settings').select('*').eq('category', '영업동기').order('sort_order', { ascending: true });
+    if (!error && data && data.length) {
+      list = data.map(r => r.item_value).filter(Boolean);
+      const d = data.find(r => r.is_default); def = d ? d.item_value : '';
+      try { localStorage.setItem(TA4_LS_MOT, JSON.stringify({ list, def })); } catch (e) {}
+    }
+  } catch (e) {}
+  if (!list || !list.length) {
+    try { const c = JSON.parse(localStorage.getItem(TA4_LS_MOT) || 'null'); if (c && c.list && c.list.length) { list = c.list; def = c.def || ''; } } catch (e) {}
+  }
+  TA4.motives = (list && list.length) ? list : TA4_DEF_MOTIVES.slice();
+  TA4.motiveDef = def || '';
+  ta4FillMotive('afMotive', el('afMotive') && el('afMotive').value);
+}
+function ta4MotiveList(cur) {
+  const l = (TA4.motives.length ? TA4.motives : TA4_DEF_MOTIVES).slice();
+  if (cur && !l.includes(cur)) l.unshift(cur);
+  return l;
+}
+function ta4FillMotive(id, cur) {
+  const s = el(id); if (!s) return;
+  const l = ta4MotiveList(cur);
+  s.innerHTML = l.map(m => `<option value="${escapeHtml(m)}">${escapeHtml(m)}</option>`).join('');
+  s.value = cur && l.includes(cur) ? cur : (TA4.motiveDef && l.includes(TA4.motiveDef) ? TA4.motiveDef : l[0]);
+}
+
+// ---------- 댓글 ----------
+async function ta4LoadCmts() {
+  TA4.cmErr = '';
+  try {
+    if (await ta2Probe('ta_comments') === 'remote') {
+      const { data, error } = await db.from('ta_comments').select('*').eq('consultant', currentViewMode).order('created_at', { ascending: false }).limit(1000);
+      if (!error) { TA4.cm = data || []; return; }
+    }
+  } catch (e) {}
+  TA4.cm = ta2LsGet(TA4_LS_CM).filter(c => c.consultant === currentViewMode);
+}
+function ta4SeenMap() { return ta4LsMap(TA4_LS_SEEN + '_' + ta4MeName()); }
+function ta4IsNew(c) {
+  if (!c || c.author === ta4MeName()) return false;
+  const seen = ta4SeenMap()[c.lead_id];
+  return !seen || String(c.created_at) > seen;
+}
+function ta4CmFor(id) { return TA4.cm.filter(c => c.lead_id === id); }
+function ta4CmBadge(id) {
+  const a = ta4CmFor(id); if (!a.length) return '';
+  const n = a.filter(ta4IsNew).length;
+  return `<span class="ta3-cmt${n ? ' new' : ''}">💬 ${a.length}</span>`;
+}
+function ta4MarkSeen(id) {
+  const m = ta4SeenMap(); m[id] = new Date(Date.now() + 1000).toISOString(); ta4LsMapSet(TA4_LS_SEEN + '_' + ta4MeName(), m);
+}
+function ta4RenderCmtBox() {
+  const box = el('ta3CmtBox'); if (!box) return;
+  const nw = TA4.cm.filter(ta4IsNew);
+  if (!nw.length) { box.innerHTML = ''; return; }
+  const rows = nw.slice(0, 5).map(c => {
+    const it = ta3Item(c.lead_id);
+    return ta3RowHtml('💬', (it ? it.name : '안건'), `<b>${escapeHtml(c.author || '')}</b> ${escapeHtml(String(c.content || '').replace(/\s+/g, ' ').slice(0, 50))}`, `ta3Open('${escapeHtml(c.lead_id)}','cmt')`);
+  }).join('');
+  box.innerHTML = `<div class="ta3-h"><b>새 댓글</b><span>${nw.length}건</span></div><div class="ta3-list">${rows}</div>`;
+}
+function ta4RenderCmts() {
+  const id = TA2.leadId, list = ta4CmFor(id).slice().sort((a, b) => String(a.created_at).localeCompare(String(b.created_at)));
+  const me = ta4MeName();
+  el('ta4CmList').innerHTML = list.map(c => `<div class="ta4-cm${c.author_role === '지사장' ? ' mgr' : ''}">
+    <div class="h"><b>${escapeHtml(c.author || '')}</b>${c.author_role ? `<span class="rl">${escapeHtml(c.author_role)}</span>` : ''}<span class="tm">${ta2FmtTs(c.created_at)}</span>
+      ${(c.author === me || isMasterUser()) ? `<button type="button" class="dl" onclick="ta4CmDel('${escapeHtml(c.id)}')">삭제</button>` : ''}</div>
+    <div class="tx">${escapeHtml(c.content)}</div></div>`).join('');
+  if (el('ta4CntCmt')) el('ta4CntCmt').textContent = list.length || '';
+}
+async function ta4CmAdd() {
+  const inp = el('ta4CmText'), text = inp.value.trim(); if (!text || !TA2.leadId) return;
+  const lead = ta2CurLead();
+  const row = { id: crypto.randomUUID(), lead_id: TA2.leadId, consultant: currentViewMode, author: ta4MeName(), author_role: isMasterUser() ? '지사장' : '컨설턴트', content: text, created_at: new Date().toISOString() };
+  try {
+    if (await ta2Probe('ta_comments') === 'remote') {
+      const { error } = await db.from('ta_comments').insert([row]); if (error) throw error;
+    } else {
+      const arr = ta2LsGet(TA4_LS_CM); arr.push(row); if (!ta2LsSet(TA4_LS_CM, arr)) throw new Error('저장 공간 부족');
+    }
+    TA4.cm.unshift(row); inp.value = ''; ta4MarkSeen(TA2.leadId); ta4RenderCmts(); ta3Toast('등록됨');
+  } catch (e) { ta3Toast('댓글 저장 실패: ' + (e.message || e), 3500); }
+}
+async function ta4CmDel(id) {
+  if (!confirm('댓글을 삭제할까요?')) return;
+  try {
+    if (await ta2Probe('ta_comments') === 'remote') { const { error } = await db.from('ta_comments').delete().eq('id', id); if (error) throw error; }
+    else ta2LsSet(TA4_LS_CM, ta2LsGet(TA4_LS_CM).filter(c => c.id !== id));
+    TA4.cm = TA4.cm.filter(c => c.id !== id); ta4RenderCmts();
+  } catch (e) { ta3Toast('삭제 실패: ' + (e.message || e), 3500); }
+}
+
+// ---------- 상세 화면 ----------
+function ta2CurLead() { return TA2.leadId ? ta3FindLead(TA2.leadId) : null; }
+function ta2Flash(msg, err) {
+  const e = el('ta2Saved'); if (!e) return;
+  e.textContent = msg; e.className = 'sv' + (err ? ' err' : '');
+  clearTimeout(TA2_FT);
+  TA2_FT = setTimeout(() => { e.textContent = ''; e.className = 'sv'; }, 2200);
+}
+function ta2RenderHead() {
+  const l = ta2CurLead(); if (!l) return;
+  el('ta2DName').textContent = l.company || '-';
+  if (l._ref) { el('ta2DBadges').innerHTML = '<span class="ta3-tag" style="background:#ede9fe;color:#6d28d9;">소개영업</span><span class="ta3-tag" style="background:#eef1f7;color:#0f2547;">' + escapeHtml(l.stage) + '</span>'; return; }
+  el('ta2DBadges').innerHTML =
+    `<span class="ta3-tag" style="background:${STAGE_BG[l.stage] || '#e5e7eb'};color:${STAGE_COLOR[l.stage] || '#374151'};">${ta2StageLabel(l.stage)}</span>` +
+    `<span class="ta2-conf"><i style="background:${CONF_COLOR[l.confidence] || '#ccc'};"></i>확도 ${escapeHtml(l.confidence || '-')}</span>`;
+}
+function ta4DateInp(field, ds) { return `<input type="date" class="ta2-inp" value="${escapeHtml(ds || '')}" onchange="ta4DateSet('${field}',this.value)">`; }
+function ta4DateSet(field, v) {
+  if (!v && field === 'expectedDate') { ta2Flash('수주예정일은 비울 수 없습니다', true); ta2RenderInfo(); return; }
+  ta2SaveFields({ [field]: v }, true);
+}
+function ta2RenderInfo() {
+  const l = ta2CurLead(); if (!l) return;
+  if (l._ref) { ta3RenderRefInfo(l); return; }
+  const f = (k, v, full) => `<div${full ? ' style="grid-column:1/-1"' : ''}><div class="k">${k}</div><div class="vv">${v}</div></div>`;
+  const regDate = l.registeredDate || (l.createdAt || '').slice(0, 10);
+  const cars = ['없음', '26호', '27호', '28호', '127호', '160호'];
+  const won = l.stage === '수주完';
+  el('ta2DInfo').innerHTML = [
+    f('서비스제공처명', `<input class="ta2-inp" value="${escapeHtml(l.company)}" onchange="ta2FText('company',this.value)">`, true),
+    f('고객 담당자', `<input class="ta2-inp" value="${escapeHtml(l.contact)}" placeholder="성명" onchange="ta2FText('contact',this.value)">`),
+    f('담당자 전화', `<input class="ta2-inp" type="tel" inputmode="tel" value="${escapeHtml(ta2Phone(l.contactPhone))}" placeholder="010-0000-0000" onchange="ta2FPhone(this.value)">`),
+    f('용역료(원)', `<input class="ta2-inp num" inputmode="numeric" value="${l.amount ? Number(l.amount).toLocaleString('ko-KR') : ''}" onchange="ta2FAmount(this)">`),
+    f('단계', `<select class="ta2-inp" onchange="ta2FSelect('stage',this.value)">${ta2OptHtml(TA2_EDIT_STAGES, l.stage)}</select>`),
+    f('상품종류', `<select class="ta2-inp" onchange="ta2FSelect('productType',this.value)">${ta2OptHtml(TA2_PRODUCTS, l.productType)}</select>`),
+    f('영업동기', `<select class="ta2-inp" onchange="ta2FSelect('motive',this.value)">${ta2OptHtml(ta4MotiveList(l.motive), l.motive)}</select>`),
+    f('수주확도', `<select class="ta2-inp" onchange="ta2FSelect('confidence',this.value)">${ta2OptHtml([['A', 'A (상)'], ['B', 'B (중)'], ['C', 'C (하)']], l.confidence || 'B')}</select>`),
+    f('등록일', ta4DateInp('registeredDate', regDate)),
+    f(won ? '계약일' : '수주예정일', ta4DateInp(won ? 'contractDate' : 'expectedDate', won ? (l.contractDate || l.expectedDate) : l.expectedDate)),
+    won ? f('기산일', ta4DateInp('baseDate', l.baseDate)) : '',
+    won ? f('담당차량', `<select class="ta2-inp" onchange="ta2FSelect('vehicleNumber',this.value)">${ta2OptHtml(cars, l.vehicleNumber || '없음')}</select>`) : ''
+  ].join('');
+  ta2RenderActions();
+}
+function ta2RenderActions() {
+  const l = ta2CurLead(); if (!l) return;
+  const has = !!String(l.contactPhone || '').replace(/[^0-9]/g, '');
+  let a = '';
+  if (has) {
+    a += `<a href="${ta2TelHref(l)}" style="text-decoration:none;"><button type="button" style="background:#16a34a;color:#fff;">📞 ${escapeHtml(ta2Phone(l.contactPhone))}</button></a>`;
+    a += `<button type="button" style="background:#0f2547;color:#fff;" onclick="ta2SaveContact()">연락처 저장</button>`;
+  }
+  if (l._ref) a += `<button type="button" style="background:#6d28d9;color:#fff;" onclick="window.open(REFERRAL_APP_URL,'_blank')">소개영업 앱에서 처리</button>`;
+  if (!l._ref && isCreatedToday(l)) a += `<button type="button" class="danger" onclick="ta2DeleteFromDetail()">삭제</button>`;
+  el('ta2DActions').innerHTML = a;
+}
+// 주소 / 길찾기 줄
+function ta4RenderAddr() {
+  const l = ta2CurLead(), box = el('ta4Addr'); if (!l || !box) return;
+  const p = TA3.places[l.id], addr = (p && p.address) || (l._ref ? (l.raw.address || '') : '') || '';
+  const has = (p && p.lat) || addr;
+  box.innerHTML = `<span class="tx">${p && p.lat ? '📍 ' : ''}${addr ? escapeHtml(addr) : '<span style="color:#b6bcc8;">주소 미지정</span>'}</span>` +
+    (has ? `<button type="button" onclick="ta4Nav('naver')">네이버</button><button type="button" onclick="ta4Nav('kakao')">카카오</button>` : '');
+}
+function ta4Nav(kind) {
+  const l = ta2CurLead(); if (!l) return;
+  const p = TA3.places[l.id] || { address: l._ref ? l.raw.address : '' };
+  ta3OpenNav(kind, l.company, p);
+}
+// 위치 지정: 서비스제공처명 옆 📍 아이콘 → 지도 선택기
+function ta4PlaceOpen(id) {
+  id = id || TA2.leadId; const it = ta3FindLead(id); if (!it) return;
+  const cur = TA3.places[id];
+  ta3PickOnMap(cur && cur.lat ? cur : { q: it.company }, async r => {
+    try {
+      await ta3PlaceSave(id, it._ref ? 'ref' : 'ta', { lat: r.lat, lng: r.lng, address: r.address || (cur && cur.address) || '' });
+      ta3BuildItems(); ta4RenderAddr(); if (TA3.tab === 'map') ta3RenderMap(true); ta2Flash('위치 저장 ✓');
+    } catch (e) { ta2Flash('위치 저장 실패: ' + (e.message || e), true); }
+  });
+}
+function ta4FormPlace() {
+  const cur = TA3.formPlace, q = el('afCompany').value.trim();
+  ta3PickOnMap(cur && cur.lat ? cur : { q: q }, r => {
+    TA3.formPlace = { lat: r.lat, lng: r.lng, address: r.address || '' };
+    el('afAddress').value = r.address || '';
+    ta4FormChip();
+  });
+}
+function ta4FormChip() {
+  const c = el('afPlaceInfo'), p = TA3.formPlace, b = el('afPlaceBtn');
+  if (p && p.lat) { c.textContent = '📍 ' + (p.address || `${p.lat.toFixed(5)}, ${p.lng.toFixed(5)}`); c.classList.add('on'); if (b) b.classList.add('set'); }
+  else { c.textContent = ''; c.classList.remove('on'); if (b) b.classList.remove('set'); }
+}
+function ta3FormReset() { TA3.formPlace = null; if (el('afAddress')) el('afAddress').value = ''; ta4FormChip(); }
+
+async function ta2OpenDetail(id, tab, date) {
+  const lead = ta3FindLead(id); if (!lead) return;
+  TA2.leadId = id; TA2.notes = []; TA2.scheds = []; TA2.pending = [];
+  TA2.calSel = date || todayStr(); TA2.calYM = TA2.calSel.slice(0, 7);
+  ta2RenderHead(); ta2RenderInfo(); ta4RenderAddr(); ta4RenderWon(); ta4RenderCmts(); ta4Counts();
+  el('ta4PlBtn').style.display = '';
+  ta4Show('ta2DetailOverlay', () => { ta4SubClose(); TA2.leadId = null; MP.open = false; ta3Refresh(); });
+  ta2Tab(['cal', 'cmt', 'memo'].includes(tab) ? tab : 'memo');
+  await Promise.all([ta2Probe('ta_notes'), ta2Probe('ta_schedules'), ta2Probe('ta_comments')]);
+  if (TA2.leadId !== id) return;
+  await ta2LoadNotes(); await ta2LoadSched();
+  if (TA2.leadId !== id) return;
+  await ta4MigrateMemo(id);
+  ta2ShowStoreWarn(); ta4RenderWon();
+}
+function ta4SubClose() { try { ta2CloseDraw(); ta2CloseLightbox(); } catch (e) {} }
+function ta2CloseDetail() { ta4Close('ta2DetailOverlay'); }
+function ta2DeleteFromDetail() {
+  const lead = ta2CurLead(); if (!lead) return;
+  const id = lead.id, co = lead.company;
+  if (!confirm(`'${co}' 안건을 삭제할까요?`)) return;
+  ta4Close('ta2DetailOverlay');
+  ta4DeleteLead(id, co);
+}
+async function ta4DeleteLead(id, company) {
+  const agentName = currentViewMode;
+  try {
+    const { error } = await db.from('ta_leads').delete().eq('id', id); if (error) throw error;
+    if (ALL[agentName] && ALL[agentName].leads) ALL[agentName].leads = ALL[agentName].leads.filter(l => l.id !== id);
+    try { await recordActivityLog(agentName, '삭제', company, id, [`서비스제공처명: ${company}`]); } catch (e) {}
+    ta3Toast('삭제됨'); ta3Refresh();
+  } catch (e) { ta3Toast('삭제 실패: ' + (e.message || e), 3500); }
+}
+function ta2Tab(t) {
+  TA2.tab = t;
+  document.querySelectorAll('.ta4-tab').forEach(b => b.classList.toggle('on', b.dataset.tab === t));
+  el('ta2PaneMemo').style.display = t === 'memo' ? 'block' : 'none';
+  el('ta2PaneCal').style.display = t === 'cal' ? 'block' : 'none';
+  el('ta4PaneCmt').style.display = t === 'cmt' ? 'block' : 'none';
+  if (t !== 'memo') ta2CloseDraw();
+  if (t === 'cal') { ta2RenderCal(); ta2RenderSchedList(); ta2SetSchDate(TA2.calSel); }
+  if (t === 'cmt') { ta4RenderCmts(); ta4MarkSeen(TA2.leadId); }
+  ta2ShowStoreWarn();
+}
+function ta2ShowStoreWarn() {
+  const table = TA2.tab === 'cal' ? 'ta_schedules' : TA2.tab === 'cmt' ? 'ta_comments' : 'ta_notes';
+  el('ta2StoreWarn').innerHTML = TA2.mode[table] === 'local' ? `<div class="ta2-warn">⚠️ 서버 저장소(${table}) 미설정 — 이 기기에만 저장됩니다</div>` : '';
+}
+function ta4Counts() {
+  if (el('ta4CntMemo')) el('ta4CntMemo').textContent = TA2.notes.length || '';
+  if (el('ta4CntCal')) el('ta4CntCal').textContent = TA2.scheds.length || '';
+  if (el('ta4CntCmt')) el('ta4CntCmt').textContent = ta4CmFor(TA2.leadId).length || '';
+}
+
+// 저장 (항목 변경 즉시)
+async function ta2SaveFields(patch, rerender, leadArg) {
+  const lead = leadArg || ta2CurLead(); if (!lead || lead._ref) return false;
+  const live = TA2.leadId === lead.id;
+  const old = Object.assign({}, lead), next = Object.assign({}, lead, patch);
+  if (!String(next.company || '').trim()) { ta2Flash('서비스제공처명은 비울 수 없습니다', true); if (live) ta2RenderInfo(); return false; }
+  const toWon = patch.stage === '수주完' && old.stage !== '수주完';
+  if (patch.stage === '수주完') {
+    next.contractDate = next.contractDate || next.expectedDate || todayStr();
+    next.baseDate = next.baseDate || next.contractDate;
+    next.vehicleNumber = next.vehicleNumber || '없음';
+    if (!patch.confidence) next.confidence = 'A';
+  }
+  if (patch.expectedDate && next.stage === '수주完') {
+    next.contractDate = patch.expectedDate;
+    if (!next.baseDate) next.baseDate = patch.expectedDate;
+  }
+  next.updatedAt = new Date().toISOString();
+  ta2Flash('저장 중');
+  let res;
+  try {
+    res = await leadWriteWithPhone('update', lead.id, next.contactPhone, {
+      company: next.company, contact: next.contact || '', amount: Number(next.amount || 0),
+      product_type: next.productType, motive: next.motive, stage: next.stage, confidence: next.confidence,
+      registered_date: next.registeredDate || null, expected_date: next.expectedDate || null,
+      contract_date: next.contractDate || null, base_date: next.baseDate || null,
+      vehicle_number: next.vehicleNumber || null, memo: next.memo || null, updated_at: next.updatedAt
+    });
+  } catch (e) { res = { error: e }; }
+  if (res.error) { ta2Flash('저장 실패: ' + (res.error.message || res.error), true); if (live) ta2RenderInfo(); return false; }
+  Object.assign(lead, next);
+  const changes = buildLeadChanges(old, next);
+  if (changes.length) { try { await recordActivityLog(currentViewMode, '수정', lead.company, lead.id, changes); } catch (e) {} }
+  ta2Flash('저장됨 ✓');
+  if (live) { ta2RenderHead(); if (rerender) ta2RenderInfo(); else ta2RenderActions(); ta4RenderWon(); if (TA2.tab === 'cal') ta2RenderCal(); }
+  ta3BuildItems();
+  if (toWon && live) setTimeout(() => ta4RpOpen(lead.id), 250);
+  return true;
+}
+
+// ---------- 날짜 선택: 기기 기본 달력 사용 ----------
+function ta2PickDate(cur, cb) {
+  const i = document.createElement('input'); i.type = 'date'; i.value = cur || '';
+  i.style.cssText = 'position:fixed;left:-9999px;top:0;opacity:0;';
+  document.body.appendChild(i);
+  i.addEventListener('change', () => { const v = i.value; i.remove(); if (cb) cb(v); });
+  i.addEventListener('blur', () => setTimeout(() => i.remove(), 400));
+  try { i.showPicker ? i.showPicker() : i.click(); } catch (e) { i.click(); }
+}
+function ta2SetSchDate(ds) {
+  const i = el('ta2SchDate'); if (i && ds) i.value = ds;
+  if (ds) { TA2.calSel = ds; TA2.calYM = ds.slice(0, 7); ta2RenderCal(); ta2RenderSchedList(); }
+}
+function ta2SchedItemHtml(s) {
+  const id = escapeHtml(s.id);
+  return `<div class="ta2-sch-item${s.done ? ' done' : ''}">
+    <div style="display:flex;flex-direction:column;gap:3px;">
+      <input type="date" class="ta2-inp" value="${escapeHtml(s.sched_date)}" onchange="ta4SchedDate('${id}',this.value)">
+      <input type="time" class="ta2-inp" value="${escapeHtml(String(s.sched_time || '').slice(0, 5))}" onchange="ta2EditSched('${id}',{sched_time:this.value||null},true)"></div>
+    <div style="flex:1;min-width:0;">
+      <input class="ta2-inp" value="${escapeHtml(s.title)}" onchange="ta2EditSched('${id}',{title:this.value.trim()},false,this)">
+      <textarea class="ta2-inp" rows="1" placeholder="내용 · 장소" onchange="ta2EditSched('${id}',{note:this.value.trim()})">${escapeHtml(s.note)}</textarea></div>
+    <div style="display:flex;flex-direction:column;gap:2px;">
+      <button type="button" class="ta2-x" style="color:#16a34a !important;" onclick="ta2EditSched('${id}',{done:${s.done ? 'false' : 'true'}},true)">${s.done ? '되돌리기' : '완료'}</button>
+      <button type="button" class="ta2-x" onclick="ta2DelSched('${id}')">삭제</button></div></div>`;
+}
+async function ta4SchedDate(id, v) {
+  if (!v) return;
+  await ta2EditSched(id, { sched_date: v }, false);
+  TA2.calSel = v; TA2.calYM = v.slice(0, 7); ta2RenderCal(); ta2RenderSchedList();
+}
+function ta2RenderSchedList() {
+  const sel = TA2.calSel;
+  el('ta2SelDateLabel').textContent = ta2FullDate(sel);
+  const day = TA2.scheds.filter(s => s.sched_date === sel).sort((a, b) => (a.sched_time || '').localeCompare(b.sched_time || ''));
+  let html = day.map(s => ta2SchedItemHtml(s)).join('');
+  const others = TA2.scheds.filter(s => s.sched_date !== sel && s.sched_date >= todayStr() && !s.done);
+  if (others.length) {
+    html += '<div style="margin-top:14px;font-size:13px;font-weight:800;color:#475569;">다른 일정</div>' +
+      others.map(s => `<div class="ta2-sch-item" style="cursor:pointer;" onclick="ta2SelDate('${escapeHtml(s.sched_date)}')"><div class="tm">${ta2DateLabel(s.sched_date)}<br>${s.sched_time ? escapeHtml(String(s.sched_time).slice(0, 5)) : '종일'}</div><div class="ti">${escapeHtml(s.title)}</div></div>`).join('');
+  }
+  el('ta2SchedList').innerHTML = html; ta4Counts();
+}
+async function ta2LoadSched() {
+  const id = TA2.leadId; const rows = await ta2SchedList(id);
+  if (TA2.leadId !== id) return;
+  TA2.scheds = rows; ta2RenderCal(); ta2RenderSchedList();
+}
+async function ta2AddSched() {
+  const date = el('ta2SchDate').value, title = el('ta2SchTitle').value.trim();
+  if (!date) { ta3Toast('날짜를 선택하세요'); return; }
+  if (!title) { ta3Toast('일정 제목을 입력하세요'); return; }
+  try {
+    await ta2SchedAdd({ lead_id: TA2.leadId, sched_date: date, sched_time: el('ta2SchTime').value, title: title, note: el('ta2SchNote').value.trim() });
+    el('ta2SchTitle').value = ''; el('ta2SchNote').value = ''; el('ta2SchTime').value = '';
+    TA2.calSel = date; TA2.calYM = date.slice(0, 7);
+    await ta2LoadSched(); await ta3LoadScheds(); ta2Flash('일정 저장됨 ✓');
+  } catch (e) { ta3Toast('일정 저장 실패: ' + (e.message || e), 3500); }
+}
+
+// ---------- 메모 게시판 (등록 시 메모 = 관리 중 메모 : 하나의 메모) ----------
+async function ta2LoadNotes() {
+  const id = TA2.leadId; const rows = await ta2NotesList(id);
+  if (TA2.leadId !== id) return;
+  TA2.notes = rows; ta2RenderMemos(); ta4Counts();
+}
+function ta2RenderMemos() {
+  const notes = TA2.notes;
+  const rows = notes.map((n, i) => {
+    const txt = String(n.content || '').trim(), lines = txt.split(/\r?\n/).filter(x => x.trim());
+    const title = lines[0] ? lines[0].slice(0, 60) : '(사진·그림)';
+    const snip = lines.slice(1).join(' ').slice(0, 80), ac = ta2Atts(n).length;
+    return `<div class="ta2-brow" onclick="ta2OpenMemoPop('${escapeHtml(n.id)}')">
+      <div class="no">${notes.length - i}</div>
+      <div class="bt"><div class="t">${escapeHtml(title)}${ac ? ` <span class="ac">📎 ${ac}</span>` : ''}</div>${snip ? `<div class="s">${escapeHtml(snip)}</div>` : ''}</div>
+      <div class="bd">${ta2FmtTs(n.created_at)}</div></div>`;
+  }).join('');
+  el('ta2MemoList').innerHTML = `<div class="ta2-board-head" style="justify-content:flex-end;"><button type="button" onclick="ta2OpenMemoPop('new')">＋ 메모</button></div>
+    <div class="ta2-board">${rows}</div>`;
+  if (MP.open) ta2RenderMpAtts();
+}
+// 레거시: 등록 시 입력했던 기본 메모(ta_leads.memo)를 메모 게시판의 메모로 이관
+async function ta4MigrateMemo(id) {
+  const lead = ta3FindLead(id); if (!lead || lead._ref) return;
+  const txt = String(lead.memo || '').trim(); if (!txt) return;
+  const done = ta4LsMap(TA4_LS_MIG); if (done[id]) return;
+  if (TA2.notes.some(n => String(n.content || '').trim() === txt)) { done[id] = 1; ta4LsMapSet(TA4_LS_MIG, done); return; }
+  try {
+    await ta4NoteInsert({ lead_id: id, kind: 'memo', content: txt, image: null, created_at: lead.createdAt || new Date().toISOString() });
+    done[id] = 1; ta4LsMapSet(TA4_LS_MIG, done);
+    try { await leadWriteWithPhone('update', id, lead.contactPhone, { memo: null }); lead.memo = ''; } catch (e) {}
+    await ta2LoadNotes();
+  } catch (e) { console.warn('[TA4] 메모 이관 실패', e); }
+}
+async function ta4NoteInsert(n) {
+  const row = { id: crypto.randomUUID(), lead_id: n.lead_id, consultant: currentViewMode, kind: n.kind || 'memo', content: n.content || '', image: n.image || null, created_at: n.created_at || new Date().toISOString() };
+  if (await ta2Probe('ta_notes') === 'remote') { const { error } = await db.from('ta_notes').insert([row]); if (error) throw error; return row; }
+  const arr = ta2LsGet(TA2_LS_NOTES); arr.push(row); if (!ta2LsSet(TA2_LS_NOTES, arr)) throw new Error('저장 공간 부족');
+  return row;
+}
+
+// 메모 에디터 (본문 + 사진 + 그림 한 화면)
+const MP = { open: false, id: 'new', draft: null };
+function ta2OpenMemoPop(id) {
+  MP.id = id || 'new'; MP.open = true;
+  ta2CloseDraw();
+  const ta = el('ta2MemoText'), isNew = MP.id === 'new';
+  if (isNew) {
+    const d = MP.draft && MP.draft.lead === TA2.leadId ? MP.draft : null;
+    ta.value = d ? d.text : ''; TA2.pending = d ? d.atts : [];
+    el('ta2MpTitle').textContent = '새 메모'; el('ta2MpMeta').textContent = '';
+  } else {
+    const n = TA2.notes.find(x => x.id === MP.id); if (!n) { MP.open = false; return; }
+    ta.value = n.content || ''; el('ta2MpTitle').textContent = '메모'; el('ta2MpMeta').textContent = ta2FmtTs(n.created_at);
+  }
+  el('ta2MpAdd').style.display = isNew ? '' : 'none';
+  el('ta2MpDel').style.display = isNew ? 'none' : '';
+  el('ta2MpAuto').textContent = ''; el('ta2MpAuto').className = 'sv';
+  ta2RenderMpAtts();
+  ta4Show('ta2MemoPop', ta4MemoHook);
+  if (isNew) setTimeout(() => ta.focus(), 120);
+}
+function ta4MemoHook() {
+  const wasNew = MP.id === 'new';
+  if (MP.open) {
+    if (wasNew) { const t = el('ta2MemoText').value; MP.draft = (t.trim() || (TA2.pending || []).length) ? { lead: TA2.leadId, text: t, atts: TA2.pending || [] } : null; }
+    else { const n = TA2.notes.find(x => x.id === MP.id), v = el('ta2MemoText').value.trim(); if (n && String(n.content || '').trim() !== v) ta2EditMemo(MP.id, v); }
+  }
+  MP.open = false; ta4SubClose();
+}
+function ta2CloseMemoPop() { ta4Close('ta2MemoPop'); }
+function ta2MpTarget() { return MP.id === 'new' ? 'new' : MP.id; }
+function ta2MpTextChange(v) { if (MP.id !== 'new') ta2EditMemo(MP.id, v); }
+function ta2RenderMpAtts() {
+  const box = el('ta2MpAtts'); if (!box) return;
+  if (MP.id === 'new') {
+    box.innerHTML = (TA2.pending || []).map((a, i) => `<div class="ta2-att${a.t === 'drawing' ? ' dr' : ''}" onclick="ta2OpenLightboxSrc(${i})">
+      <span class="kd">${a.t === 'drawing' ? '그림' : '사진'}</span><img src="${a.d}" alt="">
+      <button type="button" class="rm" onclick="event.stopPropagation();ta2RemovePending(${i})">×</button></div>`).join('');
+  } else {
+    const n = TA2.notes.find(x => x.id === MP.id);
+    box.innerHTML = n ? ta2AttThumbs(ta2Atts(n), escapeHtml(n.id), true) : '';
+  }
+}
+async function ta2AddMemo() {
+  const text = el('ta2MemoText').value.trim(), atts = TA2.pending || [];
+  if (!text && !atts.length) { ta3Toast('내용을 입력하세요'); return; }
+  try {
+    await ta4NoteInsert({ lead_id: TA2.leadId, kind: 'memo', content: text, image: atts.length ? JSON.stringify(atts) : null });
+    TA2.pending = []; MP.draft = null; el('ta2MemoText').value = '';
+    ta4Close('ta2MemoPop');
+    await ta2LoadNotes(); ta2Flash('등록됨 ✓');
+  } catch (e) { ta3Toast('메모 저장 실패: ' + (e.message || e), 3500); }
+}
+async function ta2EditMemo(id, v) {
+  try {
+    await ta2NoteUpdate(id, { content: String(v || '').trim() });
+    const n = TA2.notes.find(x => x.id === id); if (n) n.content = String(v || '').trim();
+    ta2Flash('저장됨 ✓'); const t = el('ta2MpAuto'); if (t) t.textContent = '✓';
+    ta2RenderMemos();
+  } catch (e) { ta2Flash('저장 실패: ' + (e.message || e), true); }
+}
+async function ta2DelNote(id) {
+  id = id || MP.id;
+  if (!confirm('메모를 삭제할까요?')) return;
+  try { await ta2NoteDel(id); MP.open = false; ta4Close('ta2MemoPop'); await ta2LoadNotes(); ta2Flash('삭제됨'); }
+  catch (e) { ta3Toast('삭제 실패: ' + (e.message || e), 3500); }
+}
+
+// ---------- 수주보고 ----------
+function ta4ReportedInfo(id) {
+  const n = (TA2.leadId === id ? TA2.notes : []).find(x => String(x.content || '').startsWith('📣 수주보고'));
+  if (n) return { at: n.created_at };
+  const m = ta4LsMap(TA4_LS_REPORTED)[id]; return m ? { at: m } : null;
+}
+function ta4RenderWon() {
+  const l = ta2CurLead(), b = el('ta4Won'); if (!b) return;
+  if (!l || l._ref || l.stage !== '수주完') { b.innerHTML = ''; return; }
+  const r = ta4ReportedInfo(l.id);
+  b.innerHTML = r
+    ? `<div class="done"><span>✓ 수주보고 완료 · ${ta2FmtTs(r.at)}</span><button type="button" onclick="ta4RpOpen('${escapeHtml(l.id)}')">다시 보고</button></div>`
+    : `<button type="button" onclick="ta4RpOpen('${escapeHtml(l.id)}')"><span>📣 수주보고</span><span>›</span></button>`;
+}
+function ta4Md(ds) { if (!ds) return ''; const p = String(ds).split('-'); return p.length === 3 ? `${Number(p[1])}/${Number(p[2])}` : ''; }
+function ta4RpOpen(id) {
+  const l = ta3FindLead(id); if (!l || l._ref) return;
+  const car = String(l.vehicleNumber || '').replace(/[^0-9]/g, '');
+  TA4.rp = { id: id, manual: false, busy: false };
+  el('ta4RpName').textContent = l.company;
+  ta4FillMotive('rpMotive', l.motive);
+  el('rpProduct').innerHTML = ta2OptHtml(TA2_PRODUCTS, l.productType);
+  el('rpAmount').value = l.amount ? Number(l.amount).toLocaleString('ko-KR') : '';
+  el('rpCar').value = ['26', '27', '28', '127', '160'].includes(car) ? car : '';
+  el('rpStart').value = l.contractDate || l.expectedDate || todayStr();
+  el('rpBase').value = l.baseDate || el('rpStart').value;
+  el('rpInbox').checked = true; el('rpShare').checked = true;
+  el('rpGo').disabled = false; el('rpGo').textContent = '보고하기';
+  ta4RpBuild();
+  ta4Show('ta4Report', () => { TA4.rp = null; });
+}
+function ta4RpText() {
+  const l = TA4.rp && ta3FindLead(TA4.rp.id); if (!l) return '';
+  const amt = parseCurrency(el('rpAmount').value);
+  const amtTxt = amt ? (amt % 1000 === 0 ? `${amt / 1000}천원` : `${amt.toLocaleString('ko-KR')}원`) : '';
+  const car = el('rpCar').value;
+  const lines = ['수주보고', l.company, amtTxt, el('rpMotive').value, '상품:' + el('rpProduct').value];
+  if (el('rpStart').value) lines.push('개시일:' + ta4Md(el('rpStart').value));
+  if (el('rpBase').value) lines.push('기산일:' + ta4Md(el('rpBase').value));
+  lines.push('영업:' + currentViewMode);
+  if (car) lines.push(car + '호');
+  return lines.filter(Boolean).join('\n');
+}
+function ta4RpBuild() { if (!TA4.rp || TA4.rp.manual) return; el('rpText').value = ta4RpText(); }
+async function ta4RpSubmit() {
+  const rp = TA4.rp; if (!rp || rp.busy) return;
+  const lead = ta3FindLead(rp.id); if (!lead) return;
+  const text = el('rpText').value.trim(), toInbox = el('rpInbox').checked, toShare = el('rpShare').checked;
+  if (!text) { ta3Toast('내용이 없습니다'); return; }
+  if (!toInbox && !toShare) { ta3Toast('보고 방법을 선택하세요'); return; }
+  if (toInbox && !el('rpCar').value) { ta3Toast('담당차량을 선택하세요'); return; }
+  rp.busy = true; el('rpGo').disabled = true; el('rpGo').textContent = '보고 중';
+  // 카카오톡 공유는 사용자 터치 직후에 시작해야 하므로 먼저 호출 (본인 계정으로 전송)
+  let sharePromise = null, shareMode = '';
+  if (toShare) {
+    if (navigator.share) { shareMode = 'share'; sharePromise = navigator.share({ text: text }).then(() => 'ok').catch(e => (e && e.name === 'AbortError') ? 'cancel' : 'fail'); }
+    else {
+      shareMode = 'copy';
+      sharePromise = (async () => {
+        try { await navigator.clipboard.writeText(text); } catch (e) { const t = document.createElement('textarea'); t.value = text; document.body.appendChild(t); t.select(); try { document.execCommand('copy'); } catch (x) {} t.remove(); }
+        setTimeout(() => { try { location.href = 'kakaotalk://'; } catch (x) {} }, 400);
+        return 'copied';
+      })();
+    }
+  }
+  const msgs = []; let inboxOk = !toInbox;
+  if (toInbox) {
+    try {
+      let row = { submitted_by: ta4MeName(), raw_text: text, status: '대기', source: 'TA관리포털' };
+      let { error } = await db.from('inbox_ai_reports').insert([row]);
+      if (error && /source/i.test(error.message || '')) { delete row.source; ({ error } = await db.from('inbox_ai_reports').insert([row])); }
+      if (error) throw error;
+      inboxOk = true; msgs.push('영업일보 접수');
+    } catch (e) { msgs.push('영업일보 접수 실패(' + (e.message || e) + ')'); }
+  }
+  let shareRes = sharePromise ? await sharePromise : '';
+  if (shareRes === 'ok') msgs.push('카톡 공유'); else if (shareRes === 'copied') msgs.push('복사됨 — 단톡방에 붙여넣기'); else if (shareRes === 'cancel') msgs.push('카톡 공유 취소'); else if (shareRes === 'fail') msgs.push('공유 실패');
+  if (inboxOk || shareRes === 'ok' || shareRes === 'copied') {
+    try {
+      const car = el('rpCar').value;
+      await ta2SaveFields({ baseDate: el('rpBase').value || lead.baseDate, vehicleNumber: car ? car + '호' : (lead.vehicleNumber || '없음'), amount: parseCurrency(el('rpAmount').value) || lead.amount, motive: el('rpMotive').value, productType: el('rpProduct').value }, true, lead);
+      const note = await ta4NoteInsert({ lead_id: lead.id, kind: 'memo', content: '📣 수주보고\n' + text, image: null });
+      if (TA2.leadId === lead.id) TA2.notes.unshift(note);
+      const m = ta4LsMap(TA4_LS_REPORTED); m[lead.id] = note.created_at; ta4LsMapSet(TA4_LS_REPORTED, m);
+      if (TA2.leadId === lead.id) { ta2RenderMemos(); ta4Counts(); ta4RenderWon(); }
+    } catch (e) { console.warn(e); }
+    ta3Toast(msgs.join(' · '), 4200);
+    rp.busy = false; ta4Close('ta4Report'); ta3BuildItems();
+  } else {
+    ta3Toast(msgs.join(' · '), 4200);
+    rp.busy = false; el('rpGo').disabled = false; el('rpGo').textContent = '다시 시도';
+  }
+}
+
+// ---------- 신규 TA 등록 (전체 화면) ----------
+function openNewAgentLeadModal() {
+  if (currentUser) saveUserSession(currentUser, currentViewMode, 'newLead');
+  el('afEditingId').value = '';
+  el('agentModalTitle').textContent = '신규 TA 등록';
+  ['afCompany', 'afContact', 'afContactPhone', 'afAmount', 'afMemo', 'afContractDate', 'afBaseDate'].forEach(i => { el(i).value = ''; });
+  el('afProductType').value = '알람';
+  ta4FillMotive('afMotive', '');
+  el('afConfidence').value = 'B';
+  el('afRegisteredDate').value = todayStr(); el('afExpectedDate').value = todayStr();
+  el('afVehicleNumber').value = '없음';
+  el('afSubmitBtn').textContent = 'TA 등록'; el('afSubmitBtn').disabled = false;
+  el('afStage').innerHTML = '<option value="진행중" selected>진행중</option><option value="수주完">수주완료</option><option value="보류">보류</option>';
+  el('afWonExtraRow').style.display = 'none';
+  ta3FormReset();
+  ta4Show('agentLeadModalOverlay', () => { if (currentUser) saveUserSession(currentUser, currentViewMode, null); });
+}
+function closeAgentLeadModal() { ta4Close('agentLeadModalOverlay'); }
+function onAgentStageChange(val) {
+  el('afWonExtraRow').style.display = val === '수주完' ? 'block' : 'none';
+  if (val === '수주完') {
+    const exp = el('afExpectedDate').value;
+    el('afContractDate').value = exp || el('afContractDate').value || todayStr();
+    if (!el('afBaseDate').value) el('afBaseDate').value = el('afContractDate').value;
+    el('afConfidence').value = 'A';
+  }
+}
+window.onAgentStageChange = onAgentStageChange;
+function editAgentLead(id) { ta3Open(id); }
+async function handleAgentModalSubmit(e) {
+  e.preventDefault();
+  const agentName = currentViewMode, stage = el('afStage').value, expectedDate = el('afExpectedDate').value;
+  let contractDate = null, baseDate = null, vehicleNumber = null;
+  if (stage === '수주完') {
+    contractDate = el('afContractDate').value || expectedDate || todayStr();
+    baseDate = el('afBaseDate').value || contractDate;
+    vehicleNumber = el('afVehicleNumber').value || '없음';
+  }
+  const memoText = el('afMemo').value.trim();
+  const payload = {
+    company: el('afCompany').value.trim(), contact: el('afContact').value.trim(), contactPhone: el('afContactPhone').value.trim(),
+    amount: parseCurrency(el('afAmount').value), productType: el('afProductType').value, motive: el('afMotive').value, stage: stage,
+    confidence: el('afConfidence').value, registeredDate: el('afRegisteredDate').value, expectedDate: expectedDate,
+    contractDate: contractDate, baseDate: baseDate, vehicleNumber: vehicleNumber, memo: ''
+  };
+  if (!payload.company) { ta3Toast('서비스제공처명을 입력하세요'); return; }
+  if (!payload.expectedDate) { ta3Toast('계약예정일을 선택하세요'); return; }
+  const btn = el('afSubmitBtn'); btn.disabled = true; btn.textContent = '저장 중';
+  try {
+    payload.id = crypto.randomUUID(); payload.createdAt = new Date().toISOString(); payload.updatedAt = payload.createdAt; payload.consultant = agentName;
+    const { error } = await leadWriteWithPhone('insert', payload.id, payload.contactPhone, {
+      id: payload.id, consultant: agentName, company: payload.company, contact: payload.contact, amount: payload.amount,
+      product_type: payload.productType, motive: payload.motive, stage: payload.stage, confidence: payload.confidence,
+      registered_date: payload.registeredDate || null, expected_date: payload.expectedDate || null, contract_date: payload.contractDate || null,
+      base_date: payload.baseDate || null, vehicle_number: payload.vehicleNumber || null, memo: null,
+      created_at: payload.createdAt, updated_at: payload.updatedAt
+    });
+    if (error) throw error;
+    if (!ALL[agentName]) ALL[agentName] = { leads: [] };
+    ALL[agentName].leads.unshift(payload);
+    try { await recordActivityLog(agentName, '신규 등록', payload.company, payload.id, [`서비스제공처명: ${payload.company}`, `용역료: ${formatCurrency(payload.amount)}`, `영업단계: ${payload.stage}`]); } catch (x) {}
+    // 등록 시 메모 = 메모 게시판의 첫 메모
+    if (memoText) { try { await ta4NoteInsert({ lead_id: payload.id, kind: 'memo', content: memoText, image: null, created_at: payload.createdAt }); } catch (x) { ta3Toast('안건은 저장됐지만 메모 저장 실패: ' + (x.message || x), 4000); } }
+    // 위치
+    const p = TA3.formPlace, addr = el('afAddress').value.trim();
+    if (p || addr) { try { await ta3PlaceSave(payload.id, 'ta', { lat: p ? p.lat : null, lng: p ? p.lng : null, address: addr || (p && p.address) || '' }); } catch (x) { ta3Toast('위치 저장 실패: ' + (x.message || x), 4000); } }
+    TA3.formPlace = null;
+    ta4Close('agentLeadModalOverlay');
+    ta3BuildItems(); ta3Refresh(); ta3Toast('등록됨');
+    if (stage === '수주完') setTimeout(() => ta4RpOpen(payload.id), 450);
+  } catch (err) { ta3Toast('저장 실패: ' + (err.message || err), 4000); }
+  finally { btn.disabled = false; btn.textContent = 'TA 등록'; }
+}
+window.handleAgentModalSubmit = handleAgentModalSubmit;
+
+// ---------- 금일 수주 예정 (전체 화면) ----------
+function openTodayExpectedModal() {
+  const today = todayStr();
+  const list = ta3BuildItems().filter(i => i.src === 'ta' && i.group === 'ing' && i.date === today);
+  el('ta4TodaySum').textContent = formatCurrency(list.reduce((s, i) => s + (i.amount || 0), 0)) + ' · ' + list.length + '건';
+  el('ta4TodayList').innerHTML = list.map(ta3CardHtml).join('') || '<div class="ta3-empty">없음</div>';
+  ta4Show('ta4TodayPg');
+}
+function closeTodayExpectedModal() { ta4Close('ta4TodayPg'); }
+function showPortalAlertToast(m) { ta3Toast(m); }
+
 </script>
 
 <!-- ========================================== -->
@@ -6844,22 +7249,187 @@ function initAgentView(agentName) {
   </div>
 </div>
 
-<!-- 지도에서 위치 지정 (중앙 핀 방식) -->
-<div class="ta3-full" id="ta3Picker">
+<!-- ===================== 전체화면 페이지들 (팝업 아님) ===================== -->
+
+<!-- TA 상세 -->
+<div class="ta4-pg" id="ta2DetailOverlay">
+  <div class="ta4-ph">
+    <button type="button" class="back" onclick="ta3Back()" aria-label="뒤로">‹</button>
+    <div class="ttl"><h3 id="ta2DName">-</h3><div class="bd" id="ta2DBadges"></div></div>
+    <span class="sv" id="ta2Saved"></span>
+    <button type="button" class="ic" id="ta4PlBtn" onclick="ta4PlaceOpen()" aria-label="위치 지정">📍</button>
+  </div>
+  <div class="ta4-pb"><div class="in">
+    <div class="ta4-addr" id="ta4Addr"></div>
+    <div class="ta2-info" id="ta2DInfo"></div>
+    <div class="ta4-won" id="ta4Won"></div>
+    <div class="ta2-actions" id="ta2DActions"></div>
+
+    <div class="ta4-tabs">
+      <button type="button" class="ta4-tab on" data-tab="memo" onclick="ta2Tab('memo')">메모<b id="ta4CntMemo"></b></button>
+      <button type="button" class="ta4-tab" data-tab="cal" onclick="ta2Tab('cal')">일정<b id="ta4CntCal"></b></button>
+      <button type="button" class="ta4-tab" data-tab="cmt" onclick="ta2Tab('cmt')">댓글<b id="ta4CntCmt"></b></button>
+    </div>
+    <div id="ta2StoreWarn"></div>
+
+    <div id="ta2PaneMemo"><div id="ta2MemoList"></div></div>
+
+    <div id="ta2PaneCal" style="display:none;">
+      <div class="ta2-cal-head">
+        <button type="button" class="ta2-sm" onclick="ta2CalMove(-1)">◀</button>
+        <b id="ta2CalTitle"></b>
+        <button type="button" class="ta2-sm" onclick="ta2CalMove(1)">▶</button>
+      </div>
+      <div class="ta2-cal" id="ta2CalGrid"></div>
+      <div style="margin-top:14px;font-size:14px;font-weight:800;color:var(--ink);" id="ta2SelDateLabel"></div>
+      <div id="ta2SchedList"></div>
+      <div class="ta2-sched-form">
+        <input type="date" id="ta2SchDate" onchange="ta2SetSchDate(this.value)">
+        <input type="time" id="ta2SchTime">
+        <input type="text" id="ta2SchTitle" class="full" placeholder="일정 제목">
+        <textarea id="ta2SchNote" class="full" rows="2" placeholder="상세 내용 · 장소 (선택)"></textarea>
+        <button type="button" class="full" onclick="ta2AddSched()" style="border-radius:12px;padding:12px;font-weight:800;">일정 추가</button>
+      </div>
+    </div>
+
+    <div id="ta4PaneCmt" style="display:none;">
+      <div id="ta4CmList"></div>
+      <div class="ta4-cmf"><textarea id="ta4CmText" rows="1" placeholder="댓글"></textarea><button type="button" onclick="ta4CmAdd()">등록</button></div>
+    </div>
+  </div></div>
+</div>
+
+<!-- 메모 에디터 (내용 + 사진 + 그림을 한 화면에서) -->
+<div class="ta4-pg" id="ta2MemoPop" style="z-index:100001;">
+  <div class="ta4-ph">
+    <button type="button" class="back" onclick="ta2CloseMemoPop()" aria-label="뒤로">‹</button>
+    <div class="ttl"><h3 id="ta2MpTitle">메모</h3><div class="bd"><span id="ta2MpMeta" style="font-size:11.5px;color:var(--soft);font-weight:600;"></span></div></div>
+    <span class="sv" id="ta2MpAuto"></span>
+    <button type="button" class="act dg" id="ta2MpDel" onclick="ta2DelNote()">삭제</button>
+    <button type="button" class="act" id="ta2MpAdd" onclick="ta2AddMemo()">등록</button>
+  </div>
+  <div class="ta4-pb"><div class="in">
+    <div class="ta4-ed">
+      <textarea id="ta2MemoText" class="ta2-mp-text" placeholder="메모" onchange="ta2MpTextChange(this.value)"></textarea>
+      <div class="ta2-att-grid" id="ta2MpAtts"></div>
+    </div>
+    <div class="ta2-draw" id="ta2DrawBox" style="display:none;">
+      <div class="tl">
+        <button type="button" class="ta2-swatch on" data-c="#111827" style="background:#111827;" onclick="ta2DrawColor(this)"></button>
+        <button type="button" class="ta2-swatch" data-c="#dc2626" style="background:#dc2626;" onclick="ta2DrawColor(this)"></button>
+        <button type="button" class="ta2-swatch" data-c="#2563eb" style="background:#2563eb;" onclick="ta2DrawColor(this)"></button>
+        <button type="button" class="ta2-swatch" data-c="#16a34a" style="background:#16a34a;" onclick="ta2DrawColor(this)"></button>
+        <button type="button" class="ta2-sm" onclick="ta2DrawWidth(3)">가늘게</button>
+        <button type="button" class="ta2-sm" onclick="ta2DrawWidth(7)">보통</button>
+        <button type="button" class="ta2-sm" onclick="ta2DrawWidth(14)">굵게</button>
+        <button type="button" class="ta2-sm" onclick="ta2DrawEraser()">지우개</button>
+        <button type="button" class="ta2-sm" onclick="ta2DrawUndo()">↩</button>
+        <button type="button" class="ta2-sm" onclick="ta2DrawClear()">전체 지움</button>
+      </div>
+      <canvas id="ta2Canvas"></canvas>
+      <div style="display:flex;gap:8px;margin-top:8px;justify-content:flex-end;">
+        <button type="button" class="ta2-sm" onclick="ta2CloseDraw()">취소</button>
+        <button type="button" onclick="ta2SaveDraw()" style="border-radius:11px;padding:9px 16px;font-weight:800;">그림 첨부</button>
+      </div>
+    </div>
+  </div></div>
+  <div class="ta4-pf"><div class="in" id="ta2MpPhotoBar">
+    <button type="button" class="tool" onclick="ta2AttachPick(ta2MpTarget(),'cam')">📷 촬영</button>
+    <button type="button" class="tool" onclick="ta2AttachPick(ta2MpTarget(),'album')">🖼️ 앨범</button>
+    <button type="button" class="tool" onclick="ta2OpenDraw(ta2MpTarget())">✏️ 그림</button>
+  </div></div>
+</div>
+
+<!-- 신규 TA 등록 -->
+<div class="ta4-pg" id="agentLeadModalOverlay">
+  <div class="ta4-ph">
+    <button type="button" class="back" onclick="closeAgentLeadModal()" aria-label="뒤로">‹</button>
+    <div class="ttl"><h3 id="agentModalTitle">신규 TA 등록</h3></div>
+  </div>
+  <div class="ta4-pb"><div class="in">
+    <form id="agentModalLeadForm" onsubmit="handleAgentModalSubmit(event)" class="ta4-form">
+      <input type="hidden" id="afEditingId" name="editingId"><input type="hidden" id="agentEditingId">
+      <input type="hidden" id="afAddress">
+      <div class="f">
+        <label>서비스제공처명 *</label>
+        <div class="nm"><input type="text" id="afCompany" required placeholder="현장 정식 명칭" autocomplete="off">
+          <button type="button" id="afPlaceBtn" onclick="ta4FormPlace()" aria-label="지도에서 위치 지정">📍</button></div>
+        <div class="chip" id="afPlaceInfo"></div>
+      </div>
+      <div class="row2 f">
+        <div><label>고객담당자</label><input type="text" id="afContact" placeholder="성명"></div>
+        <div><label>담당자 전화</label><input type="tel" id="afContactPhone" inputmode="tel" placeholder="010-0000-0000"></div>
+      </div>
+      <div class="row2 f">
+        <div><label>용역료(원) *</label><input type="text" inputmode="numeric" id="afAmount" class="num" required placeholder="0"></div>
+        <div><label>상품종류 *</label><select id="afProductType">
+          <option value="알람">알람</option><option value="휴엔">휴엔</option><option value="정보보안">정보보안</option><option value="블루스캔">블루스캔</option><option value="유지보수">유지보수</option><option value="안전상품">안전상품</option></select></div>
+      </div>
+      <div class="row2 f">
+        <div><label>영업동기 *</label><select id="afMotive"></select></div>
+        <div><label>수주확도 *</label><select id="afConfidence"><option value="A">A (상)</option><option value="B" selected>B (중)</option><option value="C">C (하)</option></select></div>
+      </div>
+      <div class="f"><label>영업단계 *</label><select id="afStage" onchange="onAgentStageChange(this.value)"><option value="진행중">진행중</option><option value="수주完">수주완료</option><option value="보류">보류</option></select></div>
+      <div id="afWonExtraRow" class="won" style="display:none;">
+        <div class="row2 f" style="margin-bottom:10px;">
+          <div><label>계약일 *</label><input type="date" id="afContractDate"></div>
+          <div><label>기산일 *</label><input type="date" id="afBaseDate"></div>
+        </div>
+        <div><label>차량번호</label><select id="afVehicleNumber"><option value="없음">없음</option><option value="26호">26호</option><option value="27호">27호</option><option value="28호">28호</option><option value="127호">127호</option><option value="160호">160호</option></select></div>
+      </div>
+      <div class="row2 f">
+        <div><label>등록일</label><input type="date" id="afRegisteredDate"></div>
+        <div><label>계약예정일 *</label><input type="date" id="afExpectedDate" required onchange="onAgentExpectedDateChange(this.value)"></div>
+      </div>
+      <div class="f"><label>메모</label><textarea id="afMemo" placeholder="메모"></textarea></div>
+    </form>
+  </div></div>
+  <div class="ta4-pf"><div class="in"><button type="submit" form="agentModalLeadForm" id="afSubmitBtn" class="go">TA 등록</button></div></div>
+</div>
+
+<!-- 금일 수주 예정 -->
+<div class="ta4-pg" id="ta4TodayPg">
+  <div class="ta4-ph"><button type="button" class="back" onclick="ta3Back()" aria-label="뒤로">‹</button><div class="ttl"><h3>금일 수주 예정</h3><div class="bd"><span id="ta4TodaySum" style="font-size:12px;font-weight:700;color:var(--accent);"></span></div></div></div>
+  <div class="ta4-pb"><div class="in" id="ta4TodayList"></div></div>
+</div>
+
+<!-- 수주보고 -->
+<div class="ta4-pg ta4-rp" id="ta4Report">
+  <div class="ta4-ph"><button type="button" class="back" onclick="ta3Back()" aria-label="뒤로">‹</button><div class="ttl"><h3>수주보고</h3><div class="bd"><span id="ta4RpName" style="font-size:12px;font-weight:700;color:var(--mute);"></span></div></div></div>
+  <div class="ta4-pb"><div class="in ta4-form">
+    <div class="box">
+      <div class="row2 f"><div><label>영업동기</label><select id="rpMotive" onchange="ta4RpBuild()"></select></div>
+        <div><label>상품</label><select id="rpProduct" onchange="ta4RpBuild()"></select></div></div>
+      <div class="row2 f"><div><label>용역료(원)</label><input type="text" inputmode="numeric" id="rpAmount" class="num" oninput="ta4RpBuild()"></div>
+        <div><label>담당차량</label><select id="rpCar" onchange="ta4RpBuild()"><option value="">선택</option><option value="26">26호</option><option value="27">27호</option><option value="28">28호</option><option value="127">127호</option><option value="160">160호</option></select></div></div>
+      <div class="row2 f" style="margin-bottom:0;"><div><label>개시일</label><input type="date" id="rpStart" onchange="ta4RpBuild()"></div>
+        <div><label>기산일</label><input type="date" id="rpBase" onchange="ta4RpBuild()"></div></div>
+    </div>
+    <div class="box"><textarea id="rpText"></textarea></div>
+    <div class="box" style="padding:6px 14px;">
+      <label class="ck"><input type="checkbox" id="rpInbox" checked> 영업일보 영업보고 접수<small>수주개시 등록</small></label>
+      <label class="ck"><input type="checkbox" id="rpShare" checked> 카카오톡 단톡방에 공유<small>내 이름으로 전송</small></label>
+    </div>
+  </div></div>
+  <div class="ta4-pf"><div class="in"><button type="button" class="go" id="rpGo" onclick="ta4RpSubmit()">보고하기</button></div></div>
+</div>
+
+<!-- 위치 지정 (중앙 핀 방식) -->
+<div class="ta4-pg" id="ta3Picker" style="z-index:100010;">
   <div class="ta3-fhead"><button type="button" onclick="ta3PkClose()">취소</button><b>위치 지정</b><button type="button" class="ok" onclick="ta3PkOk()">이 위치로 지정</button></div>
   <div class="ta3-pk">
     <div id="ta3PkMap"></div>
     <div class="ta3-cross"></div>
     <div class="ta3-pksearch"><input id="ta3PkQ" placeholder="주소 · 건물명 검색" onkeydown="if(event.key==='Enter')ta3PkSearch()"><button type="button" onclick="ta3PkSearch()">검색</button></div>
     <button type="button" class="ta3-pkgps" onclick="ta3PkGps()" aria-label="내 위치">◎</button>
-    <div class="ta3-pkaddr"><span id="ta3PkAddr">지도를 움직여 핀 위치를 맞추세요</span><small id="ta3PkCoord"></small></div>
+    <div class="ta3-pkaddr"><span id="ta3PkAddr"></span><small id="ta3PkCoord"></small></div>
   </div>
 </div>
 
 <!-- 안건 선택 (일정 추가용) -->
-<div class="ta3-full" id="ta3ItemPick">
-  <div class="ta3-fhead"><button type="button" onclick="ta3IpClose()">닫기</button><b>어느 안건의 일정인가요?</b><span style="width:56px"></span></div>
-  <div style="padding:10px 14px 0;background:var(--paper);"><div class="ta3-search"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg><input id="ta3IpQ" type="search" placeholder="안건 검색" oninput="ta3IpRender()"></div></div>
+<div class="ta4-pg" id="ta3ItemPick">
+  <div class="ta3-fhead"><button type="button" onclick="ta3IpClose()">닫기</button><b>안건 선택</b><span style="width:56px"></span></div>
+  <div style="padding:10px 16px 0;background:var(--bg);"><div class="ta3-search"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg><input id="ta3IpQ" type="search" placeholder="검색" oninput="ta3IpRender()"></div></div>
   <div class="ta3-plist" id="ta3IpList"></div>
 </div>
 
