@@ -7494,7 +7494,7 @@ async function ta2SaveDraw() {
 
 // ---------- 음성 입력 (브라우저 음성인식, 한국어) ----------
 const VO = { rec: null, on: false, btn: null };
-function ta4VoiceStop() { try { if (VO.rec) VO.rec.stop(); } catch (e) {} }
+function ta4VoiceStop() { try { if (VO.stopReq) VO.stopReq(); if (VO.rec) VO.rec.stop(); } catch (e) {} }
 async function ta4MicPerm() {
   // 마이크 권한 요청: 허용 전이면 브라우저/OS 권한 창이 뜸. 반환 true=허용, false=거부
   try {
@@ -7514,20 +7514,29 @@ async function ta4Voice(targetId, btnId) {
   if (VO.on) { ta4VoiceStop(); return; }
   if (!(await ta4MicPerm())) { ta4MicHelp(); return; }
   const ta = el(targetId), btn = el(btnId); if (!ta) return;
-  let base = ta.value + (ta.value && !/\s$/.test(ta.value) ? ' ' : '');
-  const r = new SR(); r.lang = 'ko-KR'; r.interimResults = true; r.continuous = true;
-  r.onresult = e => {
-    let interim = '';
-    for (let i = e.resultIndex; i < e.results.length; i++) {
-      const t = e.results[i][0].transcript;
-      if (e.results[i].isFinal) base += t.trim() + ' '; else interim += t;
-    }
-    ta.value = base + interim;
-    ta.scrollTop = ta.scrollHeight;
+  // 안드로이드 크롬은 continuous 모드에서 중간 결과가 중복 누적되므로, 한 문장씩 인식하고 끝나면 자동 재시작한다
+  let base = ta.value + (ta.value && !/\s$/.test(ta.value) ? ' ' : ''), want = true, cur = '', started = false;
+  VO.stopReq = () => { want = false; };
+  const show = t => { ta.value = base + t; ta.scrollTop = ta.scrollHeight; };
+  const run = () => {
+    const r = new SR(); r.lang = 'ko-KR'; r.interimResults = true; r.continuous = false; r.maxAlternatives = 1; cur = '';
+    r.onresult = e => {
+      let t = ''; for (let i = 0; i < e.results.length; i++) t += e.results[i][0].transcript;
+      cur = t.trim(); show(cur);
+    };
+    r.onerror = e => {
+      if (e.error === 'not-allowed' || e.error === 'service-not-allowed') { want = false; ta4MicHelp(); }
+      else if (e.error !== 'no-speech' && e.error !== 'aborted') { want = false; ta3Toast('음성 인식 오류: ' + e.error, 3000); }
+    };
+    r.onend = () => {
+      if (cur) { base += cur + ' '; cur = ''; show(''); }
+      if (want && VO.on) { setTimeout(() => { if (want && VO.on) { try { run(); } catch (e) { fin(); } } }, 120); return; }
+      fin();
+    };
+    r.start(); VO.rec = r;
   };
-  r.onerror = e => { if (e.error === 'not-allowed' || e.error === 'service-not-allowed') ta4MicHelp(); else if (e.error !== 'no-speech' && e.error !== 'aborted') ta3Toast('음성 인식 오류: ' + e.error, 3000); };
-  r.onend = () => { VO.on = false; VO.rec = null; if (btn) btn.classList.remove('rec'); ta.value = ta.value.trim(); ta.dispatchEvent(new Event('change')); };
-  try { r.start(); VO.rec = r; VO.on = true; if (btn) btn.classList.add('rec'); } catch (e) { ta3Toast('음성 인식을 시작하지 못했습니다'); }
+  const fin = () => { VO.on = false; VO.rec = null; VO.stopReq = null; if (btn) btn.classList.remove('rec'); ta.value = ta.value.trim(); ta.dispatchEvent(new Event('change')); };
+  try { VO.on = true; if (btn) btn.classList.add('rec'); run(); } catch (e) { VO.on = false; if (btn) btn.classList.remove('rec'); ta3Toast('음성 인식을 시작하지 못했습니다'); }
 }
 
 // ---------- 이모지 ----------
