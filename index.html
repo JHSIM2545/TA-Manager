@@ -1228,6 +1228,60 @@
   .ta4-voice .tx{margin:26px 28px 0;max-width:520px;min-height:48px;text-align:center;color:#fff;font-size:18px;font-weight:700;line-height:1.5;word-break:keep-all;}
   .ta4-voice .hint{position:absolute;bottom:calc(60px + env(safe-area-inset-bottom));color:rgba(255,255,255,.85);font-size:14px;font-weight:700;}
 
+  /* ===== 연락처 ===== */
+  .ta3-bar .ct-hb{display:flex;align-items:center;justify-content:center;}
+  .ta3-bar .ct-hb [data-ic] svg{width:20px;height:20px;}
+  .ta4-ph .ic{display:flex;align-items:center;justify-content:center;}
+  .ta4-ph .ic [data-ic] svg{width:22px;height:22px;}
+  .ct-tools{flex:none;padding:10px 16px 8px;background:var(--bg);}
+  .ct-tools .ta3-search{margin-bottom:8px;}
+  .ct-seg{display:flex;background:#e6eaf2;border-radius:12px;padding:3px;gap:3px;}
+  .ct-seg button{flex:1;height:34px;border:none;border-radius:10px;background:none;font-size:14px;font-weight:800;color:var(--mute);}
+  .ct-seg button.on{background:#fff;color:var(--navy);box-shadow:0 1px 4px rgba(15,23,42,.12);}
+  .ct-sec{position:sticky;top:-14px;z-index:2;background:var(--bg);padding:8px 4px 6px;font-size:13px;font-weight:800;color:var(--accent);display:flex;align-items:center;gap:6px;}
+  .ct-sec small{color:var(--soft);font-weight:700;}
+  .ct-row{display:flex;align-items:center;gap:12px;background:#fff;border:1px solid var(--line);border-radius:14px;padding:10px 12px;margin-bottom:8px;box-shadow:var(--sh);}
+  .ct-row .tx{flex:1;min-width:0;}
+  .ct-row .tx b{display:block;font-size:16px;font-weight:800;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .ct-row .tx small{display:block;font-size:12.5px;font-weight:600;color:var(--mute);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px;}
+  .ct-row .cdi{color:var(--soft);display:inline-flex;} .ct-row .cdi svg{width:18px;height:18px;}
+  .ct-row .call{flex:none;width:40px;height:40px;border-radius:50%;background:#e8f7ee;color:#15803d;display:flex;align-items:center;justify-content:center;text-decoration:none;}
+  .ct-row .call svg{width:20px;height:20px;}
+  .ct-av{flex:none;width:44px;height:44px;border-radius:50%;color:#fff;font-size:18px;font-weight:800;display:flex;align-items:center;justify-content:center;overflow:hidden;}
+  .ct-av img{width:100%;height:100%;object-fit:cover;display:block;}
+  .ct-av.big{width:88px;height:88px;font-size:36px;margin:0 auto;}
+  .ct-idx{position:absolute;right:1px;top:50%;transform:translateY(-38%);z-index:5;display:flex;flex-direction:column;align-items:center;background:rgba(255,255,255,.7);border-radius:10px;padding:3px 0;max-height:60vh;overflow:hidden;}
+  .ct-idx button{border:none;background:none;font-size:10.5px;font-weight:800;color:var(--accent);padding:1.5px 6px;line-height:1.15;}
+  #ta4CtPg .ta4-pb>.in{padding-right:14px;}
+  .ct-hero{text-align:center;padding:6px 0 14px;}
+  .ct-hero h2{margin:10px 0 2px;font-size:22px;font-weight:800;color:var(--ink);letter-spacing:-.4px;}
+  .ct-hero p{margin:0;font-size:14px;font-weight:600;color:var(--mute);}
+  .ct-chip{display:inline-block;margin-top:8px;padding:3px 11px;border-radius:99px;background:#eef3ff;color:var(--accent);font-size:12px;font-weight:800;}
+  .ct-acts{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px;}
+  .ct-acts .ac{display:flex;flex-direction:column;align-items:center;gap:5px;padding:11px 2px 9px;border-radius:14px;border:1px solid var(--line);background:#fff;color:var(--navy);text-decoration:none;font-family:inherit;box-shadow:var(--sh);}
+  .ct-acts .ac small{font-size:11.5px;font-weight:800;}
+  .ct-acts .ac.off{opacity:.38;pointer-events:none;}
+  .ct-info{padding:2px 14px !important;}
+  .ct-info .r{display:flex;gap:12px;padding:11px 0;border-bottom:1px solid var(--line);font-size:15px;}
+  .ct-info .r:last-child{border-bottom:none;}
+  .ct-info .r span{flex:none;width:68px;color:var(--mute);font-weight:700;}
+  .ct-info .r b{font-weight:700;color:var(--ink);word-break:break-all;min-width:0;}
+  .ct-info .r a{color:var(--navy);text-decoration:none;}
+  .ct-cardhd{font-size:12.5px;font-weight:800;color:var(--mute);margin-bottom:8px;}
+  .ct-cardimg{width:100%;border-radius:10px;border:1px solid var(--line);display:block;}
+  .ct-ph{text-align:center;}
+  .ct-photo{width:104px;height:104px;border-radius:50%;background:#c3cbdc;margin:2px auto 12px;display:flex;align-items:center;justify-content:center;overflow:hidden;font-size:40px;font-weight:800;color:#fff;}
+  .ct-photo img{width:100%;height:100%;object-fit:cover;}
+  .ct-phbtn{display:flex;gap:8px;justify-content:center;}
+  .ct-phbtn button{height:42px;padding:0 16px;border-radius:12px;border:1px solid var(--line);background:#eef1f7;color:var(--navy);font-size:14px;font-weight:800;display:inline-flex;align-items:center;gap:7px;}
+  .ct-phbtn [data-ic] svg{width:21px;height:21px;}
+  .ct-gc{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;}
+  .ct-gc button{border:none;background:#eef3ff;color:var(--accent);border-radius:99px;padding:5px 12px;font-size:12.5px;font-weight:800;}
+  .ct-cardpv{margin-top:10px;} .ct-cardpv:empty{display:none;} .ct-cardpv img{width:100%;border-radius:10px;border:1px solid var(--line);display:block;}
+  .ct-cardpv .x{margin-top:8px;border:none;background:#fee2e2;color:#b91c1c;border-radius:10px;padding:8px 14px;font-size:13px;font-weight:800;}
+  .ta4-imgov{position:fixed;inset:0;z-index:2000100;background:rgba(0,0,0,.88);display:none;align-items:center;justify-content:center;padding:14px;}
+  .ta4-imgov.on{display:flex;} .ta4-imgov img{max-width:100%;max-height:100%;border-radius:8px;}
+
 </style>
 <link rel="manifest" href="manifest.json">
 <link rel="icon" type="image/png" href="favicon.png">
@@ -1538,6 +1592,7 @@ if ('serviceWorker' in navigator) window.addEventListener('load', () => { naviga
         <div class="tt" id="ta3Title">영업 TA 관리 포털</div>
         <div style="display:flex;gap:8px;align-items:center;flex:none;">
           <span id="ta3Sw"></span>
+          <button type="button" class="ct-hb" onclick="ta4CtOpen()" aria-label="연락처"><span data-ic="contact"></span></button>
           <button type="button" onclick="ta3SetTab('my')" aria-label="내 정보"><span id="ta3Ini">·</span></button>
         </div>
       </header>
@@ -6349,7 +6404,7 @@ async function ta3Boot() {
   ta4Init();
   ta3Refresh();
   ta3MapInit().catch(() => {});
-  await Promise.all([ta3LoadRefs(), ta3LoadPlaces(), ta3LoadScheds(), ta4LoadMotives(), ta4LoadCmts(), ta4LoadCards()]);
+  await Promise.all([ta3LoadRefs(), ta3LoadPlaces(), ta3LoadScheds(), ta4LoadMotives(), ta4LoadCmts(), ta4LoadCards(), ta4LoadContacts()]);
   ta3Refresh();
 }
 function ta3SetTab(t) {
@@ -6613,7 +6668,7 @@ function ta3RenderMy() {
 async function ta3Reload() {
   ta3Toast('새로고침 중');
   try { await loadAllFromSupabase(); } catch (e) {}
-  await Promise.all([ta3LoadRefs(), ta3LoadPlaces(), ta3LoadScheds(), ta4LoadMotives(), ta4LoadCmts(), ta4LoadCards()]);
+  await Promise.all([ta3LoadRefs(), ta3LoadPlaces(), ta3LoadScheds(), ta4LoadMotives(), ta4LoadCmts(), ta4LoadCards(), ta4LoadContacts()]);
   ta3Refresh(); ta3Toast('갱신 완료');
 }
 // ---------- 위치 선택기 (중앙 핀) ----------
@@ -7532,14 +7587,19 @@ function ta4CardFields() { return { name: 'cdName', title: 'cdTitle', company: '
 function ta4CardRead() { const c = {}, F = ta4CardFields(); Object.keys(F).forEach(k => { c[k] = (el(F[k]).value || '').trim(); }); return c; }
 function ta4CardFill(c) { const F = ta4CardFields(); Object.keys(F).forEach(k => { el(F[k]).value = (c && c[k]) || ''; }); }
 function ta4CardOpen(mode) {
-  TA4.card = { mode, img: null, busy: false };
+  TA4.card = { mode, img: null, full: null, crop: null, busy: false };
   let c = null;
-  if (mode === 'lead') { const l = ta2CurLead(); if (!l) return; c = Object.assign({}, TA4.cards[l.id] || {}); if (!c.name) c.name = l.contact || ''; if (!c.mobile && !c.tel && l.contactPhone) c.mobile = ta4FmtPhone(l.contactPhone); el('ta4CdName').textContent = l.company || ''; }
+  if (mode === 'book') { c = {}; el('ta4CdName').textContent = '연락처에 저장'; }
+  else if (mode === 'ctedit') { c = {}; Object.keys(ta4CardFields()).forEach(k => { c[k] = (el(TA4_CT_F[k]) || {}).value || ''; }); el('ta4CdName').textContent = ''; }
+  else if (mode === 'lead') { const l = ta2CurLead(); if (!l) return; c = Object.assign({}, TA4.cards[l.id] || {}); if (!c.name) c.name = l.contact || ''; if (!c.mobile && !c.tel && l.contactPhone) c.mobile = ta4FmtPhone(l.contactPhone); el('ta4CdName').textContent = l.company || ''; }
   else { c = Object.assign({}, TA4.formCard || {}); if (!c.name) c.name = el('afContact').value.trim(); if (!c.mobile && !c.tel) c.mobile = ta4FmtPhone(el('afContactPhone').value); el('ta4CdName').textContent = el('afCompany').value.trim(); }
   ta4CardFill(c);
   el('cdImg').style.display = 'none'; el('cdImg').removeAttribute('src'); el('cdRaw').textContent = ''; el('cdStatus').textContent = ''; el('cdStatus').className = 'cd-st';
   let o = {}; try { o = JSON.parse(localStorage.getItem(TA4_LS_CARDOPT) || '{}'); } catch (e) {}
-  el('cdSave').checked = o.save !== false; el('cdPhoto').checked = o.photo !== false;
+  el('cdSave').checked = o.save !== false; el('cdPhoto').checked = o.photo !== false; el('cdBook').checked = o.book !== false; el('cdCrop').checked = o.crop !== false;
+  const pm = mode === 'book' || mode === 'ctedit';
+  el('cdSaveRow').style.display = mode === 'ctedit' ? 'none' : ''; el('cdPhotoRow').style.display = pm ? 'none' : ''; el('cdBookRow').style.display = pm ? 'none' : '';
+  el('cdApply').textContent = mode === 'book' ? '연락처에 저장' : mode === 'ctedit' ? '입력란에 적용' : '고객 정보에 적용';
   ta4Show('ta4CardPg', ta4CardCamStop);
   ta4CardCamStart();   // 카메라 바로 실행(실시간 화면)
 }
@@ -7601,7 +7661,7 @@ async function ta4CardProcess(f) {
   try {
     const url = await ta2Compress(f, 1800, 0.88); TA4.card.img = url;
     const img = new Image(); await new Promise((res, rej) => { img.onload = res; img.onerror = () => rej(new Error('이미지를 읽을 수 없습니다')); img.src = url; });
-    el('cdImg').src = url; el('cdImg').style.display = 'block';
+    el('cdImg').src = url; el('cdImg').style.display = 'block'; TA4.card.full = url; TA4.card.crop = null;
     // 1순위: Claude 이미지 인식(Supabase 함수 card-ocr) / 실패 시 2순위: 브라우저 OCR
     let c = null, via = '', why = '';
     try {
@@ -7623,10 +7683,50 @@ async function ta4CardProcess(f) {
     }
     const F = ta4CardFields();
     Object.keys(F).forEach(k => { if (c[k]) el(F[k]).value = String(c[k]).trim(); });
-    const n = Object.values(c).filter(Boolean).length;
+    TA4.card.full = ta4CardCropImg(img, null);
+    let box = ta4BoxOk(c.card_box) ? c.card_box : null; if (!box) { try { box = ta4CardAutoCrop(img); } catch (x) { box = null; } }
+    TA4.card.crop = box ? ta4CardCropImg(img, box) : null; ta4CardCropToggle();
+    const n = Object.keys(F).filter(k => c[k]).length;
     ta4CardStatus(n ? `인식 완료${via === 'ocr' ? '(기본 인식)' : ' (AI)'} — ${n}개 항목. 잘못된 곳은 고쳐주세요.${via === 'ocr' && why ? '\nAI 인식 실패 사유: ' + why : ''}` : '글자를 찾지 못했습니다. 다시 촬영하거나 직접 입력해 주세요.', n ? 'ok' : 'err');
   } catch (e) { ta4CardStatus(e.message || '인식 오류', 'err'); }
   ta4BusyUi(false);
+}
+// 명함 부분만 잘라내기: AI가 알려준 위치(card_box, 0~1000) 우선 / 없으면 배경과 다른 영역을 자동 탐지
+function ta4BoxOk(b) {
+  if (!Array.isArray(b) || b.length !== 4) return false; b = b.map(Number); if (b.some(v => !isFinite(v))) return false;
+  const h = b[2] - b[0], w = b[3] - b[1]; return b[0] >= 0 && b[1] >= 0 && b[2] <= 1000 && b[3] <= 1000 && h > 150 && w > 150 && h * w >= 120000;
+}
+function ta4CardCropImg(img, box) {
+  const iw = img.naturalWidth, ih = img.naturalHeight; let sx = 0, sy = 0, sw = iw, sh = ih;
+  if (box) {
+    const m = 12, y0 = Math.max(0, box[0] - m), x0 = Math.max(0, box[1] - m), y1 = Math.min(1000, box[2] + m), x1 = Math.min(1000, box[3] + m);
+    sx = Math.round(x0 / 1000 * iw); sy = Math.round(y0 / 1000 * ih); sw = Math.round((x1 - x0) / 1000 * iw); sh = Math.round((y1 - y0) / 1000 * ih);
+  }
+  const sc = Math.min(1, 1100 / Math.max(sw, sh)), c = document.createElement('canvas'); c.width = Math.max(1, Math.round(sw * sc)); c.height = Math.max(1, Math.round(sh * sc));
+  const x = c.getContext('2d'); x.fillStyle = '#fff'; x.fillRect(0, 0, c.width, c.height); x.drawImage(img, sx, sy, sw, sh, 0, 0, c.width, c.height);
+  return c.toDataURL('image/jpeg', 0.85);
+}
+function ta4CardAutoCrop(img) {
+  const W = 180, sc = W / Math.max(img.naturalWidth, img.naturalHeight), w = Math.max(8, Math.round(img.naturalWidth * sc)), h = Math.max(8, Math.round(img.naturalHeight * sc));
+  const c = document.createElement('canvas'); c.width = w; c.height = h; const x = c.getContext('2d'); x.drawImage(img, 0, 0, w, h);
+  const a = x.getImageData(0, 0, w, h).data; let r = 0, g = 0, b = 0, n = 0;
+  const px = (i, j) => (j * w + i) * 4;
+  for (let i = 0; i < w; i++) for (const j of [0, 1, h - 2, h - 1]) { const p = px(i, j); r += a[p]; g += a[p + 1]; b += a[p + 2]; n++; }
+  for (let j = 2; j < h - 2; j++) for (const i of [0, 1, w - 2, w - 1]) { const p = px(i, j); r += a[p]; g += a[p + 1]; b += a[p + 2]; n++; }
+  r /= n; g /= n; b /= n;
+  const rows = new Array(h).fill(0), cols = new Array(w).fill(0);
+  for (let j = 0; j < h; j++) for (let i = 0; i < w; i++) { const p = px(i, j); if (Math.abs(a[p] - r) + Math.abs(a[p + 1] - g) + Math.abs(a[p + 2] - b) > 70) { rows[j]++; cols[i]++; } }
+  const span = (arr, len, need) => { let s = -1, e = -1; for (let k = 0; k < arr.length; k++) if (arr[k] > len * need) { if (s < 0) s = k; e = k; } return [s, e]; };
+  const [y0, y1] = span(rows, w, 0.2), [x0, x1] = span(cols, h, 0.2);
+  if (y0 < 0 || x0 < 0) return null;
+  const box = [y0 / h * 1000, x0 / w * 1000, (y1 + 1) / h * 1000, (x1 + 1) / w * 1000].map(Math.round);
+  const area = (box[2] - box[0]) * (box[3] - box[1]); if (!ta4BoxOk(box) || area > 960000) return null;   // 너무 작거나 거의 전체면 실패로 본다
+  return box;
+}
+function ta4CardCropToggle() {
+  const C = TA4.card, e = el('cdImg'), use = el('cdCrop').checked && C.crop;
+  if (C.full) { e.src = use ? C.crop : C.full; e.style.display = 'block'; }
+  C.img = use ? C.crop : C.full;
 }
 // 내 전화기 연락처 저장: 웹은 연락처에 직접 쓸 수 없어 vCard를 공유/열기 → 연락처 앱에서 저장 1탭
 function ta4Vcard(c, company) {
@@ -7637,7 +7737,9 @@ function ta4Vcard(c, company) {
   const d = s => String(s || '').replace(/[^0-9+]/g, '');
   if (c.mobile) L.push('TEL;TYPE=CELL,VOICE:' + d(c.mobile)); if (c.tel) L.push('TEL;TYPE=WORK,VOICE:' + d(c.tel)); if (c.fax) L.push('TEL;TYPE=WORK,FAX:' + d(c.fax));
   if (c.email) L.push('EMAIL;TYPE=INTERNET:' + esc(c.email)); if (c.address) L.push('ADR;TYPE=WORK:;;' + esc(c.address) + ';;;;');
-  L.push('NOTE:에스원 북서울지사 TA 고객담당자', 'END:VCARD');
+  if (c.photo && /^data:image\/jpeg;base64,/.test(c.photo)) { const b64 = c.photo.split(',')[1]; const ph = 'PHOTO;ENCODING=b;TYPE=JPEG:' + b64; L.push(ph.replace(/(.{74})/g, '$1\r\n ')); }
+  if (c.memo) L.push('NOTE:' + esc(c.memo)); else L.push('NOTE:에스원 북서울지사 TA 고객담당자');
+  L.push('END:VCARD');
   return L.join('\r\n');
 }
 function ta4VcardShare(c, company) {
@@ -7658,10 +7760,20 @@ function ta2SaveContact() {
 async function ta4CardApply() {
   const c = ta4CardRead();
   if (!c.name && !c.mobile && !c.tel && !c.email) { ta3Toast('저장할 정보가 없습니다'); return; }
-  const mode = TA4.card.mode, wantSave = el('cdSave').checked, wantPhoto = el('cdPhoto').checked, img = TA4.card.img;
-  try { localStorage.setItem(TA4_LS_CARDOPT, JSON.stringify({ save: wantSave, photo: wantPhoto })); } catch (e) {}
+  const mode = TA4.card.mode, wantSave = el('cdSave').checked, wantPhoto = el('cdPhoto').checked, wantBook = el('cdBook').checked, img = el('cdCrop').checked && TA4.card.crop ? TA4.card.crop : (TA4.card.full || TA4.card.img);
+  try { localStorage.setItem(TA4_LS_CARDOPT, JSON.stringify({ save: wantSave, photo: wantPhoto, book: wantBook, crop: el('cdCrop').checked })); } catch (e) {}
   const phone = c.mobile || c.tel;
-  if (wantSave) ta4VcardShare(c, mode === 'lead' ? (ta2CurLead() || {}).company : el('afCompany').value.trim());   // 사용자 터치 직후 즉시 실행
+  const coName = mode === 'lead' ? (ta2CurLead() || {}).company : mode === 'form' ? el('afCompany').value.trim() : '';
+  if (wantSave && mode !== 'ctedit') ta4VcardShare(c, coName);   // 사용자 터치 직후 즉시 실행
+  if (mode === 'ctedit') {
+    Object.keys(ta4CardFields()).forEach(k => { if (c[k]) el(TA4_CT_F[k]).value = c[k]; });
+    if (img && TA4.card.full) TA4.ct.ed.card_img = img; ta4CtEdMedia(); ta4Close('ta4CardPg'); ta3Toast('명함 정보 입력됨'); return;
+  }
+  if (mode === 'book') {
+    try { await ta4CtFromCard(c, img, ''); ta4CtRender(); ta4Close('ta4CardPg'); ta3Toast('연락처에 저장됨'); } catch (e) { ta3Toast('저장 실패: ' + (e.message || e), 3500); }
+    return;
+  }
+  if (wantBook) { try { await ta4CtFromCard(Object.assign({}, c, { company: c.company || coName }), TA4.card.full ? img : '', mode === 'lead' ? (ta2CurLead() || {}).id : ''); } catch (e) { ta3Toast('연락처 목록 저장 실패', 3000); } }
   if (mode === 'form') {
     el('afContact').value = c.name; el('afContactPhone').value = phone;
     if (c.company && !el('afCompany').value.trim()) el('afCompany').value = c.company;
@@ -7719,6 +7831,11 @@ const TA4_IC = {
   tri: '<path d="M12 4.5l8.6 15H3.4z"/>', diamond: '<path d="M12 3.5l8.5 8.5-8.5 8.5L3.5 12z"/>',
   bgoff: '<rect x="3" y="4" width="18" height="14" rx="2.5"/><circle cx="8.5" cy="9" r="1.6" fill="currentColor"/><path d="M3.8 16l4.6-4.4 3.2 3 3.6-5 5 6.4"/><path d="M15.5 17.5l5 5M20.5 17.5l-5 5" stroke="#dc2626"/>',
   card: '<rect x="2.8" y="5" width="18.4" height="14" rx="2.6"/><rect x="6" y="8.6" width="5" height="5.6" rx=".8"/><path d="M13.6 9h4.2M13.6 12h4.2M13.6 15h4.2"/>',
+  contact: '<rect x="5" y="3" width="14.5" height="18" rx="2.4"/><circle cx="12.2" cy="9.8" r="2.7"/><path d="M8 17c.7-2.1 2.3-3.2 4.2-3.2s3.5 1.1 4.2 3.2M2.8 8h2.4M2.8 12h2.4M2.8 16h2.4"/>',
+  phone: '<path d="M5.2 4h3.6l1.8 4.6-2.3 1.5a10.6 10.6 0 0 0 5.6 5.6l1.5-2.3 4.6 1.8v3.6a2 2 0 0 1-2.2 2A16.4 16.4 0 0 1 3.2 6.2 2 2 0 0 1 5.2 4z"/>',
+  sms: '<path d="M4.5 5h15a1.5 1.5 0 0 1 1.5 1.5v9a1.5 1.5 0 0 1-1.5 1.5H9.5L5 20.5V17h-.5A1.5 1.5 0 0 1 3 15.5v-9A1.5 1.5 0 0 1 4.5 5z"/><path d="M8 9.5h8M8 12.5h5"/>',
+  mail: '<rect x="3" y="5" width="18" height="14" rx="2.6"/><path d="M3.8 7.4l8.2 6 8.2-6"/>',
+  dl: '<path d="M12 3.8v11M7.6 10.8L12 15.2l4.4-4.4M5 19.6h14"/>',
   fill: '<path d="M5 4h14v16H5z" fill="currentColor" fill-opacity=".28"/><path d="M5 4h14v16H5z"/>'
 };
 function ta4IcInit() {
@@ -7907,6 +8024,194 @@ function ta4EmoIns(id, ch) {
   ta.value = ta.value.slice(0, a) + ch + ta.value.slice(b);
   const p = a + ch.length; try { ta.setSelectionRange(p, p); } catch (e) {}
   ta.focus(); ta.dispatchEvent(new Event('input'));
+}
+
+// ==========================================================================
+// 연락처 (앱 내 고객 연락처: 목록 · 가나다/그룹/회사 · 검색 · 전화 · 사진 · 명함(잘라서 저장) · 내 폰 연락처로 저장)
+// ==========================================================================
+const TA4_LS_CT = 'S1_TA4_CONTACTS';
+TA4.contacts = []; TA4.ct = { q: '', by: 'name', cur: '', ed: null };
+const TA4_CT_AV = ['#2f6bff', '#0ea5a4', '#d9488a', '#f08c1f', '#7c5cff', '#16a34a', '#e5484d', '#0b7285'];
+
+async function ta4LoadContacts() {
+  TA4.contacts = [];
+  try {
+    if (await ta2Probe('ta_contacts') === 'remote') {
+      const { data, error } = await db.from('ta_contacts').select('*').eq('consultant', currentViewMode).limit(5000);
+      if (!error) { TA4.contacts = data || []; return; }
+    }
+  } catch (e) {}
+  TA4.contacts = ta2LsGet(TA4_LS_CT).filter(r => r.consultant === currentViewMode);
+}
+function ta4CtNewId() { return 'ct' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6); }
+function ta4CtFind(id) { return TA4.contacts.find(c => c.id === id); }
+const ta4Digits = s => String(s || '').replace(/\D/g, '');
+function ta4CtMatch(c) {   // 같은 휴대폰/전화/이메일이면 같은 사람으로 본다
+  const ph = [c.mobile, c.tel].map(ta4Digits).filter(d => d.length >= 8), em = String(c.email || '').trim().toLowerCase();
+  return TA4.contacts.find(o => (ph.length && [o.mobile, o.tel].map(ta4Digits).some(d => d && ph.includes(d))) || (em && String(o.email || '').trim().toLowerCase() === em));
+}
+async function ta4CtSave(c) {
+  const now = new Date().toISOString();
+  const row = {
+    id: c.id || ta4CtNewId(), consultant: currentViewMode, name: c.name || '', title: c.title || '', company: c.company || '', group_name: c.group_name || '',
+    mobile: c.mobile || '', tel: c.tel || '', fax: c.fax || '', email: c.email || '', address: c.address || '', memo: c.memo || '',
+    photo: c.photo || '', card_img: c.card_img || '', lead_id: c.lead_id || '', created_at: c.created_at || now, updated_at: now
+  };
+  if (await ta2Probe('ta_contacts') === 'remote') { const { error } = await db.from('ta_contacts').upsert([row], { onConflict: 'id' }); if (error) throw error; }
+  else { const arr = ta2LsGet(TA4_LS_CT).filter(r => r.id !== row.id); arr.push(row); if (!ta2LsSet(TA4_LS_CT, arr)) throw new Error('저장 공간 부족'); }
+  const i = TA4.contacts.findIndex(o => o.id === row.id); if (i >= 0) TA4.contacts[i] = row; else TA4.contacts.push(row);
+  return row;
+}
+async function ta4CtDelete(id) {
+  if (await ta2Probe('ta_contacts') === 'remote') { const { error } = await db.from('ta_contacts').delete().eq('id', id); if (error) throw error; }
+  else ta2LsSet(TA4_LS_CT, ta2LsGet(TA4_LS_CT).filter(r => r.id !== id));
+  TA4.contacts = TA4.contacts.filter(c => c.id !== id);
+}
+// 명함 인식 결과 → 연락처 목록에 저장(이미 있으면 합침)
+async function ta4CtFromCard(c, cardImg, leadId) {
+  const old = ta4CtMatch(c) || {}, m = Object.assign({}, old);
+  ['name', 'title', 'company', 'mobile', 'tel', 'fax', 'email', 'address'].forEach(k => { if (c[k]) m[k] = ['mobile', 'tel', 'fax'].includes(k) ? (ta4FmtPhone(c[k]) || c[k]) : c[k]; });
+  if (cardImg) m.card_img = cardImg; if (leadId) m.lead_id = leadId;
+  return ta4CtSave(m);
+}
+
+// ---------- 정렬 · 그룹 ----------
+const TA4_CHO = 'ㄱㄱㄴㄷㄷㄹㅁㅂㅂㅅㅅㅇㅈㅈㅊㅋㅌㅍㅎ';
+function ta4Initial(name) {
+  const ch = String(name || '').trim().charAt(0); if (!ch) return '#';
+  const c = ch.charCodeAt(0);
+  if (c >= 0xAC00 && c <= 0xD7A3) return TA4_CHO[Math.floor((c - 0xAC00) / 588)];
+  if (c >= 0x3131 && c <= 0x314E) return ({ 'ㄲ': 'ㄱ', 'ㄸ': 'ㄷ', 'ㅃ': 'ㅂ', 'ㅆ': 'ㅅ', 'ㅉ': 'ㅈ' })[ch] || ch;
+  if (/[a-z]/i.test(ch)) return ch.toUpperCase();
+  return '#';
+}
+function ta4InitialRank(k) { return /[ㄱ-ㅎ]/.test(k) ? 0 : /[A-Z]/.test(k) ? 1 : 2; }
+function ta4CtCmp(a, b) { return String(a.name || '').localeCompare(String(b.name || ''), 'ko'); }
+function ta4CtAvatar(c, big) {
+  const nm = String(c.name || c.company || '?').trim(), col = TA4_CT_AV[(nm.charCodeAt(0) || 0) % TA4_CT_AV.length];
+  return c.photo ? `<div class="ct-av${big ? ' big' : ''}"><img src="${c.photo}" alt=""></div>`
+    : `<div class="ct-av${big ? ' big' : ''}" style="background:${col}">${escapeHtml(nm.charAt(0).toUpperCase())}</div>`;
+}
+function ta4CtCallNo(c) { return String(c.mobile || c.tel || '').replace(/[^0-9+]/g, ''); }
+
+// ---------- 목록 ----------
+function ta4CtOpen() {
+  TA4.ct.q = ''; const q = el('ctQ'); if (q) q.value = '';
+  ta4CtRender(); ta4Show('ta4CtPg');
+}
+function ta4CtQ(v) { TA4.ct.q = v || ''; ta4CtRender(); }
+function ta4CtBy(by) { TA4.ct.by = by; ta4CtRender(); }
+function ta4CtRender() {
+  const box = el('ctList'); if (!box) return;
+  const q = TA4.ct.q.trim().toLowerCase(), qd = ta4Digits(q), by = TA4.ct.by;
+  document.querySelectorAll('#ta4CtPg .ct-seg button').forEach(b => b.classList.toggle('on', b.dataset.by === by));
+  let arr = TA4.contacts.filter(c => !q || [c.name, c.company, c.title, c.group_name, c.email, c.memo, c.address].join(' ').toLowerCase().includes(q) || (qd.length >= 2 && [c.mobile, c.tel].map(ta4Digits).join(' ').includes(qd)));
+  arr.sort(ta4CtCmp);
+  el('ctCnt').textContent = TA4.contacts.length + '명' + (q ? ` · 검색 ${arr.length}명` : '');
+  if (!arr.length) {
+    box.innerHTML = `<div class="ta3-empty" style="padding:48px 0;">${TA4.contacts.length ? '검색 결과가 없습니다' : '등록된 연락처가 없습니다<br><small>오른쪽 위 명함 버튼으로 명함을 찍어 바로 저장하거나, ＋ 추가를 누르세요</small>'}</div>`;
+    el('ctIdx').innerHTML = ''; return;
+  }
+  const keyOf = c => by === 'group' ? (c.group_name || '미분류') : by === 'company' ? (c.company || '회사 미지정') : ta4Initial(c.name);
+  const map = new Map(); arr.forEach(c => { const k = keyOf(c); if (!map.has(k)) map.set(k, []); map.get(k).push(c); });
+  let keys = [...map.keys()];
+  if (by === 'name') keys.sort((a, b) => ta4InitialRank(a) - ta4InitialRank(b) || (a < b ? -1 : a > b ? 1 : 0));
+  else keys.sort((a, b) => (a === '미분류' || a === '회사 미지정') - (b === '미분류' || b === '회사 미지정') || a.localeCompare(b, 'ko'));
+  box.innerHTML = keys.map((k, i) => `<div class="ct-sec" id="ctS${i}" data-k="${escapeHtml(k)}">${escapeHtml(k)}<small>${map.get(k).length}</small></div>` +
+    map.get(k).map(c => {
+      const no = ta4CtCallNo(c), sub = [c.company, c.title].filter(Boolean).join(' · ') || (c.mobile || c.tel || '');
+      return `<div class="ct-row" onclick="ta4CtView('${escapeHtml(c.id)}')">${ta4CtAvatar(c)}<div class="tx"><b>${escapeHtml(c.name || '(이름 없음)')}</b><small>${escapeHtml(sub)}</small></div>` +
+        (c.card_img ? '<span class="cdi" title="명함 있음"><span data-ic="card"></span></span>' : '') +
+        (no ? `<a class="call" href="tel:${escapeHtml(no)}" onclick="event.stopPropagation()" aria-label="전화"><span data-ic="phone"></span></a>` : '') + '</div>';
+    }).join('')).join('');
+  el('ctIdx').innerHTML = by === 'name' && keys.length > 2 ? keys.map((k, i) => `<button type="button" onclick="ta4CtJump(${i})">${escapeHtml(k)}</button>`).join('') : '';
+  ta4IcInit();
+}
+function ta4CtJump(i) { const s = el('ctS' + i); if (s) s.scrollIntoView({ block: 'start' }); }
+
+// ---------- 상세 ----------
+function ta4CtView(id) {
+  const c = ta4CtFind(id); if (!c) return;
+  TA4.ct.cur = id; ta4CtDetRender(); ta4Show('ta4CtDet');
+}
+function ta4CtDetRender() {
+  const c = ta4CtFind(TA4.ct.cur); if (!c) return;
+  const lnk = (t, v, lbl) => v ? `<a href="${t}:${escapeHtml(String(v).replace(t === 'tel' ? /[^0-9+]/g : /\s/g, ''))}">${escapeHtml(lbl || v)}</a>` : '';
+  const row = (k, v) => v ? `<div class="r"><span>${k}</span><b>${v}</b></div>` : '';
+  const act = (ic, lb, h, on) => `<${h ? 'a href="' + h + '"' : 'button type="button" onclick="' + on + '"'} class="ac${h || on ? '' : ' off'}"><span data-ic="${ic}"></span><small>${lb}</small></${h ? 'a' : 'button'}>`;
+  const no = ta4CtCallNo(c), sm = String(c.mobile || '').replace(/[^0-9+]/g, '');
+  el('ctDetBody').innerHTML =
+    `<div class="ct-hero">${ta4CtAvatar(c, true)}<h2>${escapeHtml(c.name || '(이름 없음)')}</h2><p>${escapeHtml([c.company, c.title].filter(Boolean).join(' · '))}</p>${c.group_name ? `<span class="ct-chip">${escapeHtml(c.group_name)}</span>` : ''}</div>` +
+    `<div class="ct-acts">${act('phone', '전화', no ? 'tel:' + escapeHtml(no) : '', '')}${act('sms', '문자', sm ? 'sms:' + escapeHtml(sm) : '', '')}${act('mail', '메일', c.email ? 'mailto:' + escapeHtml(c.email) : '', '')}${act('dl', '내 폰에 저장', '', 'ta4CtToPhone()')}</div>` +
+    `<div class="box ct-info">` + row('휴대폰', lnk('tel', c.mobile)) + row('회사전화', lnk('tel', c.tel)) + row('팩스', escapeHtml(c.fax)) + row('이메일', lnk('mailto', c.email)) + row('주소', escapeHtml(c.address)) + row('회사', escapeHtml(c.company)) + row('메모', escapeHtml(c.memo).replace(/\n/g, '<br>')) + `</div>` +
+    (c.card_img ? `<div class="box"><div class="ct-cardhd">명함</div><img class="ct-cardimg" src="${c.card_img}" alt="명함" onclick="ta4CtImgView(this.src)"></div>` : '');
+  ta4IcInit();
+}
+function ta4CtImgView(src) { const o = el('ta4CtImgOv'); el('ta4CtImgBig').src = src; o.classList.add('on'); }
+function ta4CtToPhone() { const c = ta4CtFind(TA4.ct.cur); if (!c) return; ta4VcardShare(c, c.company); ta3Toast('연락처 앱에서 저장해 주세요'); }
+async function ta4CtDeleteCur() {
+  const c = ta4CtFind(TA4.ct.cur); if (!c) return;
+  if (!confirm((c.name || '이 연락처') + ' 연락처를 삭제할까요?')) return;
+  try { await ta4CtDelete(c.id); ta4Close('ta4CtDet'); ta4CtRender(); ta3Toast('삭제됨'); } catch (e) { ta3Toast('삭제 실패: ' + (e.message || e), 3500); }
+}
+function ta4CtExportAll() {
+  if (!TA4.contacts.length) { ta3Toast('내보낼 연락처가 없습니다'); return; }
+  const text = TA4.contacts.slice().sort(ta4CtCmp).map(c => ta4Vcard(c, c.company)).join('\r\n') + '\r\n';
+  const url = URL.createObjectURL(new Blob([text], { type: 'text/vcard;charset=utf-8' })), a = document.createElement('a');
+  a.href = url; a.download = 'TA연락처_전체.vcf'; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(url), 4000);
+  ta3Toast('전체 연락처 파일(.vcf)을 만들었습니다');
+}
+
+// ---------- 등록 · 수정 ----------
+const TA4_CT_F = { name: 'ctName', title: 'ctTitle', company: 'ctCompany', group_name: 'ctGroup', mobile: 'ctMobile', tel: 'ctTel', fax: 'ctFax', email: 'ctEmail', address: 'ctAddr', memo: 'ctMemo' };
+function ta4CtEdit(id) {
+  const c = id ? ta4CtFind(id) : null;
+  if (id && !c) return;
+  TA4.ct.ed = { id: c ? c.id : '', photo: c ? c.photo || '' : '', card_img: c ? c.card_img || '' : '', lead_id: c ? c.lead_id || '' : '', created_at: c ? c.created_at : '' };
+  Object.keys(TA4_CT_F).forEach(k => { el(TA4_CT_F[k]).value = (c && c[k]) || ''; });
+  el('ctEdTtl').textContent = c ? '연락처 수정' : '연락처 추가';
+  const gs = [...new Set(TA4.contacts.map(x => x.group_name).filter(Boolean))].sort((a, b) => a.localeCompare(b, 'ko'));
+  el('ctGroups').innerHTML = gs.map(g => `<option value="${escapeHtml(g)}">`).join('');
+  el('ctGroupChips').innerHTML = gs.map(g => `<button type="button" onclick="el('ctGroup').value=this.textContent">${escapeHtml(g)}</button>`).join('');
+  ta4CtEdMedia(); ta4Show('ta4CtEd');
+}
+function ta4CtEdMedia() {
+  const e = TA4.ct.ed; if (!e) return;
+  const nm = el('ctName').value.trim() || '?';
+  el('ctPhoto').innerHTML = e.photo ? `<img src="${e.photo}" alt="">` : `<span>${escapeHtml(nm.charAt(0).toUpperCase())}</span>`;
+  el('ctPhotoDel').style.display = e.photo ? '' : 'none';
+  el('ctCardPv').innerHTML = e.card_img ? `<img src="${e.card_img}" alt="명함"><button type="button" class="x" onclick="ta4CtCardDel()">명함 삭제</button>` : '';
+}
+function ta4CtCardDel() { TA4.ct.ed.card_img = ''; ta4CtEdMedia(); }
+function ta4CtPhotoDel() { TA4.ct.ed.photo = ''; ta4CtEdMedia(); }
+function ta4CtThumb(file, size) {   // 가운데를 정사각형으로 잘라 작게 저장
+  return new Promise((res, rej) => {
+    const fr = new FileReader();
+    fr.onload = () => {
+      const im = new Image();
+      im.onload = () => {
+        const s = Math.min(im.naturalWidth, im.naturalHeight), sx = (im.naturalWidth - s) / 2, sy = (im.naturalHeight - s) / 2;
+        const c = document.createElement('canvas'); c.width = c.height = size; const x = c.getContext('2d'); x.fillStyle = '#fff'; x.fillRect(0, 0, size, size);
+        x.drawImage(im, sx, sy, s, s, 0, 0, size, size); res(c.toDataURL('image/jpeg', 0.82));
+      };
+      im.onerror = () => rej(new Error('이미지를 읽을 수 없습니다')); im.src = fr.result;
+    };
+    fr.onerror = () => rej(new Error('파일을 읽을 수 없습니다')); fr.readAsDataURL(file);
+  });
+}
+async function ta4CtPhotoPick(inp) {
+  const f = inp.files && inp.files[0]; inp.value = ''; if (!f) return;
+  try { TA4.ct.ed.photo = await ta4CtThumb(f, 256); ta4CtEdMedia(); } catch (e) { ta3Toast(e.message || '사진 오류', 3000); }
+}
+async function ta4CtSaveEd() {
+  const e = TA4.ct.ed; if (!e) return;
+  const c = Object.assign({}, e); Object.keys(TA4_CT_F).forEach(k => { c[k] = (el(TA4_CT_F[k]).value || '').trim(); });
+  ['mobile', 'tel', 'fax'].forEach(k => { if (c[k]) c[k] = ta4FmtPhone(c[k]) || c[k]; });
+  if (!c.name && !c.company && !c.mobile && !c.tel) { ta3Toast('이름이나 전화번호를 입력해 주세요'); return; }
+  try {
+    const row = await ta4CtSave(c); TA4.ct.cur = row.id;
+    ta4Close('ta4CtEd'); ta4CtRender(); if (PG.st.includes('ta4CtDet')) ta4CtDetRender(); ta3Toast('저장됨');
+  } catch (er) { ta3Toast('저장 실패: ' + (er.message || er), 3500); }
 }
 
 </script>
@@ -8143,12 +8448,14 @@ function ta4EmoIns(id, ch) {
       <div class="f" style="margin-bottom:0;"><label>주소</label><input type="text" id="cdAddr"></div>
     </div>
     <div class="box" style="padding:6px 14px;">
-      <label class="ck"><input type="checkbox" id="cdSave" checked> 내 연락처로 동시 저장<small>휴대폰 연락처 앱</small></label>
-      <label class="ck"><input type="checkbox" id="cdPhoto" checked> 명함 사진을 노트에 첨부</label>
+      <label class="ck" id="cdSaveRow"><input type="checkbox" id="cdSave" checked> 내 연락처로 동시 저장<small>휴대폰 연락처 앱</small></label>
+      <label class="ck" id="cdPhotoRow"><input type="checkbox" id="cdPhoto" checked> 명함 사진을 노트에 첨부</label>
+      <label class="ck" id="cdBookRow"><input type="checkbox" id="cdBook" checked> 연락처 목록에도 저장<small>앱 내 연락처</small></label>
+      <label class="ck" id="cdCropRow"><input type="checkbox" id="cdCrop" checked onchange="ta4CardCropToggle()"> 명함 부분만 잘라서 저장</label>
     </div>
     <details class="cd-raw"><summary>인식된 원문</summary><pre id="cdRaw"></pre></details>
   </div></div>
-  <div class="ta4-pf"><div class="in"><button type="button" class="go" onclick="ta4CardApply()">고객 정보에 적용</button></div></div>
+  <div class="ta4-pf"><div class="in"><button type="button" class="go" id="cdApply" onclick="ta4CardApply()">고객 정보에 적용</button></div></div>
 </div>
 
 <div class="ta4-sheet" id="ta4CdDet" onclick="if(event.target===this)ta4CardDetailClose()">
@@ -8158,6 +8465,58 @@ function ta4EmoIns(id, ch) {
     <div class="ft"><button type="button" class="ta4-cardbtn" onclick="ta4CardDetailClose();ta4CardOpen('lead')"><span data-ic="card"></span>명함 인식 / 수정</button></div>
   </div>
 </div>
+
+<!-- 연락처 -->
+<div class="ta4-pg" id="ta4CtPg">
+  <div class="ta4-ph"><button type="button" class="back" onclick="ta3Back()" aria-label="뒤로">‹</button><div class="ttl"><h3>연락처</h3><div class="bd"><span id="ctCnt" style="font-size:12px;font-weight:700;color:var(--mute);"></span></div></div>
+    <button type="button" class="ic" onclick="ta4CardOpen('book')" aria-label="명함 인식"><span data-ic="card"></span></button>
+    <button type="button" class="act" onclick="ta4CtEdit('')">＋ 추가</button></div>
+  <div class="ct-tools">
+    <div class="ta3-search"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg><input id="ctQ" type="search" placeholder="이름 · 회사 · 전화번호 검색" oninput="ta4CtQ(this.value)"></div>
+    <div class="ct-seg"><button type="button" data-by="name" class="on" onclick="ta4CtBy('name')">가나다</button><button type="button" data-by="group" onclick="ta4CtBy('group')">그룹</button><button type="button" data-by="company" onclick="ta4CtBy('company')">회사</button></div>
+  </div>
+  <div class="ta4-pb"><div class="in"><div id="ctList"></div><div style="text-align:center;padding:14px 0 4px;"><button type="button" class="ta4-cardbtn" onclick="ta4CtExportAll()"><span data-ic="dl"></span>전체를 내 폰 연락처로 내보내기(.vcf)</button></div></div></div>
+  <div class="ct-idx" id="ctIdx"></div>
+</div>
+
+<div class="ta4-pg" id="ta4CtDet">
+  <div class="ta4-ph"><button type="button" class="back" onclick="ta3Back()" aria-label="뒤로">‹</button><div class="ttl"><h3>연락처</h3></div>
+    <button type="button" class="act ghost" onclick="ta4CtEdit(TA4.ct.cur)">수정</button></div>
+  <div class="ta4-pb"><div class="in ta4-rp" id="ctDetBody"></div></div>
+  <div class="ta4-pf"><div class="in"><button type="button" class="tool" style="color:#b91c1c !important;" onclick="ta4CtDeleteCur()">삭제</button></div></div>
+</div>
+
+<div class="ta4-pg" id="ta4CtEd">
+  <div class="ta4-ph"><button type="button" class="back" onclick="ta3Back()" aria-label="뒤로">‹</button><div class="ttl"><h3 id="ctEdTtl">연락처 추가</h3></div></div>
+  <div class="ta4-pb"><div class="in ta4-form">
+    <div class="box ct-ph">
+      <div class="ct-photo" id="ctPhoto"></div>
+      <div class="ct-phbtn">
+        <button type="button" onclick="el('ctPhCam').click()"><span data-ic="cam"></span>촬영</button>
+        <button type="button" onclick="el('ctPhAlb').click()"><span data-ic="album"></span>앨범</button>
+        <button type="button" id="ctPhotoDel" onclick="ta4CtPhotoDel()" style="display:none;"><span data-ic="trash"></span></button>
+      </div>
+      <input type="file" id="ctPhCam" accept="image/*" capture="user" style="display:none;" onchange="ta4CtPhotoPick(this)">
+      <input type="file" id="ctPhAlb" accept="image/*" style="display:none;" onchange="ta4CtPhotoPick(this)">
+    </div>
+    <div class="box">
+      <div class="row2 f"><div><label>이름</label><input type="text" id="ctName" oninput="ta4CtEdMedia()"></div><div><label>직책</label><input type="text" id="ctTitle"></div></div>
+      <div class="f"><label>회사</label><input type="text" id="ctCompany"></div>
+      <div class="f"><label>그룹</label><input type="text" id="ctGroup" list="ctGroups" placeholder="예) 거래처, 파트너, 지인"><datalist id="ctGroups"></datalist><div class="ct-gc" id="ctGroupChips"></div></div>
+      <div class="row2 f"><div><label>휴대폰</label><input type="tel" inputmode="tel" id="ctMobile"></div><div><label>회사 전화</label><input type="tel" inputmode="tel" id="ctTel"></div></div>
+      <div class="row2 f"><div><label>팩스</label><input type="tel" inputmode="tel" id="ctFax"></div><div><label>이메일</label><input type="email" inputmode="email" id="ctEmail" autocapitalize="off"></div></div>
+      <div class="f"><label>주소</label><input type="text" id="ctAddr"></div>
+      <div class="f" style="margin-bottom:0;"><label>메모</label><textarea id="ctMemo" style="min-height:80px;"></textarea></div>
+    </div>
+    <div class="box">
+      <button type="button" class="ta4-cardbtn" onclick="ta4CardOpen('ctedit')"><span data-ic="card"></span>명함 촬영 · 인식해서 채우기</button>
+      <div id="ctCardPv" class="ct-cardpv"></div>
+    </div>
+  </div></div>
+  <div class="ta4-pf"><div class="in"><button type="button" class="go" onclick="ta4CtSaveEd()">저장</button></div></div>
+</div>
+
+<div class="ta4-imgov" id="ta4CtImgOv" onclick="this.classList.remove('on')"><img id="ta4CtImgBig" alt=""></div>
 
 <!-- 위치 지정 (중앙 핀 방식) -->
 <div class="ta4-pg" id="ta3Picker" style="z-index:100010;">
