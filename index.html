@@ -3504,7 +3504,7 @@ function switchView(mode) {
   if (mode === 'master') {
     document.body.classList.remove('ta3-on');
     el('viewMaster').style.display = 'block';
-    try { ta4PsAdminShow(); } catch (x) { console.warn(x); }
+    try { admInit(); } catch (x) {} try { ta4PsAdminShow(); } catch (x) { console.warn(x); }
     el('viewAgent').style.display = 'none';
     if (el('dateBanner')) el('dateBanner').style.display = 'flex';
     el('topbarHeaderTitle').textContent = '영업 TA 통합관리 대시보드';

@@ -1298,6 +1298,42 @@ table.lead-table button.lt-x{width:26px;height:26px;padding:0;border-radius:50%;
 <style>#ta4Splash{position:fixed;inset:0;z-index:2147483000;background:#eef4fc url(splash.jpg) center/cover no-repeat;transition:opacity .45s ease;}#ta4Splash.out{opacity:0;pointer-events:none;}</style>
 <meta name="theme-color" content="#0f2547">
 <style>:root{--bg:#0d1c38;}</style>
+<style>/* ===== 관리자 화면: 상단은 로그아웃만, 하단 메뉴바 ===== */
+#topbarViewSwitchGroup,#btnUserManage,#btnTopbarTarget,#btnNoticeManage,#agentRankBadge{display:none !important;}
+#ta4PsFab{display:none !important;}
+body{padding-bottom:calc(var(--tab-h) + env(safe-area-inset-bottom) + 18px);}
+body.adm-list #dateBanner,body.adm-map #dateBanner{display:none;}
+body.adm-list #viewMaster>*:not(#categoryFilters):not(#panelAllTA){display:none !important;}
+body.adm-home #panelAllTA{display:none !important;}
+body.adm-map main,body.adm-map #dateBanner{display:none !important;}
+#admTabbar{z-index:90;}
+#admTabbar .ta3-tab.on{color:var(--accent) !important;}
+#admMapView{display:none;position:fixed;left:0;right:0;top:var(--adm-top,64px);bottom:calc(var(--tab-h) + env(safe-area-inset-bottom));z-index:60;background:#e9ecef;}
+body.adm-map #admMapView{display:block;}
+#admMap{position:absolute;inset:0;}
+.adm-mf{position:absolute;left:8px;right:8px;top:8px;z-index:500;display:flex;gap:6px;flex-wrap:wrap;pointer-events:none;}
+.adm-mf>*{pointer-events:auto;}
+.adm-mf select,.adm-mf input{height:36px;border:1px solid #d5dbe6;border-radius:10px;background:#fff;color:#111827;padding:0 8px;font-size:13px;font-weight:700;box-shadow:0 2px 8px rgba(0,0,0,.14);min-width:0;}
+.adm-mf input[type=text]{width:110px;}
+.adm-mf input[type=month]{width:132px;}
+.adm-mcnt{position:absolute;left:10px;bottom:10px;z-index:500;background:rgba(255,255,255,.92);border-radius:10px;padding:6px 10px;font-size:12px;font-weight:800;color:#0f2547;box-shadow:0 2px 8px rgba(0,0,0,.15);}
+.adm-mcnt i{display:inline-block;width:10px;height:10px;border-radius:50%;margin:0 4px 0 8px;vertical-align:-1px;}
+#admPrev{position:absolute;left:10px;right:10px;bottom:46px;z-index:510;background:#fff;border-radius:18px;padding:14px;box-shadow:0 10px 30px rgba(16,24,40,.28);display:none;color:#111827;}
+#admPrev .nm{font-size:16px;font-weight:800;padding-right:28px;}
+#admPrev .x{position:absolute;right:10px;top:8px;border:none;background:none;font-size:22px;color:#6b7280;}
+#admPrev .tg{display:inline-block;border-radius:999px;padding:2px 9px;font-size:12px;font-weight:800;margin:6px 5px 0 0;background:#eef1f7;}
+#admPrev .bt{display:flex;gap:8px;margin-top:10px;}
+#admPrev .bt button,#admPrev .bt a{flex:1;text-align:center;border:none;border-radius:10px;padding:10px;font-weight:800;font-size:14px;text-decoration:none;}
+#admMapBtn{position:absolute;right:10px;bottom:10px;z-index:500;width:42px;height:42px;border-radius:50%;border:none;background:#fff;color:#0f2547;font-size:17px;font-weight:800;box-shadow:0 2px 10px rgba(0,0,0,.25);}
+#admSheetOv{display:none;position:fixed;inset:0;z-index:3000;background:rgba(10,20,40,.5);}
+#admSheetOv.on{display:block;}
+#admSheet{position:absolute;left:0;right:0;bottom:0;background:#fff;border-radius:20px 20px 0 0;padding:16px 16px calc(16px + env(safe-area-inset-bottom));color:#111827;}
+#admSheet h4{margin:2px 4px 10px;font-size:15px;color:#6b7280;font-weight:800;}
+#admSheet button{display:flex;align-items:center;gap:12px;width:100%;text-align:left;border:none;background:#f4f5f8;border-radius:14px;padding:15px 14px;margin-bottom:8px;font-size:16px;font-weight:800;color:#0f2547;}
+#admSheet button{background:#eaeef6 !important;color:#0f2547 !important;box-shadow:none !important;}
+#admSheet button small{display:block;font-size:12px;font-weight:600;color:#6b7280;margin-top:2px;}
+#admSheet button .ic{font-size:22px;width:30px;text-align:center;}
+</style>
 </head>
 <body>
 <div id="ta4Splash" aria-hidden="true"></div>
@@ -3501,7 +3537,7 @@ function switchView(mode) {
   if (mode === 'master') {
     document.body.classList.remove('ta3-on');
     el('viewMaster').style.display = 'block';
-    try { ta4PsAdminShow(); } catch (x) { console.warn(x); }
+    try { admInit(); } catch (x) {} try { ta4PsAdminShow(); } catch (x) { console.warn(x); }
     el('viewAgent').style.display = 'none';
     if (el('dateBanner')) el('dateBanner').style.display = 'flex';
     el('topbarHeaderTitle').textContent = '영업 TA 통합관리 대시보드';
@@ -8501,6 +8537,145 @@ function ta4AdminOpen(id) {
     try { renderLeadTable(); } catch (e) {}
   };
 }
+
+
+// =====================================================================
+// 관리자 화면: 하단 메뉴바(홈·목록·안건추가·지도·더보기) / 안건추가 시트 / 지도
+// =====================================================================
+const ADM = { tab: 'home', map: null, places: {}, sel: null, f: { who: 'all', kind: 'all', month: '', stage: 'all', q: '' } };
+const ADM_SRC = { 'TA': 'ta', '소개': 'ref', '가망': 'ps' };
+
+function admInit() {
+  if (el('admTabbar')) return;
+  const nav = document.createElement('nav'); nav.className = 'ta3-tabbar'; nav.id = 'admTabbar';
+  nav.innerHTML = `
+    <button type="button" class="ta3-tab on" data-t="home" onclick="admTab('home')"><svg viewBox="0 0 24 24"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/></svg>홈</button>
+    <button type="button" class="ta3-tab" data-t="list" onclick="admTab('list')"><svg viewBox="0 0 24 24"><path d="M8 6h13M8 12h13M8 18h13"/><circle cx="3.5" cy="6" r="1"/><circle cx="3.5" cy="12" r="1"/><circle cx="3.5" cy="18" r="1"/></svg>목록</button>
+    <button type="button" class="ta3-tab add" onclick="admAddSheet()"><i><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></i><span>안건추가</span></button>
+    <button type="button" class="ta3-tab" data-t="map" onclick="admTab('map')"><svg viewBox="0 0 24 24"><path d="M12 21s7-6.2 7-11.5A7 7 0 005 9.5C5 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg>지도</button>
+    <button type="button" class="ta3-tab" onclick="admMoreSheet()"><svg viewBox="0 0 24 24"><rect x="3.5" y="3.5" width="7" height="7" rx="2"/><rect x="13.5" y="3.5" width="7" height="7" rx="2"/><rect x="3.5" y="13.5" width="7" height="7" rx="2"/><rect x="13.5" y="13.5" width="7" height="7" rx="2"/></svg>더보기</button>`;
+  document.body.appendChild(nav);
+  const mv = document.createElement('div'); mv.id = 'admMapView';
+  mv.innerHTML = `<div id="admMap"></div>
+    <div class="adm-mf">
+      <select id="admFWho" onchange="admMapSet('who',this.value)"><option value="all">전체 컨설턴트</option>${CONSULTANTS.map(n => `<option value="${n}">${n}</option>`).join('')}</select>
+      <select id="admFKind" onchange="admMapSet('kind',this.value)"><option value="all">전체 종류</option><option value="TA">TA</option><option value="소개">소개</option><option value="가망">가망</option></select>
+      <input type="month" id="admFMonth" title="수주예정 월" onchange="admMapSet('month',this.value)">
+      <select id="admFStage" onchange="admMapSet('stage',this.value)"><option value="all">전체 단계</option><option value="진행중">진행중</option><option value="수주完">수주완료</option><option value="실패">실패</option><option value="보류">보류</option></select>
+      <input type="text" id="admFQ" placeholder="고객명" oninput="admMapSet('q',this.value)">
+    </div>
+    <div class="adm-mcnt" id="admMCnt"></div>
+    <button type="button" id="admMapBtn" onclick="admMapFit()" aria-label="전체 보기">⤢</button>
+    <div id="admPrev"></div>`;
+  document.body.appendChild(mv);
+  const so = document.createElement('div'); so.id = 'admSheetOv'; so.onclick = e => { if (e.target === so) admSheetClose(); };
+  so.innerHTML = '<div id="admSheet"></div>'; document.body.appendChild(so);
+  try { const p = el('leadTbody').closest('.panel'); if (p) p.id = 'panelAllTA'; } catch (e) {}
+  document.body.classList.add('adm-home');
+  const setTop = () => { const h = document.querySelector('header.topbar'); document.documentElement.style.setProperty('--adm-top', (h ? h.getBoundingClientRect().height : 64) + 'px'); };
+  setTop(); window.addEventListener('resize', setTop); window.admSetTop = setTop;
+}
+function admTab(t) {
+  ADM.tab = t;
+  ['home', 'list', 'map'].forEach(k => document.body.classList.toggle('adm-' + k, k === t));
+  document.querySelectorAll('#admTabbar .ta3-tab[data-t]').forEach(b => b.classList.toggle('on', b.dataset.t === t));
+  if (window.admSetTop) window.admSetTop();
+  if (t === 'map') admMapRender(); else window.scrollTo(0, 0);
+  if (t === 'list') { try { renderLeadTable(); } catch (e) {} }
+}
+
+// ----- 시트 (안건추가 / 더보기) -----
+function admSheetOpen(title, items) {
+  el('admSheet').innerHTML = `<h4>${title}</h4>` + items.map((it, i) => `<button type="button" onclick="admSheetPick(${i})"><span class="ic">${it.ic}</span><span>${it.t}<small>${it.s || ''}</small></span></button>`).join('');
+  ADM.sheetItems = items; el('admSheetOv').classList.add('on');
+}
+function admSheetClose() { el('admSheetOv').classList.remove('on'); }
+function admSheetPick(i) { const f = ADM.sheetItems[i].fn; admSheetClose(); setTimeout(f, 60); }
+function admAddSheet() {
+  admSheetOpen('안건 추가', [
+    { ic: '💬', t: '가망고객 문자 등록', s: '받은 문자를 붙여넣어 분석 · 컨설턴트에게 바로 등록', fn: () => ta4PsOpenInput() },
+    { ic: '📝', t: 'TA 안건 등록', s: '컨설턴트를 선택해 TA 안건을 직접 등록', fn: () => admNewLead() }
+  ]);
+}
+function admMoreSheet() {
+  admSheetOpen('더보기', [
+    { ic: '👥', t: '사용자 관리', s: '', fn: () => openUserManageModal() },
+    { ic: '🎯', t: '목표 설정', s: '', fn: () => openTargetModal() },
+    { ic: '📢', t: '공지사항 관리', s: '', fn: () => openNoticeModal() }
+  ]);
+}
+
+// ----- TA 안건 직접 등록 (배정 컨설턴트 선택) -----
+function admNewLead() {
+  const prev = currentViewMode;
+  openNewAgentLeadModal();
+  if (!el('afAdminWho')) {
+    const f = el('afCompany').closest('.f');
+    const d = document.createElement('div'); d.className = 'f';
+    d.innerHTML = `<label>배정 컨설턴트 *</label><select id="afAdminWho" onchange="currentViewMode=this.value||'master'" style="width:100%;padding:12px;border:1px solid #d5dbe6;border-radius:12px;font-size:16px;"><option value="">선택</option>${CONSULTANTS.map(n => `<option value="${n}">${n}</option>`).join('')}</select>`;
+    f.parentNode.insertBefore(d, f);
+  }
+  el('afAdminWho').value = ''; currentViewMode = 'master';
+  const orig = PG.hooks['agentLeadModalOverlay'];
+  PG.hooks['agentLeadModalOverlay'] = () => { try { if (orig) orig(); } catch (e) {} currentViewMode = prev || 'master'; try { render(); } catch (e) {} try { renderLeadTable(); } catch (e) {} };
+}
+const admSubmitOrig = window.handleAgentModalSubmit;
+window.handleAgentModalSubmit = function (e) {
+  const w = el('afAdminWho');
+  if (w && !w.value) { e.preventDefault(); ta3Toast('배정 컨설턴트를 선택하세요'); return; }
+  return admSubmitOrig(e);
+};
+
+// ----- 지도 -----
+async function admLoadPlaces() {
+  ADM.places = {};
+  try {
+    if (await ta2Probe('ta_places') === 'remote') {
+      const { data, error } = await db.from('ta_places').select('*').limit(5000);
+      if (!error) { (data || []).forEach(p => { ADM.places[p.lead_id] = p; }); return; }
+    }
+  } catch (e) {}
+  ta2LsGet(TA3_LS_PLACES).forEach(p => { ADM.places[p.lead_id] = p; });
+}
+function admLeads() {
+  const out = [];
+  Object.keys(ALL).forEach(n => ((ALL[n] && ALL[n].leads) || []).forEach(l => out.push(l)));
+  return out;
+}
+function admMapSet(k, v) { ADM.f[k] = v; admMapRender(true); }
+function admFiltered() {
+  const f = ADM.f, q = (f.q || '').trim().toLowerCase();
+  return admLeads().filter(l => (f.who === 'all' || l.consultant === f.who) && (f.kind === 'all' || ta4Kind(l) === f.kind) && (!f.month || (l.expectedDate || '').slice(0, 7) === f.month) && (f.stage === 'all' || l.stage === f.stage) && (!q || (l.company || '').toLowerCase().includes(q)));
+}
+async function admMapRender(noFit) {
+  if (!ADM.placesLoaded) { ADM.placesLoaded = true; await admLoadPlaces(); }
+  const list = admFiltered(), placed = list.filter(l => ADM.places[l.id] && ADM.places[l.id].lat), miss = list.length - placed.length;
+  el('admMCnt').innerHTML = `${placed.length}건 표시${miss ? ' · 위치 미지정 ' + miss + '건' : ''}<i style="background:#e11d1d"></i>TA<i style="background:#1f6bff"></i>소개<i style="background:#16a34a"></i>가망`;
+  try { await ta3MapInit(); } catch (e) { el('admMap').innerHTML = '<div style="padding:30px;text-align:center;color:#6b7280;">지도를 불러오지 못했습니다. 네트워크를 확인해주세요.</div>'; return; }
+  if (!ADM.map) { el('admMap').innerHTML = ''; ADM.map = ta3NewMap(el('admMap')); ADM.map.onClick(() => { el('admPrev').style.display = 'none'; ADM.sel = null; }); }
+  ADM.map.invalidate(); ADM.map.clear();
+  placed.forEach(l => {
+    const g = TA3_GRP[ta3GrpTa(l.stage)], k = ta4Kind(l), src = ADM_SRC[k] || 'ta';
+    const pl = ADM.places[l.id];
+    ADM.map.addMarker({ lat: pl.lat, lng: pl.lng, html: ta3PinHtml(g.c, src, k, ADM.sel === l.id), onClick: () => admMapPreview(l.id) });
+  });
+  if (!noFit) ADM.map.fit(placed.map(l => [ADM.places[l.id].lat, ADM.places[l.id].lng]));
+}
+function admMapFit() { if (!ADM.map) return; ADM.map.fit(admFiltered().filter(l => ADM.places[l.id] && ADM.places[l.id].lat).map(l => [ADM.places[l.id].lat, ADM.places[l.id].lng])); }
+function admMapPreview(id) {
+  const l = admLeads().find(x => x.id === id); if (!l) return;
+  ADM.sel = id; const pl = ADM.places[id] || {}, g = TA3_GRP[ta3GrpTa(l.stage)], e = escapeHtml, tel = String(l.contactPhone || '').replace(/[^0-9]/g, '');
+  el('admPrev').innerHTML = `<button type="button" class="x" onclick="el('admPrev').style.display='none'">×</button>
+    <div class="nm">${e(l.company)}</div>
+    <div><span class="tg" style="color:${g.c};">${e(l.stage)}</span><span class="tg">${e(ta4Kind(l))}</span><span class="tg" style="color:${CONSULTANT_COLOR[l.consultant] || '#0f2547'};">${e(l.consultant)}</span></div>
+    <div style="margin-top:7px;font-size:13px;color:#374151;font-weight:700;">${formatCurrency(l.amount)} · 수주예정 ${l.expectedDate ? formatDateShort(l.expectedDate) : '-'}${l.contact ? ' · 👤 ' + e(l.contact) : ''}</div>
+    <div style="margin-top:4px;font-size:12.5px;color:#6b7280;font-weight:600;">📍 ${e(pl.address || '')}</div>
+    <div class="bt"><button type="button" style="background:#0f2547;color:#fff;" onclick="ta4AdminOpen('${e(id)}')">상세보기</button>${tel ? `<a href="tel:${tel}" style="background:#16a34a;color:#fff;">전화</a>` : ''}</div>`;
+  el('admPrev').style.display = 'block';
+  admMapRender(true);
+}
+
+function admBoot() { admInit(); }
 
 </script>
 
