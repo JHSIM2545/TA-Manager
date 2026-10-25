@@ -1286,6 +1286,7 @@
   .ct-row .tx b .ct-pth.p1{background:#fee2e2;color:#b91c1c;} .ct-row .tx b .ct-pth.p2{background:#dbeafe;color:#1d4ed8;} .ct-row .tx b .ct-pth.p3{background:#dcfce7;color:#15803d;}
   .ta3-lg{display:flex;gap:12px;align-items:center;font-size:12px;font-weight:800;color:#475569;padding:2px 2px 6px;} .ta3-lg i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:4px;vertical-align:-1px;}
 
+@media(max-width:760px){table.lead-table .lt-w{display:none}table.lead-table th,table.lead-table td{padding:8px 4px;font-size:12px}table.lead-table th{white-space:normal;font-size:11px}table.lead-table th,table.lead-table td{min-width:0!important}table.lead-table td:first-child,table.lead-table th:first-child{white-space:nowrap}table.lead-table .sched-cell{white-space:nowrap}table.lead-table .amount-cell{font-size:12px}table.lead-table button.danger{padding:4px 6px;font-size:11px}}
 </style>
 <link rel="manifest" href="manifest.json">
 <link rel="icon" type="image/png" href="favicon.png">
@@ -1576,7 +1577,7 @@ if ('serviceWorker' in navigator) window.addEventListener('load', () => { naviga
         <div class="table-scroll">
           <table class="lead-table">
             <thead><tr>
-              <th>컨설턴트</th><th style="min-width:170px;">서비스제공처명</th><th>고객담당자</th><th>금액</th><th>단계</th><th>확도</th><th>상품종류</th><th>영업동기</th><th>일정</th><th>메모</th><th>관리</th>
+              <th>컨설턴트</th><th style="min-width:120px;">서비스제공처명</th><th class="lt-w">고객담당자</th><th>서비스료</th><th class="lt-w">진행단계</th><th class="lt-w">확도</th><th class="lt-w">안건종류</th><th class="lt-w">상품종류</th><th class="lt-w">등록일</th><th>수주예정일</th><th class="lt-w">메모</th><th>관리</th>
             </tr></thead>
             <tbody id="leadTbody"></tbody>
           </table>
@@ -3354,14 +3355,15 @@ function renderLeadTable() {
     <tr>
       <td style="font-weight:700;color:${CONSULTANT_COLOR[l.consultant] || 'inherit'};">${escapeHtml(l.consultant)}</td>
       <td style="min-width:170px;word-break:break-word;">${escapeHtml(l.company)}</td>
-      <td>${escapeHtml(l.contact) || '-'}</td>
+      <td class="lt-w">${escapeHtml(l.contact) || '-'}</td>
       <td class="amount-cell">${formatCurrency(l.amount)}</td>
-      <td><span class="badge" style="background:${STAGE_BG[l.stage]};color:${STAGE_COLOR[l.stage]};">${l.stage}</span></td>
-      <td><span class="dot" style="background:${CONF_COLOR[l.confidence] || '#ccc'};"></span>${l.confidence || '-'}</td>
-      <td>${escapeHtml(l.productType) || '-'}</td>
-      <td>${escapeHtml(l.motive) || '-'}</td>
-      <td class="sched-cell">${scheduleLabel(l)}</td>
-      <td style="max-width:180px;color:var(--muted);font-size:12px;">${escapeHtml(l.memo) || ''}</td>
+      <td class="lt-w"><span class="badge" style="background:${STAGE_BG[l.stage]};color:${STAGE_COLOR[l.stage]};">${l.stage}</span></td>
+      <td class="lt-w"><span class="dot" style="background:${CONF_COLOR[l.confidence] || '#ccc'};"></span>${l.confidence || '-'}</td>
+      <td class="lt-w">${ta4IsPs(l) ? '가망고객' : (l.origin === '소개' ? '소개고객' : 'TA')}</td>
+      <td class="lt-w">${escapeHtml(l.productType) || '-'}</td>
+      <td class="lt-w">${l.registeredDate ? formatDateShort(l.registeredDate) : '-'}</td>
+      <td class="sched-cell">${l.expectedDate ? formatDateShort(l.expectedDate) : '-'}</td>
+      <td class="lt-w" style="max-width:180px;color:var(--muted);font-size:12px;">${escapeHtml(l.memo) || ''}</td>
       <td>
         <button type="button" class="danger" onclick="deleteLeadMaster('${l.id}', '${escapeHtml(l.company)}', '${l.consultant}')">삭제</button>
       </td>
