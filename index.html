@@ -1318,16 +1318,9 @@ body.ta3-on{background:#fff !important;}
 #ta3Src button{flex:1;background:none !important;border:none !important;border-radius:0 !important;color:#9aa0aa !important;font-size:16px !important;font-weight:700 !important;padding:14px 4px !important;border-bottom:3px solid transparent !important;margin-bottom:-1px;box-shadow:none !important;}
 #ta3Src button.on{color:#111 !important;border-bottom-color:#2b2f36 !important;background:none !important;}
 #ta3ScrHome.h-c .ta8s,#ta3ScrHome.h-s .ta8c{display:none !important;}
-body.ta3-themed .ta3-bar,body.ta3-themed .ta4-ph{background:#fff !important;border-bottom:1px solid #eceef2 !important;}
-body.ta3-themed .ta3-bar .tt,body.ta3-themed .ta4-ph .ttl h3{color:var(--tb-pr,#111827) !important;}
-body.ta3-themed .ta3-bar button{background:#f1f3f6 !important;color:#111827 !important;}
-body.ta3-themed .ta4-ph .back{color:#111827 !important;}
-body.ta3-themed .ta4-ph .sv{color:#16a34a;}
-body.ta3-themed .ta4-ph .ttl .bd,body.ta3-themed .ta4-ph .ttl .bd span{color:#6b7280;}
-body.ta3-themed .ta4-ph .ic{background:#f1f3f6 !important;color:#111827 !important;}
-body.ta3-themed .ta4-ph .act.ghost{background:#f1f3f6 !important;color:#111827 !important;}
 #ta3ScrItems.on{display:flex;flex-direction:column;}
 #ta3ScrItems #ta3Src{order:-1;}
+body.ta3-themed .ta3-bar button{background:#fff !important;color:var(--tb-pr) !important;}
 </style>
 <link rel="manifest" href="manifest.json">
 <link rel="icon" type="image/png" href="favicon.png">
@@ -8574,7 +8567,6 @@ function ta4AdminOpen(id) {
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
 })();
-(function () { const f = window.ta4ApplyBarTheme; if (typeof f !== 'function') return; window.ta4ApplyBarTheme = function () { f.apply(this, arguments); const m = document.querySelector('meta[name=theme-color]'); if (m) m.content = '#ffffff'; }; })();
 
 </script>
 
