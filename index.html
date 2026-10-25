@@ -1321,6 +1321,14 @@ body.ta3-on{background:#fff !important;}
 #ta3ScrItems.on{display:flex;flex-direction:column;}
 #ta3ScrItems #ta3Src{order:-1;}
 body.ta3-themed .ta3-bar button{background:#fff !important;color:var(--tb-pr) !important;}
+
+.ta3-menu .ta8-sw-row{display:flex !important;align-items:center;justify-content:space-between;}
+.ta8-sw{position:relative;width:62px;height:32px;border-radius:999px;background:#e3e5e9;display:block;flex:none;transition:background .2s;box-shadow:inset 0 1px 3px rgba(0,0,0,.12);}
+.ta8-sw u{position:absolute;top:3px;left:3px;width:26px;height:26px;border-radius:50%;background:linear-gradient(#fff,#ececec);box-shadow:0 1px 4px rgba(0,0,0,.35);transition:left .2s;}
+.ta8-sw b{position:absolute;top:0;bottom:0;right:9px;display:flex;align-items:center;font-size:11px;font-weight:800;color:#a3a8b0;letter-spacing:.3px;}
+.ta8-sw.on{background:#22c55e;}
+.ta8-sw.on u{left:33px;}
+.ta8-sw.on b{right:auto;left:9px;color:#0f7a35;}
 </style>
 <link rel="manifest" href="manifest.json">
 <link rel="icon" type="image/png" href="favicon.png">
@@ -8602,10 +8610,9 @@ async function taPushToggle() {
     f.apply(this, arguments);
     taPushState().then(st => {
       const m = document.getElementById('ta3MyMenu'); if (!m || st === 'unsupported' && false) return;
-      const b = document.createElement('button'); b.type = 'button'; b.onclick = taPushToggle;
-      b.textContent = '알림 ' + (st === 'on' ? '끄기 (현재 켜짐)' : st === 'denied' ? '차단됨 (기기 설정에서 허용)' : '켜기');
+      const b = document.createElement('button'); b.type = 'button'; b.className = 'ta8-sw-row'; b.onclick = taPushToggle;
+      b.innerHTML = '<span>TA 알림</span><i class="ta8-sw' + (st === 'on' ? ' on' : '') + '"><b>' + (st === 'on' ? 'ON' : 'OFF') + '</b><u></u></i>';
       m.insertBefore(b, m.lastElementChild);
-      if (st === 'on') { const t = document.createElement('button'); t.type = 'button'; t.textContent = '알림 테스트 (5초 뒤 표시)'; t.onclick = taPushTest; m.insertBefore(t, m.lastElementChild); }
     });
   };
 })();
@@ -8613,15 +8620,6 @@ if ('serviceWorker' in navigator) navigator.serviceWorker.addEventListener('mess
   const d = e.data || {}; if (d.type === 'push-refresh' || d.type === 'push-open') { try { ta3Reload(); } catch (x) {} if (d.type === 'push-open' && d.lead) setTimeout(() => { try { ta3Open(d.lead); } catch (x) {} }, 600); }
 });
 
-async function taPushTest() {
-  try {
-    const reg = await navigator.serviceWorker.ready;
-    const sw = (reg.active && reg.active.scriptURL) || '없음';
-    const sub = await reg.pushManager.getSubscription();
-    alert('서비스워커: ' + sw + '\n상태: ' + (reg.active ? reg.active.state : '-') + '\n권한: ' + Notification.permission + '\n구독: ' + (sub ? '있음' : '없음') + '\n\n확인을 누르고 앱을 홈 화면으로 나가 5초 기다려 주세요.');
-    setTimeout(() => reg.showNotification('알림 테스트', { body: '이 알림이 보이면 기기 표시는 정상입니다', icon: './icon-192.png', tag: 'ta-test' }), 5000);
-  } catch (e) { alert('테스트 실패: ' + (e.message || e)); }
-}
 
 </script>
 
