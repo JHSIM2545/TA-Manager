@@ -2744,7 +2744,7 @@ async function loadTargetsFromSupabase(month) {
           if (!TARGETS.targets[c]) TARGETS.targets[c] = {};
           if (!TARGETS.targets[c][month]) TARGETS.targets[c][month] = {};
           const md = TARGETS.targets[c][month];
-          Object.keys(MAPC).forEach(pt => { md[MAPC[pt]] = dr.filter(r => r.rep_name === c && r.product_type === pt).reduce((s, r) => s + (Number(r.target_order) || 0), 0); });
+          Object.keys(MAPC).forEach(pt => { md[MAPC[pt]] = dr.filter(r => r.rep_name === c && r.product_type === pt).reduce((s, r) => s + (Number(r.target_order) || 0) * 1000, 0); });   // 영업일보 목표는 천원 단위 → 원으로 환산
           if (md['안전상품'] === undefined) md['안전상품'] = 0;   // 영업일보에는 컨설턴트별 안전상품 목표가 없음
         });
         TARGETS.fromDaily = month;

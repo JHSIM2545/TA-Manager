@@ -2856,7 +2856,7 @@ async function loadTargetsFromSupabase(month) {
           if (!TARGETS.targets[c]) TARGETS.targets[c] = {};
           if (!TARGETS.targets[c][month]) TARGETS.targets[c][month] = {};
           const md = TARGETS.targets[c][month];
-          Object.keys(MAPC).forEach(pt => { md[MAPC[pt]] = dr.filter(r => r.rep_name === c && r.product_type === pt).reduce((s, r) => s + (Number(r.target_order) || 0), 0); });
+          Object.keys(MAPC).forEach(pt => { md[MAPC[pt]] = dr.filter(r => r.rep_name === c && r.product_type === pt).reduce((s, r) => s + (Number(r.target_order) || 0) * 1000, 0); });   // 영업일보 목표는 천원 단위 → 원으로 환산
           if (md['안전상품'] === undefined) md['안전상품'] = 0;   // 영업일보에는 컨설턴트별 안전상품 목표가 없음
         });
         TARGETS.fromDaily = month;
@@ -6737,7 +6737,7 @@ function ta3RenderItems() {
 function ta3MapSrcSet(v) { ta3MapSet('src', v); }
 function ta3MapSet(k, v) { TA3.mapF[k] = v; ta3RenderMap(true); }
 async function ta3RenderMap(noFit) {
-  el('ta3MapSrc').innerHTML = ta3SegHtml(TA3.mapF.src, 'ta3MapSrcSet');
+  el('ta3MapSrc').innerHTML = [['all', '전체', '#111111'], ['ta', 'TA', '#e11d1d'], ['ref', '소개', '#1f6bff'], ['ps', '가망', '#16a34a']].map(([v, l, c]) => `<button type="button" class="ta8-sq${TA3.mapF.src === v ? ' on' : ''}" style="--c:${c}" onclick="ta3MapSrcSet('${v}')">${l}</button>`).join('');
   const base = TA3.items.filter(i => TA3.mapF.src === 'all' || i.src === TA3.mapF.src);
   const cnt = g => g === 'all' ? base.length : base.filter(i => i.group === g).length;
   el('ta3MapGroups').innerHTML = [['all', '전체', ''], ['ing', '진행중', '#2563eb'], ['won', '수주완료', '#16a34a'], ['fail', '실패', '#dc2626'], ['hold', '보류', '#9ca3af']].map(([v, l, c]) => `<button type="button" class="ta3-chip${TA3.mapF.group === v ? ' on' : ''}" onclick="ta3MapSet('group','${v}')">${c ? `<i style="display:inline-block;width:9px;height:9px;border-radius:50%;background:${c};margin-right:5px;vertical-align:0;box-shadow:0 0 0 1.5px #fff;"></i>` : ''}${l}<b>${cnt(v)}</b></button>`).join('');
@@ -6745,7 +6745,7 @@ async function ta3RenderMap(noFit) {
   const placed = shown.filter(i => TA3.places[i.id] && TA3.places[i.id].lat);
   const noPlace = shown.filter(i => !(TA3.places[i.id] && TA3.places[i.id].lat));
   const geoable = noPlace.filter(i => i.address);
-  el('ta3MapNote').innerHTML = '<div class="ta3-lg" style="background:rgba(255,255,255,.9);border-radius:10px;margin-top:6px;padding:6px 10px;display:inline-flex;box-shadow:0 2px 8px rgba(0,0,0,.15);"><span><em style="display:inline-block;background:#e11d1d;color:#fff;border-radius:5px;padding:2px 7px;font-style:normal;font-size:11.5px;font-weight:800;">TA</em></span><span><em style="display:inline-block;background:#1f6bff;color:#fff;border-radius:5px;padding:2px 7px;font-style:normal;font-size:11.5px;font-weight:800;">소개</em></span><span><em style="display:inline-block;background:#16a34a;color:#fff;border-radius:5px;padding:2px 7px;font-style:normal;font-size:11.5px;font-weight:800;">가망</em></span></div>' + (noPlace.length ? `<div class="ta3-mapnote"><span>📌 위치 미지정 ${noPlace.length}건</span>${geoable.length ? `<button type="button" onclick="ta3BatchGeo()">주소로 일괄 지정</button>` : ''}</div>` : '');
+  el('ta3MapNote').innerHTML = (noPlace.length ? `<div class="ta3-mapnote"><span>📌 위치 미지정 ${noPlace.length}건</span>${geoable.length ? `<button type="button" onclick="ta3BatchGeo()">주소로 일괄 지정</button>` : ''}</div>` : '');
   try { await ta3MapInit(); } catch (e) { el('ta3Map').innerHTML = '<div class="ta3-empty">지도를 불러오지 못했습니다. 네트워크를 확인해주세요.</div>'; return; }
   if (!TA3.map) {
     el('ta3Map').innerHTML = '';
