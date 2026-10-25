@@ -1388,6 +1388,71 @@ body.adm-list{--adm-gap:1;}
 #admSheet button{transition:none !important;}
 body.adm-sheet #admTabbar{visibility:hidden;}
 #admSheet button:hover,#admSheet button:active{background:#dde3f0 !important;color:#0f2547 !important;}
+.modal-overlay,#admPop,#admSheetOv,#ta4PsOv{overscroll-behavior:contain;} .modal-card,.adm-popc{overscroll-behavior:contain;} .modal-overlay:focus,#admPop:focus,#admSheetOv:focus{outline:none;}
+
+/* 더보기 전체 페이지 */
+#admMoreView{display:none;max-width:720px;margin:0 auto;padding:14px 14px 0;}
+body.adm-more #admMoreView{display:block;}
+body.adm-more main,body.adm-more header.topbar,body.adm-more #dateBanner{display:none !important;}
+.adm-me{display:flex;align-items:center;gap:12px;background:#fff;border-radius:16px;padding:16px;color:#111827;margin-top:8px;}
+.adm-me .av{width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,#1e3a8a,#2f6bff);color:#fff;font-size:20px;font-weight:800;display:flex;align-items:center;justify-content:center;flex:none;}
+.adm-me .nm{flex:1;min-width:0;display:flex;flex-direction:column;} .adm-me .nm b{font-size:17px;} .adm-me .nm small{font-size:12.5px;color:#6b7280;font-weight:600;margin-top:2px;}
+.adm-me>button{flex:none;border:1px solid #d5dbe6 !important;background:#fff !important;color:#0f2547 !important;border-radius:10px !important;padding:8px 12px !important;font-size:13px;font-weight:800;}
+.adm-ml{margin-top:14px;background:#fff;border-radius:16px;overflow:hidden;}
+.adm-ml button{display:flex !important;align-items:center;gap:14px;width:100%;text-align:left;border:none !important;border-bottom:1px solid #eef0f5 !important;border-radius:0 !important;background:#fff !important;color:#0f2547 !important;padding:16px !important;font-size:16px;font-weight:800;}
+.adm-ml button:last-child{border-bottom:none !important;}
+.adm-ml button:active,.adm-ml button:hover{background:#f4f6fb !important;}
+.adm-ml .ic{width:28px;height:28px;display:flex;align-items:center;justify-content:center;flex:none;}
+.adm-ml .ic svg{width:24px;height:24px;stroke:#0f2547;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;}
+.adm-ml .tx{flex:1;display:flex;flex-direction:column;} .adm-ml .tx small{font-size:12px;color:#6b7280;font-weight:600;margin-top:2px;}
+.adm-ml .ch{color:#9aa3b2;font-size:24px;line-height:1;}
+
+/* ===== 라이트 스타일 (건강기록 앱 스타일 참고) ===== */
+:root{--bg:#ffffff;}
+html,body{background:#ffffff !important;color:#111827 !important;}
+header.topbar{background:#fff !important;color:#111827 !important;border-bottom:1px solid #eceef2 !important;padding:14px 16px !important;box-shadow:none !important;}
+header.topbar .brand{color:#6b7280 !important;opacity:1 !important;letter-spacing:0;text-transform:none;font-size:12px;}
+header.topbar .page-title{font-size:20px !important;color:#111827 !important;}
+#btnLogout{background:none !important;border:none !important;color:#111827 !important;font-weight:800;font-size:14px;padding:6px 4px !important;}
+#btnLogout::after{content:' ›';}
+#dateBanner{background:#f6f7f9 !important;border:none !important;box-shadow:none !important;}
+#dateBanner .date-text{color:#111827 !important;}
+#dateBanner .workdays-badge{background:#e8f3f8 !important;color:#0b6e8f !important;}
+.filters button{background:#fff !important;color:#6b7280 !important;border:1px solid #d9dde4 !important;border-radius:999px !important;padding:9px 16px !important;font-weight:700;}
+.filters button.active{background:#111 !important;color:#fff !important;border-color:#111 !important;}
+#masterMonthlyTargetBadge{background:#eef6fa !important;border:none !important;color:#0b4f66 !important;border-radius:12px !important;}
+.kpi-card{background:#f6f7f9 !important;border:none !important;color:#111827 !important;}
+.kpi-card .label,.kpi-card .sub{color:#6b7280 !important;}
+.kpi-card .value{color:#111827 !important;}
+.panel{border:1px solid #eceef2 !important;box-shadow:none !important;border-radius:16px !important;}
+table.lead-table thead tr,.target-table thead tr{background:#eaf5f9 !important;}
+table.lead-table th{color:#4b5563 !important;}
+.target-table th{background:#eaf5f9 !important;color:#4b5563 !important;}
+.adm-kt th{background:#eaf5f9;}
+.adm-me,.adm-ml{background:#f6f7f9 !important;}
+.adm-ml button{background:#f6f7f9 !important;}
+.adm-ml button:active,.adm-ml button:hover{background:#eceef2 !important;}
+.adm-me>button{background:#fff !important;}
+#admMoreView{padding-top:18px;}
+/* 하단 메뉴바 */
+#admTabbar{background:#fff !important;border-top:1px solid #eceef2 !important;}
+#admTabbar .ta3-tab{color:#9aa0aa !important;font-weight:700;}
+#admTabbar .ta3-tab svg{fill:currentColor;fill-opacity:.18;}
+#admTabbar .ta3-tab.on{color:#111 !important;}
+#admTabbar .ta3-tab.on svg{fill-opacity:.9;stroke-width:1.6;}
+#admTabbar .ta3-tab.add i{background:#111 !important;box-shadow:0 6px 14px rgba(0,0,0,.28) !important;}
+#admTabbar .ta3-tab.add svg{fill:none;stroke:#fff;}
+#admTabbar .ta3-tab.add span{color:#6b7280;}
+/* 상단 밑줄 탭 */
+#admUT{display:none;position:sticky;top:var(--adm-hh,0px);z-index:90;background:#fff;border-bottom:1px solid #eceef2;}
+body.adm-home #admUT,body.adm-list #admUT{display:flex;}
+#admUT button{flex:1;background:none !important;border:none !important;border-radius:0 !important;color:#9aa0aa !important;font-size:16px;font-weight:700;padding:15px 4px !important;border-bottom:3px solid transparent !important;margin-bottom:-1px;}
+#admUT button.on{color:#111 !important;border-bottom-color:#2b2f36 !important;}
+#fKind{display:none !important;}
+body.adm-home.adm-h-chart #viewMaster>*:not(#categoryFilters):not(#admPChart){display:none !important;}
+body.adm-home.adm-h-cal #viewMaster>*:not(#admPCal){display:none !important;}
+body.adm-home.adm-h-stat #admPChart,body.adm-home.adm-h-stat #admPCal{display:none !important;}
+body.adm-home.adm-h-chart #dateBanner,body.adm-home.adm-h-cal #dateBanner{display:none !important;}
 </style>
 </head>
 <body>
@@ -8607,6 +8672,7 @@ function ta4AdminOpen(id) {
   };
 }
 
+const ADM_IC = {'users': '<svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.6-3.6 3.2-5.5 6.5-5.5s5.9 1.9 6.5 5.5"/><path d="M16 4.7a3.5 3.5 0 010 6.6M18 14.8c2 .6 3.2 2.2 3.5 5.2"/></svg>', 'target': '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.2"/></svg>', 'bell': '<svg viewBox="0 0 24 24"><path d="M4 10v4a1 1 0 001 1h2l6 4V5L7 9H5a1 1 0 00-1 1z"/><path d="M16.5 8.5a5 5 0 010 7M19 6a8.5 8.5 0 010 12"/></svg>', 'out': '<svg viewBox="0 0 24 24"><path d="M9 4H5a1 1 0 00-1 1v14a1 1 0 001 1h4"/><path d="M16 8l4 4-4 4M20 12H9"/></svg>'};
 
 // =====================================================================
 // 관리자 화면: 하단 메뉴바(홈·목록·안건추가·지도·더보기) / 안건추가 시트 / 지도
@@ -8615,6 +8681,7 @@ const ADM = { tab: 'home', map: null, places: {}, sel: null, f: { who: 'all', ki
 const ADM_SRC = { 'TA': 'ta', '소개': 'ref', '가망': 'ps' };
 
 function admInit() {
+  try { ta4Init(); } catch (e) {}
   if (el('admTabbar')) return;
   const nav = document.createElement('nav'); nav.className = 'ta3-tabbar'; nav.id = 'admTabbar';
   nav.innerHTML = `
@@ -8622,7 +8689,7 @@ function admInit() {
     <button type="button" class="ta3-tab" data-t="list" onclick="admTab('list')"><svg viewBox="0 0 24 24"><path d="M8 6h13M8 12h13M8 18h13"/><circle cx="3.5" cy="6" r="1"/><circle cx="3.5" cy="12" r="1"/><circle cx="3.5" cy="18" r="1"/></svg>목록</button>
     <button type="button" class="ta3-tab add" onclick="admAddSheet()"><i><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></i><span>안건추가</span></button>
     <button type="button" class="ta3-tab" data-t="map" onclick="admTab('map')"><svg viewBox="0 0 24 24"><path d="M12 21s7-6.2 7-11.5A7 7 0 005 9.5C5 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg>지도</button>
-    <button type="button" class="ta3-tab" onclick="admMoreSheet()"><svg viewBox="0 0 24 24"><rect x="3.5" y="3.5" width="7" height="7" rx="2"/><rect x="13.5" y="3.5" width="7" height="7" rx="2"/><rect x="3.5" y="13.5" width="7" height="7" rx="2"/><rect x="13.5" y="13.5" width="7" height="7" rx="2"/></svg>더보기</button>`;
+    <button type="button" class="ta3-tab" data-t="more" onclick="admTab('more')"><svg viewBox="0 0 24 24"><rect x="3.5" y="3.5" width="7" height="7" rx="2"/><rect x="13.5" y="3.5" width="7" height="7" rx="2"/><rect x="3.5" y="13.5" width="7" height="7" rx="2"/><rect x="13.5" y="13.5" width="7" height="7" rx="2"/></svg>더보기</button>`;
   document.body.appendChild(nav);
   const mv = document.createElement('div'); mv.id = 'admMapView';
   mv.innerHTML = `<div id="admMap"></div>
@@ -8637,19 +8704,25 @@ function admInit() {
     <button type="button" id="admMapBtn" onclick="admMapFit()" aria-label="전체 보기">⤢</button>
     <div id="admPrev"></div>`;
   document.body.appendChild(mv);
+  const mo = document.createElement('div'); mo.id = 'admMoreView'; document.body.appendChild(mo);
   const so = document.createElement('div'); so.id = 'admSheetOv'; so.onclick = e => { if (e.target === so) admSheetClose(); };
   so.innerHTML = '<div id="admSheet"></div>'; document.body.appendChild(so);
   try { const p = el('leadTbody').closest('.panel'); if (p) p.id = 'panelAllTA'; } catch (e) {}
   try { el('leadTbody').closest('.table-scroll').classList.add('cal-noscroll'); } catch (e) {}
+  try { [['barChart', 'admPChart'], ['calendarTbody', 'admPCal'], ['todayListCount', 'admPToday'], ['targetTbody', 'admPTarget']].forEach(([a, id]) => { const p = el(a).closest('.panel'); if (p) p.id = id; }); } catch (e) {}
+  const ut = document.createElement('div'); ut.id = 'admUT'; const hd = document.querySelector('header.topbar'); (hd && hd.parentNode) ? hd.parentNode.insertBefore(ut, hd.nextSibling) : document.body.prepend(ut);
+  document.body.classList.add('adm-h-stat'); admUTRender();
   document.body.classList.add('adm-home');
-  const setTop = () => { const h = document.querySelector('header.topbar'); document.documentElement.style.setProperty('--adm-top', (h ? h.getBoundingClientRect().height : 64) + 'px'); };
+  const setTop = () => { const h = document.querySelector('header.topbar'); document.documentElement.style.setProperty('--adm-top', (h ? h.getBoundingClientRect().height : 64) + 'px'); document.documentElement.style.setProperty('--adm-hh', (h && h.offsetParent !== null ? h.getBoundingClientRect().height : 0) + 'px'); };
   setTop(); window.addEventListener('resize', setTop); window.admSetTop = setTop;
 }
 function admTab(t) {
   ADM.tab = t;
-  ['home', 'list', 'map'].forEach(k => document.body.classList.toggle('adm-' + k, k === t));
+  ['home', 'list', 'map', 'more'].forEach(k => document.body.classList.toggle('adm-' + k, k === t));
+  if (t === 'more') admMoreRender();
   document.querySelectorAll('#admTabbar .ta3-tab[data-t]').forEach(b => b.classList.toggle('on', b.dataset.t === t));
   if (window.admSetTop) window.admSetTop();
+  admUTRender();
   if (t === 'map') admMapRender(); else window.scrollTo(0, 0);
   if (t === 'list') { try { renderLeadTable(); } catch (e) {} }
 }
@@ -8842,6 +8915,117 @@ function admTargetView() {
   const rows = CONSULTANTS.map(n => `<tr><td style="color:${CONSULTANT_COLOR[n]};font-weight:800;">${n}</td>${cats.map(c => `<td>${admK(getConsultantTarget(n, month, c))}</td>`).join('')}<td><b>${admK(getConsultantTarget(n, month, 'all'))}</b></td></tr>`).join('');
   const tot = `<tr class="adm-ctotal"><td>지사 합계</td>${cats.map(c => `<td>${admK(getTotalTarget(month, c))}</td>`).join('')}<td>${admK(CONSULTANTS.reduce((s, n) => s + getConsultantTarget(n, month, 'all'), 0))}</td></tr>`;
   admPopOpen(`<h3>${Number(month.slice(5, 7))}월 목표 현황 <small>단위: 천원 · 영업일보 기준</small></h3><table class="adm-kt"><thead><tr><th>컨설턴트</th><th>일반알람</th><th>디지털</th><th>안전상품</th><th>합계</th></tr></thead><tbody>${rows}${tot}</tbody></table>`);
+}
+
+// =====================================================================
+// 팝업 동작: 열려 있는 동안 배경 스크롤 잠금 · 포커스 고정 · 뒤로가기/ESC 로 닫기
+// =====================================================================
+const ADM_L = { n: 0, y: 0, locked: false, silOnce: 0 };
+const ADM_CLOSERS = {
+  userManageModalOverlay: () => closeUserManageModal(), targetModalOverlay: () => { try { closeTargetModal(); } catch (e) { admHide('targetModalOverlay'); } },
+  noticeModalOverlay: () => { try { closeNoticeModal(); } catch (e) { admHide('noticeModalOverlay'); } }, calendarModalOverlay: () => { try { closeCalendarModal(); } catch (e) { admHide('calendarModalOverlay'); } },
+  agentNoticeModalOverlay: () => { try { closeAgentNoticeModal(); } catch (e) { admHide('agentNoticeModalOverlay'); } }, ta2DpOverlay: () => { try { ta2DpClose(); } catch (e) { admHide('ta2DpOverlay'); } },
+  ta4PsOv: () => ta4PsCloseInput(), admPop: () => el('admPop').classList.remove('on'), admSheetOv: () => admSheetClose()
+};
+function admHide(id) { const e = el(id); if (e) { e.style.display = 'none'; e.classList.remove('show'); } }
+function admVis(e) { return !!e && (getComputedStyle(e).display !== 'none') && e.offsetParent !== null || (!!e && getComputedStyle(e).position === 'fixed' && getComputedStyle(e).display !== 'none'); }
+function admLayers() {
+  const out = [];
+  document.querySelectorAll('.modal-overlay,#admPop,#admSheetOv').forEach(e => {
+    if (!admVis(e)) return;
+    if ((e.id === 'admPop' || e.id === 'admSheetOv') && !e.classList.contains('on')) return;
+    out.push(e);
+  });
+  return out.sort((a, b) => (Number(getComputedStyle(a).zIndex) || 0) - (Number(getComputedStyle(b).zIndex) || 0));
+}
+function admClosable(l) { return l.id !== 'portalAlertOverlay' && l.id !== 'portalConfirmOverlay' && !/^portal/.test(l.id); }
+function admCloseTop() {
+  const ls = admLayers().filter(admClosable); const t = ls[ls.length - 1]; if (!t) return false;
+  const f = ADM_CLOSERS[t.id];
+  try { if (f) f(); else { const x = t.querySelector('.modal-close'); if (x) x.click(); else admHide(t.id); } } catch (e) { admHide(t.id); }
+  return true;
+}
+function admLayerSync() {
+  const ls = admLayers(), cnt = ls.length;
+  // 배경 스크롤 잠금
+  if (cnt > 0 && !ADM_L.locked) {
+    ADM_L.locked = true; ADM_L.y = window.scrollY || 0;
+    document.body.style.cssText += ';position:fixed;top:' + (-ADM_L.y) + 'px;left:0;right:0;width:100%;overflow:hidden;';
+  } else if (cnt === 0 && ADM_L.locked) {
+    ADM_L.locked = false;
+    document.body.style.position = ''; document.body.style.top = ''; document.body.style.left = ''; document.body.style.right = ''; document.body.style.width = ''; document.body.style.overflow = '';
+    window.scrollTo(0, ADM_L.y);
+  }
+  // 뒤로가기 기록
+  const closable = ls.filter(admClosable).length;
+  if (closable > ADM_L.n) { for (let i = ADM_L.n; i < closable; i++) { try { history.pushState({ adm: i + 1 }, ''); } catch (e) {} } ADM_L.n = closable; }
+  else if (closable < ADM_L.n) { const d = ADM_L.n - closable; ADM_L.n = closable; ADM_L.silOnce = 1; try { history.go(-d); } catch (e) { ADM_L.silOnce = 0; } }
+  // 포커스 이동
+  const top = ls[ls.length - 1];
+  if (top && ADM_L.focusEl !== top) { ADM_L.focusEl = top; if (!top.hasAttribute('tabindex')) top.setAttribute('tabindex', '-1'); try { top.focus({ preventScroll: true }); } catch (e) {} }
+  if (!top) ADM_L.focusEl = null;
+}
+(function () {
+  let t = null; const sched = () => { if (t) return; t = requestAnimationFrame(() => { t = null; try { admLayerSync(); } catch (e) {} }); };
+  const start = () => { new MutationObserver(sched).observe(document.body, { subtree: true, childList: true, attributes: true, attributeFilter: ['style', 'class'] }); sched(); };
+  if (document.body) start(); else document.addEventListener('DOMContentLoaded', start);
+  // 뒤로가기: 팝업이 떠 있으면 팝업만 닫는다 (페이지 스택 처리보다 먼저)
+  window.addEventListener('popstate', e => {
+    if (ADM_L.silOnce) { ADM_L.silOnce = 0; e.stopImmediatePropagation(); return; }
+    if (ADM_L.n > 0 && admLayers().filter(admClosable).length) { e.stopImmediatePropagation(); ADM_L.n = Math.max(0, ADM_L.n - 1); admCloseTop(); sched(); }
+  }, true);
+  document.addEventListener('keydown', e => {
+    const ls = admLayers();
+    if (e.key === 'Escape') {
+      if (ls.filter(admClosable).length) { e.preventDefault(); e.stopPropagation(); admCloseTop(); sched(); }
+      else if (!ls.length && typeof PG !== 'undefined' && PG.st && PG.st.length) { e.preventDefault(); ta3Back(); }
+      return;
+    }
+    if (e.key === 'Tab' && ls.length) {   // 포커스가 팝업 밖으로 나가지 않게
+      const top = ls[ls.length - 1], f = [...top.querySelectorAll('a[href],button:not([disabled]),input:not([disabled]):not([type=hidden]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])')].filter(x => x.offsetParent !== null);
+      if (!f.length) { e.preventDefault(); return; }
+      const first = f[0], last = f[f.length - 1];
+      if (!top.contains(document.activeElement)) { e.preventDefault(); first.focus(); }
+      else if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+      else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+    }
+  }, true);
+})();
+
+
+// ---------- 더보기 (전체 페이지) ----------
+function admMoreRender() {
+  const u = (typeof currentUser !== 'undefined' && currentUser) || {}, e = escapeHtml;
+  const items = [
+    { ic: ADM_IC.users, t: '사용자 관리', fn: 'openUserManageModal()' },
+    { ic: ADM_IC.target, t: '목표 현황', s: '영업일보 기준 · 보기 전용', fn: 'admTargetView()' },
+    { ic: ADM_IC.bell, t: '공지사항 관리', fn: 'openNoticeModal()' },
+    { ic: ADM_IC.out, t: '로그아웃', fn: 'doLogout()' }
+  ];
+  el('admMoreView').innerHTML = `
+    <div class="adm-me">
+      <div class="av">${e((u.name || '관').slice(0, 1))}</div>
+      <div class="nm"><b>${e(u.name || '관리자')}</b><small>${e(u.job || '지사관리자')}${u.phone ? ' · ' + e(String(u.phone).replace(/[^0-9]/g, '')) : ''}</small></div>
+      <button type="button" onclick="doLogout()">계정 변경</button>
+    </div>
+    <div class="adm-ml">${items.map(i => `<button type="button" onclick="${i.fn}"><span class="ic">${i.ic}</span><span class="tx">${i.t}${i.s ? `<small>${i.s}</small>` : ''}</span><span class="ch">&rsaquo;</span></button>`).join('')}</div>`;
+  window.scrollTo(0, 0);
+}
+
+
+// ---------- 상단 밑줄 탭 (홈: 현황 | 통계 | 캘린더 / 목록: 전체 | TA | 소개 | 가망) ----------
+const ADM_HT = [['stat', '현황'], ['chart', '통계'], ['cal', '캘린더']], ADM_LT = [['all', '전체'], ['TA', 'TA'], ['소개', '소개'], ['가망', '가망']];
+function admUTRender() {
+  const ut = el('admUT'); if (!ut) return;
+  const home = ADM.tab === 'home', list = ADM.tab === 'list'; if (!home && !list) { ut.innerHTML = ''; return; }
+  const cur = home ? (ADM.hs || 'stat') : (el('fKind') ? el('fKind').value : 'all');
+  ut.innerHTML = (home ? ADM_HT : ADM_LT).map(([v, l]) => `<button type="button" class="${v === cur ? 'on' : ''}" onclick="admUTPick('${v}')">${l}</button>`).join('');
+  if (home) ['stat', 'chart', 'cal'].forEach(k => document.body.classList.toggle('adm-h-' + k, k === cur));
+}
+function admUTPick(v) {
+  if (ADM.tab === 'home') { ADM.hs = v; window.scrollTo(0, 0); }
+  else if (el('fKind')) { el('fKind').value = v; renderLeadTable(); }
+  admUTRender();
 }
 
 </script>

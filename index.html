@@ -1286,8 +1286,48 @@
   .ct-row .tx b .ct-pth.p1{background:#fee2e2;color:#b91c1c;} .ct-row .tx b .ct-pth.p2{background:#dbeafe;color:#1d4ed8;} .ct-row .tx b .ct-pth.p3{background:#dcfce7;color:#15803d;}
   .ta3-lg{display:flex;gap:12px;align-items:center;font-size:12px;font-weight:800;color:#475569;padding:2px 2px 6px;} .ta3-lg i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:4px;vertical-align:-1px;}
 
-.calendar-table th{text-align:center !important}.am-s{display:none}@media(max-width:760px){.am-w{display:none}.am-s{display:inline}.calendar-table{table-layout:fixed;width:100%;font-size:11px}.calendar-table th,.calendar-table td{padding:6px 2px;white-space:normal;word-break:break-all;text-align:right}.calendar-table th:first-child,.calendar-table td:first-child{position:static;width:40px;text-align:left}.calendar-table th{font-size:10px}.calendar-table .cal-count{display:block;margin:0;font-size:9px}}@media(max-width:760px){table.lead-table .lt-w{display:none}table.lead-table th,table.lead-table td{padding:8px 4px;font-size:12px}table.lead-table th{white-space:normal;font-size:11px}table.lead-table th,table.lead-table td{min-width:0!important}table.lead-table td:first-child,table.lead-table th:first-child{white-space:nowrap}table.lead-table .sched-cell{white-space:nowrap}table.lead-table .amount-cell{font-size:12px}table.lead-table button.danger{padding:4px 6px;font-size:11px}}
-table.lead-table button.lt-x{width:26px;height:26px;padding:0;border-radius:50%;line-height:1;font-size:13px;font-weight:800;display:inline-flex;align-items:center;justify-content:center}
+.calendar-table th{text-align:center !important}.cal-noscroll{max-height:none !important;overflow:visible !important}.calendar-table th{position:static !important}#dateBanner{flex-wrap:nowrap !important;justify-content:flex-start !important;gap:10px !important}#dateBanner .date-text{font-size:clamp(15px,4.8vw,26px) !important;white-space:nowrap}#dateBanner .workdays-badge{font-size:clamp(11px,3.3vw,14.5px) !important;padding:5px 10px !important}#masterMonthlyTargetBadge{margin:0 0 12px !important}@media(max-width:760px){#dateBanner{padding:10px 12px !important}.calendar-table th,.calendar-table td{padding:4px 2px !important}}.user-table-wrapper{overflow-x:hidden !important}.user-data-table{table-layout:auto;width:100%}#userManageModalOverlay .modal-card{padding:14px 8px !important;width:97% !important}.user-data-table th,.user-data-table td{padding:8px 3px !important;font-size:12px !important;white-space:nowrap}.user-data-table th:last-child,.user-data-table td:last-child{width:1%}.user-data-table td:first-child{font-weight:700}.btn-user-edit,.btn-user-del{width:28px;height:28px;padding:0 !important;margin:0 1px !important;display:inline-flex;align-items:center;justify-content:center;border-radius:8px !important;vertical-align:middle}.user-data-table .job-badge,.user-data-table td span{font-size:11px !important;padding:2px 6px !important}.am-s{display:none}@media(max-width:760px){.am-w{display:none}.am-s{display:inline}.calendar-table{table-layout:fixed;width:100%;font-size:11px}.calendar-table th,.calendar-table td{padding:6px 2px;white-space:normal;word-break:break-all;text-align:right}.calendar-table th:first-child,.calendar-table td:first-child{position:static;width:40px;text-align:left}.calendar-table th{font-size:10px}.calendar-table .cal-count{display:block;margin:0;font-size:9px}}@media(max-width:760px){table.lead-table .lt-w{display:none}table.lead-table th,table.lead-table td{padding:8px 4px;font-size:12px}table.lead-table th{white-space:normal;font-size:11px}table.lead-table th,table.lead-table td{min-width:0!important}table.lead-table td:first-child,table.lead-table th:first-child{white-space:nowrap}table.lead-table .sched-cell{white-space:nowrap}table.lead-table .amount-cell{font-size:12px}table.lead-table button.danger{padding:4px 6px;font-size:11px}}
+table.lead-table button.lt-x{width:30px;height:30px;padding:0;border-radius:8px;line-height:1;display:inline-flex;align-items:center;justify-content:center}
+</style>
+<style>/* 컨설턴트 앱 — 건강기록 앱 스타일 */
+:root{--bg:#fff;--navy:#111827;--line:#eceef2;--sh:none;}
+body.ta3-on{background:#fff !important;}
+.ta3-bar{background:#fff !important;border-bottom:1px solid #eceef2 !important;backdrop-filter:none !important;}
+.ta3-bar .tt{font-size:20px !important;color:#111827 !important;}
+.ta3-bar button{background:#f1f3f6 !important;color:#111827 !important;}
+.ta3-k,.ta3-list,.ta3-card,.ta3-calbox,.ta3-me-card,.ta3-menu{box-shadow:none !important;border-color:#eceef2 !important;}
+.ta3-k{background:#f6f7f9 !important;border:none !important;}
+.ta3-today{background:#eaf5f9 !important;color:#0b4f66 !important;box-shadow:none !important;}
+.ta3-today .t{opacity:.8;} .ta3-today .a{color:#0b4f66;}
+.ta3-today button{background:#111 !important;color:#fff !important;border:none !important;}
+.ta3-chip.on{background:#111 !important;border-color:#111 !important;color:#fff !important;}
+.ta3-chip{border-color:#d9dde4 !important;}
+.ta3-tabbar{background:#fff !important;backdrop-filter:none !important;border-top:1px solid #eceef2 !important;}
+.ta3-tab{color:#9aa0aa !important;}
+.ta3-tab svg{fill:currentColor;fill-opacity:.18;}
+.ta3-tab.on{color:#111 !important;} .ta3-tab.on svg{fill-opacity:.9;}
+.ta3-tab.add i{background:#111 !important;box-shadow:0 6px 14px rgba(0,0,0,.28) !important;border-radius:50% !important;}
+.ta3-tab.add svg{fill:none;}
+.ta3-d.sel{background:#111 !important;}
+.ta3-avc,.ta3-av{background:#111 !important;}
+/* 상단 밑줄 탭 */
+.ta8-ut{display:flex;background:#fff;border-bottom:1px solid #eceef2;margin:-14px -16px 14px;position:sticky;top:calc(var(--bar-h) + env(safe-area-inset-top));z-index:50;}
+.ta8-ut button{flex:1;background:none !important;border:none !important;border-radius:0 !important;color:#9aa0aa !important;font-size:16px;font-weight:700;padding:14px 4px !important;border-bottom:3px solid transparent !important;margin-bottom:-1px;}
+.ta8-ut button.on{color:#111 !important;border-bottom-color:#2b2f36 !important;}
+#ta3Src{display:flex !important;background:none !important;border-radius:0 !important;padding:0 !important;border-bottom:1px solid #eceef2;margin:-14px -16px 12px !important;position:sticky;top:calc(var(--bar-h) + env(safe-area-inset-top));z-index:50;background:#fff !important;width:calc(100% + 32px);}
+#ta3Src button{flex:1;background:none !important;border:none !important;border-radius:0 !important;color:#9aa0aa !important;font-size:16px !important;font-weight:700 !important;padding:14px 4px !important;border-bottom:3px solid transparent !important;margin-bottom:-1px;box-shadow:none !important;}
+#ta3Src button.on{color:#111 !important;border-bottom-color:#2b2f36 !important;background:none !important;}
+#ta3ScrHome.h-c .ta8s,#ta3ScrHome.h-s .ta8c{display:none !important;}
+body.ta3-themed .ta3-bar,body.ta3-themed .ta4-ph{background:#fff !important;border-bottom:1px solid #eceef2 !important;}
+body.ta3-themed .ta3-bar .tt,body.ta3-themed .ta4-ph .ttl h3{color:var(--tb-pr,#111827) !important;}
+body.ta3-themed .ta3-bar button{background:#f1f3f6 !important;color:#111827 !important;}
+body.ta3-themed .ta4-ph .back{color:#111827 !important;}
+body.ta3-themed .ta4-ph .sv{color:#16a34a;}
+body.ta3-themed .ta4-ph .ttl .bd,body.ta3-themed .ta4-ph .ttl .bd span{color:#6b7280;}
+body.ta3-themed .ta4-ph .ic{background:#f1f3f6 !important;color:#111827 !important;}
+body.ta3-themed .ta4-ph .act.ghost{background:#f1f3f6 !important;color:#111827 !important;}
+#ta3ScrItems.on{display:flex;flex-direction:column;}
+#ta3ScrItems #ta3Src{order:-1;}
 </style>
 <link rel="manifest" href="manifest.json">
 <link rel="icon" type="image/png" href="favicon.png">
@@ -1441,15 +1481,15 @@ if ('serviceWorker' in navigator) window.addEventListener('load', () => { naviga
     <!-- ========================================== -->
     <div id="viewMaster">
       <!-- 지사 전체 이달 목표 (사 전체 목표) -->
-      <div id="masterMonthlyTargetBadge" style="margin-bottom:12px;font-size:13.5px;font-weight:700;color:#1e3a8a;background:#eff6ff;padding:8px 16px;border-radius:8px;border:1px solid #bfdbfe;display:flex;align-items:center;gap:8px;">
-        🎯 <strong>사 전체 이달 목표 (일반알람)</strong>: 2,500,000원 <span style="font-size:12px;font-weight:normal;color:#475569;">(사 전체 총 목표: 3,739,000원)</span>
-      </div>
       <!-- 상단 카테고리 필터 (전체 TA 조회 테이블과도 100% 동기화) -->
       <div class="filters" id="categoryFilters">
         <button type="button" data-category="일반알람" class="active">일반알람</button>
         <button type="button" data-category="디지털(정보보안)">디지털(정보보안)</button>
         <button type="button" data-category="안전상품">안전상품</button>
         <button type="button" data-category="all">전체</button>
+      </div>
+      <div id="masterMonthlyTargetBadge" style="margin-bottom:12px;font-size:13.5px;font-weight:700;color:#1e3a8a;background:#eff6ff;padding:8px 16px;border-radius:8px;border:1px solid #bfdbfe;display:flex;align-items:center;gap:8px;">
+        🎯 <strong>사 전체 이달 목표 (일반알람)</strong>: 2,500,000원 <span style="font-size:12px;font-weight:normal;color:#475569;">(사 전체 총 목표: 3,739,000원)</span>
       </div>
 
       <!-- 8개 종합 KPI 지표 카드 -->
@@ -1467,8 +1507,8 @@ if ('serviceWorker' in navigator) window.addEventListener('load', () => { naviga
       <!-- 금일 수주 예정 전체 리스트 -->
       <div class="panel">
         <div class="panel-toolbar today-list-toolbar">
-          <h2>금일 수주 예정 전체 리스트 <span class="count-tag" id="todayListCount"></span></h2>
-          <button type="button" class="small copy-btn" id="btnCopyToday">복사하기 (외부 공지용)</button>
+          <h2>금일 수주 예정 TA <span class="count-tag" id="todayListCount"></span></h2>
+          <button type="button" class="small copy-btn" id="btnCopyToday">TA 복사</button>
         </div>
         <div class="table-scroll" style="max-height:320px;">
           <table class="lead-table">
@@ -1488,7 +1528,6 @@ if ('serviceWorker' in navigator) window.addEventListener('load', () => { naviga
             <button type="button" class="small" id="btnActivityRefresh">새로고침</button>
           </div>
         </div>
-        <p style="font-size:12px;color:var(--muted);margin:-6px 0 12px;">컨설턴트가 TA를 신규 등록/수정/삭제할 때마다 자동으로 기록됩니다. 하루치만 표시되며, 30초마다 자동 갱신됩니다.</p>
         <div class="table-scroll" style="max-height:420px;">
           <table class="lead-table">
             <thead><tr><th>시간</th><th>컨설턴트</th><th>구분</th><th style="min-width:170px;">서비스제공처명</th><th>변경 내용</th></tr></thead>
@@ -1497,43 +1536,36 @@ if ('serviceWorker' in navigator) window.addEventListener('load', () => { naviga
         </div>
       </div>
 
-      <!-- 차트: 바차트 & 도넛차트 -->
+      <!-- 차트 -->
       <div class="panel">
-        <div class="charts-grid">
+        <div class="charts-grid adm-charts">
           <div>
             <h2>컨설턴트별 진행 TA 금액</h2>
             <div id="barChart"></div>
           </div>
           <div>
-            <h2>영업단계별 금액 분포</h2>
+            <h2>영업단계별 금액·건수</h2>
             <div class="donut-wrap">
-              <div class="donut" id="donutChart"></div>
+              <div class="donut sm" id="donutChart"></div>
               <div class="legend" id="donutLegend"></div>
+            </div>
+          </div>
+          <div>
+            <h2>안건 종류별 금액·건수</h2>
+            <div class="donut-wrap">
+              <div class="donut sm" id="donutKind"></div>
+              <div class="legend" id="donutKindLegend"></div>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- 컨설턴트별 달성현황 & 목표 관리 -->
+      <!-- 컨설턴트별 달성현황 (보기 전용 · 목표는 영업일보 기준 데이터) -->
       <div class="panel">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px;">
-          <h2>컨설턴트별 달성현황 <span class="count-tag" id="targetMonthLabel"></span> <span class="count-tag" id="targetCategoryLabel" style="background:#e0e7ff;color:#3730a3;"></span></h2>
-          <button type="button" class="small" id="btnOpenTargetModal" onclick="openTargetModal()" style="background:var(--blue);color:#fff;font-weight:700;display:inline-flex;align-items:center;gap:6px;">
-            🎯 월간 목표 설정 / 배분
-          </button>
-        </div>
-        <div class="table-scroll">
-          <table class="target-table">
-            <thead><tr>
-              <th style="white-space:nowrap;width:80px;">컨설턴트</th>
-              <th style="white-space:nowrap;width:130px;">이달 수주</th>
-              <th style="white-space:nowrap;min-width:210px;">수주 달성율 (차트)</th>
-              <th style="white-space:nowrap;width:130px;">진행중 TA</th>
-              <th style="white-space:nowrap;width:95px;">보유 TA율</th>
-              <th style="white-space:nowrap;width:90px;">TA 수주율</th>
-              <th style="white-space:nowrap;width:90px;">수주 실패율</th>
-              <th style="white-space:nowrap;width:130px;">이달 확정목표(원)</th>
-            </tr></thead>
+        <h2>컨설턴트별 달성현황 <span class="count-tag" id="targetMonthLabel"></span> <span class="count-tag" id="targetCategoryLabel" style="background:#e0e7ff;color:#3730a3;"></span></h2>
+        <div class="table-scroll cal-noscroll">
+          <table class="target-table adm-target">
+            <thead><tr><th>컨설턴트</th><th>이달 수주(건수)</th><th>TA 수주율</th></tr></thead>
             <tbody id="targetTbody"></tbody>
           </table>
         </div>
@@ -1541,8 +1573,8 @@ if ('serviceWorker' in navigator) window.addEventListener('load', () => { naviga
 
       <!-- 이달 캘린더 — 컨설턴트별 수주예상 금액 그리드 -->
       <div class="panel">
-        <h2>이달 캘린더 — 컨설턴트별 수주예상 금액 <span class="count-tag" id="calendarMonthLabel"></span><span class="am-s" style="font-size:11px;color:var(--muted);font-weight:700;margin-left:6px;">단위: 천원</span></h2>
-        <div class="table-scroll" style="max-height:560px;">
+        <h2 style="display:flex;align-items:center;gap:6px;">TA 캘린더 <span class="count-tag" id="calendarMonthLabel"></span><span class="am-s" style="margin-left:auto;font-size:11.5px;color:var(--muted);font-weight:700;">단위: 천원</span></h2>
+        <div class="table-scroll cal-noscroll">
           <table class="calendar-table">
             <thead><tr id="calendarHeadRow"><th>일자</th></tr></thead>
             <tbody id="calendarTbody"></tbody>
@@ -1584,6 +1616,7 @@ if ('serviceWorker' in navigator) window.addEventListener('load', () => { naviga
             <tbody id="leadTbody"></tbody>
           </table>
         </div>
+        <div id="leadPager" class="lead-pager"></div>
       </div>
     </div>
 
@@ -1744,7 +1777,7 @@ if ('serviceWorker' in navigator) window.addEventListener('load', () => { naviga
         <thead>
           <tr>
             <th>이름</th>
-            <th>전화번호(아이디)</th>
+            <th>전화번호</th>
             <th>직무</th>
             <th style="text-align:center;">관리</th>
           </tr>
@@ -2698,6 +2731,20 @@ async function loadTargetsFromSupabase(month) {
         TARGETS.rates[c][m][cat] = rate;
       });
     }
+    try {
+      const { data: dr } = await db.from('sales_targets_rep').select('*').eq('year_month', month);
+      if (dr && dr.length) {
+        const MAPC = { '알람': '일반알람', '정보보안': '디지털(정보보안)' };
+        CONSULTANTS.forEach(c => {
+          if (!TARGETS.targets[c]) TARGETS.targets[c] = {};
+          if (!TARGETS.targets[c][month]) TARGETS.targets[c][month] = {};
+          const md = TARGETS.targets[c][month];
+          Object.keys(MAPC).forEach(pt => { md[MAPC[pt]] = dr.filter(r => r.rep_name === c && r.product_type === pt).reduce((s, r) => s + (Number(r.target_order) || 0), 0); });
+          if (md['안전상품'] === undefined) md['안전상품'] = 0;   // 영업일보에는 컨설턴트별 안전상품 목표가 없음
+        });
+        TARGETS.fromDaily = month;
+      }
+    } catch (e2) { console.warn('영업일보 목표 조회 실패:', e2); }
   } catch (err) {
     console.error('목표 데이터 로드 예외:', err);
   }
@@ -2778,13 +2825,13 @@ function renderKPI() {
 
   if (el('masterMonthlyTargetBadge')) {
     if (activeDashboardCategory === 'all') {
-      el('masterMonthlyTargetBadge').innerHTML = `🎯 <strong>사 전체 이달 목표</strong>: 총 ${formatCurrency(grandTotal)} (일반알람 ${formatCurrency(alarmTotal)} · 디지털 ${formatCurrency(digiTotal)} · 안전상품 ${formatCurrency(safeTotal)})`;
+      el('masterMonthlyTargetBadge').innerHTML = `🎯 <strong>${admTgtLabel(month, grandTotal)}</strong>`;
     } else if (activeDashboardCategory === '일반알람') {
-      el('masterMonthlyTargetBadge').innerHTML = `🎯 <strong>사 전체 이달 목표 (일반알람)</strong>: ${formatCurrency(alarmTotal)} <span style="font-size:12px;font-weight:normal;color:#475569;">(사 전체 총 목표: ${formatCurrency(grandTotal)})</span>`;
+      el('masterMonthlyTargetBadge').innerHTML = `🎯 <strong>${admTgtLabel(month, alarmTotal)}</strong><span hidden style="font-size:12px;font-weight:normal;color:#475569;">(사 전체 총 목표: ${formatCurrency(grandTotal)})</span>`;
     } else if (activeDashboardCategory === '디지털(정보보안)') {
-      el('masterMonthlyTargetBadge').innerHTML = `🎯 <strong>사 전체 이달 목표 (디지털)</strong>: ${formatCurrency(digiTotal)} <span style="font-size:12px;font-weight:normal;color:#475569;">(사 전체 총 목표: ${formatCurrency(grandTotal)})</span>`;
+      el('masterMonthlyTargetBadge').innerHTML = `🎯 <strong>${admTgtLabel(month, digiTotal)}</strong><span hidden style="font-size:12px;font-weight:normal;color:#475569;">(사 전체 총 목표: ${formatCurrency(grandTotal)})</span>`;
     } else if (activeDashboardCategory === '안전상품') {
-      el('masterMonthlyTargetBadge').innerHTML = `🎯 <strong>사 전체 이달 목표 (안전상품)</strong>: ${formatCurrency(safeTotal)} <span style="font-size:12px;font-weight:normal;color:#475569;">(사 전체 총 목표: ${formatCurrency(grandTotal)})</span>`;
+      el('masterMonthlyTargetBadge').innerHTML = `🎯 <strong>${admTgtLabel(month, safeTotal)}</strong><span hidden style="font-size:12px;font-weight:normal;color:#475569;">(사 전체 총 목표: ${formatCurrency(grandTotal)})</span>`;
     }
   }
 
@@ -3247,6 +3294,7 @@ async function saveAllTargets() {
   }
 }
 
+function admTgtLabel(month, v) { return '지사 ' + Number(String(month).slice(5, 7)) + '월 목표 : ' + Math.round(Number(v || 0) / 1000).toLocaleString('ko-KR') + '천원'; }
 function calAmt(n) { n = Number(n || 0); return `<span class="am-w">${formatCurrency(n)}</span><span class="am-s">${Math.round(n / 1000).toLocaleString('ko-KR')}</span>`; }
 function renderCalendarGrid() {
   const monthStr = currentMonthStr();
@@ -3349,6 +3397,11 @@ function renderLeadTable() {
 
   leads.sort((a, b) => (b.updatedAt || '').localeCompare(a.updatedAt || ''));
   el('leadCountTag').textContent = '(' + leads.length + '건)';
+  const _sig = [cf, sf, kf, mf, qf, el('fKind') ? el('fKind').value : '', activeDashboardCategory].join('|');
+  if (_sig !== window.__leadSig) { window.__leadSig = _sig; window.__leadPage = 1; }
+  const _pages = Math.max(1, Math.ceil(leads.length / 20)); window.__leadPage = Math.min(Math.max(1, window.__leadPage || 1), _pages);
+  const _total = leads.length; leads = leads.slice((window.__leadPage - 1) * 20, window.__leadPage * 20);
+  if (typeof admPager === 'function') admPager(_total, _pages);
 
   const tbody = el('leadTbody');
   if (leads.length === 0) {
@@ -3369,7 +3422,7 @@ function renderLeadTable() {
       <td class="sched-cell">${l.expectedDate ? formatDateShort(l.expectedDate) : '-'}</td>
       <td class="lt-w" style="max-width:180px;color:var(--muted);font-size:12px;">${escapeHtml(l.memo) || ''}</td>
       <td>
-        <button type="button" class="danger lt-x" title="삭제" aria-label="삭제" onclick="event.stopPropagation();deleteLeadMaster('${l.id}', '${escapeHtml(l.company)}', '${l.consultant}')">✕</button>
+        <button type="button" class="danger lt-x" title="삭제" aria-label="삭제" onclick="event.stopPropagation();deleteLeadMaster('${l.id}', '${escapeHtml(l.company)}', '${l.consultant}')"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/></svg></button>
       </td>
     </tr>
   `).join('');
@@ -4548,7 +4601,7 @@ async function initApp(initialMode) {
   document.getElementById('mainApp').style.display = 'block';
 
   el('topbarDateValue').textContent = todayLabel();
-  el('topbarWorkdays').textContent = '이번달 잔여 영업일 : ' + workingDaysLeftInMonth() + '일 (오늘 포함)';
+  el('topbarWorkdays').textContent = '이달 잔여일 : ' + workingDaysLeftInMonth() + '일 (오늘 포함)';
   el('fConsultant').innerHTML = '<option value="all">전체 컨설턴트</option>' + CONSULTANTS.map(n => `<option value="${n}">${n}</option>`).join('');
   el('activityLogDate').value = todayStr();
 
@@ -4947,11 +5000,11 @@ async function loadAllUsers() {
       var phoneFmt = formatPhone(u.phone);
       html += '<tr>'
         + '<td><strong>' + escapeHtml(u.name || '-') + '</strong></td>'
-        + '<td>' + escapeHtml(phoneFmt) + '</td>'
+        + '<td style="white-space:nowrap;">' + escapeHtml(String(u.phone || '').replace(/[^0-9]/g, '')) + '</td>'
         + '<td>' + renderJobBadge(u.job) + '</td>'
         + '<td style="text-align:center; white-space:nowrap;">'
-        + '<button type="button" class="btn-user-edit" data-phone="' + escapeHtml(u.phone) + '" data-name="' + escapeHtml(u.name || '') + '" data-job="' + escapeHtml(u.job || 'CS근무자') + '">수정</button>'
-        + '<button type="button" class="btn-user-del" data-phone="' + escapeHtml(u.phone) + '" data-name="' + escapeHtml(u.name || '') + '">삭제</button>'
+        + '<button type="button" class="btn-user-edit" data-phone="' + escapeHtml(u.phone) + '" data-name="' + escapeHtml(u.name || '') + '" data-job="' + escapeHtml(u.job || 'CS근무자') + '" title="수정" aria-label="수정"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 013 3L7 19l-4 1 1-4z"/></svg></button>'
+        + '<button type="button" class="btn-user-del" data-phone="' + escapeHtml(u.phone) + '" data-name="' + escapeHtml(u.name || '') + '" title="삭제" aria-label="삭제"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/></svg></button>'
         + '</td>'
         + '</tr>';
     });
@@ -8505,6 +8558,23 @@ function ta4AdminOpen(id) {
     try { renderLeadTable(); } catch (e) {}
   };
 }
+
+
+// ---------- 컨설턴트 홈: 상단 밑줄 탭 (현황 | 일정) ----------
+(function () {
+  function init() {
+    const h = document.getElementById('ta3ScrHome'); if (!h || h.querySelector('.ta8-ut')) return;
+    let after = false;
+    Array.from(h.children).forEach(c => { if (after) c.classList.add('ta8s'); else c.classList.add('ta8c'); if (c.id === 'ta4PsBox') after = true; });
+    const ut = document.createElement('div'); ut.className = 'ta8-ut';
+    ut.innerHTML = '<button type="button" data-v="c">현황</button><button type="button" data-v="s">일정</button>';
+    ut.addEventListener('click', e => { const b = e.target.closest('button'); if (b) set(b.dataset.v); });
+    h.insertBefore(ut, h.firstChild); set('c');
+    function set(v) { h.classList.toggle('h-c', v === 'c'); h.classList.toggle('h-s', v === 's'); ut.querySelectorAll('button').forEach(b => b.classList.toggle('on', b.dataset.v === v)); window.scrollTo(0, 0); }
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
+})();
+(function () { const f = window.ta4ApplyBarTheme; if (typeof f !== 'function') return; window.ta4ApplyBarTheme = function () { f.apply(this, arguments); const m = document.querySelector('meta[name=theme-color]'); if (m) m.content = '#ffffff'; }; })();
 
 </script>
 
