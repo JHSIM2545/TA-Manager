@@ -8568,6 +8568,50 @@ function ta4AdminOpen(id) {
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
 })();
 
+// ---------- 푸시 알림 (설정 > 내 정보에서 켜기) ----------
+const TA_PUSH_FN = SUPABASE_URL + '/functions/v1/ta-push';
+function taPushB64(s) { const p = '='.repeat((4 - s.length % 4) % 4), b = (s + p).replace(/-/g, '+').replace(/_/g, '/'), r = atob(b); return Uint8Array.from([...r].map(c => c.charCodeAt(0))); }
+async function taPushState() {
+  if (!('serviceWorker' in navigator) || !('PushManager' in window)) return 'unsupported';
+  if (Notification.permission === 'denied') return 'denied';
+  try { const reg = await navigator.serviceWorker.ready; return (await reg.pushManager.getSubscription()) ? 'on' : 'off'; } catch (e) { return 'off'; }
+}
+async function taPushToggle() {
+  const st = await taPushState();
+  if (st === 'unsupported') { alert('이 브라우저는 알림을 지원하지 않습니다. 아이폰은 Safari에서 "홈 화면에 추가"한 앱으로 열어야 합니다.'); return; }
+  if (st === 'denied') { alert('알림이 차단되어 있습니다. 기기 설정에서 이 앱의 알림을 허용해 주세요.'); return; }
+  const reg = await navigator.serviceWorker.ready;
+  if (st === 'on') {
+    const sub = await reg.pushManager.getSubscription();
+    if (sub) { try { await db.from('push_subscriptions').delete().eq('endpoint', sub.endpoint); } catch (e) {} await sub.unsubscribe(); }
+    ta3Toast('알림을 껐습니다'); ta3RenderMy(); return;
+  }
+  try {
+    const perm = await Notification.requestPermission(); if (perm !== 'granted') { ta3Toast('알림이 허용되지 않았습니다'); return; }
+    const kr = await fetch(TA_PUSH_FN, { headers: { apikey: SUPABASE_ANON_KEY } }); const { key } = await kr.json(); if (!key) throw new Error('공개키 없음');
+    const sub = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: taPushB64(key) });
+    const j = sub.toJSON();
+    const { error } = await db.from('push_subscriptions').upsert([{ endpoint: j.endpoint, consultant: currentUser.name, p256dh: j.keys.p256dh, auth: j.keys.auth }]);
+    if (error) throw error;
+    ta3Toast('알림을 켰습니다'); ta3RenderMy();
+  } catch (e) { alert('알림 설정 실패: ' + (e.message || e) + '\n(서버 설정이 아직 안 되었을 수 있습니다)'); }
+}
+(function () {
+  const f = window.ta3RenderMy; if (typeof f !== 'function') return;
+  window.ta3RenderMy = function () {
+    f.apply(this, arguments);
+    taPushState().then(st => {
+      const m = document.getElementById('ta3MyMenu'); if (!m || st === 'unsupported' && false) return;
+      const b = document.createElement('button'); b.type = 'button'; b.onclick = taPushToggle;
+      b.textContent = '알림 ' + (st === 'on' ? '끄기 (현재 켜짐)' : st === 'denied' ? '차단됨 (기기 설정에서 허용)' : '켜기');
+      m.insertBefore(b, m.lastElementChild);
+    });
+  };
+})();
+if ('serviceWorker' in navigator) navigator.serviceWorker.addEventListener('message', e => {
+  const d = e.data || {}; if (d.type === 'push-refresh' || d.type === 'push-open') { try { ta3Reload(); } catch (x) {} if (d.type === 'push-open' && d.lead) setTimeout(() => { try { ta3Open(d.lead); } catch (x) {} }, 600); }
+});
+
 </script>
 
 <!-- ========================================== -->
