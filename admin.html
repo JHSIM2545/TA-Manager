@@ -1289,10 +1289,32 @@
 @media(max-width:760px){table.lead-table .lt-w{display:none}table.lead-table th,table.lead-table td{padding:8px 4px;font-size:12px}table.lead-table th{white-space:normal;font-size:11px}table.lead-table th,table.lead-table td{min-width:0!important}table.lead-table td:first-child,table.lead-table th:first-child{white-space:nowrap}table.lead-table .sched-cell{white-space:nowrap}table.lead-table .amount-cell{font-size:12px}table.lead-table button.danger{padding:4px 6px;font-size:11px}}
 table.lead-table button.lt-x{width:26px;height:26px;padding:0;border-radius:50%;line-height:1;font-size:13px;font-weight:800;display:inline-flex;align-items:center;justify-content:center}
 </style>
+<link rel="manifest" href="manifest-admin.json">
+<link rel="icon" type="image/png" href="favicon.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="TA 관리자">
+<style>#ta4Splash{position:fixed;inset:0;z-index:2147483000;background:#eef4fc url(splash.jpg) center/cover no-repeat;transition:opacity .45s ease;}#ta4Splash.out{opacity:0;pointer-events:none;}</style>
 <meta name="theme-color" content="#0f2547">
 <style>:root{--bg:#0d1c38;}</style>
 </head>
 <body>
+<div id="ta4Splash" aria-hidden="true"></div>
+<script>
+// ---------- 스플래시 / 설치형 앱 ----------
+(function () {
+  const sp = document.getElementById('ta4Splash'); if (!sp) return;
+  let seen = false; try { seen = sessionStorage.getItem('S1_SPLASH') === '1'; sessionStorage.setItem('S1_SPLASH', '1'); } catch (e) {}
+  if (seen) { sp.remove(); return; }
+  const hide = () => { sp.classList.add('out'); setTimeout(() => sp.remove(), 600); };
+  const t0 = Date.now(), min = 1400;
+  const go = () => setTimeout(hide, Math.max(0, min - (Date.now() - t0)));
+  if (document.readyState === 'complete') go(); else window.addEventListener('load', go);
+  setTimeout(hide, 3500);
+})();
+if ('serviceWorker' in navigator) window.addEventListener('load', () => { navigator.serviceWorker.register('sw.js').catch(() => {}); });
+</script>
 
 <!-- 1. 로그인 오버레이 -->
 <div id="loginOverlay">
