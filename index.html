@@ -1286,7 +1286,7 @@
   .ct-row .tx b .ct-pth.p1{background:#fee2e2;color:#b91c1c;} .ct-row .tx b .ct-pth.p2{background:#dbeafe;color:#1d4ed8;} .ct-row .tx b .ct-pth.p3{background:#dcfce7;color:#15803d;}
   .ta3-lg{display:flex;gap:12px;align-items:center;font-size:12px;font-weight:800;color:#475569;padding:2px 2px 6px;} .ta3-lg i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:4px;vertical-align:-1px;}
 
-@media(max-width:760px){table.lead-table .lt-w{display:none}table.lead-table th,table.lead-table td{padding:8px 4px;font-size:12px}table.lead-table th{white-space:normal;font-size:11px}table.lead-table th,table.lead-table td{min-width:0!important}table.lead-table td:first-child,table.lead-table th:first-child{white-space:nowrap}table.lead-table .sched-cell{white-space:nowrap}table.lead-table .amount-cell{font-size:12px}table.lead-table button.danger{padding:4px 6px;font-size:11px}}
+.am-s{display:none}@media(max-width:760px){.am-w{display:none}.am-s{display:inline}.calendar-table{table-layout:fixed;width:100%;font-size:11px}.calendar-table th,.calendar-table td{padding:6px 2px;white-space:normal;word-break:break-all;text-align:right}.calendar-table th:first-child,.calendar-table td:first-child{position:static;width:40px;text-align:left}.calendar-table th{font-size:10px}.calendar-table .cal-count{display:block;margin:0;font-size:9px}}@media(max-width:760px){table.lead-table .lt-w{display:none}table.lead-table th,table.lead-table td{padding:8px 4px;font-size:12px}table.lead-table th{white-space:normal;font-size:11px}table.lead-table th,table.lead-table td{min-width:0!important}table.lead-table td:first-child,table.lead-table th:first-child{white-space:nowrap}table.lead-table .sched-cell{white-space:nowrap}table.lead-table .amount-cell{font-size:12px}table.lead-table button.danger{padding:4px 6px;font-size:11px}}
 table.lead-table button.lt-x{width:26px;height:26px;padding:0;border-radius:50%;line-height:1;font-size:13px;font-weight:800;display:inline-flex;align-items:center;justify-content:center}
 </style>
 <link rel="manifest" href="manifest.json">
@@ -1541,7 +1541,7 @@ if ('serviceWorker' in navigator) window.addEventListener('load', () => { naviga
 
       <!-- 이달 캘린더 — 컨설턴트별 수주예상 금액 그리드 -->
       <div class="panel">
-        <h2>이달 캘린더 — 컨설턴트별 수주예상 금액 <span class="count-tag" id="calendarMonthLabel"></span></h2>
+        <h2>이달 캘린더 — 컨설턴트별 수주예상 금액 <span class="count-tag" id="calendarMonthLabel"></span><span class="am-s" style="font-size:11px;color:var(--muted);font-weight:700;margin-left:6px;">단위: 천원</span></h2>
         <div class="table-scroll" style="max-height:560px;">
           <table class="calendar-table">
             <thead><tr id="calendarHeadRow"><th>일자</th></tr></thead>
@@ -3247,6 +3247,7 @@ async function saveAllTargets() {
   }
 }
 
+function calAmt(n) { n = Number(n || 0); return `<span class="am-w">${formatCurrency(n)}</span><span class="am-s">${Math.round(n / 1000).toLocaleString('ko-KR')}</span>`; }
 function renderCalendarGrid() {
   const monthStr = currentMonthStr();
   const [y, m] = monthStr.split('-').map(Number);
@@ -3284,17 +3285,17 @@ function renderCalendarGrid() {
     else if (holiday) rowClass = 'calendar-row-holiday';
 
     const totalCellContent = totalCount > 0
-      ? `<span class="cal-count">${totalCount}건</span>${formatCurrency(totalAmount)}`
+      ? `<span class="cal-count">${totalCount}건</span>${calAmt(totalAmount)}`
       : '-';
     const totalCellAttrs = totalCount > 0 ? `class="cal-cell" data-date="${dateStr}" data-name=""` : '';
 
     rows.push(`
       <tr class="${rowClass}">
-        <td>${day}일 (${weekdayNames[wd]})</td>
+        <td><span class="am-w">${day}일 (${weekdayNames[wd]})</span><span class="am-s">${day}(${weekdayNames[wd]})</span></td>
         <td ${totalCellAttrs}>${totalCellContent}</td>
         ${perConsultant.map(r => {
           if (r.count === 0) return `<td class="calendar-cell-zero">-</td>`;
-          return `<td class="cal-cell" data-date="${dateStr}" data-name="${r.name}"><span class="cal-count">${r.count}건</span>${formatCurrency(r.amount)}</td>`;
+          return `<td class="cal-cell" data-date="${dateStr}" data-name="${r.name}"><span class="cal-count">${r.count}건</span>${calAmt(r.amount)}</td>`;
         }).join('')}
       </tr>
     `);
