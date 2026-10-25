@@ -8583,7 +8583,7 @@ async function taPushToggle() {
   const reg = await navigator.serviceWorker.ready;
   if (st === 'on') {
     const sub = await reg.pushManager.getSubscription();
-    if (sub) { try { await db.from('push_subscriptions').delete().eq('endpoint', sub.endpoint); } catch (e) {} await sub.unsubscribe(); }
+    if (sub) { try { await db.from('ta_push_subs').delete().eq('endpoint', sub.endpoint); } catch (e) {} await sub.unsubscribe(); }
     ta3Toast('알림을 껐습니다'); ta3RenderMy(); return;
   }
   try {
@@ -8591,7 +8591,7 @@ async function taPushToggle() {
     const kr = await fetch(TA_PUSH_FN, { headers: { apikey: SUPABASE_ANON_KEY } }); const { key } = await kr.json(); if (!key) throw new Error('공개키 없음');
     const sub = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: taPushB64(key) });
     const j = sub.toJSON();
-    const { error } = await db.from('push_subscriptions').upsert([{ endpoint: j.endpoint, consultant: currentUser.name, p256dh: j.keys.p256dh, auth: j.keys.auth }]);
+    const { error } = await db.from('ta_push_subs').upsert([{ endpoint: j.endpoint, consultant: currentUser.name, p256dh: j.keys.p256dh, auth: j.keys.auth }]);
     if (error) throw error;
     ta3Toast('알림을 켰습니다'); ta3RenderMy();
   } catch (e) { alert('알림 설정 실패: ' + (e.message || e) + '\n(서버 설정이 아직 안 되었을 수 있습니다)'); }
