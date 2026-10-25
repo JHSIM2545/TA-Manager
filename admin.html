@@ -2778,6 +2778,20 @@ async function loadTargetsFromSupabase(month) {
         TARGETS.rates[c][m][cat] = rate;
       });
     }
+    try {
+      const { data: dr } = await db.from('sales_targets_rep').select('*').eq('year_month', month);
+      if (dr && dr.length) {
+        const MAPC = { '알람': '일반알람', '정보보안': '디지털(정보보안)' };
+        CONSULTANTS.forEach(c => {
+          if (!TARGETS.targets[c]) TARGETS.targets[c] = {};
+          if (!TARGETS.targets[c][month]) TARGETS.targets[c][month] = {};
+          const md = TARGETS.targets[c][month];
+          Object.keys(MAPC).forEach(pt => { md[MAPC[pt]] = dr.filter(r => r.rep_name === c && r.product_type === pt).reduce((s, r) => s + (Number(r.target_order) || 0), 0); });
+          if (md['안전상품'] === undefined) md['안전상품'] = 0;   // 영업일보에는 컨설턴트별 안전상품 목표가 없음
+        });
+        TARGETS.fromDaily = month;
+      }
+    } catch (e2) { console.warn('영업일보 목표 조회 실패:', e2); }
   } catch (err) {
     console.error('목표 데이터 로드 예외:', err);
   }
