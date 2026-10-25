@@ -1336,6 +1336,58 @@ body.adm-map #admMapView{display:block;}
 
 body.adm-list header.topbar,body.adm-map header.topbar,body.adm-list #dateBanner,body.adm-map #dateBanner{display:none !important;}
 body.adm-list{--adm-gap:1;}
+
+/* 아이콘 통일 (시트) */
+#admSheet button .ic{width:30px;height:30px;display:flex;align-items:center;justify-content:center;flex:none;}
+#admSheet button .ic svg{width:24px;height:24px;stroke:#0f2547;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;}
+/* 차트 */
+.adm-charts{grid-template-columns:1.2fr 1fr 1fr !important;}
+@media(max-width:900px){.adm-charts{grid-template-columns:1fr !important;}}
+.donut.sm{width:110px;height:110px;}
+.donut.sm::after{inset:20px;}
+.adm-charts .donut-wrap{gap:14px;justify-content:flex-start;}
+.adm-charts .legend{font-size:12.5px;flex:1;min-width:150px;}
+@media(max-width:760px){
+  .bar-row{grid-template-columns:48px 1fr auto !important;gap:6px !important;}
+  .bar-value{font-size:11.5px !important;white-space:nowrap;}
+  .adm-charts .donut-wrap{gap:10px;}
+  .donut.sm{width:92px;height:92px;}
+  .donut.sm::after{inset:17px;}
+}
+/* 달성현황 */
+.adm-target th,.adm-target td{padding:10px 6px !important;}
+.adm-crow{cursor:pointer;} .adm-crow:hover{background:#eef3fb;}
+.adm-dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:6px;}
+.adm-rate{display:flex;align-items:center;gap:8px;}
+.adm-rbar{flex:1;min-width:50px;height:14px;background:#e2e8f0;border-radius:999px;overflow:hidden;}
+.adm-rbar i{display:block;height:100%;border-radius:999px;}
+.adm-rate b{min-width:44px;text-align:right;font-size:13px;}
+.adm-ctotal{background:#f8fafc;font-weight:800;border-top:2px solid var(--navy);}
+#admPop{display:none;position:fixed;inset:0;z-index:3500;background:rgba(10,20,40,.55);align-items:center;justify-content:center;padding:14px;}
+#admPop.on{display:flex;}
+.adm-popc{position:relative;background:#fff;border-radius:16px;max-width:520px;width:100%;max-height:88vh;overflow:auto;padding:18px 14px;color:#111827;}
+.adm-popc h3{margin:0 28px 12px 2px;font-size:18px;} .adm-popc h3 small{font-size:12px;color:#6b7280;font-weight:700;margin-left:6px;}
+.adm-popc h4{margin:16px 2px 6px;font-size:14px;color:#0f2547;}
+.adm-popx{position:absolute;right:8px;top:6px;border:none !important;background:none !important;color:#6b7280 !important;font-size:26px;padding:4px 10px !important;}
+.adm-mg{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.adm-mc{background:#f4f6fb;border-radius:12px;padding:10px 12px;display:flex;flex-direction:column;gap:2px;}
+.adm-mc span{font-size:12px;color:#6b7280;font-weight:700;} .adm-mc b{font-size:16px;color:#0f2547;} .adm-mc small{font-size:11.5px;color:#6b7280;}
+.adm-kt{width:100%;border-collapse:collapse;font-size:12.5px;}
+.adm-kt th,.adm-kt td{padding:8px 4px;border-bottom:1px solid #e8ebf1;text-align:center;white-space:nowrap;}
+.adm-kt th{color:#6b7280;font-size:11.5px;} .adm-kt td:first-child,.adm-kt th:first-child{text-align:left;}
+/* 캘린더 날짜 가운데 */
+.calendar-table td:first-child,.calendar-table th:first-child{text-align:center !important;}
+/* 페이지 번호 */
+.lead-pager{display:flex;justify-content:center;gap:6px;margin-top:14px;flex-wrap:wrap;}
+.lead-pager button{min-width:34px;height:34px;border-radius:8px;border:1px solid #d5dbe6 !important;background:#fff !important;color:#0f2547 !important;font-weight:800;padding:0 8px !important;}
+.lead-pager button.on{background:#0f2547 !important;color:#fff !important;border-color:#0f2547 !important;}
+.lead-pager button:disabled{opacity:.35;}
+/* 가망고객 문자 등록: 전체 화면 */
+#ta4PsOv{padding:0 !important;align-items:stretch !important;justify-content:stretch !important;background:#fff !important;z-index:100050 !important;}
+#ta4PsOv>div{max-width:none !important;width:100% !important;max-height:none !important;height:100%;border-radius:0 !important;padding:16px 14px calc(18px + env(safe-area-inset-bottom)) !important;box-sizing:border-box;}
+#admSheet button{transition:none !important;}
+body.adm-sheet #admTabbar{visibility:hidden;}
+#admSheet button:hover,#admSheet button:active{background:#dde3f0 !important;color:#0f2547 !important;}
 </style>
 </head>
 <body>
@@ -1502,8 +1554,8 @@ if ('serviceWorker' in navigator) window.addEventListener('load', () => { naviga
       <!-- 금일 수주 예정 전체 리스트 -->
       <div class="panel">
         <div class="panel-toolbar today-list-toolbar">
-          <h2>금일 수주 예정 전체 리스트 <span class="count-tag" id="todayListCount"></span></h2>
-          <button type="button" class="small copy-btn" id="btnCopyToday">복사하기 (외부 공지용)</button>
+          <h2>금일 수주 예정 TA <span class="count-tag" id="todayListCount"></span></h2>
+          <button type="button" class="small copy-btn" id="btnCopyToday">TA 복사</button>
         </div>
         <div class="table-scroll" style="max-height:320px;">
           <table class="lead-table">
@@ -1523,7 +1575,6 @@ if ('serviceWorker' in navigator) window.addEventListener('load', () => { naviga
             <button type="button" class="small" id="btnActivityRefresh">새로고침</button>
           </div>
         </div>
-        <p style="font-size:12px;color:var(--muted);margin:-6px 0 12px;">컨설턴트가 TA를 신규 등록/수정/삭제할 때마다 자동으로 기록됩니다. 하루치만 표시되며, 30초마다 자동 갱신됩니다.</p>
         <div class="table-scroll" style="max-height:420px;">
           <table class="lead-table">
             <thead><tr><th>시간</th><th>컨설턴트</th><th>구분</th><th style="min-width:170px;">서비스제공처명</th><th>변경 내용</th></tr></thead>
@@ -1532,43 +1583,36 @@ if ('serviceWorker' in navigator) window.addEventListener('load', () => { naviga
         </div>
       </div>
 
-      <!-- 차트: 바차트 & 도넛차트 -->
+      <!-- 차트 -->
       <div class="panel">
-        <div class="charts-grid">
+        <div class="charts-grid adm-charts">
           <div>
             <h2>컨설턴트별 진행 TA 금액</h2>
             <div id="barChart"></div>
           </div>
           <div>
-            <h2>영업단계별 금액 분포</h2>
+            <h2>영업단계별 금액·건수</h2>
             <div class="donut-wrap">
-              <div class="donut" id="donutChart"></div>
+              <div class="donut sm" id="donutChart"></div>
               <div class="legend" id="donutLegend"></div>
+            </div>
+          </div>
+          <div>
+            <h2>안건 종류별 금액·건수</h2>
+            <div class="donut-wrap">
+              <div class="donut sm" id="donutKind"></div>
+              <div class="legend" id="donutKindLegend"></div>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- 컨설턴트별 달성현황 & 목표 관리 -->
+      <!-- 컨설턴트별 달성현황 (보기 전용 · 목표는 영업일보 기준 데이터) -->
       <div class="panel">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px;">
-          <h2>컨설턴트별 달성현황 <span class="count-tag" id="targetMonthLabel"></span> <span class="count-tag" id="targetCategoryLabel" style="background:#e0e7ff;color:#3730a3;"></span></h2>
-          <button type="button" class="small" id="btnOpenTargetModal" onclick="openTargetModal()" style="background:var(--blue);color:#fff;font-weight:700;display:inline-flex;align-items:center;gap:6px;">
-            🎯 월간 목표 설정 / 배분
-          </button>
-        </div>
-        <div class="table-scroll">
-          <table class="target-table">
-            <thead><tr>
-              <th style="white-space:nowrap;width:80px;">컨설턴트</th>
-              <th style="white-space:nowrap;width:130px;">이달 수주</th>
-              <th style="white-space:nowrap;min-width:210px;">수주 달성율 (차트)</th>
-              <th style="white-space:nowrap;width:130px;">진행중 TA</th>
-              <th style="white-space:nowrap;width:95px;">보유 TA율</th>
-              <th style="white-space:nowrap;width:90px;">TA 수주율</th>
-              <th style="white-space:nowrap;width:90px;">수주 실패율</th>
-              <th style="white-space:nowrap;width:130px;">이달 확정목표(원)</th>
-            </tr></thead>
+        <h2>컨설턴트별 달성현황 <span class="count-tag" id="targetMonthLabel"></span> <span class="count-tag" id="targetCategoryLabel" style="background:#e0e7ff;color:#3730a3;"></span></h2>
+        <div class="table-scroll cal-noscroll">
+          <table class="target-table adm-target">
+            <thead><tr><th>컨설턴트</th><th>이달 수주(건수)</th><th>TA 수주율</th></tr></thead>
             <tbody id="targetTbody"></tbody>
           </table>
         </div>
@@ -1576,7 +1620,7 @@ if ('serviceWorker' in navigator) window.addEventListener('load', () => { naviga
 
       <!-- 이달 캘린더 — 컨설턴트별 수주예상 금액 그리드 -->
       <div class="panel">
-        <h2>이달 캘린더 — 컨설턴트별 수주예상 금액 <span class="count-tag" id="calendarMonthLabel"></span><span class="am-s" style="font-size:11px;color:var(--muted);font-weight:700;margin-left:6px;">단위: 천원</span></h2>
+        <h2 style="display:flex;align-items:center;gap:6px;">TA 캘린더 <span class="count-tag" id="calendarMonthLabel"></span><span class="am-s" style="margin-left:auto;font-size:11.5px;color:var(--muted);font-weight:700;">단위: 천원</span></h2>
         <div class="table-scroll cal-noscroll">
           <table class="calendar-table">
             <thead><tr id="calendarHeadRow"><th>일자</th></tr></thead>
@@ -1619,6 +1663,7 @@ if ('serviceWorker' in navigator) window.addEventListener('load', () => { naviga
             <tbody id="leadTbody"></tbody>
           </table>
         </div>
+        <div id="leadPager" class="lead-pager"></div>
       </div>
     </div>
 
@@ -3385,6 +3430,11 @@ function renderLeadTable() {
 
   leads.sort((a, b) => (b.updatedAt || '').localeCompare(a.updatedAt || ''));
   el('leadCountTag').textContent = '(' + leads.length + '건)';
+  const _sig = [cf, sf, kf, mf, qf, el('fKind') ? el('fKind').value : '', activeDashboardCategory].join('|');
+  if (_sig !== window.__leadSig) { window.__leadSig = _sig; window.__leadPage = 1; }
+  const _pages = Math.max(1, Math.ceil(leads.length / 20)); window.__leadPage = Math.min(Math.max(1, window.__leadPage || 1), _pages);
+  const _total = leads.length; leads = leads.slice((window.__leadPage - 1) * 20, window.__leadPage * 20);
+  if (typeof admPager === 'function') admPager(_total, _pages);
 
   const tbody = el('leadTbody');
   if (leads.length === 0) {
@@ -8576,6 +8626,7 @@ function admInit() {
   const so = document.createElement('div'); so.id = 'admSheetOv'; so.onclick = e => { if (e.target === so) admSheetClose(); };
   so.innerHTML = '<div id="admSheet"></div>'; document.body.appendChild(so);
   try { const p = el('leadTbody').closest('.panel'); if (p) p.id = 'panelAllTA'; } catch (e) {}
+  try { el('leadTbody').closest('.table-scroll').classList.add('cal-noscroll'); } catch (e) {}
   document.body.classList.add('adm-home');
   const setTop = () => { const h = document.querySelector('header.topbar'); document.documentElement.style.setProperty('--adm-top', (h ? h.getBoundingClientRect().height : 64) + 'px'); };
   setTop(); window.addEventListener('resize', setTop); window.admSetTop = setTop;
@@ -8592,22 +8643,22 @@ function admTab(t) {
 // ----- 시트 (안건추가 / 더보기) -----
 function admSheetOpen(title, items) {
   el('admSheet').innerHTML = `<h4>${title}</h4>` + items.map((it, i) => `<button type="button" onclick="admSheetPick(${i})"><span class="ic">${it.ic}</span><span>${it.t}<small>${it.s || ''}</small></span></button>`).join('');
-  ADM.sheetItems = items; el('admSheetOv').classList.add('on');
+  ADM.sheetItems = items; el('admSheetOv').classList.add('on'); document.body.classList.add('adm-sheet');
 }
-function admSheetClose() { el('admSheetOv').classList.remove('on'); }
+function admSheetClose() { el('admSheetOv').classList.remove('on'); document.body.classList.remove('adm-sheet'); }
 function admSheetPick(i) { const f = ADM.sheetItems[i].fn; admSheetClose(); setTimeout(f, 60); }
 function admAddSheet() {
   admSheetOpen('안건 추가', [
-    { ic: '💬', t: '가망고객 문자 등록', s: '받은 문자를 붙여넣어 분석 · 컨설턴트에게 바로 등록', fn: () => ta4PsOpenInput() },
-    { ic: '📝', t: 'TA 안건 등록', s: '컨설턴트를 선택해 TA 안건을 직접 등록', fn: () => admNewLead() }
+    { ic: '<svg viewBox="0 0 24 24"><path d="M21 12a8 8 0 01-11.6 7.1L4 20l1-4.6A8 8 0 1121 12z"/><path d="M8.5 11h7M8.5 14h4"/></svg>', t: '가망고객 문자 등록', s: '받은 문자를 붙여넣어 분석 · 컨설턴트에게 바로 등록', fn: () => ta4PsOpenInput() },
+    { ic: '<svg viewBox="0 0 24 24"><path d="M14 3H6a2 2 0 00-2 2v14a2 2 0 002 2h12a2 2 0 002-2V9z"/><path d="M14 3v6h6"/><path d="M12 12v6M9 15h6"/></svg>', t: 'TA 안건 등록', s: '컨설턴트를 선택해 TA 안건을 직접 등록', fn: () => admNewLead() }
   ]);
 }
 function admMoreSheet() {
   admSheetOpen('더보기', [
-    { ic: '👥', t: '사용자 관리', s: '', fn: () => openUserManageModal() },
-    { ic: '🎯', t: '목표 설정', s: '', fn: () => openTargetModal() },
-    { ic: '📢', t: '공지사항 관리', s: '', fn: () => openNoticeModal() },
-    { ic: '🚪', t: '로그아웃', s: '', fn: () => doLogout() }
+    { ic: '<svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.6-3.6 3.2-5.5 6.5-5.5s5.9 1.9 6.5 5.5"/><path d="M16 4.7a3.5 3.5 0 010 6.6M18 14.8c2 .6 3.2 2.2 3.5 5.2"/></svg>', t: '사용자 관리', s: '', fn: () => openUserManageModal() },
+    { ic: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.2"/></svg>', t: '목표 현황', s: '영업일보 기준 · 보기 전용', fn: () => admTargetView() },
+    { ic: '<svg viewBox="0 0 24 24"><path d="M4 10v4a1 1 0 001 1h2l6 4V5L7 9H5a1 1 0 00-1 1z"/><path d="M16.5 8.5a5 5 0 010 7M19 6a8.5 8.5 0 010 12"/></svg>', t: '공지사항 관리', s: '', fn: () => openNoticeModal() },
+    { ic: '<svg viewBox="0 0 24 24"><path d="M9 4H5a1 1 0 00-1 1v14a1 1 0 001 1h4"/><path d="M16 8l4 4-4 4M20 12H9"/></svg>', t: '로그아웃', s: '', fn: () => doLogout() }
   ]);
 }
 
@@ -8682,6 +8733,102 @@ function admMapPreview(id) {
 }
 
 function admBoot() { admInit(); }
+
+// ---------- 페이지 번호 (전체 TA 조회, 20건 단위) ----------
+function admPager(total, pages) {
+  const box = el('leadPager'); if (!box) return;
+  const cur = window.__leadPage || 1;
+  if (pages <= 1) { box.innerHTML = ''; return; }
+  let s = Math.max(1, cur - 2), e = Math.min(pages, s + 4); s = Math.max(1, e - 4);
+  let h = `<button type="button" ${cur === 1 ? 'disabled' : ''} onclick="admPage(${cur - 1})" aria-label="이전">&laquo;</button>`;
+  for (let i = s; i <= e; i++) h += `<button type="button" class="${i === cur ? 'on' : ''}" onclick="admPage(${i})">${i}</button>`;
+  h += `<button type="button" ${cur === pages ? 'disabled' : ''} onclick="admPage(${cur + 1})" aria-label="다음">&raquo;</button>`;
+  box.innerHTML = h;
+}
+function admPage(n) { window.__leadPage = n; renderLeadTable(); try { el('leadTbody').closest('.panel').scrollIntoView({ block: 'start' }); } catch (e) {} }
+
+// ---------- 차트 ----------
+const ADM_KIND_COLOR = { 'TA': '#e11d1d', '소개': '#1f6bff', '가망': '#16a34a' };
+function admK(n) { return Math.round(Number(n || 0) / 1000).toLocaleString('ko-KR'); }
+function renderBarChart() {
+  const rows = CONSULTANTS.map(name => {
+    const pl = consultantLeads(name).filter(l => l.stage === '진행중');
+    return { name, val: pl.reduce((s, l) => s + Number(l.amount || 0), 0), count: pl.length };
+  });
+  const max = Math.max(1, ...rows.map(r => r.val));
+  el('barChart').innerHTML = rows.map(r => `
+    <div class="bar-row" title="${r.name} · ${admK(r.val)}천원 / ${r.count}건">
+      <div class="bar-name">${r.name}</div>
+      <div class="bar-track"><div class="bar-fill" style="width:${Math.round(r.val / max * 100)}%;background:${CONSULTANT_COLOR[r.name] || 'var(--blue)'};"></div></div>
+      <div class="bar-value"><span class="am-w">${formatCurrency(r.val)} / ${r.count}건</span><span class="am-s">${admK(r.val)} / ${r.count}건</span></div>
+    </div>`).join('');
+}
+function admPie(boxId, legId, items) {
+  const total = items.reduce((s, i) => s + i.val, 0);
+  let acc = 0; const seg = items.map(i => { const p = total > 0 ? i.val / total * 100 : 0; const t = `${i.color} ${acc}% ${acc + p}%`; acc += p; return t; });
+  el(boxId).style.background = total > 0 ? `conic-gradient(${seg.join(',')})` : '#eef1f7';
+  el(legId).innerHTML = items.map(i => `<div class="item" title="${i.label} · ${admK(i.val)}천원 / ${i.count}건"><span class="sw" style="background:${i.color};"></span><span style="white-space:nowrap;"><b>${i.label}</b> <small>${total > 0 ? Math.round(i.val / total * 100) : 0}%</small><br><span class="am-w">${formatCurrency(i.val)}</span><span class="am-s">${admK(i.val)}천원</span> / ${i.count}건</span></div>`).join('');
+}
+function renderDonut() {
+  const L = allLeads();
+  admPie('donutChart', 'donutLegend', STAGES.map(s => { const a = L.filter(l => l.stage === s); return { label: s === '수주完' ? '수주완료' : s, color: STAGE_COLOR[s], val: a.reduce((t, l) => t + Number(l.amount || 0), 0), count: a.length }; }));
+  admPie('donutKind', 'donutKindLegend', ['TA', '소개', '가망'].map(k => { const a = L.filter(l => ta4Kind(l) === k); return { label: k, color: ADM_KIND_COLOR[k], val: a.reduce((t, l) => t + Number(l.amount || 0), 0), count: a.length }; }));
+}
+
+// ---------- 컨설턴트별 달성현황: 이름 · 이달 수주(건수) · TA 수주율 차트 → 클릭 시 상세 팝업 ----------
+function admRate(r) { return r === null || r === undefined ? '-' : r + '%'; }
+function renderTargets() {
+  const month = currentMonthStr();
+  if (el('targetMonthLabel')) el('targetMonthLabel').textContent = '(' + month + ')';
+  if (el('targetCategoryLabel')) el('targetCategoryLabel').textContent = activeDashboardCategory === 'all' ? '전체 상품 합계' : activeDashboardCategory;
+  let wAmt = 0, wCnt = 0, allAmt = 0, allWon = 0;
+  const rows = CONSULTANTS.map(name => {
+    const target = getConsultantTarget(name, month, activeDashboardCategory);
+    const m = computeMetrics(consultantLeads(name), target, month);
+    wAmt += m.monthWonAmount; wCnt += m.monthWonCount; allAmt += m.totalAmount; allWon += m.wonAllAmount;
+    const rate = m.winRate === null ? 0 : m.winRate, col = rate >= 50 ? 'var(--green)' : rate >= 25 ? 'var(--blue)' : 'var(--amber)';
+    return `<tr class="adm-crow" onclick="admCsPop('${name}')"><td style="font-weight:800;color:${CONSULTANT_COLOR[name]};white-space:nowrap;"><span class="adm-dot" style="background:${CONSULTANT_COLOR[name]}"></span>${name}</td>
+      <td style="white-space:nowrap;"><span class="am-w">${formatCurrency(m.monthWonAmount)}</span><span class="am-s">${admK(m.monthWonAmount)}</span> <span class="count-tag">(${m.monthWonCount}건)</span></td>
+      <td><div class="adm-rate"><div class="adm-rbar"><i style="width:${Math.min(100, rate)}%;background:${col}"></i></div><b style="color:${col}">${admRate(m.winRate)}</b></div></td></tr>`;
+  });
+  const tr = allAmt > 0 ? Math.round(allWon / allAmt * 1000) / 10 : null;
+  rows.push(`<tr class="adm-ctotal"><td style="white-space:nowrap;">사 전체</td><td style="white-space:nowrap;"><span class="am-w">${formatCurrency(wAmt)}</span><span class="am-s">${admK(wAmt)}</span> <span class="count-tag">(${wCnt}건)</span></td><td><div class="adm-rate"><div class="adm-rbar"><i style="width:${Math.min(100, tr || 0)}%;background:var(--navy)"></i></div><b>${admRate(tr)}</b></div></td></tr>`);
+  el('targetTbody').innerHTML = rows.join('');
+}
+function admPopOpen(html) {
+  let ov = el('admPop');
+  if (!ov) { ov = document.createElement('div'); ov.id = 'admPop'; ov.onclick = e => { if (e.target === ov) ov.classList.remove('on'); }; document.body.appendChild(ov); }
+  ov.innerHTML = `<div class="adm-popc"><button type="button" class="adm-popx" onclick="el('admPop').classList.remove('on')" aria-label="닫기">&times;</button>${html}</div>`;
+  ov.classList.add('on');
+}
+function admCsPop(name) {
+  const month = currentMonthStr(), target = getConsultantTarget(name, month, activeDashboardCategory), leads = consultantLeads(name);
+  const m = computeMetrics(leads, target, month), e = escapeHtml;
+  const cell = (l, v, s) => `<div class="adm-mc"><span>${l}</span><b>${v}</b>${s ? `<small>${s}</small>` : ''}</div>`;
+  const kinds = ['TA', '소개', '가망'].map(k => {
+    const a = leads.filter(l => ta4Kind(l) === k), mm = computeMetrics(a, 0, month);
+    return `<tr><td><i class="adm-dot" style="background:${ADM_KIND_COLOR[k]}"></i>${k}</td><td>${a.length}건</td><td><span class="am-w">${formatCurrency(mm.totalAmount)}</span><span class="am-s">${admK(mm.totalAmount)}</span></td><td>${admRate(mm.winRate)}</td><td>${admRate(mm.failRate)}</td></tr>`;
+  }).join('');
+  admPopOpen(`<h3 style="color:${CONSULTANT_COLOR[name]}">${e(name)} <small>${month} · ${activeDashboardCategory === 'all' ? '전체 상품' : e(activeDashboardCategory)}</small></h3>
+    <div class="adm-mg">
+      ${cell('이달 수주', formatCurrency(m.monthWonAmount), m.monthWonCount + '건')}
+      ${cell('이달 확정 목표', target > 0 ? formatCurrency(target) : '미설정', m.achievementRate === null ? '' : '달성 ' + m.achievementRate + '%')}
+      ${cell('진행중 TA', formatCurrency(m.pipelineAmount), m.pipelineCount + '건')}
+      ${cell('보유 TA율', admRate(m.holdingRate), '이달 수주예정 ' + formatCurrency(m.monthPipelineAmount))}
+      ${cell('TA 수주율', admRate(m.winRate))}
+      ${cell('수주 실패율', admRate(m.failRate))}
+    </div>
+    <h4>안건 종류별 현황</h4>
+    <table class="adm-kt"><thead><tr><th>종류</th><th>건수</th><th>금액<span class="am-s">(천원)</span></th><th>수주율</th><th>실패율</th></tr></thead><tbody>${kinds}</tbody></table>`);
+}
+
+// ---------- 목표 현황 (보기 전용, 영업일보 기준 데이터) ----------
+function admTargetView() {
+  const month = currentMonthStr(), cats = ['일반알람', '디지털(정보보안)', '안전상품'];
+  const rows = CONSULTANTS.map(n => `<tr><td style="color:${CONSULTANT_COLOR[n]};font-weight:800;">${n}</td>${cats.map(c => `<td>${admK(getConsultantTarget(n, month, c))}</td>`).join('')}<td><b>${admK(getConsultantTarget(n, month, 'all'))}</b></td></tr>`).join('');
+  const tot = `<tr class="adm-ctotal"><td>지사 합계</td>${cats.map(c => `<td>${admK(getTotalTarget(month, c))}</td>`).join('')}<td>${admK(CONSULTANTS.reduce((s, n) => s + getConsultantTarget(n, month, 'all'), 0))}</td></tr>`;
+  admPopOpen(`<h3>${Number(month.slice(5, 7))}월 목표 현황 <small>단위: 천원 · 영업일보 기준</small></h3><table class="adm-kt"><thead><tr><th>컨설턴트</th><th>일반알람</th><th>디지털</th><th>안전상품</th><th>합계</th></tr></thead><tbody>${rows}${tot}</tbody></table>`);
+}
 
 </script>
 
