@@ -1458,6 +1458,11 @@ body.adm-home.adm-h-chart #dateBanner,body.adm-home.adm-h-cal #dateBanner{displa
 .adm-mcnt .adm-sq{font-style:normal;color:#fff;border-radius:5px;padding:2px 7px;font-size:11.5px;font-weight:800;}
 .adm-mcnt .adm-dt{display:inline-flex;align-items:center;font-size:11.5px;}
 .adm-mcnt .adm-dt i{margin:0 4px 0 0;}
+
+.adm-sw{position:relative;width:76px;height:38px;border-radius:999px;background:linear-gradient(#4a4a4a,#3c3c3c);display:block;flex:none;transition:background .2s;box-shadow:0 0 0 2px #fff,0 0 0 3px #e3e5e9;}
+.adm-sw u{position:absolute;top:3px;left:3px;width:32px;height:32px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;text-decoration:none;font-size:10.5px;font-weight:800;color:#3c3c3c;box-shadow:0 1px 3px rgba(0,0,0,.25);transition:left .2s;}
+.adm-sw.on{background:linear-gradient(#10c98a,#12b97f);}
+.adm-sw.on u{left:41px;color:#0fae78;font-size:12px;}
 </style>
 </head>
 <body>
@@ -9032,6 +9037,64 @@ function admUTPick(v) {
   else if (el('fKind')) { el('fKind').value = v; renderLeadTable(); }
   admUTRender();
 }
+
+
+// ---------- 관리자 푸시 알림 스위치 (더보기 > TA 알림) ----------
+const ADM_PUSH_FN = SUPABASE_URL + '/functions/v1/ta-push';
+function admPushB64(s) { const p = '='.repeat((4 - s.length % 4) % 4), b = (s + p).replace(/-/g, '+').replace(/_/g, '/'), r = atob(b); return Uint8Array.from([...r].map(c => c.charCodeAt(0))); }
+async function admPushState() {
+  if (!('serviceWorker' in navigator) || !('PushManager' in window)) return 'unsupported';
+  if (Notification.permission === 'denied') return 'denied';
+  try { const reg = await navigator.serviceWorker.ready; return (await reg.pushManager.getSubscription()) ? 'on' : 'off'; } catch (e) { return 'off'; }
+}
+async function admPushToggle() {
+  const st = await admPushState();
+  if (st === 'unsupported') { alert('이 브라우저는 알림을 지원하지 않습니다. 아이폰은 Safari에서 "홈 화면에 추가"한 앱으로 열어야 합니다.'); return; }
+  if (st === 'denied') { alert('알림이 차단되어 있습니다. 기기 설정에서 이 앱의 알림을 허용해 주세요.'); return; }
+  const reg = await navigator.serviceWorker.ready;
+  if (st === 'on') {
+    const sub = await reg.pushManager.getSubscription();
+    if (sub) { try { await db.from('ta_push_subs').delete().eq('endpoint', sub.endpoint); } catch (e) {} await sub.unsubscribe(); }
+    ta3Toast('알림을 껐습니다'); admMoreRender(); return;
+  }
+  try {
+    const perm = await Notification.requestPermission(); if (perm !== 'granted') { ta3Toast('알림이 허용되지 않았습니다'); return; }
+    const kr = await fetch(ADM_PUSH_FN, { headers: { apikey: SUPABASE_ANON_KEY } }); const { key } = await kr.json(); if (!key) throw new Error('공개키 없음');
+    const sub = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: admPushB64(key) });
+    const j = sub.toJSON();
+    const { error } = await db.from('ta_push_subs').upsert([{ endpoint: j.endpoint, consultant: currentUser.name, role: 'admin', scope: 'all', p256dh: j.keys.p256dh, auth: j.keys.auth }]);
+    if (error) throw error;
+    ta3Toast('알림을 켰습니다'); admMoreRender();
+  } catch (e) { alert('알림 설정 실패: ' + (e.message || e) + '\n(서버 설정(SQL의 role 컬럼 추가)이 안 되었을 수 있습니다)'); }
+}
+async function admPushScope(v) {
+  try {
+    const reg = await navigator.serviceWorker.ready, sub = await reg.pushManager.getSubscription(); if (!sub) { ta3Toast('먼저 TA 알림을 켜 주세요'); return; }
+    const { error } = await db.from('ta_push_subs').update({ scope: v }).eq('endpoint', sub.endpoint); if (error) throw error;
+    ta3Toast(v === 'all' ? '모든 알림을 받습니다' : '내 알림만 받습니다'); admMoreRender();
+  } catch (e) { alert('설정 실패: ' + (e.message || e) + '\n(SQL의 scope 컬럼 추가가 필요합니다)'); }
+}
+(function () {
+  const f = window.admMoreRender; if (typeof f !== 'function') return;
+  window.admMoreRender = function () {
+    f.apply(this, arguments);
+    admPushState().then(st => {
+      const l = document.querySelector('#admMoreView .adm-ml'); if (!l) return;
+      if (st === 'on') {
+        navigator.serviceWorker.ready.then(r => r.pushManager.getSubscription()).then(async sub => {
+          let all = true; try { const { data } = await db.from('ta_push_subs').select('scope').eq('endpoint', sub.endpoint).maybeSingle(); all = !data || data.scope !== 'mine'; } catch (e) {}
+          const sb = document.createElement('button'); sb.type = 'button'; sb.onclick = () => admPushScope(all ? 'mine' : 'all');
+          sb.innerHTML = '<span class="ic">' + ADM_IC.bell + '</span><span class="tx">전체 알림 받기<small>' + (all ? '모든 컨설턴트 알림 + 관리자 알림' : '관리자(내) 알림만') + '</small></span><i class="adm-sw' + (all ? ' on' : '') + '"><u>' + (all ? 'ON' : 'OFF') + '</u></i>';
+          const l2 = document.querySelector('#admMoreView .adm-ml'); if (l2) l2.insertBefore(sb, l2.lastElementChild);
+        });
+      }
+      const b = document.createElement('button'); b.type = 'button'; b.onclick = admPushToggle;
+      b.innerHTML = '<span class="ic">' + ADM_IC.bell + '</span><span class="tx">TA 알림<small>신규 안건 · 수주 완료 · 일정 요약</small></span><i class="adm-sw' + (st === 'on' ? ' on' : '') + '"><u>' + (st === 'on' ? 'ON' : 'OFF') + '</u></i>';
+      l.insertBefore(b, l.lastElementChild);
+    });
+  };
+})();
+if ('serviceWorker' in navigator) navigator.serviceWorker.addEventListener('message', e => { const d = e.data || {}; if (d.type === 'push-refresh') { try { loadAllFromSupabase(); } catch (x) {} } });
 
 </script>
 
