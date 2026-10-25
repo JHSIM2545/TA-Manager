@@ -1286,7 +1286,7 @@
   .ct-row .tx b .ct-pth.p1{background:#fee2e2;color:#b91c1c;} .ct-row .tx b .ct-pth.p2{background:#dbeafe;color:#1d4ed8;} .ct-row .tx b .ct-pth.p3{background:#dcfce7;color:#15803d;}
   .ta3-lg{display:flex;gap:12px;align-items:center;font-size:12px;font-weight:800;color:#475569;padding:2px 2px 6px;} .ta3-lg i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:4px;vertical-align:-1px;}
 
-.calendar-table th{text-align:center !important}.am-s{display:none}@media(max-width:760px){.am-w{display:none}.am-s{display:inline}.calendar-table{table-layout:fixed;width:100%;font-size:11px}.calendar-table th,.calendar-table td{padding:6px 2px;white-space:normal;word-break:break-all;text-align:right}.calendar-table th:first-child,.calendar-table td:first-child{position:static;width:40px;text-align:left}.calendar-table th{font-size:10px}.calendar-table .cal-count{display:block;margin:0;font-size:9px}}@media(max-width:760px){table.lead-table .lt-w{display:none}table.lead-table th,table.lead-table td{padding:8px 4px;font-size:12px}table.lead-table th{white-space:normal;font-size:11px}table.lead-table th,table.lead-table td{min-width:0!important}table.lead-table td:first-child,table.lead-table th:first-child{white-space:nowrap}table.lead-table .sched-cell{white-space:nowrap}table.lead-table .amount-cell{font-size:12px}table.lead-table button.danger{padding:4px 6px;font-size:11px}}
+.calendar-table th{text-align:center !important}.user-table-wrapper{overflow-x:hidden !important}.user-data-table{table-layout:auto;width:100%}#userManageModalOverlay .modal-card{padding:14px 8px !important;width:97% !important}.user-data-table th,.user-data-table td{padding:8px 3px !important;font-size:12px !important;white-space:nowrap}.user-data-table th:last-child,.user-data-table td:last-child{width:1%}.user-data-table td:first-child{font-weight:700}.btn-user-edit,.btn-user-del{width:28px;height:28px;padding:0 !important;margin:0 1px !important;display:inline-flex;align-items:center;justify-content:center;border-radius:8px !important;vertical-align:middle}.user-data-table .job-badge,.user-data-table td span{font-size:11px !important;padding:2px 6px !important}.am-s{display:none}@media(max-width:760px){.am-w{display:none}.am-s{display:inline}.calendar-table{table-layout:fixed;width:100%;font-size:11px}.calendar-table th,.calendar-table td{padding:6px 2px;white-space:normal;word-break:break-all;text-align:right}.calendar-table th:first-child,.calendar-table td:first-child{position:static;width:40px;text-align:left}.calendar-table th{font-size:10px}.calendar-table .cal-count{display:block;margin:0;font-size:9px}}@media(max-width:760px){table.lead-table .lt-w{display:none}table.lead-table th,table.lead-table td{padding:8px 4px;font-size:12px}table.lead-table th{white-space:normal;font-size:11px}table.lead-table th,table.lead-table td{min-width:0!important}table.lead-table td:first-child,table.lead-table th:first-child{white-space:nowrap}table.lead-table .sched-cell{white-space:nowrap}table.lead-table .amount-cell{font-size:12px}table.lead-table button.danger{padding:4px 6px;font-size:11px}}
 table.lead-table button.lt-x{width:26px;height:26px;padding:0;border-radius:50%;line-height:1;font-size:13px;font-weight:800;display:inline-flex;align-items:center;justify-content:center}
 </style>
 <link rel="manifest" href="manifest-admin.json">
@@ -1333,6 +1333,9 @@ body.adm-map #admMapView{display:block;}
 #admSheet button{background:#eaeef6 !important;color:#0f2547 !important;box-shadow:none !important;}
 #admSheet button small{display:block;font-size:12px;font-weight:600;color:#6b7280;margin-top:2px;}
 #admSheet button .ic{font-size:22px;width:30px;text-align:center;}
+
+body.adm-list header.topbar,body.adm-map header.topbar,body.adm-list #dateBanner,body.adm-map #dateBanner{display:none !important;}
+body.adm-list{--adm-gap:1;}
 </style>
 </head>
 <body>
@@ -1776,7 +1779,7 @@ if ('serviceWorker' in navigator) window.addEventListener('load', () => { naviga
         <thead>
           <tr>
             <th>이름</th>
-            <th>전화번호(아이디)</th>
+            <th>전화번호</th>
             <th>직무</th>
             <th style="text-align:center;">관리</th>
           </tr>
@@ -4980,11 +4983,11 @@ async function loadAllUsers() {
       var phoneFmt = formatPhone(u.phone);
       html += '<tr>'
         + '<td><strong>' + escapeHtml(u.name || '-') + '</strong></td>'
-        + '<td>' + escapeHtml(phoneFmt) + '</td>'
+        + '<td style="white-space:nowrap;">' + escapeHtml(String(u.phone || '').replace(/[^0-9]/g, '')) + '</td>'
         + '<td>' + renderJobBadge(u.job) + '</td>'
         + '<td style="text-align:center; white-space:nowrap;">'
-        + '<button type="button" class="btn-user-edit" data-phone="' + escapeHtml(u.phone) + '" data-name="' + escapeHtml(u.name || '') + '" data-job="' + escapeHtml(u.job || 'CS근무자') + '">수정</button>'
-        + '<button type="button" class="btn-user-del" data-phone="' + escapeHtml(u.phone) + '" data-name="' + escapeHtml(u.name || '') + '">삭제</button>'
+        + '<button type="button" class="btn-user-edit" data-phone="' + escapeHtml(u.phone) + '" data-name="' + escapeHtml(u.name || '') + '" data-job="' + escapeHtml(u.job || 'CS근무자') + '" title="수정" aria-label="수정"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 013 3L7 19l-4 1 1-4z"/></svg></button>'
+        + '<button type="button" class="btn-user-del" data-phone="' + escapeHtml(u.phone) + '" data-name="' + escapeHtml(u.name || '') + '" title="삭제" aria-label="삭제"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/></svg></button>'
         + '</td>'
         + '</tr>';
     });
@@ -8602,7 +8605,8 @@ function admMoreSheet() {
   admSheetOpen('더보기', [
     { ic: '👥', t: '사용자 관리', s: '', fn: () => openUserManageModal() },
     { ic: '🎯', t: '목표 설정', s: '', fn: () => openTargetModal() },
-    { ic: '📢', t: '공지사항 관리', s: '', fn: () => openNoticeModal() }
+    { ic: '📢', t: '공지사항 관리', s: '', fn: () => openNoticeModal() },
+    { ic: '🚪', t: '로그아웃', s: '', fn: () => doLogout() }
   ]);
 }
 
