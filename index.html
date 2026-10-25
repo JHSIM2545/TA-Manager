@@ -8605,12 +8605,23 @@ async function taPushToggle() {
       const b = document.createElement('button'); b.type = 'button'; b.onclick = taPushToggle;
       b.textContent = '알림 ' + (st === 'on' ? '끄기 (현재 켜짐)' : st === 'denied' ? '차단됨 (기기 설정에서 허용)' : '켜기');
       m.insertBefore(b, m.lastElementChild);
+      if (st === 'on') { const t = document.createElement('button'); t.type = 'button'; t.textContent = '알림 테스트 (5초 뒤 표시)'; t.onclick = taPushTest; m.insertBefore(t, m.lastElementChild); }
     });
   };
 })();
 if ('serviceWorker' in navigator) navigator.serviceWorker.addEventListener('message', e => {
   const d = e.data || {}; if (d.type === 'push-refresh' || d.type === 'push-open') { try { ta3Reload(); } catch (x) {} if (d.type === 'push-open' && d.lead) setTimeout(() => { try { ta3Open(d.lead); } catch (x) {} }, 600); }
 });
+
+async function taPushTest() {
+  try {
+    const reg = await navigator.serviceWorker.ready;
+    const sw = (reg.active && reg.active.scriptURL) || '없음';
+    const sub = await reg.pushManager.getSubscription();
+    alert('서비스워커: ' + sw + '\n상태: ' + (reg.active ? reg.active.state : '-') + '\n권한: ' + Notification.permission + '\n구독: ' + (sub ? '있음' : '없음') + '\n\n확인을 누르고 앱을 홈 화면으로 나가 5초 기다려 주세요.');
+    setTimeout(() => reg.showNotification('알림 테스트', { body: '이 알림이 보이면 기기 표시는 정상입니다', icon: './icon-192.png', tag: 'ta-test' }), 5000);
+  } catch (e) { alert('테스트 실패: ' + (e.message || e)); }
+}
 
 </script>
 
