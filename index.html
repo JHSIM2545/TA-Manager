@@ -1327,6 +1327,8 @@ body.ta3-themed .ta3-bar button{background:#fff !important;color:var(--tb-pr) !i
 .ta8-sw u{position:absolute;top:3px;left:3px;width:32px;height:32px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;text-decoration:none;font-size:10.5px;font-weight:800;color:#3c3c3c;letter-spacing:-.2px;box-shadow:0 1px 3px rgba(0,0,0,.25);transition:left .2s;}
 .ta8-sw.on{background:linear-gradient(#10c98a,#12b97f);}
 .ta8-sw.on u{left:41px;color:#0fae78;font-size:12px;}
+.ta3-pksearch button.ta8-mg{display:flex;align-items:center;justify-content:center;padding:0 14px !important;}
+.ta3-tab{font-size:10px;}
 </style>
 <link rel="manifest" href="manifest.json">
 <link rel="icon" type="image/png" href="favicon.png">
@@ -1701,7 +1703,7 @@ if ('serviceWorker' in navigator) window.addEventListener('load', () => { naviga
         <button type="button" class="ta3-tab" data-t="items" onclick="ta3SetTab('items')"><svg viewBox="0 0 24 24"><path d="M8 6h13M8 12h13M8 18h13"/><circle cx="3.5" cy="6" r="1"/><circle cx="3.5" cy="12" r="1"/><circle cx="3.5" cy="18" r="1"/></svg>안건</button>
         <button type="button" class="ta3-tab add" onclick="openNewAgentLeadModal()"><i><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></i><span>신규</span></button>
         <button type="button" class="ta3-tab" data-t="map" onclick="ta3SetTab('map')"><svg viewBox="0 0 24 24"><path d="M12 21s7-6.2 7-11.5A7 7 0 005 9.5C5 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg>지도</button>
-        <button type="button" class="ta3-tab" data-t="cal" onclick="ta3SetTab('cal')"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>일정</button>
+        <button type="button" class="ta3-tab" data-t="cal" onclick="ta3SetTab('cal')"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>TA스케쥴</button>
       </nav>
      </div>
     </div>
@@ -6469,7 +6471,7 @@ function ta3OpenNav(kind, name, pl) {
 async function ta3Boot() {
   document.body.classList.add('ta3-on');
   const name = currentViewMode;
-  el('ta3Title').textContent = `영업 TA 관리 포털 (${name})`;
+  el('ta3Title').textContent = `TA 관리 포털 (${name})`;
   el('ta3Ini').textContent = (name || '·').slice(0, 1);
   try { const t = sessionStorage.getItem('S1_TA3_TAB'); if (t && !TA3.booted) TA3.tab = t; } catch (e) {}
   TA3.booted = true;
@@ -6621,12 +6623,12 @@ async function ta3RenderMap(noFit) {
   el('ta3MapSrc').innerHTML = ta3SegHtml(TA3.mapF.src, 'ta3MapSrcSet');
   const base = TA3.items.filter(i => TA3.mapF.src === 'all' || i.src === TA3.mapF.src);
   const cnt = g => g === 'all' ? base.length : base.filter(i => i.group === g).length;
-  el('ta3MapGroups').innerHTML = [['all', '전체'], ['ing', '진행중'], ['won', '수주완료'], ['fail', '실패'], ['hold', '보류']].map(([v, l]) => `<button type="button" class="ta3-chip${TA3.mapF.group === v ? ' on' : ''}" onclick="ta3MapSet('group','${v}')">${l}<b>${cnt(v)}</b></button>`).join('');
+  el('ta3MapGroups').innerHTML = [['all', '전체', ''], ['ing', '진행중', '#2563eb'], ['won', '수주완료', '#16a34a'], ['fail', '실패', '#dc2626'], ['hold', '보류', '#9ca3af']].map(([v, l, c]) => `<button type="button" class="ta3-chip${TA3.mapF.group === v ? ' on' : ''}" onclick="ta3MapSet('group','${v}')">${c ? `<i style="display:inline-block;width:9px;height:9px;border-radius:50%;background:${c};margin-right:5px;vertical-align:0;box-shadow:0 0 0 1.5px #fff;"></i>` : ''}${l}<b>${cnt(v)}</b></button>`).join('');
   const shown = base.filter(i => TA3.mapF.group === 'all' || i.group === TA3.mapF.group);
   const placed = shown.filter(i => TA3.places[i.id] && TA3.places[i.id].lat);
   const noPlace = shown.filter(i => !(TA3.places[i.id] && TA3.places[i.id].lat));
   const geoable = noPlace.filter(i => i.address);
-  el('ta3MapNote').innerHTML = '<div class="ta3-lg" style="background:rgba(255,255,255,.9);border-radius:10px;margin-top:6px;padding:6px 10px;display:inline-flex;box-shadow:0 2px 8px rgba(0,0,0,.15);"><span><i style="background:#e11d1d"></i>TA</span><span><i style="background:#1f6bff"></i>소개</span><span><i style="background:#16a34a"></i>가망</span></div>' + (noPlace.length ? `<div class="ta3-mapnote"><span>📌 위치 미지정 ${noPlace.length}건</span>${geoable.length ? `<button type="button" onclick="ta3BatchGeo()">주소로 일괄 지정</button>` : ''}</div>` : '');
+  el('ta3MapNote').innerHTML = '<div class="ta3-lg" style="background:rgba(255,255,255,.9);border-radius:10px;margin-top:6px;padding:6px 10px;display:inline-flex;box-shadow:0 2px 8px rgba(0,0,0,.15);"><span><em style="display:inline-block;background:#e11d1d;color:#fff;border-radius:5px;padding:2px 7px;font-style:normal;font-size:11.5px;font-weight:800;">TA</em></span><span><em style="display:inline-block;background:#1f6bff;color:#fff;border-radius:5px;padding:2px 7px;font-style:normal;font-size:11.5px;font-weight:800;">소개</em></span><span><em style="display:inline-block;background:#16a34a;color:#fff;border-radius:5px;padding:2px 7px;font-style:normal;font-size:11.5px;font-weight:800;">가망</em></span></div>' + (noPlace.length ? `<div class="ta3-mapnote"><span>📌 위치 미지정 ${noPlace.length}건</span>${geoable.length ? `<button type="button" onclick="ta3BatchGeo()">주소로 일괄 지정</button>` : ''}</div>` : '');
   try { await ta3MapInit(); } catch (e) { el('ta3Map').innerHTML = '<div class="ta3-empty">지도를 불러오지 못했습니다. 네트워크를 확인해주세요.</div>'; return; }
   if (!TA3.map) {
     el('ta3Map').innerHTML = '';
@@ -6810,7 +6812,7 @@ function initAgentView(agentName) {
   if (currentUser && !isMasterUser() && currentUser.name) agentName = currentUser.name;
   currentViewMode = agentName;
   try { localStorage.setItem('S1_TA3_LASTVIEW', agentName); } catch (e) {}
-  if (el('topbarHeaderTitle')) el('topbarHeaderTitle').textContent = `영업 TA 관리 포털 (${agentName})`;
+  if (el('topbarHeaderTitle')) el('topbarHeaderTitle').textContent = `TA 관리 포털 (${agentName})`;
   if (currentUser) checkAndShowAgentNotice();
   ta3Boot();
   const st = el('ta3SetTabInit'); if (st) st.remove();
@@ -8937,7 +8939,7 @@ if ('serviceWorker' in navigator) navigator.serviceWorker.addEventListener('mess
   <div class="ta3-pk">
     <div id="ta3PkMap"></div>
     <div class="ta3-cross" id="ta4Cross"></div>
-    <div class="ta3-pksearch"><input id="ta3PkQ" placeholder="주소 · 건물명 검색" onkeydown="if(event.key==='Enter')ta3PkSearch()"><button type="button" onclick="ta3PkSearch()">검색</button></div>
+    <div class="ta3-pksearch"><input id="ta3PkQ" placeholder="주소 · 건물명 검색" onkeydown="if(event.key==='Enter')ta3PkSearch()"><button type="button" class="ta8-mg" onclick="ta3PkSearch()" aria-label="검색"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg></button></div>
     <button type="button" class="ta3-pkgps" onclick="ta3PkGps()" aria-label="내 위치">◎</button>
     <div class="ta3-pkaddr"><span id="ta3PkAddr"></span><small id="ta3PkCoord"></small></div>
   </div>
