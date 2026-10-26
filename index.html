@@ -8588,25 +8588,31 @@ async function taPushState() {
   if (Notification.permission === 'denied') return 'denied';
   try { const reg = await navigator.serviceWorker.ready; return (await reg.pushManager.getSubscription()) ? 'on' : 'off'; } catch (e) { return 'off'; }
 }
-async function taPushToggle() {
-  const st = await taPushState();
-  if (st === 'unsupported') { alert('이 브라우저는 알림을 지원하지 않습니다. 아이폰은 Safari에서 "홈 화면에 추가"한 앱으로 열어야 합니다.'); return; }
-  if (st === 'denied') { alert('알림이 차단되어 있습니다. 기기 설정에서 이 앱의 알림을 허용해 주세요.'); return; }
-  const reg = await navigator.serviceWorker.ready;
-  if (st === 'on') {
-    const sub = await reg.pushManager.getSubscription();
-    if (sub) { try { await db.from('ta_push_subs').delete().eq('endpoint', sub.endpoint); } catch (e) {} await sub.unsubscribe(); }
-    ta3Toast('알림을 껐습니다'); ta3RenderMy(); return;
-  }
+function taSwSet(btn, on) { const sw = btn && btn.querySelector('.ta8-sw'); if (!sw) return; sw.classList.toggle('on', on); const u = sw.querySelector('u'); if (u) u.textContent = on ? 'ON' : 'OFF'; }
+let taPushBusy = false;
+async function taPushToggle(ev) {
+  const btn = ev && ev.currentTarget, sw = btn && btn.querySelector('.ta8-sw'), want = !(sw && sw.classList.contains('on'));
+  if (taPushBusy) return; taPushBusy = true;
+  taSwSet(btn, want);   // 화면은 먼저 바꾸고, 실제 설정은 뒤에서 처리 (실패하면 되돌림)
+  const back = msg => { taSwSet(btn, !want); if (msg) alert(msg); };
   try {
-    const perm = await Notification.requestPermission(); if (perm !== 'granted') { ta3Toast('알림이 허용되지 않았습니다'); return; }
+    if (!('serviceWorker' in navigator) || !('PushManager' in window)) return back('이 브라우저는 알림을 지원하지 않습니다. 아이폰은 Safari에서 "홈 화면에 추가"한 앱으로 열어야 합니다.');
+    if (want && Notification.permission === 'denied') return back('알림이 차단되어 있습니다. 기기 설정에서 이 앱의 알림을 허용해 주세요.');
+    const reg = await navigator.serviceWorker.ready;
+    if (!want) {
+      const sub = await reg.pushManager.getSubscription();
+      if (sub) { try { await db.from('ta_push_subs').delete().eq('endpoint', sub.endpoint); } catch (e) {} await sub.unsubscribe(); }
+      ta3Toast('알림을 껐습니다'); return;
+    }
+    const perm = await Notification.requestPermission(); if (perm !== 'granted') return back(''), ta3Toast('알림이 허용되지 않았습니다');
     const kr = await fetch(TA_PUSH_FN, { headers: { apikey: SUPABASE_ANON_KEY } }); const { key } = await kr.json(); if (!key) throw new Error('공개키 없음');
     const sub = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: taPushB64(key) });
     const j = sub.toJSON();
     const { error } = await db.from('ta_push_subs').upsert([{ endpoint: j.endpoint, consultant: currentUser.name, p256dh: j.keys.p256dh, auth: j.keys.auth }]);
-    if (error) throw error;
-    ta3Toast('알림을 켰습니다'); ta3RenderMy();
-  } catch (e) { alert('알림 설정 실패: ' + (e.message || e) + '\n(서버 설정이 아직 안 되었을 수 있습니다)'); }
+    if (error) { try { await sub.unsubscribe(); } catch (e) {} throw error; }
+    ta3Toast('알림을 켰습니다');
+  } catch (e) { back('알림 설정 실패: ' + (e.message || e) + '\n(서버 설정이 아직 안 되었을 수 있습니다)'); }
+  finally { taPushBusy = false; }
 }
 (function () {
   const f = window.ta3RenderMy; if (typeof f !== 'function') return;

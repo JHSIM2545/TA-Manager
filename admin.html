@@ -9047,45 +9047,58 @@ async function admPushState() {
   if (Notification.permission === 'denied') return 'denied';
   try { const reg = await navigator.serviceWorker.ready; return (await reg.pushManager.getSubscription()) ? 'on' : 'off'; } catch (e) { return 'off'; }
 }
-async function admPushToggle() {
-  const st = await admPushState();
-  if (st === 'unsupported') { alert('이 브라우저는 알림을 지원하지 않습니다. 아이폰은 Safari에서 "홈 화면에 추가"한 앱으로 열어야 합니다.'); return; }
-  if (st === 'denied') { alert('알림이 차단되어 있습니다. 기기 설정에서 이 앱의 알림을 허용해 주세요.'); return; }
-  const reg = await navigator.serviceWorker.ready;
-  if (st === 'on') {
-    const sub = await reg.pushManager.getSubscription();
-    if (sub) { try { await db.from('ta_push_subs').delete().eq('endpoint', sub.endpoint); } catch (e) {} await sub.unsubscribe(); }
-    ta3Toast('알림을 껐습니다'); admMoreRender(); return;
-  }
+function admSwSet(btn, on) { const sw = btn && btn.querySelector('.adm-sw'); if (!sw) return; sw.classList.toggle('on', on); const u = sw.querySelector('u'); if (u) u.textContent = on ? 'ON' : 'OFF'; }
+let admPushBusy = false;
+async function admPushToggle(ev) {
+  const btn = ev && ev.currentTarget, sw = btn && btn.querySelector('.adm-sw'), want = !(sw && sw.classList.contains('on'));
+  if (admPushBusy) return; admPushBusy = true;
+  admSwSet(btn, want);   // 화면은 먼저 바꾸고, 실제 설정은 뒤에서 처리 (실패하면 되돌림)
+  const back = msg => { admSwSet(btn, !want); if (msg) alert(msg); };
   try {
-    const perm = await Notification.requestPermission(); if (perm !== 'granted') { ta3Toast('알림이 허용되지 않았습니다'); return; }
+    if (!('serviceWorker' in navigator) || !('PushManager' in window)) return back('이 브라우저는 알림을 지원하지 않습니다. 아이폰은 Safari에서 "홈 화면에 추가"한 앱으로 열어야 합니다.');
+    if (want && Notification.permission === 'denied') return back('알림이 차단되어 있습니다. 기기 설정에서 이 앱의 알림을 허용해 주세요.');
+    const reg = await navigator.serviceWorker.ready;
+    if (!want) {
+      const sub = await reg.pushManager.getSubscription();
+      if (sub) { try { await db.from('ta_push_subs').delete().eq('endpoint', sub.endpoint); } catch (e) {} await sub.unsubscribe(); }
+      ta3Toast('알림을 껐습니다'); admMoreRender(); return;
+    }
+    const perm = await Notification.requestPermission(); if (perm !== 'granted') return back(''), ta3Toast('알림이 허용되지 않았습니다');
     const kr = await fetch(ADM_PUSH_FN, { headers: { apikey: SUPABASE_ANON_KEY } }); const { key } = await kr.json(); if (!key) throw new Error('공개키 없음');
     const sub = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: admPushB64(key) });
     const j = sub.toJSON();
     const { error } = await db.from('ta_push_subs').upsert([{ endpoint: j.endpoint, consultant: currentUser.name, role: 'admin', scope: 'all', p256dh: j.keys.p256dh, auth: j.keys.auth }]);
-    if (error) throw error;
+    if (error) { try { await sub.unsubscribe(); } catch (e) {} throw error; }
     ta3Toast('알림을 켰습니다'); admMoreRender();
-  } catch (e) { alert('알림 설정 실패: ' + (e.message || e) + '\n(서버 설정(SQL의 role 컬럼 추가)이 안 되었을 수 있습니다)'); }
+  } catch (e) { back('알림 설정 실패: ' + (e.message || e) + '\n(서버 설정(SQL의 role 컬럼 추가)이 안 되었을 수 있습니다)'); }
+  finally { admPushBusy = false; }
 }
-async function admPushScope(v) {
+async function admPushScope(v, ev) {
+  const btn = ev && ev.currentTarget, want = v === 'all';
+  admSwSet(btn, want);   // 화면 먼저 반영
+  const sm = btn && btn.querySelector('small'); const old = sm ? sm.textContent : '';
+  if (sm) sm.textContent = want ? '모든 컨설턴트 알림 + 관리자 알림' : '관리자(내) 알림만';
+  const back = msg => { admSwSet(btn, !want); if (sm) sm.textContent = old; if (msg) alert(msg); };
   try {
-    const reg = await navigator.serviceWorker.ready, sub = await reg.pushManager.getSubscription(); if (!sub) { ta3Toast('먼저 TA 알림을 켜 주세요'); return; }
+    const reg = await navigator.serviceWorker.ready, sub = await reg.pushManager.getSubscription(); if (!sub) { back(''); ta3Toast('먼저 TA 알림을 켜 주세요'); return; }
     const { error } = await db.from('ta_push_subs').update({ scope: v }).eq('endpoint', sub.endpoint); if (error) throw error;
-    ta3Toast(v === 'all' ? '모든 알림을 받습니다' : '내 알림만 받습니다'); admMoreRender();
-  } catch (e) { alert('설정 실패: ' + (e.message || e) + '\n(SQL의 scope 컬럼 추가가 필요합니다)'); }
+    if (btn) btn.onclick = e => admPushScope(want ? 'mine' : 'all', e);   // 다음 클릭은 반대로
+    ta3Toast(want ? '모든 알림을 받습니다' : '내 알림만 받습니다');
+  } catch (e) { back('설정 실패: ' + (e.message || e) + '\n(SQL의 scope 컬럼 추가가 필요합니다)'); }
 }
 (function () {
   const f = window.admMoreRender; if (typeof f !== 'function') return;
   window.admMoreRender = function () {
     f.apply(this, arguments);
+    const rid = window.__admPushRid = (window.__admPushRid || 0) + 1;   // 화면이 연속으로 그려질 때 오래된 작업이 행을 또 추가하지 않도록
     admPushState().then(st => {
-      const l = document.querySelector('#admMoreView .adm-ml'); if (!l) return;
+      const l = document.querySelector('#admMoreView .adm-ml'); if (!l || rid !== window.__admPushRid) return;
       if (st === 'on') {
         navigator.serviceWorker.ready.then(r => r.pushManager.getSubscription()).then(async sub => {
           let all = true; try { const { data } = await db.from('ta_push_subs').select('scope').eq('endpoint', sub.endpoint).maybeSingle(); all = !data || data.scope !== 'mine'; } catch (e) {}
-          const sb = document.createElement('button'); sb.type = 'button'; sb.onclick = () => admPushScope(all ? 'mine' : 'all');
+          const sb = document.createElement('button'); sb.type = 'button'; sb.onclick = e => admPushScope(all ? 'mine' : 'all', e);
           sb.innerHTML = '<span class="ic">' + ADM_IC.bell + '</span><span class="tx">전체 알림 받기<small>' + (all ? '모든 컨설턴트 알림 + 관리자 알림' : '관리자(내) 알림만') + '</small></span><i class="adm-sw' + (all ? ' on' : '') + '"><u>' + (all ? 'ON' : 'OFF') + '</u></i>';
-          const l2 = document.querySelector('#admMoreView .adm-ml'); if (l2) l2.insertBefore(sb, l2.lastElementChild);
+          const l2 = document.querySelector('#admMoreView .adm-ml'); if (l2 && rid === window.__admPushRid) l2.insertBefore(sb, l2.lastElementChild);
         });
       }
       const b = document.createElement('button'); b.type = 'button'; b.onclick = admPushToggle;
