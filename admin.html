@@ -8681,6 +8681,14 @@ async function ta4PsInsertLead(row) {
   }
   throw new Error('저장 실패');
 }
+// 주소 → 좌표: 원문 → 괄호 제거 → 번지까지만, 순서대로 시도 (각 7초 제한)
+async function ta4PsGeo(addr) {
+  const a = String(addr || '').trim(), v = [a, a.replace(/\([^)]*\)/g, '').replace(/\s+/g, ' ').trim(), a.replace(/\([^)]*\)/g, '').replace(/\s+\d+\s*(층|호|동).*$/, '').replace(/\s+/g, ' ').trim()];
+  for (const q of v.filter((x, i) => x && v.indexOf(x) === i)) {
+    try { const g = await Promise.race([ta3Geocode(q), new Promise(r => setTimeout(() => r(null), 7000))]); if (g) return g; } catch (e) {}
+  }
+  return null;
+}
 async function ta4PsCreate(p) {
   const now = new Date().toISOString(), today = todayStr(), d = new Date(); d.setDate(d.getDate() + 2);
   const exp = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
@@ -8690,7 +8698,7 @@ async function ta4PsCreate(p) {
     origin: '가망', referrer: p.agent_name || null, referrer_phone: ta4Num(p.agent_phone) || null, contact_phone: phone || null };
   const { dropped } = await ta4PsInsertLead(row);
   // 첫 노트 (문자 내용 요약)
-  const note = ['[가망고객 · ' + (p.kind || '') + '] 관리자 등록', p.product && '희망 상품: ' + p.product, p.category && '업종: ' + p.category, p.prospect_no && '가망고객번호: ' + p.prospect_no, p.agent_name && (/소개/.test(p.kind) ? '소개자: ' : '대리점 영업사원/소개자: ') + p.agent_name + (p.agent_phone ? ' ' + p.agent_phone : ''), p.req_date && '설계요청일: ' + p.req_date, p.memo && p.memo, dropped.length ? '(참고) 서버에 소개자/분류 컬럼이 없어 일부가 저장되지 않았습니다. 설정 SQL을 실행하세요.' : ''].filter(Boolean).join('\n');
+  const note = ['[가망고객 · ' + (p.kind || '') + '] 관리자 등록', p.product && '희망 상품: ' + p.product, p.category && '업종: ' + p.category, p.address && '주소: ' + p.address, p.prospect_no && '가망고객번호: ' + p.prospect_no, p.agent_name && (/소개/.test(p.kind) ? '소개자: ' : '대리점 영업사원/소개자: ') + p.agent_name + (p.agent_phone ? ' ' + p.agent_phone : ''), p.req_date && '설계요청일: ' + p.req_date, p.memo && p.memo, dropped.length ? '(참고) 서버에 소개자/분류 컬럼이 없어 일부가 저장되지 않았습니다. 설정 SQL을 실행하세요.' : ''].filter(Boolean).join('\n');
   try { await db.from('ta_notes').insert([{ id: crypto.randomUUID(), lead_id: id, consultant: who, kind: 'memo', content: note, image: null, created_at: now }]); } catch (e) {}
   // 연락처 (이미 같은 번호가 있으면 만들지 않음)
   try {
@@ -8706,8 +8714,9 @@ async function ta4PsCreate(p) {
   // 지도 위치 (주소 → 좌표). 실패하면 컨설턴트 화면에서 자동으로 다시 시도
   if (p.address) {
     let pl = { lead_id: id, src: 'ta', consultant: who, address: p.address, updated_at: now };
-    try { const g = await Promise.race([ta3Geocode(p.address), new Promise(r => setTimeout(() => r(null), 7000))]); if (g) { pl.lat = g.lat; pl.lng = g.lng; } } catch (e) {}
-    try { await db.from('ta_places').upsert([pl], { onConflict: 'lead_id' }); } catch (e) {}
+    const g = await ta4PsGeo(p.address);
+    if (g) { pl.lat = g.lat; pl.lng = g.lng; } else { TA4.psGeoFail = (TA4.psGeoFail || []).concat(p.name || p.address); }
+    try { const { error } = await db.from('ta_places').upsert([pl], { onConflict: 'lead_id' }); if (error) throw error; } catch (e) { console.warn('[가망 지도]', e); TA4.psGeoFail = (TA4.psGeoFail || []).concat((p.name || p.address) + '(저장실패)'); }
   }
   return id;
 }
@@ -8717,13 +8726,14 @@ async function ta4PsSaveDraft() {
   if (!rows.length) { alert('등록할 가망고객이 없습니다 (이름이나 전화번호를 입력하세요)'); return; }
   if (rows.some(p => !p.assigned_to)) { alert('모든 건에 배정 컨설턴트를 선택해 주세요'); return; }
   const btn = el('ta4PsSaveBtn'); btn.disabled = true; btn.textContent = '등록 중...';
-  let ok = 0, fail = [];
+  let ok = 0, fail = []; TA4.psGeoFail = [];
   for (const p of rows) { try { await ta4PsCreate(p); ok++; } catch (e) { fail.push((p.name || p.phone) + ': ' + (e.message || e)); } }
   btn.disabled = false; btn.textContent = '컨설턴트에게 등록';
   try { await loadAllFromSupabase(); try { await ta3LoadPlaces(); } catch (x) {} try { render(); } catch (x) {} } catch (e) {}
+  try { if (typeof ADM !== 'undefined') ADM.placesLoaded = false; } catch (e) {}   // 관리자 지도가 새 위치를 다시 불러오게
   try { if (ok) { ['fConsultant', 'fStage', 'fConfidence', 'fKind'].forEach(id => { if (el(id)) el(id).value = 'all'; }); ['fMonth', 'fSearch'].forEach(id => { if (el(id)) el(id).value = ''; }); if (el('fMonth')) { try { admUTRender(); } catch (x) {} renderLeadTable(); } } } catch (e) {}   // 새 안건이 이달 필터 등에 가려지지 않도록 목록 필터 해제
   ta4PsAdminShow();
-  if (fail.length) alert(`${ok}건 등록, ${fail.length}건 실패\n` + fail.join('\n')); else { ta4PsCloseInput(); alert(`${ok}건을 오늘(${todayStr()}) 등록일로 컨설턴트 안건·연락처·지도에 반영했습니다.` + (TA4.psDraft.some(p => p.dup) ? `\n(이미 반영된 ${TA4.psDraft.filter(p => p.dup).length}건은 추가 등록하지 않았습니다.)` : '')); }
+  if (fail.length) alert(`${ok}건 등록, ${fail.length}건 실패\n` + fail.join('\n')); else { ta4PsCloseInput(); alert(`${ok}건을 오늘(${todayStr()}) 등록일로 컨설턴트 안건·연락처·지도에 반영했습니다.` + ((TA4.psGeoFail || []).length ? `\n※ 지도 위치를 찾지 못한 건: ${TA4.psGeoFail.join(', ')}\n(주소는 저장되었습니다. 컨설턴트가 앱을 열면 자동으로 다시 시도하며, 안건 상세의 위치 지정에서 직접 찍을 수도 있습니다)` : '') + (TA4.psDraft.some(p => p.dup) ? `\n(이미 반영된 ${TA4.psDraft.filter(p => p.dup).length}건은 추가 등록하지 않았습니다.)` : '')); }
 }
 
 // ---------- 컨설턴트: 가망고객 안건의 위치 자동 지정 ----------
