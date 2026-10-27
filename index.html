@@ -8416,6 +8416,18 @@ function ta4PsParse(text) {
       out.push({ kind: intro ? '패밀리넷(소개)' : '패밀리넷', name: g['경비대상처'] || g['고객명'] || '', person: g['고객명'] || '', phone: fmt(g['전화번호']), address: addr, category: [g['업종'] || g['형태'], g['제공서비스']].filter(Boolean).join(' / '), memo, prospect_no: g['가망고객번호'] || '', agent_name: agent, agent_phone: agentPhone, area: g['면적'] || '', fee, req_date: g['설계요청일'] || '', hint: assign, raw });
       return;
     }
+    const pm = /가망고객\s*[:：]\s*(\d{6,})/.exec(raw);   // 형식 3: 가망고객:번호 / 이름 / 전화번호 / 주소 / 상품, [비고]
+    if (pm) {
+      const lines = raw.split(/\r?\n/).map(x => x.trim()).filter(Boolean).filter(x => !/가망고객\s*[:：]/.test(x));
+      const pi = lines.findIndex(x => /^\+?0\d[\d\-\s]{8,12}\d$/.test(x));
+      const nm = pi > 0 ? lines.slice(0, pi).join(' ') : '';
+      const rest = pi >= 0 ? lines.slice(pi + 1) : lines;
+      let last = rest.length > 1 ? rest[rest.length - 1] : '', addr = rest.length > 1 ? rest.slice(0, -1).join(' ') : (rest[0] || '');
+      if (rest.length === 1 && /\[/.test(rest[0])) { addr = ''; last = rest[0]; }
+      const bi = last.indexOf('['), prod = (bi >= 0 ? last.slice(0, bi) : last).replace(/[,\s]+$/, '').trim(), note = bi >= 0 ? last.slice(bi).trim() : '';
+      out.push({ kind: '가망고객', name: nm, person: nm, phone: pi >= 0 ? fmt(lines[pi]) : '', address: addr, category: prod, memo: note, prospect_no: pm[1], agent_name: '', agent_phone: '', area: '', fee: 0, req_date: '', hint: '', raw });
+      return;
+    }
     const m = /신규\)\s*(\S+)\s+(\+?[0-9][0-9\-\s]{8,14}[0-9])\s*([^\[]*?)\s*\[([^\]]+)\]\s*([\s\S]*)$/.exec(raw);   // 형식 1: 신규)이름 전화 주소 [분류] 메모
     if (m) { out.push({ kind: '신규문자', name: m[1], person: m[1], phone: fmt(m[2]), address: m[3].trim(), category: m[4].trim(), memo: m[5].trim().replace(/\s+/g, ' '), prospect_no: '', agent_name: '', agent_phone: '', area: '', fee: 0, req_date: '', hint: '', raw }); return; }
     const ph = /0\d{1,2}[-\s]?\d{3,4}[-\s]?\d{4}/.exec(raw);   // 알 수 없는 형식: 번호만이라도 추출
