@@ -2717,6 +2717,7 @@ async function loadAllFromSupabase() {
         vehicleNumber: r.vehicle_number,
         memo: r.memo,
         origin: r.origin || '',
+        wishProduct: r.wish_product || '',
         referrer: r.referrer || '',
         referrerPhone: r.referrer_phone || '',
         createdAt: r.created_at,
@@ -7041,6 +7042,7 @@ function ta2RenderInfo() {
     f('용역료(원)', `<input class="ta2-inp num" inputmode="numeric" value="${l.amount ? Number(l.amount).toLocaleString('ko-KR') : ''}" onchange="ta2FAmount(this)">`),
     f('단계', `<select class="ta2-inp" onchange="ta2FSelect('stage',this.value)">${ta2OptHtml(TA2_EDIT_STAGES, l.stage)}</select>`),
     f('상품종류', `<select class="ta2-inp" onchange="ta2FSelect('productType',this.value)">${ta2OptHtml(TA2_PRODUCTS, l.productType)}</select>`),
+    ...(l.wishProduct || ta4IsPs(l) ? [f('희망 상품', ta4WishChips(l.wishProduct || '', "ta4WishDetail('%s')"), true)] : []),
     f('영업동기', `<select class="ta2-inp" onchange="ta2FSelect('motive',this.value)">${ta2OptHtml(ta4MotiveList(l.motive), l.motive)}</select>`),
     f('수주확도', `<select class="ta2-inp" onchange="ta2FSelect('confidence',this.value)">${ta2OptHtml([['A', 'A (상)'], ['B', 'B (중)'], ['C', 'C (하)']], l.confidence || 'B')}</select>`),
     f('등록일', ta4DateInp('registeredDate', regDate)),
@@ -7192,7 +7194,8 @@ async function ta2SaveFields(patch, rerender, leadArg) {
       registered_date: next.registeredDate || null, expected_date: next.expectedDate || null,
       contract_date: next.contractDate || null, base_date: next.baseDate || null,
       vehicle_number: next.vehicleNumber || null, memo: next.memo || null, updated_at: next.updatedAt,
-      ...('referrer' in patch ? { referrer: next.referrer || null } : {})
+      ...('referrer' in patch ? { referrer: next.referrer || null } : {}),
+      ...('wishProduct' in patch ? { wish_product: next.wishProduct || null } : {})
     });
   } catch (e) { res = { error: e }; }
   if (res.error) { ta2Flash('저장 실패: ' + (res.error.message || res.error), true); if (live) ta2RenderInfo(); return false; }
@@ -8126,6 +8129,34 @@ function ta4EmoIns(id, ch) {
   ta.focus(); ta.dispatchEvent(new Event('input'));
 }
 
+
+// ---------- 희망 상품 (소개영업 앱의 '관심/추천 상품'과 동일한 다중 선택) ----------
+const TA4_WISH = ['알람', '영상렌탈', '블루스캔', '정보보안', '영상매각', '금고', 'AED', 'AI도어캠', '기타'];
+function ta4WishList(v) { return String(v || '').split(/\s*[,，、/·]\s*/).map(x => x.trim()).filter(Boolean); }
+// 자유 문구(예: 영상(CCTV), 방범) → 표준 상품 목록. 맞는 것이 없으면 '기타', 값이 없으면 빈 문자열
+function ta4WishNorm(v) {
+  const t = String(v || '').trim(); if (!t) return '';
+  const got = [];
+  const add = k => { if (!got.includes(k)) got.push(k); };
+  if (/AI\s*도어\s*캠|도어\s*캠/i.test(t)) add('AI도어캠');
+  if (/AED|제세동/i.test(t)) add('AED');
+  if (/블루\s*스캔/.test(t)) add('블루스캔');
+  if (/정보\s*보안/.test(t)) add('정보보안');
+  if (/금고/.test(t)) add('금고');
+  if (/영상\s*매각|CCTV\s*매각/i.test(t)) add('영상매각');
+  else if (/영상|CCTV|씨씨티비|카메라/i.test(t)) add('영상렌탈');
+  if (/알람|방범|경보|출입|보안\s*서비스|기계경비/.test(t)) add('알람');
+  if (/기타/.test(t) || !got.length) add('기타');
+  return TA4_WISH.filter(k => got.includes(k)).join(', ');
+}
+function ta4WishChips(val, onclickTpl) {
+  const on = ta4WishList(val);
+  return `<div style="display:flex;flex-wrap:wrap;gap:6px;">${TA4_WISH.map(k => { const a = on.includes(k); return `<button type="button" onclick="${onclickTpl.replace('%s', k)}" style="padding:6px 12px;border-radius:99px;font-size:13px;font-weight:800;cursor:pointer;border:1.5px solid ${a ? '#111' : '#cbd5e1'};background:${a ? '#111' : '#fff'};color:${a ? '#fff' : '#475569'};">${k}</button>`; }).join('')}</div>`;
+}
+function ta4WishToggle(val, k) { const cur = ta4WishList(val); const nx = cur.includes(k) ? cur.filter(x => x !== k) : cur.concat(k); return TA4_WISH.filter(x => nx.includes(x)).concat(nx.filter(x => !TA4_WISH.includes(x))).join(', '); }
+function ta4WishDetail(k) { const l = ta2CurLead(); if (!l) return; ta2SaveFields({ wishProduct: ta4WishToggle(l.wishProduct, k) }, true); }
+function ta4WishDraft(i, k) { const p = TA4.psDraft[i]; p.product = ta4WishToggle(p.product, k); ta4PsDraftRender(); }
+
 // ==========================================================================
 // 연락처 (앱 내 고객 연락처: 목록 · 가나다/그룹/회사 · 검색 · 전화 · 사진 · 명함(잘라서 저장) · 내 폰 연락처로 저장)
 // ==========================================================================
@@ -8412,8 +8443,9 @@ function ta4PsParse(text) {
       const assign = (/\]\s*(\S+?)\s*님께\s*배정/.exec(raw) || [])[1] || '';
       const addr = (g['고객주소'] || '').replace(/^\(\s*\d{4,6}\s*\)\s*/, '').trim();
       const fee = Number(onlyNum(g['용역료'])) || 0;
-      const memo = [g['영업동기'] && '영업동기 ' + g['영업동기'], g['이용목적'] && '이용목적 ' + g['이용목적'], g['타사정보'] && '타사정보 ' + g['타사정보'], g['면적'] && '면적 ' + g['면적'].replace(/\s+/g, ''), g['기타'], type && '구분 ' + type].filter(Boolean).join(' / ');
-      out.push({ kind: intro ? '패밀리넷(소개)' : '패밀리넷', name: g['경비대상처'] || g['고객명'] || '', person: g['고객명'] || '', phone: fmt(g['전화번호']), address: addr, category: [g['업종'] || g['형태'], g['제공서비스']].filter(Boolean).join(' / '), memo, prospect_no: g['가망고객번호'] || '', agent_name: agent, agent_phone: agentPhone, area: g['면적'] || '', fee, req_date: g['설계요청일'] || '', hint: assign, raw });
+      const prod = g['제공서비스'] || g['이용목적'] || '';   // 희망 상품 (업종과는 별개)
+      const memo = [g['영업동기'] && '영업동기 ' + g['영업동기'], g['제공서비스'] && g['이용목적'] && '이용목적 ' + g['이용목적'], g['타사정보'] && '타사정보 ' + g['타사정보'], g['면적'] && '면적 ' + g['면적'].replace(/\s+/g, ''), g['기타'], type && '구분 ' + type].filter(Boolean).join(' / ');
+      out.push({ kind: intro ? '패밀리넷(소개)' : '패밀리넷', name: g['경비대상처'] || g['고객명'] || '', person: g['고객명'] || '', phone: fmt(g['전화번호']), address: addr, category: g['업종'] || g['형태'] || '', product: prod, memo, prospect_no: g['가망고객번호'] || '', agent_name: agent, agent_phone: agentPhone, area: g['면적'] || '', fee, req_date: g['설계요청일'] || '', hint: assign, raw });
       return;
     }
     const pm = /가망고객\s*[:：]\s*(\d{6,})/.exec(raw);   // 형식 3: 가망고객:번호 / 이름 / 전화번호 / 주소 / 상품, [비고]
@@ -8425,13 +8457,13 @@ function ta4PsParse(text) {
       let last = rest.length > 1 ? rest[rest.length - 1] : '', addr = rest.length > 1 ? rest.slice(0, -1).join(' ') : (rest[0] || '');
       if (rest.length === 1 && /\[/.test(rest[0])) { addr = ''; last = rest[0]; }
       const bi = last.indexOf('['), prod = (bi >= 0 ? last.slice(0, bi) : last).replace(/[,\s]+$/, '').trim(), note = bi >= 0 ? last.slice(bi).trim() : '';
-      out.push({ kind: '가망고객', name: nm, person: nm, phone: pi >= 0 ? fmt(lines[pi]) : '', address: addr, category: prod, memo: note, prospect_no: pm[1], agent_name: '', agent_phone: '', area: '', fee: 0, req_date: '', hint: '', raw });
+      out.push({ kind: '가망고객', name: nm, person: nm, phone: pi >= 0 ? fmt(lines[pi]) : '', address: addr, category: '', product: prod, memo: note, prospect_no: pm[1], agent_name: '', agent_phone: '', area: '', fee: 0, req_date: '', hint: '', raw });
       return;
     }
     const m = /신규\)\s*(\S+)\s+(\+?[0-9][0-9\-\s]{8,14}[0-9])\s*([^\[]*?)\s*\[([^\]]+)\]\s*([\s\S]*)$/.exec(raw);   // 형식 1: 신규)이름 전화 주소 [분류] 메모
-    if (m) { out.push({ kind: '신규문자', name: m[1], person: m[1], phone: fmt(m[2]), address: m[3].trim(), category: m[4].trim(), memo: m[5].trim().replace(/\s+/g, ' '), prospect_no: '', agent_name: '', agent_phone: '', area: '', fee: 0, req_date: '', hint: '', raw }); return; }
+    if (m) { out.push({ kind: '신규문자', name: m[1], person: m[1], phone: fmt(m[2]), address: m[3].trim(), category: '', product: m[4].trim(), memo: m[5].trim().replace(/\s+/g, ' '), prospect_no: '', agent_name: '', agent_phone: '', area: '', fee: 0, req_date: '', hint: '', raw }); return; }
     const ph = /0\d{1,2}[-\s]?\d{3,4}[-\s]?\d{4}/.exec(raw);   // 알 수 없는 형식: 번호만이라도 추출
-    if (raw.length > 5) out.push({ kind: '기타', name: '', person: '', phone: ph ? fmt(ph[0]) : '', address: '', category: '', memo: raw.replace(/\s+/g, ' ').slice(0, 300), prospect_no: '', agent_name: '', agent_phone: '', area: '', fee: 0, req_date: '', hint: '', raw });
+    if (raw.length > 5) out.push({ kind: '기타', name: '', person: '', phone: ph ? fmt(ph[0]) : '', address: '', category: '', product: '', memo: raw.replace(/\s+/g, ' ').slice(0, 300), prospect_no: '', agent_name: '', agent_phone: '', area: '', fee: 0, req_date: '', hint: '', raw });
   });
   return out;
 }
@@ -8443,7 +8475,7 @@ function ta4PsLeads() { return Object.values(ALL).flatMap(a => (a && a.leads) ||
 function ta4PsDup(p) {
   return ta4PsLeads().find(l => (p.prospect_no && String(l.memo || '').includes(p.prospect_no)) || (!p.prospect_no && p.phone && ta4Num(l.contactPhone) === ta4Num(p.phone) && (l.company || '') === (p.name || p.person || '')));
 }
-const TA4_PS_COLS = ['origin', 'referrer', 'referrer_phone', 'contact_phone'];   // 서버에 아직 없을 수 있는 컬럼(없으면 빼고 다시 저장)
+const TA4_PS_COLS = ['origin', 'referrer', 'referrer_phone', 'contact_phone', 'wish_product'];   // 서버에 아직 없을 수 있는 컬럼(없으면 빼고 다시 저장)
 
 // ---------- 관리자 화면 ----------
 function ta4PsAdminShow() {
@@ -8492,8 +8524,8 @@ async function ta4PsAiParse(text) {
   const ctl = new AbortController(), tm = setTimeout(() => ctl.abort(), 25000);
   try {
     const r = await fetch(SUPABASE_URL + '/functions/v1/ps-parse', { method: 'POST', signal: ctl.signal, headers: { 'Content-Type': 'application/json', apikey: SUPABASE_ANON_KEY }, body: JSON.stringify({ text, phone: (currentUser && currentUser.phone) || '' }) });
-    const j = await r.json(); if (!r.ok || !Array.isArray(j.items)) throw new Error(j.error || ('HTTP ' + r.status));
-    return j.items.map(x => ({ kind: String(x.kind || '기타'), name: String(x.name || ''), person: String(x.person || ''), phone: ta4PsFmtPhone(x.phone), address: String(x.address || ''), category: String(x.category || ''), memo: String(x.memo || ''), prospect_no: String(x.prospect_no || '').replace(/\D/g, ''), agent_name: String(x.agent_name || ''), agent_phone: ta4PsFmtPhone(x.agent_phone), area: String(x.area || ''), fee: Number(x.fee) || 0, req_date: String(x.req_date || ''), hint: String(x.hint || ''), ai: true, raw: text })).filter(x => x.name || x.person || x.phone || x.prospect_no);
+    const j = await r.json(); if (!r.ok || !Array.isArray(j.items)) throw new Error((j.error || ('HTTP ' + r.status)) + (j.status ? ' ' + j.status : '') + (j.detail ? ' ' + String(j.detail).slice(0, 90) : ''));
+    return j.items.map(x => ({ kind: String(x.kind || '기타'), name: String(x.name || ''), person: String(x.person || ''), phone: ta4PsFmtPhone(x.phone), address: String(x.address || ''), category: String(x.category || ''), product: String(x.product || ''), memo: String(x.memo || ''), prospect_no: String(x.prospect_no || '').replace(/\D/g, ''), agent_name: String(x.agent_name || ''), agent_phone: ta4PsFmtPhone(x.agent_phone), area: String(x.area || ''), fee: Number(x.fee) || 0, req_date: String(x.req_date || ''), hint: String(x.hint || ''), ai: true, raw: text })).filter(x => x.name || x.person || x.phone || x.prospect_no);
   } finally { clearTimeout(tm); }
 }
 async function ta4PsAnalyze() {
@@ -8501,15 +8533,15 @@ async function ta4PsAnalyze() {
   if (!String(text).trim()) { alert('분석할 문자를 붙여넣어 주세요'); return; }
   const btn = el('ta4PsGo'), old = btn ? btn.textContent : '';
   if (btn) { btn.disabled = true; btn.textContent = 'AI 분석 중…'; }
-  let items = [], used = 'ai';
+  let items = [], used = 'ai', why = '';
   try { items = await ta4PsAiParse(text); if (!items.length) throw new Error('결과 없음'); }
-  catch (e) { console.warn('AI 분석 실패 → 기본 분석', e); used = 'rule'; items = ta4PsParse(text); }
+  catch (e) { console.warn('AI 분석 실패 → 기본 분석', e); used = 'rule'; why = (e && (e.name === 'AbortError' ? '시간 초과' : e.message)) || ''; items = ta4PsParse(text); }
   finally { if (btn) { btn.disabled = false; btn.textContent = old || '분석하기'; } }
   if (!items.length) { alert('분석할 수 있는 내용이 없습니다'); return; }
-  TA4.psDraft = items.map(p => Object.assign(p, { assigned_to: '', dup: !!ta4PsDup(p), dupInfo: (d => d ? (d.consultant || '') + ' · 등록 ' + String(d.registeredDate || d.createdAt || '').slice(0, 10) : '')(ta4PsDup(p)) })); ta4PsDraftRender();
-  try { ta3Toast(used === 'ai' ? 'AI(Gemini)로 분석했습니다. 내용을 확인해 주세요' : 'AI 분석을 쓸 수 없어 기본 분석으로 처리했습니다', 3200); } catch (e) {}
+  TA4.psDraft = items.map(p => Object.assign(p, { product: (raw => { const n = ta4WishNorm(raw); if (n === '기타' && raw && !/기타/.test(raw)) p.memo = ('희망 상품: ' + raw + (p.memo ? ' / ' + p.memo : '')); return n; })(p.product),  assigned_to: '', dup: !!ta4PsDup(p), dupInfo: (d => d ? (d.consultant || '') + ' · 등록 ' + String(d.registeredDate || d.createdAt || '').slice(0, 10) : '')(ta4PsDup(p)) })); ta4PsDraftRender();
+  try { ta3Toast(used === 'ai' ? 'AI(Gemini)로 분석했습니다. 내용을 확인해 주세요' : 'AI 분석 실패(' + why + ') → 기본 분석으로 처리했습니다', 6000); } catch (e) {}
 }
-function ta4PsAddBlank() { TA4.psDraft.push({ kind: '직접', name: '', person: '', phone: '', address: '', category: '', memo: '', prospect_no: '', agent_name: '', agent_phone: '', area: '', fee: 0, req_date: '', assigned_to: '', raw: '' }); ta4PsDraftRender(); }
+function ta4PsAddBlank() { TA4.psDraft.push({ kind: '직접', name: '', person: '', phone: '', address: '', category: '', product: '', memo: '', prospect_no: '', agent_name: '', agent_phone: '', area: '', fee: 0, req_date: '', assigned_to: '', raw: '' }); ta4PsDraftRender(); }
 function ta4PsConf(p) { return Number(p.fee) > 0 ? 'B' : 'C'; }
 function ta4PsDraftRender() {
   const e = escapeHtml, box = el('ta4PsDraft');
@@ -8518,7 +8550,8 @@ function ta4PsDraftRender() {
     const rf = /소개/.test(p.kind);
     return `<div style="border:1px solid ${p.dup ? '#f59e0b' : '#e2e8f0'};border-radius:12px;padding:12px;margin-bottom:10px;background:#f8fafc;">
       <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;"><span style="background:#e0e7ff;color:#3730a3;border-radius:99px;padding:2px 10px;font-size:12px;font-weight:800;">${e(p.kind)}</span>${p.ai ? '<span style="background:#dcfce7;color:#166534;border-radius:99px;padding:2px 9px;font-size:11.5px;font-weight:800;">AI 분석</span>' : ''}${p.dup ? `<span style="color:#b45309;font-size:12px;font-weight:800;">이미 반영된 안건입니다 — 추가 등록되지 않습니다${p.dupInfo ? ' (' + e(p.dupInfo) + ')' : ''}</span>` : ''}<button type="button" onclick="TA4.psDraft.splice(${i},1);ta4PsDraftRender()" style="margin-left:auto;border:none;background:none;color:#b91c1c;font-weight:800;cursor:pointer;">제거</button></div>
-      <div style="display:flex;flex-wrap:wrap;gap:8px;">${f('name', '고객 / 경비대상처', 2)}${f('person', '고객 담당자', 1)}${f('phone', '전화번호', 1, 'tel')}${f('category', '업종·분류', 1)}${f('fee', '용역료(원)', 1)}</div>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;">${f('name', '고객 / 경비대상처', 2)}${f('person', '고객 담당자', 1)}${f('phone', '전화번호', 1, 'tel')}${f('category', '업종', 1)}${f('fee', '용역료(원)', 1)}</div>
+      <div style="margin-top:8px;font-size:12px;color:#64748b;font-weight:700;">희망 상품 (다중 선택)<div style="margin-top:4px;">${ta4WishChips(p.product, 'ta4WishDraft(' + i + ',\'%s\')')}</div></div>
       <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:8px;">${f('address', '주소', 3)}${f('prospect_no', '가망고객번호', 1)}</div>
       <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:8px;">${f('memo', '메모', 3)}${f('agent_name', rf ? '소개자' : '대리점 영업사원 / 소개자', 1)}${f('agent_phone', '소개자 전화', 1, 'tel')}</div>
       <div style="margin-top:8px;font-size:12px;color:#64748b;font-weight:700;">배정 컨설턴트 <select onchange="TA4.psDraft[${i}].assigned_to=this.value" style="margin-left:6px;padding:7px;border-radius:8px;border:1px solid #cbd5e1;font-size:14px;"><option value="">선택</option>${CONSULTANTS.map(n => `<option value="${e(n)}"${p.assigned_to === n ? ' selected' : ''}>${e(n)}</option>`).join('')}</select>
@@ -8544,12 +8577,12 @@ async function ta4PsCreate(p) {
   const now = new Date().toISOString(), today = todayStr(), d = new Date(); d.setDate(d.getDate() + 14);
   const exp = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
   const id = crypto.randomUUID(), who = p.assigned_to, company = (p.name || p.person || p.phone || '가망고객').trim(), phone = ta4Num(p.phone);
-  const row = { id, consultant: who, company, contact: p.person || '', amount: Number(p.fee) || 0, product_type: /정보보안/.test(p.category || '') ? '정보보안' : '알람', motive: '콜/패밀리넷', stage: '진행중', confidence: ta4PsConf(p),
+  const row = { id, consultant: who, company, contact: p.person || '', amount: Number(p.fee) || 0, product_type: /정보보안/.test((p.product || '') + ' ' + (p.category || '')) ? '정보보안' : '알람', wish_product: p.product || null, motive: '콜/패밀리넷', stage: '진행중', confidence: ta4PsConf(p),
     registered_date: today, expected_date: exp, memo: p.prospect_no ? '가망고객번호 ' + p.prospect_no : null, created_at: now, updated_at: now,
     origin: '가망', referrer: p.agent_name || null, referrer_phone: ta4Num(p.agent_phone) || null, contact_phone: phone || null };
   const { dropped } = await ta4PsInsertLead(row);
   // 첫 노트 (문자 내용 요약)
-  const note = ['[가망고객 · ' + (p.kind || '') + '] 관리자 등록', p.category && '업종/분류: ' + p.category, p.prospect_no && '가망고객번호: ' + p.prospect_no, p.agent_name && (/소개/.test(p.kind) ? '소개자: ' : '대리점 영업사원/소개자: ') + p.agent_name + (p.agent_phone ? ' ' + p.agent_phone : ''), p.req_date && '설계요청일: ' + p.req_date, p.memo && p.memo, dropped.length ? '(참고) 서버에 소개자/분류 컬럼이 없어 일부가 저장되지 않았습니다. 설정 SQL을 실행하세요.' : ''].filter(Boolean).join('\n');
+  const note = ['[가망고객 · ' + (p.kind || '') + '] 관리자 등록', p.product && '희망 상품: ' + p.product, p.category && '업종: ' + p.category, p.prospect_no && '가망고객번호: ' + p.prospect_no, p.agent_name && (/소개/.test(p.kind) ? '소개자: ' : '대리점 영업사원/소개자: ') + p.agent_name + (p.agent_phone ? ' ' + p.agent_phone : ''), p.req_date && '설계요청일: ' + p.req_date, p.memo && p.memo, dropped.length ? '(참고) 서버에 소개자/분류 컬럼이 없어 일부가 저장되지 않았습니다. 설정 SQL을 실행하세요.' : ''].filter(Boolean).join('\n');
   try { await db.from('ta_notes').insert([{ id: crypto.randomUUID(), lead_id: id, consultant: who, kind: 'memo', content: note, image: null, created_at: now }]); } catch (e) {}
   // 연락처 (이미 같은 번호가 있으면 만들지 않음)
   try {
