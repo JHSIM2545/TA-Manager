@@ -7290,7 +7290,7 @@ async function ta2SaveFields(patch, rerender, leadArg) {
   ta2Flash('저장 중');
   let res;
   try {
-    res = await leadWriteWithPhone('update', lead.id, next.contactPhone, {
+    const row = {
       company: next.company, contact: next.contact || '', amount: Number(next.amount || 0),
       product_type: next.productType, motive: next.motive, stage: next.stage, confidence: next.confidence,
       registered_date: next.registeredDate || null, expected_date: next.expectedDate || null,
@@ -7298,7 +7298,13 @@ async function ta2SaveFields(patch, rerender, leadArg) {
       vehicle_number: next.vehicleNumber || null, memo: next.memo || null, updated_at: next.updatedAt,
       ...('referrer' in patch ? { referrer: next.referrer || null } : {}),
       ...('wishProduct' in patch ? { wish_product: next.wishProduct || null } : {})
-    });
+    };
+    res = await leadWriteWithPhone('update', lead.id, next.contactPhone, row);
+    for (let n = 0; n < 3 && res.error && /(wish_product|referrer)/i.test(res.error.message || ''); n++) {   // 서버에 아직 없는 컬럼은 빼고 저장
+      const col = /wish_product/i.test(res.error.message) ? 'wish_product' : 'referrer';
+      delete row[col]; res = await leadWriteWithPhone('update', lead.id, next.contactPhone, row);
+      if (!res.error && col === 'wish_product') setTimeout(() => alert('저장은 되었지만 서버에 희망 상품 컬럼(wish_product)이 없어 희망 상품은 저장되지 않았습니다.\n가망_희망상품_설정.sql을 실행해 주세요.'), 50);
+    }
   } catch (e) { res = { error: e }; }
   if (res.error) { ta2Flash('저장 실패: ' + (res.error.message || res.error), true); if (live) ta2RenderInfo(); return false; }
   Object.assign(lead, next);
@@ -8676,7 +8682,7 @@ async function ta4PsInsertLead(row) {
   throw new Error('저장 실패');
 }
 async function ta4PsCreate(p) {
-  const now = new Date().toISOString(), today = todayStr(), d = new Date(); d.setDate(d.getDate() + 14);
+  const now = new Date().toISOString(), today = todayStr(), d = new Date(); d.setDate(d.getDate() + 2);
   const exp = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
   const id = crypto.randomUUID(), who = p.assigned_to, company = (p.name || p.person || p.phone || '가망고객').trim(), phone = ta4Num(p.phone);
   const row = { id, consultant: who, company, contact: p.person || '', amount: Number(p.fee) || 0, product_type: /정보보안/.test((p.product || '') + ' ' + (p.category || '')) ? '정보보안' : '알람', wish_product: p.product || null, motive: '콜/패밀리넷', stage: '진행중', confidence: ta4PsConf(p),
