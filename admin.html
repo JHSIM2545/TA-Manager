@@ -8715,6 +8715,7 @@ async function ta4PsSaveDraft() {
   for (const p of rows) { try { await ta4PsCreate(p); ok++; } catch (e) { fail.push((p.name || p.phone) + ': ' + (e.message || e)); } }
   btn.disabled = false; btn.textContent = '컨설턴트에게 등록';
   try { await loadAllFromSupabase(); try { await ta3LoadPlaces(); } catch (x) {} try { render(); } catch (x) {} } catch (e) {}
+  try { if (ok) { ['fConsultant', 'fStage', 'fConfidence', 'fKind'].forEach(id => { if (el(id)) el(id).value = 'all'; }); ['fMonth', 'fSearch'].forEach(id => { if (el(id)) el(id).value = ''; }); if (el('fMonth')) { try { admUTRender(); } catch (x) {} renderLeadTable(); } } } catch (e) {}   // 새 안건이 이달 필터 등에 가려지지 않도록 목록 필터 해제
   ta4PsAdminShow();
   if (fail.length) alert(`${ok}건 등록, ${fail.length}건 실패\n` + fail.join('\n')); else { ta4PsCloseInput(); alert(`${ok}건을 오늘(${todayStr()}) 등록일로 컨설턴트 안건·연락처·지도에 반영했습니다.` + (TA4.psDraft.some(p => p.dup) ? `\n(이미 반영된 ${TA4.psDraft.filter(p => p.dup).length}건은 추가 등록하지 않았습니다.)` : '')); }
 }
