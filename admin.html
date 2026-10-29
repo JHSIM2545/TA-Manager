@@ -1513,6 +1513,33 @@ if ('serviceWorker' in navigator) window.addEventListener('load', () => { naviga
           아직 계정이 없으신가요?<br>
           <button type="button" class="signup-toggle-btn" id="btnGoSignup" onclick="toggleLoginSignup('signup')" style="margin-top:6px;background:none;border:none;color:#2563eb;font-weight:700;font-size:15px;cursor:pointer;text-decoration:underline;">신규 회원가입</button>
         </div>
+
+        <!-- 바탕화면(홈 화면)에 앱 설치 -->
+        <div id="pwaInstallBox" style="display:none;margin-top:14px;text-align:center;">
+          <button type="button" id="pwaInstallBtn" style="width:100%;padding:11px;font-size:14px;font-weight:700;border:1.5px solid #cbd5e1;background:#f8fafc;color:#0f2547;border-radius:10px;cursor:pointer;">📲 바탕화면에 앱으로 저장</button>
+          <div id="pwaInstallMsg" style="margin-top:8px;font-size:12px;line-height:1.55;color:#64748b;"></div>
+        </div>
+        <script>
+        (function () {
+          var box = document.getElementById('pwaInstallBox'), btn = document.getElementById('pwaInstallBtn'), msg = document.getElementById('pwaInstallMsg'), dp = null;
+          if (!box) return;
+          var standalone = (window.matchMedia && matchMedia('(display-mode: standalone)').matches) || window.navigator.standalone === true;
+          if (standalone) return;   // 이미 앱으로 실행 중이면 숨김
+          var ua = navigator.userAgent || '', ios = /iphone|ipad|ipod/i.test(ua) || (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1);
+          box.style.display = 'block';
+          window.addEventListener('beforeinstallprompt', function (e) { e.preventDefault(); dp = e; msg.textContent = ''; });
+          window.addEventListener('appinstalled', function () { box.style.display = 'none'; dp = null; });
+          btn.onclick = async function () {
+            if (dp) {
+              try { dp.prompt(); var c = await dp.userChoice; if (c && c.outcome === 'accepted') box.style.display = 'none'; } catch (x) {}
+              dp = null; return;
+            }
+            if (ios) msg.innerHTML = '아이폰/아이패드: Safari 하단 <b>공유(⬆︎) 버튼 → 홈 화면에 추가</b>를 눌러 주세요.<br>(카카오톡·네이버 앱 안에서 연 경우 Safari로 다시 열어야 합니다)';
+            else if (/KAKAOTALK|NAVER|; wv\)/i.test(ua)) msg.innerHTML = '앱 안에서 열린 화면에서는 설치할 수 없습니다. <b>Chrome(또는 Safari)</b>으로 다시 열어 주세요.';
+            else msg.innerHTML = '주소창 오른쪽의 <b>설치 아이콘(⊕)</b> 또는 브라우저 메뉴(⋮) → <b>앱 설치 / 바탕화면에 바로가기 만들기</b>를 눌러 주세요.<br>(이미 설치했다면 바탕화면 아이콘으로 여세요)';
+          };
+        })();
+        </script>
       </form>
     </div>
 
@@ -2821,6 +2848,7 @@ async function loadAllFromSupabase() {
         wishProduct: r.wish_product || '',
         referrer: r.referrer || '',
         referrerPhone: r.referrer_phone || '',
+        address: r.address || '',
         createdAt: r.created_at,
         updatedAt: r.updated_at
       });
@@ -6337,7 +6365,7 @@ function ta3BuildItems() {
     const g = ta3GrpTa(l.stage), pl = TA3.places[l.id];
     out.push({
       src: ta4IsPs(l) ? 'ps' : 'ta', referrer: l.referrer || '', id: l.id, name: l.company, contact: l.contact, phone: l.contactPhone, amount: Number(l.amount || 0), group: g,
-      stage: ta2StageLabel(l.stage), conf: l.confidence, product: l.productType, address: (pl && pl.address) || '',
+      stage: ta2StageLabel(l.stage), conf: l.confidence, product: l.productType, address: (pl && pl.address) || l.address || '',
       date: l.stage === '수주完' ? (l.contractDate || l.expectedDate) : l.expectedDate, updated: l.updatedAt || '', raw: l
     });
   });
@@ -7168,12 +7196,32 @@ function ta2RenderActions() {
   el('ta2DActions').innerHTML = a;
 }
 // 주소 정보 (지도 위치에서 자동 입력)
+function ta4AddrFromNotes() {
+  // 예전에 등록되어 주소가 노트('주소: …')에만 남아 있는 가망고객 복구용
+  const ns = (typeof TA2 !== 'undefined' && TA2.notes) || [];
+  for (const n of ns) { const m = /(?:^|\n)\s*주소\s*[:：]\s*([^\n]+)/.exec(String(n.content || '')); if (m && m[1].trim()) return m[1].trim(); }
+  return '';
+}
 function ta4RenderAddr() {
   const l = ta2CurLead(); if (!l) return;
-  const p = TA3.places[l.id], addr = (p && p.address) || (l._ref ? (l.raw.address || '') : '') || '';
+  const p = TA3.places[l.id];
+  let addr = (p && p.address) || (l._ref ? (l.raw.address || '') : '') || l.address || '';
+  if (!addr && !l._ref) addr = ta4AddrFromNotes();
   const inp = el('ta4AddrInp'); if (inp) inp.value = addr;
   const pin = el('ta4PinBtn'); if (pin) pin.classList.toggle('set', !!(p && p.lat));
   const bar = el('ta4Addr'); if (bar) bar.innerHTML = '';
+  // 지도 위치 테이블에 주소가 비어 있으면 찾은 주소를 채워 넣고(자가 복구) 좌표도 구함
+  try {
+    TA4.addrHeal = TA4.addrHeal || {};
+    if (addr && !l._ref && !(p && p.address) && !TA4.addrHeal[l.id] && typeof currentViewMode !== 'undefined' && CONSULTANTS.includes(currentViewMode)) {
+      TA4.addrHeal[l.id] = 1;
+      (async () => {
+        await ta3PlaceSave(l.id, 'ta', { address: addr });
+        if (!(TA3.places[l.id] && TA3.places[l.id].lat)) { const r = await ta3Geocode(addr); if (r) await ta3PlaceSave(l.id, 'ta', { lat: r.lat, lng: r.lng }); }
+        ta3BuildItems(); const pin2 = el('ta4PinBtn'); if (pin2) pin2.classList.toggle('set', !!(TA3.places[l.id] && TA3.places[l.id].lat));
+      })().catch(e => console.warn('[주소 복구]', e));
+    }
+  } catch (e) {}
 }
 async function ta4AddrSave(v) {
   const l = ta2CurLead(); if (!l) return; v = String(v || '').trim();
@@ -7381,7 +7429,7 @@ async function ta2AddSched() {
 async function ta2LoadNotes() {
   const id = TA2.leadId; const rows = await ta2NotesList(id);
   if (TA2.leadId !== id) return;
-  TA2.notes = rows; ta2RenderMemos(); ta4Counts();
+  TA2.notes = rows; ta2RenderMemos(); ta4Counts(); try { ta4RenderAddr(); } catch (e) {}
 }
 function ta2RenderMemos() {
   const notes = TA2.notes;
@@ -8583,7 +8631,7 @@ function ta4PsLeads() { return Object.values(ALL).flatMap(a => (a && a.leads) ||
 function ta4PsDup(p) {
   return ta4PsLeads().find(l => (p.prospect_no && String(l.memo || '').includes(p.prospect_no)) || (!p.prospect_no && p.phone && ta4Num(l.contactPhone) === ta4Num(p.phone) && (l.company || '') === (p.name || p.person || '')));
 }
-const TA4_PS_COLS = ['origin', 'referrer', 'referrer_phone', 'contact_phone', 'wish_product', 'zone', 'vehicle', 'auto_assigned', 'assign_basis'];   // 서버에 아직 없을 수 있는 컬럼(없으면 빼고 다시 저장)
+const TA4_PS_COLS = ['origin', 'referrer', 'referrer_phone', 'contact_phone', 'wish_product', 'address', 'zone', 'vehicle', 'auto_assigned', 'assign_basis'];   // 서버에 아직 없을 수 있는 컬럼(없으면 빼고 다시 저장)
 
 // ---------- 관리자 화면 ----------
 function ta4PsAdminShow() {
@@ -8610,7 +8658,7 @@ function ta4PsAdminRender() {
   const rows = ta4PsLeads().sort((a, b) => String(b.createdAt || '').localeCompare(String(a.createdAt || '')));
   el('ta4PsCnt').textContent = rows.length + '건';
   const e = escapeHtml, sel = l => `<select onchange="ta4PsReassign('${e(l.id)}',this.value)" style="padding:5px;border-radius:6px;border:1px solid #cbd5e1;">${CONSULTANTS.map(n => `<option value="${e(n)}"${l.consultant === n ? ' selected' : ''}>${e(n)}</option>`).join('')}</select>`;
-  body.innerHTML = rows.length ? rows.map(l => `<tr><td>${e(String(l.createdAt || '').slice(0, 10))}</td><td>${sel(l)}</td><td><b>${e(l.company)}</b>${l.contact && l.contact !== l.company ? `<br><small>${e(l.contact)}</small>` : ''}</td><td>${l.contactPhone ? `<a href="tel:${e(ta4Num(l.contactPhone))}">${e(ta4FmtPhone(l.contactPhone))}</a>` : ''}</td><td style="min-width:170px;">${e((TA4.psAddr && TA4.psAddr[l.id]) || '')}</td><td>${e(l.referrer || '')}</td><td style="text-align:right;">${l.amount ? Number(l.amount).toLocaleString('ko-KR') + '원' : ''}</td><td>${e(l.confidence || '')}</td><td>${e(l.stage || '')}</td><td><button type="button" class="small secondary" onclick="ta4PsDel('${e(l.id)}')" style="background:#fee2e2;color:#b91c1c;border:none;border-radius:6px;padding:5px 9px;cursor:pointer;">삭제</button></td></tr>`).join('') : '<tr><td colspan="10" style="text-align:center;color:#94a3b8;padding:24px;">등록된 가망고객이 없습니다</td></tr>';
+  body.innerHTML = rows.length ? rows.map(l => `<tr><td>${e(String(l.createdAt || '').slice(0, 10))}</td><td>${sel(l)}</td><td><b>${e(l.company)}</b>${l.contact && l.contact !== l.company ? `<br><small>${e(l.contact)}</small>` : ''}</td><td>${l.contactPhone ? `<a href="tel:${e(ta4Num(l.contactPhone))}">${e(ta4FmtPhone(l.contactPhone))}</a>` : ''}</td><td style="min-width:170px;">${e((TA4.psAddr && TA4.psAddr[l.id]) || l.address || '')}</td><td>${e(l.referrer || '')}</td><td style="text-align:right;">${l.amount ? Number(l.amount).toLocaleString('ko-KR') + '원' : ''}</td><td>${e(l.confidence || '')}</td><td>${e(l.stage || '')}</td><td><button type="button" class="small secondary" onclick="ta4PsDel('${e(l.id)}')" style="background:#fee2e2;color:#b91c1c;border:none;border-radius:6px;padding:5px 9px;cursor:pointer;">삭제</button></td></tr>`).join('') : '<tr><td colspan="10" style="text-align:center;color:#94a3b8;padding:24px;">등록된 가망고객이 없습니다</td></tr>';
 }
 async function ta4PsReassign(id, who) {
   try {
@@ -9079,7 +9127,7 @@ async function ta4PsCreate(p) {
   const zi = ta4PsSuggest(p) || p.zoneInfo || null;   // 주소로 판정한 구역·차량 (관리자가 컨설턴트를 바꿔도 구역 정보는 그대로 기록)
   const row = { id, consultant: who, company, contact: p.person || '', amount: Number(p.fee) || 0, product_type: /정보보안/.test((p.product || '') + ' ' + (p.category || '')) ? '정보보안' : '알람', wish_product: p.product || null, motive: '콜/패밀리넷', stage: '진행중', confidence: ta4PsConf(p),
     registered_date: today, expected_date: exp, memo: p.prospect_no ? '가망고객번호 ' + p.prospect_no : null, created_at: now, updated_at: now,
-    origin: '가망', referrer: p.agent_name || null, referrer_phone: ta4Num(p.agent_phone) || null, contact_phone: phone || null,
+    origin: '가망', referrer: p.agent_name || null, referrer_phone: ta4Num(p.agent_phone) || null, contact_phone: phone || null, address: p.address || null,
     zone: zi && zi.zone || null, vehicle: zi && zi.zone ? (zi.vehicle || null) : null, auto_assigned: zi ? !!(zi.consultant && zi.consultant === who) : null, assign_basis: zi ? String(zi.basis || '').slice(0, 200) : null };
   const { dropped } = await ta4PsInsertLead(row);
   // 첫 노트 (문자 내용 요약)

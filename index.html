@@ -2747,6 +2747,7 @@ async function loadAllFromSupabase() {
         wishProduct: r.wish_product || '',
         referrer: r.referrer || '',
         referrerPhone: r.referrer_phone || '',
+        address: r.address || '',
         createdAt: r.created_at,
         updatedAt: r.updated_at
       });
@@ -6262,7 +6263,7 @@ function ta3BuildItems() {
     const g = ta3GrpTa(l.stage), pl = TA3.places[l.id];
     out.push({
       src: ta4IsPs(l) ? 'ps' : 'ta', referrer: l.referrer || '', id: l.id, name: l.company, contact: l.contact, phone: l.contactPhone, amount: Number(l.amount || 0), group: g,
-      stage: ta2StageLabel(l.stage), conf: l.confidence, product: l.productType, address: (pl && pl.address) || '',
+      stage: ta2StageLabel(l.stage), conf: l.confidence, product: l.productType, address: (pl && pl.address) || l.address || '',
       date: l.stage === '수주完' ? (l.contractDate || l.expectedDate) : l.expectedDate, updated: l.updatedAt || '', raw: l
     });
   });
@@ -7093,12 +7094,32 @@ function ta2RenderActions() {
   el('ta2DActions').innerHTML = a;
 }
 // 주소 정보 (지도 위치에서 자동 입력)
+function ta4AddrFromNotes() {
+  // 예전에 등록되어 주소가 노트('주소: …')에만 남아 있는 가망고객 복구용
+  const ns = (typeof TA2 !== 'undefined' && TA2.notes) || [];
+  for (const n of ns) { const m = /(?:^|\n)\s*주소\s*[:：]\s*([^\n]+)/.exec(String(n.content || '')); if (m && m[1].trim()) return m[1].trim(); }
+  return '';
+}
 function ta4RenderAddr() {
   const l = ta2CurLead(); if (!l) return;
-  const p = TA3.places[l.id], addr = (p && p.address) || (l._ref ? (l.raw.address || '') : '') || '';
+  const p = TA3.places[l.id];
+  let addr = (p && p.address) || (l._ref ? (l.raw.address || '') : '') || l.address || '';
+  if (!addr && !l._ref) addr = ta4AddrFromNotes();
   const inp = el('ta4AddrInp'); if (inp) inp.value = addr;
   const pin = el('ta4PinBtn'); if (pin) pin.classList.toggle('set', !!(p && p.lat));
   const bar = el('ta4Addr'); if (bar) bar.innerHTML = '';
+  // 지도 위치 테이블에 주소가 비어 있으면 찾은 주소를 채워 넣고(자가 복구) 좌표도 구함
+  try {
+    TA4.addrHeal = TA4.addrHeal || {};
+    if (addr && !l._ref && !(p && p.address) && !TA4.addrHeal[l.id] && typeof currentViewMode !== 'undefined' && CONSULTANTS.includes(currentViewMode)) {
+      TA4.addrHeal[l.id] = 1;
+      (async () => {
+        await ta3PlaceSave(l.id, 'ta', { address: addr });
+        if (!(TA3.places[l.id] && TA3.places[l.id].lat)) { const r = await ta3Geocode(addr); if (r) await ta3PlaceSave(l.id, 'ta', { lat: r.lat, lng: r.lng }); }
+        ta3BuildItems(); const pin2 = el('ta4PinBtn'); if (pin2) pin2.classList.toggle('set', !!(TA3.places[l.id] && TA3.places[l.id].lat));
+      })().catch(e => console.warn('[주소 복구]', e));
+    }
+  } catch (e) {}
 }
 async function ta4AddrSave(v) {
   const l = ta2CurLead(); if (!l) return; v = String(v || '').trim();
@@ -7306,7 +7327,7 @@ async function ta2AddSched() {
 async function ta2LoadNotes() {
   const id = TA2.leadId; const rows = await ta2NotesList(id);
   if (TA2.leadId !== id) return;
-  TA2.notes = rows; ta2RenderMemos(); ta4Counts();
+  TA2.notes = rows; ta2RenderMemos(); ta4Counts(); try { ta4RenderAddr(); } catch (e) {}
 }
 function ta2RenderMemos() {
   const notes = TA2.notes;
