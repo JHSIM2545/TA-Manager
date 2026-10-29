@@ -1407,6 +1407,33 @@ if ('serviceWorker' in navigator) window.addEventListener('load', () => { naviga
           아직 계정이 없으신가요?<br>
           <button type="button" class="signup-toggle-btn" id="btnGoSignup" onclick="toggleLoginSignup('signup')" style="margin-top:6px;background:none;border:none;color:#2563eb;font-weight:700;font-size:15px;cursor:pointer;text-decoration:underline;">신규 회원가입</button>
         </div>
+
+        <!-- 바탕화면(홈 화면)에 앱 설치 -->
+        <div id="pwaInstallBox" style="display:none;margin-top:14px;text-align:center;">
+          <button type="button" id="pwaInstallBtn" style="width:100%;padding:11px;font-size:14px;font-weight:700;border:1.5px solid #cbd5e1;background:#f8fafc;color:#0f2547;border-radius:10px;cursor:pointer;">📲 바탕화면에 앱으로 저장</button>
+          <div id="pwaInstallMsg" style="margin-top:8px;font-size:12px;line-height:1.55;color:#64748b;"></div>
+        </div>
+        <script>
+        (function () {
+          var box = document.getElementById('pwaInstallBox'), btn = document.getElementById('pwaInstallBtn'), msg = document.getElementById('pwaInstallMsg'), dp = null;
+          if (!box) return;
+          var standalone = (window.matchMedia && matchMedia('(display-mode: standalone)').matches) || window.navigator.standalone === true;
+          if (standalone) return;   // 이미 앱으로 실행 중이면 숨김
+          var ua = navigator.userAgent || '', ios = /iphone|ipad|ipod/i.test(ua) || (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1);
+          box.style.display = 'block';
+          window.addEventListener('beforeinstallprompt', function (e) { e.preventDefault(); dp = e; msg.textContent = ''; });
+          window.addEventListener('appinstalled', function () { box.style.display = 'none'; dp = null; });
+          btn.onclick = async function () {
+            if (dp) {
+              try { dp.prompt(); var c = await dp.userChoice; if (c && c.outcome === 'accepted') box.style.display = 'none'; } catch (x) {}
+              dp = null; return;
+            }
+            if (ios) msg.innerHTML = '아이폰/아이패드: Safari 하단 <b>공유(⬆︎) 버튼 → 홈 화면에 추가</b>를 눌러 주세요.<br>(카카오톡·네이버 앱 안에서 연 경우 Safari로 다시 열어야 합니다)';
+            else if (/KAKAOTALK|NAVER|; wv\)/i.test(ua)) msg.innerHTML = '앱 안에서 열린 화면에서는 설치할 수 없습니다. <b>Chrome(또는 Safari)</b>으로 다시 열어 주세요.';
+            else msg.innerHTML = '주소창 오른쪽의 <b>설치 아이콘(⊕)</b> 또는 브라우저 메뉴(⋮) → <b>앱 설치 / 바탕화면에 바로가기 만들기</b>를 눌러 주세요.<br>(이미 설치했다면 바탕화면 아이콘으로 여세요)';
+          };
+        })();
+        </script>
       </form>
     </div>
 
