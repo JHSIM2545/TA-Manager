@@ -4147,7 +4147,7 @@ function renderAgentLeadTable(agentName) {
 function openNewAgentLeadModal() {
   if (currentUser) saveUserSession(currentUser, currentViewMode, 'newLead');
   el('afEditingId').value = '';
-  el('agentModalTitle').textContent = '신규 TA 등록'; try { el('afPsWrap').style.display = ''; } catch (e) {}
+  el('agentModalTitle').textContent = '신규 TA 등록'; try { el('afPsFab').style.display = ''; } catch (e) {}
   el('afCompany').value = '';
   el('afContact').value = '';
   el('afContactPhone').value = '';
@@ -4214,7 +4214,7 @@ function editAgentLead(id) {
   if (!lead) return;
 
   el('afEditingId').value = id;
-  el('agentModalTitle').textContent = 'TA 안건 수정'; try { el('afPsWrap').style.display = 'none'; } catch (e) {}
+  el('agentModalTitle').textContent = 'TA 안건 수정'; try { el('afPsFab').style.display = 'none'; } catch (e) {}
   el('afCompany').value = lead.company;
   el('afContact').value = lead.contact || '';
   el('afContactPhone').value = lead.contactPhone || '';
@@ -7554,7 +7554,7 @@ async function ta4RpSubmit() {
 function openNewAgentLeadModal() {
   if (currentUser) saveUserSession(currentUser, currentViewMode, 'newLead');
   el('afEditingId').value = '';
-  el('agentModalTitle').textContent = '신규 TA 등록'; try { el('afPsWrap').style.display = ''; } catch (e) {}
+  el('agentModalTitle').textContent = '신규 TA 등록'; try { el('afPsFab').style.display = ''; } catch (e) {}
   ['afCompany', 'afContact', 'afContactPhone', 'afAmount', 'afContractDate', 'afBaseDate'].forEach(i => { el(i).value = ''; });
   el('afProductType').value = '알람';
   ta4FillMotive('afMotive', '');
@@ -9381,7 +9381,6 @@ function ta8nDetail(i) {
     <form id="agentModalLeadForm" onsubmit="handleAgentModalSubmit(event)" class="ta4-form">
       <input type="hidden" id="afEditingId" name="editingId"><input type="hidden" id="agentEditingId">
       <input type="hidden" id="afAddress">
-      <div class="f" id="afPsWrap"><button type="button" class="ta4-cardbtn" onclick="ta4PsOpenFromForm()">📩 가망고객 문자로 등록 (자동 분석 · 컨설턴트 배정)</button><div class="chip" style="margin-top:6px;">받은 문자를 붙여넣으면 건별로 분석해 가망고객으로 등록하고, 주소로 담당 컨설턴트를 자동 배정합니다. (변경 가능)</div></div>
       <div class="f">
         <label>서비스제공처명 *</label>
         <div class="nm"><input type="text" id="afCompany" required placeholder="현장 정식 명칭" autocomplete="off">
@@ -9418,6 +9417,8 @@ function ta8nDetail(i) {
     </form>
   </div></div>
   <div class="ta4-pf"><div class="in"><button type="submit" form="agentModalLeadForm" id="afSubmitBtn" class="go">TA 등록</button></div></div>
+  <!-- 가망고객 문자 등록 (신규 등록 화면 우측 하단 빨간 버튼) -->
+  <button type="button" id="afPsFab" onclick="ta4PsOpenFromForm()" aria-label="가망고객 문자로 등록" title="가망고객 문자로 등록" style="position:absolute;right:16px;bottom:calc(82px + env(safe-area-inset-bottom,0px));width:58px;height:58px;border-radius:50%;border:none;background:#dc2626;color:#fff;font-size:15px;font-weight:800;line-height:1;box-shadow:0 6px 16px rgba(220,38,38,.45);cursor:pointer;z-index:5;">가망</button>
 </div>
 
 <!-- 금일 수주 예정 -->
