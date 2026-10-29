@@ -2926,7 +2926,7 @@ function renderTodayList() {
   }
   const total = leads.reduce((s, l) => s + Number(l.amount || 0), 0);
   tbody.innerHTML = leads.map(l => `
-    <tr onclick="ta4AdminOpen('${l.id}')" style="cursor:pointer;">
+    <tr ${l._ref ? '' : `onclick="ta4AdminOpen('${l.id}')" style="cursor:pointer;"`}>
       <td style="font-weight:700;color:${CONSULTANT_COLOR[l.consultant] || 'inherit'};">${escapeHtml(l.consultant)}</td>
       <td style="min-width:170px;word-break:break-word;">${escapeHtml(l.company)}</td>
       <td>${escapeHtml(l.contact) || '-'}</td>
@@ -3437,6 +3437,26 @@ function openCalendarModal(dateStr, name) {
   el('calendarModalOverlay').classList.add('show');
 }
 
+// 소개영업(leads 테이블) 안건을 전체 목록에 '소개' 구분으로 함께 표시
+let ADM_REFS = [], ADM_REFS_T = 0, ADM_REFS_BUSY = false;
+function admRefLeads() {
+  if (!ADM_REFS_BUSY && Date.now() - ADM_REFS_T > 60000) {
+    ADM_REFS_BUSY = true; ADM_REFS_T = Date.now();
+    db.from('leads').select('*').order('created_at', { ascending: false }).limit(1000).then(({ data, error }) => {
+      ADM_REFS_BUSY = false;
+      if (error) return;
+      const n = (data || []).length, changed = n !== ADM_REFS.length || (n && data[0].lead_id !== ADM_REFS[0]._rid);
+      ADM_REFS = (data || []).map(r => ({
+        id: 'ref-' + r.lead_id, _rid: r.lead_id, _ref: true, consultant: r.assigned_rep || '', company: r.customer_name || '(고객명 없음)',
+        contact: r.contact_person || '', amount: Number(r.contract_amount || r.quote_amount || 0), stage: r.status || '접수대기', confidence: '',
+        origin: '소개', productType: r.product || '', registeredDate: (r.created_at || '').slice(0, 10),
+        expectedDate: r.expected_contract_date || (r.created_at || '').slice(0, 10), memo: r.memo || r.note || '', updatedAt: r.updated_at || r.created_at || ''
+      }));
+      if (changed && typeof renderLeadTable === 'function') renderLeadTable();
+    }).catch(() => { ADM_REFS_BUSY = false; });
+  }
+  return ADM_REFS.filter(l => activeDashboardCategory === 'all' || productCategory(l.productType) === activeDashboardCategory);
+}
 function renderLeadTable() {
   const cf = el('fConsultant').value;
   const sf = el('fStage').value;
@@ -3444,7 +3464,7 @@ function renderLeadTable() {
   const mf = el('fMonth').value;
   const qf = el('fSearch').value.trim().toLowerCase();
 
-  let leads = allLeads();
+  let leads = allLeads().concat(admRefLeads());
   if (cf !== 'all') leads = leads.filter(l => l.consultant === cf);
   if (sf !== 'all') leads = leads.filter(l => l.stage === sf);
   if (kf !== 'all') leads = leads.filter(l => l.confidence === kf);
@@ -3466,12 +3486,12 @@ function renderLeadTable() {
     return;
   }
   tbody.innerHTML = leads.map(l => `
-    <tr onclick="ta4AdminOpen('${l.id}')" style="cursor:pointer;">
+    <tr ${l._ref ? '' : `onclick="ta4AdminOpen('${l.id}')" style="cursor:pointer;"`}>
       <td style="font-weight:700;color:${CONSULTANT_COLOR[l.consultant] || 'inherit'};">${escapeHtml(l.consultant)}</td>
       <td style="min-width:170px;word-break:break-word;">${escapeHtml(l.company)}</td>
       <td class="lt-w">${escapeHtml(l.contact) || '-'}</td>
       <td class="amount-cell">${formatCurrency(l.amount)}</td>
-      <td class="lt-w"><span class="badge" style="background:${STAGE_BG[l.stage]};color:${STAGE_COLOR[l.stage]};">${l.stage}</span></td>
+      <td class="lt-w"><span class="badge" style="background:${STAGE_BG[l.stage] || '#eef1f7'};color:${STAGE_COLOR[l.stage] || '#1a2333'};">${l.stage}</span></td>
       <td class="lt-w"><span class="dot" style="background:${CONF_COLOR[l.confidence] || '#ccc'};"></span>${l.confidence || '-'}</td>
       <td class="lt-w">${ta4Kind(l)}</td>
       <td class="lt-w">${escapeHtml(l.productType) || '-'}</td>
@@ -4129,7 +4149,7 @@ function renderAgentLeadTable(agentName) {
         <td style="min-width:170px;word-break:break-word;font-weight:700;">${escapeHtml(l.company)}</td>
         <td>${escapeHtml(l.contact) || '-'}</td>
         <td class="amount-cell" style="text-align:right;font-weight:700;white-space:nowrap;">${formatCurrency(l.amount)}</td>
-        <td><span class="badge" style="background:${STAGE_BG[l.stage]};color:${STAGE_COLOR[l.stage]};">${l.stage}</span></td>
+        <td><span class="badge" style="background:${STAGE_BG[l.stage] || '#eef1f7'};color:${STAGE_COLOR[l.stage] || '#1a2333'};">${l.stage}</span></td>
         <td><span class="dot" style="background:${CONF_COLOR[l.confidence] || '#ccc'};"></span>${l.confidence || '-'}</td>
         <td>${escapeHtml(l.productType) || '-'}</td>
         <td>${escapeHtml(l.motive) || '-'}</td>
@@ -4485,7 +4505,7 @@ safeAddListener('btnResetFilter', 'click', () => {
   el('fConsultant').value = 'all';
   el('fStage').value = 'all';
   el('fConfidence').value = 'all';
-  if (el('fKind')) el('fKind').value = 'all';
+  // 구분(종류) 선택은 유지
   el('fMonth').value = currentMonthStr();
   el('fSearch').value = '';
   renderLeadTable();
