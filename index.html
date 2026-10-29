@@ -164,6 +164,9 @@
 
   /* 모달 */
   .modal-overlay{position:fixed;inset:0;background:rgba(10,20,40,.55);display:none;align-items:center;justify-content:center;z-index:200;padding:20px;}
+  /* 가망고객 문자 등록: 전체 화면 */
+  #ta4PsOv{padding:0 !important;align-items:stretch !important;justify-content:stretch !important;background:#fff !important;z-index:100050 !important;}
+  #ta4PsOv>div{max-width:none !important;width:100% !important;max-height:none !important;height:100%;border-radius:0 !important;padding:16px 14px calc(18px + env(safe-area-inset-bottom)) !important;box-sizing:border-box;}
   .modal-overlay.show{display:flex;}
   .modal-card{background:#fff;color:var(--text);border-radius:14px;max-width:780px;width:100%;max-height:82vh;overflow:auto;padding:26px;position:relative;}
   .modal-card h3{margin:0 0 4px;font-size:18px;color:var(--navy);}
@@ -4144,7 +4147,7 @@ function renderAgentLeadTable(agentName) {
 function openNewAgentLeadModal() {
   if (currentUser) saveUserSession(currentUser, currentViewMode, 'newLead');
   el('afEditingId').value = '';
-  el('agentModalTitle').textContent = '신규 TA 등록';
+  el('agentModalTitle').textContent = '신규 TA 등록'; try { el('afPsWrap').style.display = ''; } catch (e) {}
   el('afCompany').value = '';
   el('afContact').value = '';
   el('afContactPhone').value = '';
@@ -4211,7 +4214,7 @@ function editAgentLead(id) {
   if (!lead) return;
 
   el('afEditingId').value = id;
-  el('agentModalTitle').textContent = 'TA 안건 수정';
+  el('agentModalTitle').textContent = 'TA 안건 수정'; try { el('afPsWrap').style.display = 'none'; } catch (e) {}
   el('afCompany').value = lead.company;
   el('afContact').value = lead.contact || '';
   el('afContactPhone').value = lead.contactPhone || '';
@@ -7551,7 +7554,7 @@ async function ta4RpSubmit() {
 function openNewAgentLeadModal() {
   if (currentUser) saveUserSession(currentUser, currentViewMode, 'newLead');
   el('afEditingId').value = '';
-  el('agentModalTitle').textContent = '신규 TA 등록';
+  el('agentModalTitle').textContent = '신규 TA 등록'; try { el('afPsWrap').style.display = ''; } catch (e) {}
   ['afCompany', 'afContact', 'afContactPhone', 'afAmount', 'afContractDate', 'afBaseDate'].forEach(i => { el(i).value = ''; });
   el('afProductType').value = '알람';
   ta4FillMotive('afMotive', '');
@@ -7566,6 +7569,7 @@ function openNewAgentLeadModal() {
   ta4Show('agentLeadModalOverlay', () => { if (currentUser) saveUserSession(currentUser, currentViewMode, null); });
 }
 function closeAgentLeadModal() { ta4Close('agentLeadModalOverlay'); }
+function ta4PsOpenFromForm() { closeAgentLeadModal(); setTimeout(ta4PsOpenInput, 60); }
 function onAgentStageChange(val) {
   el('afWonExtraRow').style.display = val === '수주完' ? 'block' : 'none';
   if (val === '수주完') {
@@ -8529,24 +8533,28 @@ function ta4PsLeads() { return Object.values(ALL).flatMap(a => (a && a.leads) ||
 function ta4PsDup(p) {
   return ta4PsLeads().find(l => (p.prospect_no && String(l.memo || '').includes(p.prospect_no)) || (!p.prospect_no && p.phone && ta4Num(l.contactPhone) === ta4Num(p.phone) && (l.company || '') === (p.name || p.person || '')));
 }
-const TA4_PS_COLS = ['origin', 'referrer', 'referrer_phone', 'contact_phone', 'wish_product'];   // 서버에 아직 없을 수 있는 컬럼(없으면 빼고 다시 저장)
+const TA4_PS_COLS = ['origin', 'referrer', 'referrer_phone', 'contact_phone', 'wish_product', 'address', 'zone', 'vehicle', 'auto_assigned', 'assign_basis'];   // 서버에 아직 없을 수 있는 컬럼(없으면 빼고 다시 저장)
 
 // ---------- 관리자 화면 ----------
-function ta4PsAdminShow() {
-  if (!el('ta4PsFab')) {
-    const fb = document.createElement('button'); fb.type = 'button'; fb.id = 'ta4PsFab'; fb.title = '가망고객 추가'; fb.setAttribute('aria-label', '가망고객 추가'); fb.textContent = '+';
-    fb.onclick = ta4PsOpenInput;
-    fb.style.cssText = 'position:fixed;right:18px;bottom:calc(20px + env(safe-area-inset-bottom,0px));width:58px;height:58px;border-radius:50%;border:none;background:#16a34a;color:#fff;font-size:34px;line-height:1;font-weight:400;box-shadow:0 6px 18px rgba(0,0,0,.35);cursor:pointer;z-index:900;';
-    document.body.appendChild(fb);
-    const ov = document.createElement('div'); ov.className = 'modal-overlay'; ov.id = 'ta4PsOv'; ov.style.display = 'none';
-    ov.innerHTML = `<div style="background:#fff;border-radius:14px;max-width:760px;width:100%;max-height:92vh;overflow:auto;padding:20px;color:#1a2333;">
+function ta4PsBuildOv() {
+  if (el('ta4PsOv')) return;
+  const ov = document.createElement('div'); ov.className = 'modal-overlay'; ov.id = 'ta4PsOv'; ov.style.display = 'none';
+  ov.innerHTML = `<div style="background:#fff;border-radius:14px;max-width:760px;width:100%;max-height:92vh;overflow:auto;padding:20px;color:#1a2333;">
       <div style="display:flex;align-items:center;margin-bottom:10px;"><h2 style="margin:0;font-size:18px;color:var(--navy,#0f2547);">가망고객 입력</h2><button type="button" onclick="ta4PsCloseInput()" style="margin-left:auto;border:none;background:#eef1f7;border-radius:50%;width:34px;height:34px;cursor:pointer;">✕</button></div>
       <div style="font-size:13px;color:#64748b;margin-bottom:8px;">받은 문자를 그대로 붙여넣으세요. 여러 건을 한꺼번에 붙여넣어도 건별로 나눠 분석합니다. (신규) 문자 · 패밀리넷 대리점 계약 요청 · 패밀리넷 소개 가망고객)</div>
       <textarea id="ta4PsText" rows="8" placeholder="[Web발신] 신규)홍길동 01012345678 주소 [영상보안] 메모..." style="width:100%;border:1px solid #cbd5e1;border-radius:10px;padding:10px;font-size:14px;font-family:inherit;box-sizing:border-box;"></textarea>
       <div style="margin:10px 0;display:flex;gap:8px;"><button type="button" id="ta4PsGo" onclick="ta4PsAnalyze()" style="background:#0f2547;color:#fff;border:none;border-radius:8px;padding:10px 18px;font-weight:800;cursor:pointer;">분석하기</button><button type="button" onclick="ta4PsAddBlank()" style="background:#eef1f7;color:#0f2547;border:none;border-radius:8px;padding:10px 14px;font-weight:700;cursor:pointer;">직접 입력</button></div>
       <div id="ta4PsDraft"></div>
       <div id="ta4PsFoot" style="display:none;margin-top:12px;text-align:right;"><button type="button" id="ta4PsSaveBtn" onclick="ta4PsSaveDraft()" style="background:var(--blue,#2f6bff);color:#fff;border:none;border-radius:8px;padding:11px 22px;font-weight:800;cursor:pointer;">컨설턴트에게 등록</button></div></div>`;
-    document.body.appendChild(ov);
+  document.body.appendChild(ov);
+}
+function ta4PsAdminShow() {
+  if (!el('ta4PsFab')) {
+    const fb = document.createElement('button'); fb.type = 'button'; fb.id = 'ta4PsFab'; fb.title = '가망고객 추가'; fb.setAttribute('aria-label', '가망고객 추가'); fb.textContent = '+';
+    fb.onclick = ta4PsOpenInput;
+    fb.style.cssText = 'position:fixed;right:18px;bottom:calc(20px + env(safe-area-inset-bottom,0px));width:58px;height:58px;border-radius:50%;border:none;background:#16a34a;color:#fff;font-size:34px;line-height:1;font-weight:400;box-shadow:0 6px 18px rgba(0,0,0,.35);cursor:pointer;z-index:900;';
+    document.body.appendChild(fb);
+    ta4PsBuildOv();
   }
   ta4PsAdminRender();
   try { db.from('ta_places').select('lead_id,address').limit(3000).then(r => { TA4.psAddr = {}; ((r && r.data) || []).forEach(x => { TA4.psAddr[x.lead_id] = x.address; }); ta4PsAdminRender(); }); } catch (e) {}
@@ -8556,13 +8564,14 @@ function ta4PsAdminRender() {
   const rows = ta4PsLeads().sort((a, b) => String(b.createdAt || '').localeCompare(String(a.createdAt || '')));
   el('ta4PsCnt').textContent = rows.length + '건';
   const e = escapeHtml, sel = l => `<select onchange="ta4PsReassign('${e(l.id)}',this.value)" style="padding:5px;border-radius:6px;border:1px solid #cbd5e1;">${CONSULTANTS.map(n => `<option value="${e(n)}"${l.consultant === n ? ' selected' : ''}>${e(n)}</option>`).join('')}</select>`;
-  body.innerHTML = rows.length ? rows.map(l => `<tr><td>${e(String(l.createdAt || '').slice(0, 10))}</td><td>${sel(l)}</td><td><b>${e(l.company)}</b>${l.contact && l.contact !== l.company ? `<br><small>${e(l.contact)}</small>` : ''}</td><td>${l.contactPhone ? `<a href="tel:${e(ta4Num(l.contactPhone))}">${e(ta4FmtPhone(l.contactPhone))}</a>` : ''}</td><td style="min-width:170px;">${e((TA4.psAddr && TA4.psAddr[l.id]) || '')}</td><td>${e(l.referrer || '')}</td><td style="text-align:right;">${l.amount ? Number(l.amount).toLocaleString('ko-KR') + '원' : ''}</td><td>${e(l.confidence || '')}</td><td>${e(l.stage || '')}</td><td><button type="button" class="small secondary" onclick="ta4PsDel('${e(l.id)}')" style="background:#fee2e2;color:#b91c1c;border:none;border-radius:6px;padding:5px 9px;cursor:pointer;">삭제</button></td></tr>`).join('') : '<tr><td colspan="10" style="text-align:center;color:#94a3b8;padding:24px;">등록된 가망고객이 없습니다</td></tr>';
+  body.innerHTML = rows.length ? rows.map(l => `<tr><td>${e(String(l.createdAt || '').slice(0, 10))}</td><td>${sel(l)}</td><td><b>${e(l.company)}</b>${l.contact && l.contact !== l.company ? `<br><small>${e(l.contact)}</small>` : ''}</td><td>${l.contactPhone ? `<a href="tel:${e(ta4Num(l.contactPhone))}">${e(ta4FmtPhone(l.contactPhone))}</a>` : ''}</td><td style="min-width:170px;">${e((TA4.psAddr && TA4.psAddr[l.id]) || l.address || '')}</td><td>${e(l.referrer || '')}</td><td style="text-align:right;">${l.amount ? Number(l.amount).toLocaleString('ko-KR') + '원' : ''}</td><td>${e(l.confidence || '')}</td><td>${e(l.stage || '')}</td><td><button type="button" class="small secondary" onclick="ta4PsDel('${e(l.id)}')" style="background:#fee2e2;color:#b91c1c;border:none;border-radius:6px;padding:5px 9px;cursor:pointer;">삭제</button></td></tr>`).join('') : '<tr><td colspan="10" style="text-align:center;color:#94a3b8;padding:24px;">등록된 가망고객이 없습니다</td></tr>';
 }
 async function ta4PsReassign(id, who) {
   try {
     const { error } = await db.from('ta_leads').update({ consultant: who, updated_at: new Date().toISOString() }).eq('id', id); if (error) throw error;
     try { await db.from('ta_contacts').update({ consultant: who }).eq('lead_id', id); } catch (x) {}
     try { await db.from('ta_places').update({ consultant: who }).eq('lead_id', id); } catch (x) {}
+    try { const { data: zr } = await db.from('ta_leads').select('zone').eq('id', id).limit(1); const zc = zr && zr[0] && zr[0].zone ? ZoneAssign.consultantOf(zr[0].zone) : null; await db.from('ta_leads').update({ auto_assigned: !!zc && zc === who }).eq('id', id); } catch (x) {}
     await loadAllFromSupabase(); try { render(); } catch (x) {} ta4PsAdminRender();
   } catch (e) { alert('변경 실패: ' + (e.message || e)); ta4PsAdminRender(); }
 }
@@ -8570,7 +8579,7 @@ async function ta4PsDel(id) {
   if (!confirm('이 가망고객 안건을 삭제할까요? (컨설턴트의 안건 목록에서도 삭제됩니다)')) return;
   try { const { error } = await db.from('ta_leads').delete().eq('id', id); if (error) throw error; await loadAllFromSupabase(); try { render(); } catch (x) {} ta4PsAdminRender(); } catch (e) { alert('삭제 실패: ' + (e.message || e)); }
 }
-function ta4PsOpenInput() { el('ta4PsText').value = ''; TA4.psDraft = []; ta4PsDraftRender(); el('ta4PsOv').style.display = 'flex'; const fb = el('ta4PsFab'); if (fb) fb.style.display = 'none'; }
+function ta4PsOpenInput() { ta4PsBuildOv(); try { ZoneAssign.load(db); } catch (x) {} el('ta4PsText').value = ''; TA4.psDraft = []; ta4PsDraftRender(); el('ta4PsOv').style.display = 'flex'; const fb = el('ta4PsFab'); if (fb) fb.style.display = 'none'; }
 function ta4PsCloseInput() { el('ta4PsOv').style.display = 'none'; const fb = el('ta4PsFab'); if (fb) fb.style.display = ''; }
 // 문자 분석: Gemini(AI)로 자연어를 구조화 → 실패하면 기존 규칙 기반 분석으로 대체
 function ta4PsFmtPhone(s) { let d = String(s || '').replace(/\D/g, ''); if (d.startsWith('82') && d.length >= 11) d = '0' + d.slice(2); if (d.startsWith('02')) return d.length === 9 ? `02-${d.slice(2, 5)}-${d.slice(5)}` : d.length === 10 ? `02-${d.slice(2, 6)}-${d.slice(6)}` : d; if (d.length === 11) return `${d.slice(0, 3)}-${d.slice(3, 7)}-${d.slice(7)}`; if (d.length === 10) return `${d.slice(0, 3)}-${d.slice(3, 6)}-${d.slice(6)}`; return String(s || '').trim(); }
@@ -8592,7 +8601,9 @@ async function ta4PsAnalyze() {
   catch (e) { console.warn('AI 분석 실패 → 기본 분석', e); used = 'rule'; why = (e && (e.name === 'AbortError' ? '시간 초과' : e.message)) || ''; items = ta4PsParse(text); }
   finally { if (btn) { btn.disabled = false; btn.textContent = old || '분석하기'; } }
   if (!items.length) { alert('분석할 수 있는 내용이 없습니다'); return; }
-  TA4.psDraft = items.map(p => Object.assign(p, { product: (raw => { const n = ta4WishNorm(raw); if (n === '기타' && raw && !/기타/.test(raw)) p.memo = ('희망 상품: ' + raw + (p.memo ? ' / ' + p.memo : '')); return n; })(p.product),  assigned_to: '', dup: !!ta4PsDup(p), dupInfo: (d => d ? (d.consultant || '') + ' · 등록 ' + String(d.registeredDate || d.createdAt || '').slice(0, 10) : '')(ta4PsDup(p)) })); ta4PsDraftRender();
+  TA4.psDraft = items.map(p => Object.assign(p, { product: (raw => { const n = ta4WishNorm(raw); if (n === '기타' && raw && !/기타/.test(raw)) p.memo = ('희망 상품: ' + raw + (p.memo ? ' / ' + p.memo : '')); return n; })(p.product),  assigned_to: '', dup: !!ta4PsDup(p), dupInfo: (d => d ? (d.consultant || '') + ' · 등록 ' + String(d.registeredDate || d.createdAt || '').slice(0, 10) : '')(ta4PsDup(p)) }));
+  try { await ZoneAssign.load(db); } catch (e) {}
+  TA4.psDraft.forEach((_, i) => ta4PsAutoAssign(i)); ta4PsDraftRender();
   try { ta3Toast(used === 'ai' ? 'AI(Gemini)로 분석했습니다. 내용을 확인해 주세요' : 'AI 분석 실패(' + why + ') → 기본 분석으로 처리했습니다', 6000); } catch (e) {}
 }
 function ta4PsAddBlank() { TA4.psDraft.push({ kind: '직접', name: '', person: '', phone: '', address: '', category: '', product: '', memo: '', prospect_no: '', agent_name: '', agent_phone: '', area: '', fee: 0, req_date: '', assigned_to: '', raw: '' }); ta4PsDraftRender(); }
@@ -8600,7 +8611,7 @@ function ta4PsConf(p) { return Number(p.fee) > 0 ? 'B' : 'C'; }
 function ta4PsDraftRender() {
   const e = escapeHtml, box = el('ta4PsDraft');
   box.innerHTML = TA4.psDraft.map((p, i) => {
-    const f = (k, lb, w, type) => `<label style="display:block;font-size:12px;color:#64748b;font-weight:700;flex:${w || 1};min-width:130px;">${lb}<input type="${type || 'text'}" value="${e(p[k] == null ? '' : p[k])}" oninput="TA4.psDraft[${i}].${k}=${k === 'fee' ? 'Number(this.value.replace(/\\D/g,\'\'))||0' : 'this.value'};${k === 'fee' ? `ta4PsConfUi(${i})` : ''}" style="width:100%;box-sizing:border-box;margin-top:3px;padding:8px;border:1px solid #cbd5e1;border-radius:8px;font-size:14px;"></label>`;
+    const f = (k, lb, w, type) => `<label style="display:block;font-size:12px;color:#64748b;font-weight:700;flex:${w || 1};min-width:130px;">${lb}<input type="${type || 'text'}" value="${e(p[k] == null ? '' : p[k])}" oninput="TA4.psDraft[${i}].${k}=${k === 'fee' ? 'Number(this.value.replace(/\\D/g,\'\'))||0' : 'this.value'};${k === 'fee' ? `ta4PsConfUi(${i})` : ''}${(k === 'address' || k === 'name' || k === 'area') ? `ta4PsAutoSoon(${i})` : ''}" style="width:100%;box-sizing:border-box;margin-top:3px;padding:8px;border:1px solid #cbd5e1;border-radius:8px;font-size:14px;"></label>`;
     const rf = /소개/.test(p.kind);
     return `<div style="border:1px solid ${p.dup ? '#f59e0b' : '#e2e8f0'};border-radius:12px;padding:12px;margin-bottom:10px;background:#f8fafc;">
       <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;"><span style="background:#e0e7ff;color:#3730a3;border-radius:99px;padding:2px 10px;font-size:12px;font-weight:800;">${e(p.kind)}</span>${p.ai ? '<span style="background:#dcfce7;color:#166534;border-radius:99px;padding:2px 9px;font-size:11.5px;font-weight:800;">AI 분석</span>' : ''}${p.dup ? `<span style="color:#b45309;font-size:12px;font-weight:800;">이미 반영된 안건입니다 — 추가 등록되지 않습니다${p.dupInfo ? ' (' + e(p.dupInfo) + ')' : ''}</span>` : ''}<button type="button" onclick="TA4.psDraft.splice(${i},1);ta4PsDraftRender()" style="margin-left:auto;border:none;background:none;color:#b91c1c;font-weight:800;cursor:pointer;">제거</button></div>
@@ -8608,12 +8619,399 @@ function ta4PsDraftRender() {
       <div style="margin-top:8px;font-size:12px;color:#64748b;font-weight:700;">희망 상품 (다중 선택)<div style="margin-top:4px;">${ta4WishChips(p.product, 'ta4WishDraft(' + i + ',\'%s\')')}</div></div>
       <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:8px;">${f('address', '주소', 3)}${f('prospect_no', '가망고객번호', 1)}</div>
       <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:8px;">${f('memo', '메모', 3)}${f('agent_name', rf ? '소개자' : '대리점 영업사원 / 소개자', 1)}${f('agent_phone', '소개자 전화', 1, 'tel')}</div>
-      <div style="margin-top:8px;font-size:12px;color:#64748b;font-weight:700;">배정 컨설턴트 <select onchange="TA4.psDraft[${i}].assigned_to=this.value" style="margin-left:6px;padding:7px;border-radius:8px;border:1px solid #cbd5e1;font-size:14px;"><option value="">선택</option>${CONSULTANTS.map(n => `<option value="${e(n)}"${p.assigned_to === n ? ' selected' : ''}>${e(n)}</option>`).join('')}</select>
-        <span style="margin-left:10px;">수주확도 <b id="ta4PsConf${i}" style="color:#0f2547;">${ta4PsConf(p)}</b> <span style="color:#94a3b8;">(용역료 있으면 B, 없으면 C)</span></span>${p.hint ? `<span style="margin-left:8px;color:#94a3b8;">문자 속 이름: ${e(p.hint)}</span>` : ''}</div></div>`;
+      <div style="margin-top:8px;font-size:12px;color:#64748b;font-weight:700;">배정 컨설턴트 <select id="ta4PsSel${i}" onchange="ta4PsPick(${i},this.value)" style="margin-left:6px;padding:7px;border-radius:8px;border:1px solid #cbd5e1;font-size:14px;"><option value="">선택</option>${CONSULTANTS.map(n => `<option value="${e(n)}"${p.assigned_to === n ? ' selected' : ''}>${e(n)}</option>`).join('')}</select>
+        <span style="margin-left:10px;">수주확도 <b id="ta4PsConf${i}" style="color:#0f2547;">${ta4PsConf(p)}</b> <span style="color:#94a3b8;">(용역료 있으면 B, 없으면 C)</span></span>${p.hint ? `<span style="margin-left:8px;color:#94a3b8;">문자 속 이름: ${e(p.hint)}</span>` : ''}</div><div id="ta4PsAs${i}" style="margin-top:6px;font-size:12.5px;line-height:1.5;"></div></div>`;
   }).join('');
+  TA4.psDraft.forEach((_, i) => ta4PsAssignUi(i));
   el('ta4PsFoot').style.display = TA4.psDraft.length ? 'block' : 'none';
 }
 function ta4PsConfUi(i) { const b = el('ta4PsConf' + i); if (b) b.textContent = ta4PsConf(TA4.psDraft[i]); }
+
+// ---------- 구역 판정 모듈 (ZoneAssign) — zone-assign.js 와 동일 ----------
+/* ===== ZoneAssign v1.0 — 주소/단지명 → 담당 구역(Z1~Z5) → 차량 → 담당 컨설턴트 =====
+ * 에스원 북서울지사 구역별 담당차량 조회 규칙(v6.4)을 DB(ta_zones / ta_zone_rules)에서 읽어 판정합니다.
+ * 다른 앱에서도 이 파일을 그대로 가져가 쓰면 됩니다.
+ *
+ *   await ZoneAssign.load(db);                               // db = supabase client (1회, 이후 캐시)
+ *   const r = ZoneAssign.resolve({ address, name });         // name(고객/단지명)은 선택
+ *   r.consultant  → '임영민' (타지사/판정불가는 null)   r.vehicle → '127호'   r.zone → 'Z1'
+ *   r.level       → high | mid | low | ambiguous | other | none
+ *   r.basis       → 판정 근거 문장      r.cands → 후보 [{zone, vehicle, consultant, label}]
+ */
+(function (root) {
+  'use strict';
+  var LS_KEY = 'zoneAssign.v1';
+  var ZA = { ready: false, error: '', R: null, Z: {}, X: null };
+
+  /* ---------- 문자열 정리 ---------- */
+  function norm(s) {
+    s = String(s == null ? '' : s).replace(/[ㆍᆞ・∙•·]/g, '·');
+    try { s = s.normalize('NFKC'); } catch (e) {}
+    s = s.replace(/(^|[^\d])4\s*[.·]?\s*19\s*로/g, '$14·19로');
+    return s.replace(/\s+/g, ' ').trim();
+  }
+  function compact(s) { return String(s || '').replace(/[\s()\[\],]/g, ''); }
+
+  /* ---------- 규칙 색인 ---------- */
+  function setData(rules, zones) {
+    var R = rules || {}, X = {};
+    ZA.R = R; ZA.Z = zones || {};
+    // 행정동 → 구역 (상계3·4동 → 상계3동, 상계4동 별칭 포함) / 행정동 → 자치구
+    X.dm = {}; X.dist = {};
+    var di = R.dong_index || {};
+    Object.keys(di).forEach(function (k) {
+      var sp = k.indexOf(' '), d = k.slice(0, sp), n = k.slice(sp + 1), z = di[k];
+      X.dm[n] = z; X.dist[n] = d;
+      var m = /^(.*?)(\d+)·(\d+)동$/.exec(n);
+      if (m) { [m[1] + m[2] + '동', m[1] + m[3] + '동'].forEach(function (a) { X.dm[a] = z; X.dist[a] = d; }); }
+    });
+    // 큰길 번호 구간
+    X.ranges = {};
+    ((R.main_road_ranges && R.main_road_ranges.rows) || []).forEach(function (r) {
+      (X.ranges[r[0]] = X.ranges[r[0]] || []).push({ from: r[1], to: r[2], dong: r[3], side: r[4] || '', pri: r[5] ? 1 : 0 });
+    });
+    // ○○로N길 기준점
+    X.anchors = {};
+    ((R.gil_anchors && R.gil_anchors.rows) || []).forEach(function (r) {
+      (X.anchors[r[0]] = X.anchors[r[0]] || []).push({ no: r[1], dong: r[2] });
+    });
+    // 단지·기관명(landmark) 색인: compact 이름 → {구역:1}
+    var lm = {};
+    function add(n, z) { n = compact(n); if (n.length < 2) return; (lm[n] = lm[n] || {})[z] = 1; }
+    Object.keys(R.zones || {}).forEach(function (z) { ((R.zones[z] || {}).landmarks || []).forEach(function (n) { add(n, z); }); });
+    X.lm = lm;
+    // 이름 일부 키워드(태릉·공릉·상계 등) — 가장 마지막 보조 수단
+    X.kw = {};
+    (R.keywords || []).forEach(function (kv) { var n = compact(kv[0]); if (n.length >= 2) X.kw[n] = kv[1]; });
+    X.kwNames = Object.keys(X.kw).sort(function (a, b) { return b.length - a.length; });
+    X.gov = {};
+    (R.government_offices || []).forEach(function (g) { X.gov[compact(g[0])] = g[1]; });
+    X.names = Object.keys(lm).concat(Object.keys(X.gov).filter(function (n) { return !lm[n]; }));
+    X.names.sort(function (a, b) { return b.length - a.length; });
+    X.oor = (R.out_of_area_roads || []);
+    X.oorr = (R.out_of_area_regions || []);
+    X.known = {};
+    Object.keys(X.ranges).concat(R.inner_roads || [], X.oor, Object.keys(X.anchors)).forEach(function (n) { X.known[n] = 1; });
+    ZA.X = X; ZA.ready = true;
+  }
+
+  /* ---------- 결과 객체 ---------- */
+  function out(zone, level, basis, cands) {
+    var z = (zone && ZA.Z[zone]) || {};
+    return {
+      zone: zone || null, zoneName: z.name || '', vehicle: z.vehicle || (zone === 'OTHER' ? '타지사' : ''),
+      consultant: (zone && zone !== 'OTHER' && z.consultant) ? z.consultant : null,
+      level: level, basis: basis || '',
+      cands: (cands || []).map(function (c) { var cz = ZA.Z[c.zone] || {}; return { zone: c.zone, vehicle: cz.vehicle || (c.zone === 'OTHER' ? '타지사' : ''), consultant: (c.zone !== 'OTHER' && cz.consultant) || null, label: c.label || '' }; })
+    };
+  }
+
+  /* ---------- 분할동 판정 ---------- */
+  function splitResolve(D, ctx) {
+    var R = ZA.R, rule = (R.split_rules || {})[D];
+    if (!rule) return { cands: [] };
+    var road = ctx && ctx.road, num = ctx && ctx.num, i, r;
+    if (road) {
+      var nr = R.main_road_number_rules && R.main_road_number_rules[D] && R.main_road_number_rules[D][road];
+      if (nr && num != null) { for (i = 0; i < nr.length; i++) if (num >= nr[i][0] && num <= nr[i][1]) return { zone: nr[i][2], how: D + ' ' + road + ' ' + num + '번' }; }
+      var pr = R.parity_rules && R.parity_rules[D] && R.parity_rules[D][road];
+      if (pr && num != null) return { zone: (num % 2 === 1 ? pr.o : pr.e), how: D + ' ' + road + ' ' + (num % 2 === 1 ? '홀수' : '짝수') + '번' };
+      for (i = 0; i < (rule.roads || []).length; i++) { r = rule.roads[i]; if (r[0] === road) return { zone: r[1], how: D + ' ' + road }; }
+      for (i = 0; i < (rule.prefix || []).length; i++) { r = rule.prefix[i]; if (road.indexOf(r[0]) === 0) return { zone: r[1], how: D + ' ' + road }; }
+      var op = rule.opts && rule.opts[road];
+      if (op) return { cands: op.map(function (o) { return { zone: o[0], label: o[1] }; }) };
+    }
+    return { cands: (rule.fallback || []).map(function (f) { return { zone: f[0], label: f[1] }; }) };
+  }
+
+  /* ---------- 행정동 → 결과 ---------- */
+  function dongResult(D, ctx, lvl, how) {
+    var z = ZA.X.dm[D];
+    if (!z) return null;
+    if (z === 'SPLIT') {
+      var s = splitResolve(D, ctx);
+      if (s.zone) return out(s.zone, lvl === 'high' ? 'mid' : lvl, '분할동 ' + (s.how || D));
+      return out(null, 'ambiguous', D + ' 은(는) 경계가 갈리는 동입니다 (도로·번지로 확인 필요)', s.cands);
+    }
+    return out(z, lvl, how || ('행정동 ' + D));
+  }
+
+  /* ---------- 주소 요소 추출 ---------- */
+  function parseRoad(t) {
+    var re = /(4·19로|[가-힣]+로(?:\d+[가-힣]?길)?|[가-힣]+길)\s*(\d+)(?:-(\d+))?/g, m, first = null, pick = null;
+    while ((m = re.exec(t))) {
+      var road = m[1].replace(/^(?:도봉|노원|강북|성북|중랑|동대문)구/, '');
+      var g = /^(.*로)(\d+)[가-힣]?길$/.exec(road);
+      var o = { road: road, parent: g ? g[1] : road, gil: !!g, gilNo: g ? parseInt(g[2], 10) : null, num: parseInt(m[2], 10) };
+      if (!first) first = o;
+      if (!pick && ZA.X.known[o.parent]) pick = o;
+    }
+    return pick || first;
+  }
+  function lookupSuffix(tok, map, minLen) {
+    for (var i = 0; i <= tok.length - minLen; i++) { var sub = tok.slice(i); if (Object.prototype.hasOwnProperty.call(map, sub)) return sub; }
+    return null;
+  }
+  function findDong(t) {
+    var re = /[가-힣]+\d*(?:·\d+)?동|[가-힣]+본동/g, m;
+    while ((m = re.exec(t))) { var k = lookupSuffix(m[0], ZA.X.dm, 3); if (k) return k; }
+    return null;
+  }
+  function findLegal(t) {
+    var re = /[가-힣]+동/g, m, L = ZA.R.legal_dong_index || {};
+    while ((m = re.exec(t))) { var k = lookupSuffix(m[0], L, 2); if (k) return { name: k, v: L[k] }; }
+    return null;
+  }
+
+  /* ---------- 큰길 번호 / 길 기준점 → 행정동 ---------- */
+  function locateRoad(ro, ok) {
+    var X = ZA.X, best = null;
+    if (!ro.gil && ro.num != null) {
+      (X.ranges[ro.parent] || []).forEach(function (r) {
+        if (ro.num < r.from || ro.num > r.to) return;
+        if (r.side && ((ro.num % 2 === 1) !== (r.side === 'o'))) return;
+        if (!X.dm[r.dong] || !ok(r.dong)) return;
+        var w = r.to - r.from;
+        if (!best || r.pri > best.pri || (r.pri === best.pri && w < best.w)) best = { dong: r.dong, w: w, pri: r.pri };
+      });
+      if (best) return { dong: best.dong, how: ro.road + ' ' + ro.num + '번 구간 → ' + best.dong, lvl: 'mid' };
+    }
+    if (ro.gil) {
+      var anc = (X.anchors[ro.parent] || []).filter(function (a) { return X.dm[a.dong] && ok(a.dong); }), n = null, i;
+      for (i = 0; i < anc.length; i++) { if (anc[i].no === ro.gilNo) return { dong: anc[i].dong, how: ro.road + ' 기준점 → ' + anc[i].dong, lvl: 'mid' }; }
+      for (i = 0; i < anc.length; i++) { var dd = Math.abs(anc[i].no - ro.gilNo); if (dd <= 15 && (!n || dd < n.d)) n = { d: dd, dong: anc[i].dong }; }
+      if (n) return { dong: n.dong, how: ro.road + ' 가까운 기준점 추정 → ' + n.dong, lvl: 'low' };
+    }
+    return null;
+  }
+
+  /* ---------- 후보 동 목록(법정동이 여러 행정동에 걸칠 때) ---------- */
+  function candResolve(cand, ctx, why) {
+    var X = ZA.X, exact = [], i, s;
+    if (ctx && ctx.road) {
+      cand.forEach(function (D) {
+        if (X.dm[D] === 'SPLIT') { s = splitResolve(D, ctx); if (s.zone) exact.push({ zone: s.zone, how: s.how }); }
+      });
+      var zs = {}; exact.forEach(function (e) { zs[e.zone] = e; });
+      var ks = Object.keys(zs);
+      if (ks.length === 1) return out(ks[0], 'mid', '분할동 ' + zs[ks[0]].how);
+    }
+    var all = [], seen = {};
+    cand.forEach(function (D) {
+      var z = X.dm[D]; if (!z) return;
+      if (z === 'SPLIT') { splitResolve(D, ctx).cands.forEach(function (c) { var k = c.zone + c.label; if (!seen[k]) { seen[k] = 1; all.push({ zone: c.zone, label: D + ' ' + c.label }); } }); }
+      else { var k2 = z + D; if (!seen[k2]) { seen[k2] = 1; all.push({ zone: z, label: D }); } }
+    });
+    var zset = {}; all.forEach(function (c) { zset[c.zone] = 1; });
+    var zk = Object.keys(zset);
+    if (zk.length === 1) return out(zk[0], 'mid', why + ' (해당 동 모두 같은 구역)');
+    if (!zk.length) return null;
+    return out(null, 'ambiguous', why + ' — 번지·도로 번호가 없어 구역이 갈립니다', all);
+  }
+
+  /* ---------- 번동 지번 표본 ---------- */
+  function jibunResolve(t) {
+    var S = (ZA.R.jibun_samples || {})['번동'];
+    var m = /번동\s*(산)?\s*(\d+)(?:-(\d+))?/.exec(t);
+    if (!S || !m) return null;
+    var san = m[1] ? 1 : 0, main = parseInt(m[2], 10), sub = m[3] ? parseInt(m[3], 10) : 0, best = null;
+    S.forEach(function (s) {
+      var d = Math.abs(s[1] - main) * 1000 + (s[1] === main ? Math.abs(s[2] - sub) : 0) + (s[0] !== san ? 100000 : 0);
+      if (!best || d < best.d) best = { d: d, s: s };
+    });
+    if (!best) return null;
+    var exact = best.s[1] === main && best.s[2] === sub && best.s[0] === san;
+    var r = dongResult(best.s[3], { road: best.s[4] || '', num: null }, exact ? 'mid' : 'low', '번동 ' + main + (sub ? '-' + sub : '') + (exact ? ' 지번 표본' : ' 가까운 지번 표본(' + best.s[1] + ') 기준 추정') + ' → ' + best.s[3]);
+    if (r && r.zone && !exact) r.level = 'low';
+    return r;
+  }
+
+  /* ---------- 주소 구조 판정 ---------- */
+  function structured(t) {
+    var X = ZA.X;
+    t = t.replace(/[()\[\]]/g, ' ').replace(/\s+/g, ' ');
+    var distM = /(도봉구|노원구|강북구|성북구|중랑구|동대문구)/.exec(t), dist = distM ? distM[1] : null;
+    var ro = parseRoad(t), D = findDong(t), legal = findLegal(t);
+    // 1) 행정동 표기
+    if (D) return dongResult(D, ro, 'high', '행정동 ' + D);
+    // 2) 관할 밖 지역
+    var inArea = dist && dist !== '동대문구';
+    if (!inArea && !(legal && /이문/.test(legal.name))) {
+      var hit = X.oorr.filter(function (r) { return t.indexOf(r) >= 0; })[0];
+      if (hit) return out('OTHER', 'other', '관할 밖 지역 (' + hit + ')');
+      if (ro && X.oor.indexOf(ro.parent) >= 0) return out('OTHER', 'other', '관할 밖 도로 (' + ro.parent + ')');
+    }
+    // 3) 도로명 + 번호
+    var cand = legal && Array.isArray(legal.v) ? legal.v : null;
+    var stem = legal && typeof legal.v === 'string' ? legal.name.replace(/동$/, '') : null;
+    if (ro) {
+      var ok = function (dn) {
+        if (cand) return cand.indexOf(dn) >= 0;
+        if (stem) return dn.indexOf(stem) === 0;
+        return !dist || !X.dist[dn] || X.dist[dn] === dist;
+      };
+      var exactSplit = function () {
+        var dongs = cand || Object.keys(ZA.R.split_rules || {}), ex = {};
+        dongs.forEach(function (dn) { if (X.dm[dn] === 'SPLIT') { var s = splitResolve(dn, ro); if (s.zone) ex[s.zone] = s.how; } });
+        var ek = Object.keys(ex);
+        return ek.length === 1 ? out(ek[0], 'mid', '분할동 ' + ex[ek[0]]) : null;
+      };
+      var xr = null;
+      if (ro.gil || !X.known[ro.parent]) { xr = exactSplit(); if (xr) return xr; }   // 골목길은 분할동 도로 목록을 먼저 확인
+      var loc = locateRoad(ro, ok);
+      if (loc) { var dr = dongResult(loc.dong, ro, loc.lvl, loc.how); if (dr) { if (!dr.basis || dr.basis.indexOf(loc.how) < 0) dr.basis = loc.how + (dr.basis ? ' / ' + dr.basis : ''); return dr; } }
+    }
+    // 4) 법정동
+    if (legal) {
+      if (typeof legal.v === 'string') return out(legal.v, 'mid', '법정동 ' + legal.name);
+      if (legal.name === '번동') { var jr = jibunResolve(t); if (jr) return jr; }
+      return candResolve(legal.v, ro, '법정동 ' + legal.name);
+    }
+    return null;
+  }
+
+  /* ---------- 단지·기관명 판정 ---------- */
+  function landmarks(ct) {
+    var X = ZA.X, used = new Array(ct.length), hits = [], i, j;
+    X.names.forEach(function (n) {
+      var idx = ct.indexOf(n);
+      while (idx >= 0) {
+        var free = true; for (j = idx; j < idx + n.length; j++) if (used[j]) { free = false; break; }
+        var nx = ct.charAt(idx + n.length);
+        if (free && (nx === '로' || nx === '길') && !/[로길]$/.test(n)) free = false;   // 도로명의 일부(마들로, 삼각산로 등)는 단지명으로 보지 않음
+        if (free) { for (j = idx; j < idx + n.length; j++) used[j] = 1; hits.push(n); break; }
+        idx = ct.indexOf(n, idx + 1);
+      }
+    });
+    var zs = {}, gov = null;
+    hits.forEach(function (n) { if (X.lm[n]) Object.keys(X.lm[n]).forEach(function (z) { zs[z] = 1; }); if (X.gov[n] && !gov) gov = { name: n, addr: X.gov[n] }; });
+    return { hits: hits, zones: Object.keys(zs), gov: gov };
+  }
+
+  function kwHit(ct, k) {
+    var idx = ct.indexOf(k);
+    while (idx >= 0) { var nx = ct.charAt(idx + k.length); if (!((nx === '로' || nx === '길') && !/[로길]$/.test(k))) return true; idx = ct.indexOf(k, idx + 1); }
+    return false;
+  }
+
+  /* ---------- 공개 resolve ---------- */
+  function resolve(input) {
+    if (!ZA.ready) return out(null, 'none', '구역 규칙이 아직 로드되지 않았습니다');
+    var a = typeof input === 'string' ? { address: input } : (input || {});
+    var addr = norm(a.address), all = norm([a.address, a.name, a.extra].filter(Boolean).join(' '));
+    if (!all) return out(null, 'none', '주소가 없습니다');
+    var lmr = landmarks(compact(all)), st = null;
+    try { st = structured(addr || all); } catch (e) { st = null; }
+    if (!st && addr && all !== addr) { try { st = structured(all); } catch (e2) { st = null; } }
+    var named = lmr.hits.slice(0, 3).join(', ');
+    if (lmr.gov) {
+      var g = null; try { g = structured(norm(lmr.gov.addr)); } catch (e3) {}
+      if (g && g.zone) { g.basis = '관공서·기관 ' + lmr.gov.name + ' 등록 주소 → ' + g.basis; g.level = g.level === 'low' ? 'low' : 'high'; return g; }
+    }
+    if (lmr.zones.length === 1) {
+      var z = lmr.zones[0];
+      if (st && st.zone && st.zone !== z) {
+        var r = out(z, 'mid', '단지·기관명 \'' + named + '\' 기준 (주소로는 ' + (st.vehicle || st.zone) + ' — 확인 필요)', [{ zone: z, label: '단지·기관명 ' + named }, { zone: st.zone, label: '주소 판정' }]);
+        return r;
+      }
+      return out(z, 'high', '단지·기관명 \'' + named + '\'');
+    }
+    if (st && (st.zone || st.cands.length)) return st;
+    if (lmr.zones.length <= 1) {
+      var kz = {}, kn = [];
+      for (var q = 0; q < ZA.X.kwNames.length; q++) { var kk = ZA.X.kwNames[q]; if (kwHit(compact(all), kk)) { kz[ZA.X.kw[kk]] = 1; kn.push(kk); } }
+      var kzk = Object.keys(kz);
+      if (kzk.length === 1) return out(kzk[0], 'low', '이름 키워드 \'' + kn.slice(0, 3).join(', ') + '\' (추정)');
+    }
+    if (lmr.zones.length > 1) return out(null, 'ambiguous', '단지·기관명 \'' + named + '\' 이(가) 여러 구역에 걸칩니다', lmr.zones.map(function (zz) { return { zone: zz, label: '' }; }));
+    return out(null, 'none', '주소에서 구역을 특정하지 못했습니다 (동·도로명·단지명 확인)');
+  }
+
+  /* ---------- DB 로드 ---------- */
+  async function load(db, force) {
+    if (ZA.ready && !force) return true;
+    try {
+      var rs = await Promise.all([db.from('ta_zones').select('*').order('sort_order', { ascending: true }), db.from('ta_zone_rules').select('key,data')]);
+      if (rs[0].error) throw rs[0].error;
+      if (rs[1].error) throw rs[1].error;
+      if (!rs[0].data.length || !rs[1].data.length) throw new Error('구역 테이블이 비어 있습니다 (설정 SQL 실행 필요)');
+      var rules = {}, zones = {};
+      rs[1].data.forEach(function (r) { rules[r.key] = r.data; });
+      rs[0].data.forEach(function (z) { if (z.active !== false) zones[z.zone] = z; });
+      try { root.localStorage.setItem(LS_KEY, JSON.stringify({ rules: rules, zones: zones })); } catch (e) {}
+      setData(rules, zones); ZA.error = ''; return true;
+    } catch (e) {
+      try {
+        var c = JSON.parse(root.localStorage.getItem(LS_KEY) || 'null');
+        if (c && c.rules) { setData(c.rules, c.zones); ZA.error = '저장된 사본 사용 중 (' + (e.message || e) + ')'; return true; }
+      } catch (x) {}
+      ZA.error = e && e.message ? e.message : String(e);
+      return false;
+    }
+  }
+
+  root.ZoneAssign = {
+    load: load, resolve: resolve, setData: setData,
+    get ready() { return ZA.ready; }, get error() { return ZA.error; },
+    zones: function () { return ZA.Z; },
+    consultantOf: function (zone) { var z = ZA.Z[zone]; return z && zone !== 'OTHER' ? (z.consultant || null) : null; }
+  };
+})(typeof window !== 'undefined' ? window : globalThis);
+
+// ---------- 담당 컨설턴트 자동 배정 (주소 → 구역 → 차량 → 컨설턴트) ----------
+// 규칙·담당자는 DB(ta_zones / ta_zone_rules)에서 읽습니다. 로직 본체는 위 ZoneAssign (zone-assign.js 와 동일).
+function ta4PsSuggest(p) {
+  if (!window.ZoneAssign || !ZoneAssign.ready) return null;
+  try { return ZoneAssign.resolve({ address: p.address, name: p.name, extra: p.area }); } catch (e) { console.warn('[구역판정]', e); return null; }
+}
+function ta4PsSelf() { try { return CONSULTANTS.includes(currentViewMode) ? currentViewMode : ''; } catch (e) { return ''; } }   // 컨설턴트 앱에서 등록하는 본인 (관리자 화면은 '')
+function ta4PsWho() { return ta4PsSelf() || '관리자'; }
+function ta4PsAutoAssign(i) {
+  const p = TA4.psDraft[i]; if (!p) return;
+  const r = ta4PsSuggest(p); p.zoneInfo = r;
+  if (!p.manualAssign) {   // 수동으로 바꾼 건은 덮어쓰지 않음
+    const sug = (r && r.consultant && CONSULTANTS.includes(r.consultant)) ? r.consultant : '';
+    p.assigned_to = sug || ta4PsSelf();   // 구역을 확정 못 하면 컨설턴트 본인에게 임시 배정
+    p.selfFallback = !sug && !!p.assigned_to;
+  }
+  ta4PsAssignUi(i);
+}
+function ta4PsAutoSoon(i) { TA4.psT = TA4.psT || {}; clearTimeout(TA4.psT[i]); TA4.psT[i] = setTimeout(() => ta4PsAutoAssign(i), 300); }
+function ta4PsPick(i, v) {
+  const p = TA4.psDraft[i]; if (!p) return;
+  p.assigned_to = v;
+  const r = p.zoneInfo; p.manualAssign = !(r && r.consultant && r.consultant === v);   // 자동 추천과 같으면 자동, 다르면 수동 변경
+  ta4PsAssignUi(i);
+}
+function ta4PsAutoReset(i) { const p = TA4.psDraft[i]; if (!p) return; p.manualAssign = false; ta4PsAutoAssign(i); }
+function ta4PsAssignUi(i) {
+  const p = TA4.psDraft[i]; if (!p) return;
+  const sel = el('ta4PsSel' + i), box = el('ta4PsAs' + i), e = escapeHtml;
+  if (sel && sel.value !== (p.assigned_to || '')) sel.value = p.assigned_to || '';
+  if (!box) return;
+  if (!String(p.address || '').trim() && !String(p.name || '').trim()) { box.innerHTML = ''; return; }
+  const r = p.zoneInfo, tag = (bg, fg, t) => `<span style="background:${bg};color:${fg};border-radius:99px;padding:1px 8px;font-size:11.5px;font-weight:800;margin-right:6px;">${t}</span>`;
+  const reset = `<button type="button" onclick="ta4PsAutoReset(${i})" style="border:none;background:#eef1f7;color:#0f2547;border-radius:6px;padding:3px 9px;font-weight:700;cursor:pointer;font-size:12px;margin-left:6px;">자동 추천으로 되돌리기</button>`;
+  let h = '';
+  if (!window.ZoneAssign || !ZoneAssign.ready) {
+    h = tag('#fef3c7', '#92400e', '자동 배정 불가') + `<span style="color:#92400e;">구역 규칙을 불러오지 못했습니다${ZoneAssign && ZoneAssign.error ? ' (' + e(ZoneAssign.error) + ')' : ''} — 직접 선택하세요. (구역 자동배정 설정 SQL 실행 여부 확인)</span>`;
+  } else if (r && r.consultant) {
+    const lv = { high: '확실', mid: '높음', low: '추정' }[r.level] || '';
+    if (p.manualAssign) h = tag('#e0e7ff', '#3730a3', '수동 지정') + `<span style="color:#475569;">자동 추천은 <b>${e(r.vehicle)} ${e(r.consultant)}</b> (${e(r.basis)})</span>` + reset;
+    else h = tag('#dcfce7', '#166534', '자동 배정') + `<b style="color:#0f2547;">${e(r.vehicle)} · ${e(r.zoneName)} → ${e(r.consultant)}</b> ${lv ? tag(r.level === 'low' ? '#fef3c7' : '#f1f5f9', r.level === 'low' ? '#92400e' : '#475569', lv) : ''}<span style="color:#94a3b8;">${e(r.basis)}${r.level === 'low' ? ' — 확인해 주세요' : ''}</span>`;
+    if (r.cands && r.cands.length > 1 && !p.manualAssign) h += `<div style="margin-top:3px;color:#b45309;">⚠ 다른 후보: ${r.cands.filter(c => c.consultant && c.consultant !== r.consultant).map(c => e(c.vehicle + ' ' + c.consultant)).join(', ') || '타지사'}</div>`;
+  } else if (r && r.level === 'other') {
+    h = tag('#fee2e2', '#b91c1c', '타 지사') + `<span style="color:#b91c1c;">타 지사 관할 지역입니다 (${e(r.basis)}) — 컨설턴트를 직접 선택하세요</span>` + (p.manualAssign ? reset : '');
+  } else if (r && r.level === 'ambiguous') {
+    const grp = {}; (r.cands || []).forEach(c => { const k = c.consultant || '타지사'; (grp[k] = grp[k] || { vehicle: c.vehicle, consultant: c.consultant, labels: [] }).labels.push(c.label || ''); });
+    const chips = Object.keys(grp).map(k => { const g = grp[k], lb = g.labels.length === 1 ? g.labels[0] : g.labels.length + '곳', tx = e(lb ? String(lb).slice(0, 26) : ''); return g.consultant ? `<button type="button" onclick="ta4PsPick(${i},'${e(g.consultant)}')" style="border:1px solid #cbd5e1;background:#fff;border-radius:99px;padding:3px 10px;margin:3px 4px 0 0;cursor:pointer;font-size:12px;">${e(g.vehicle)} ${e(g.consultant)}${tx ? ' · ' + tx : ''}</button>` : `<span style="display:inline-block;margin:3px 4px 0 0;color:#94a3b8;font-size:12px;">타지사${tx ? ' · ' + tx : ''}</span>`; }).join('');
+    h = tag('#fef3c7', '#92400e', '경계 지역') + `<span style="color:#92400e;">${e(r.basis)}. 후보를 눌러 선택하세요</span><div>${chips}</div>` + (p.manualAssign ? `<div>${tag('#e0e7ff', '#3730a3', '수동 지정')}${reset}</div>` : '');
+  } else {
+    h = tag('#f1f5f9', '#475569', '판정 불가') + `<span style="color:#64748b;">${e((r && r.basis) || '주소에서 구역을 찾지 못했습니다')} — 직접 선택하세요</span>` + (p.manualAssign ? reset : '');
+  }
+  if (p.selfFallback && !p.manualAssign && p.assigned_to) h += `<div style="color:#475569;margin-top:2px;">구역을 확정하지 못해 <b>본인(${e(p.assigned_to)})</b>에게 임시 배정했습니다. 필요하면 위에서 변경하세요.</div>`;
+  box.innerHTML = h;
+}
 
 // ---------- 등록: 안건 + 첫 노트 + 연락처 + 지도 ----------
 async function ta4PsInsertLead(row) {
@@ -8639,12 +9037,14 @@ async function ta4PsCreate(p) {
   const now = new Date().toISOString(), today = todayStr(), d = new Date(); d.setDate(d.getDate() + 2);
   const exp = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
   const id = crypto.randomUUID(), who = p.assigned_to, company = (p.name || p.person || p.phone || '가망고객').trim(), phone = ta4Num(p.phone);
+  const zi = ta4PsSuggest(p) || p.zoneInfo || null;   // 주소로 판정한 구역·차량 (컨설턴트를 바꿔도 구역 정보는 그대로 기록)
   const row = { id, consultant: who, company, contact: p.person || '', amount: Number(p.fee) || 0, product_type: /정보보안/.test((p.product || '') + ' ' + (p.category || '')) ? '정보보안' : '알람', wish_product: p.product || null, motive: '콜/패밀리넷', stage: '진행중', confidence: ta4PsConf(p),
     registered_date: today, expected_date: exp, memo: p.prospect_no ? '가망고객번호 ' + p.prospect_no : null, created_at: now, updated_at: now,
-    origin: '가망', referrer: p.agent_name || null, referrer_phone: ta4Num(p.agent_phone) || null, contact_phone: phone || null };
+    origin: '가망', referrer: p.agent_name || null, referrer_phone: ta4Num(p.agent_phone) || null, contact_phone: phone || null, address: p.address || null,
+    zone: zi && zi.zone || null, vehicle: zi && zi.zone ? (zi.vehicle || null) : null, auto_assigned: zi ? !!(zi.consultant && zi.consultant === who) : null, assign_basis: zi ? String(zi.basis || '').slice(0, 200) : null };
   const { dropped } = await ta4PsInsertLead(row);
   // 첫 노트 (문자 내용 요약)
-  const note = ['[가망고객 · ' + (p.kind || '') + '] 관리자 등록', p.product && '희망 상품: ' + p.product, p.category && '업종: ' + p.category, p.address && '주소: ' + p.address, p.prospect_no && '가망고객번호: ' + p.prospect_no, p.agent_name && (/소개/.test(p.kind) ? '소개자: ' : '대리점 영업사원/소개자: ') + p.agent_name + (p.agent_phone ? ' ' + p.agent_phone : ''), p.req_date && '설계요청일: ' + p.req_date, p.memo && p.memo, dropped.length ? '(참고) 서버에 소개자/분류 컬럼이 없어 일부가 저장되지 않았습니다. 설정 SQL을 실행하세요.' : ''].filter(Boolean).join('\n');
+  const note = ['[가망고객 · ' + (p.kind || '') + '] ' + ta4PsWho() + ' 등록', p.product && '희망 상품: ' + p.product, p.category && '업종: ' + p.category, p.address && '주소: ' + p.address, p.prospect_no && '가망고객번호: ' + p.prospect_no, p.agent_name && (/소개/.test(p.kind) ? '소개자: ' : '대리점 영업사원/소개자: ') + p.agent_name + (p.agent_phone ? ' ' + p.agent_phone : ''), p.req_date && '설계요청일: ' + p.req_date, p.memo && p.memo, dropped.length ? '(참고) 서버에 소개자/분류 컬럼이 없어 일부가 저장되지 않았습니다. 설정 SQL을 실행하세요.' : ''].filter(Boolean).join('\n');
   try { await db.from('ta_notes').insert([{ id: crypto.randomUUID(), lead_id: id, consultant: who, kind: 'memo', content: note, image: null, created_at: now }]); } catch (e) {}
   // 연락처 (이미 같은 번호가 있으면 만들지 않음)
   try {
@@ -8678,7 +9078,7 @@ async function ta4PsSaveDraft() {
   try { await loadAllFromSupabase(); try { await ta3LoadPlaces(); } catch (x) {} try { render(); } catch (x) {} } catch (e) {}
   try { if (typeof ADM !== 'undefined') ADM.placesLoaded = false; } catch (e) {}   // 관리자 지도가 새 위치를 다시 불러오게
   try { if (ok) { ['fConsultant', 'fStage', 'fConfidence', 'fKind'].forEach(id => { if (el(id)) el(id).value = 'all'; }); ['fMonth', 'fSearch'].forEach(id => { if (el(id)) el(id).value = ''; }); if (el('fMonth')) { try { admUTRender(); } catch (x) {} renderLeadTable(); } } } catch (e) {}   // 새 안건이 이달 필터 등에 가려지지 않도록 목록 필터 해제
-  ta4PsAdminShow();
+  if (el('ta4PsBox')) ta4PsAdminShow();
   if (fail.length) alert(`${ok}건 등록, ${fail.length}건 실패\n` + fail.join('\n')); else { ta4PsCloseInput(); alert(`${ok}건을 오늘(${todayStr()}) 등록일로 컨설턴트 안건·연락처·지도에 반영했습니다.` + ((TA4.psGeoFail || []).length ? `\n※ 지도 위치를 찾지 못한 건: ${TA4.psGeoFail.join(', ')}\n(주소는 저장되었습니다. 컨설턴트가 앱을 열면 자동으로 다시 시도하며, 안건 상세의 위치 지정에서 직접 찍을 수도 있습니다)` : '') + (TA4.psDraft.some(p => p.dup) ? `\n(이미 반영된 ${TA4.psDraft.filter(p => p.dup).length}건은 추가 등록하지 않았습니다.)` : '')); }
 }
 
@@ -8981,6 +9381,7 @@ function ta8nDetail(i) {
     <form id="agentModalLeadForm" onsubmit="handleAgentModalSubmit(event)" class="ta4-form">
       <input type="hidden" id="afEditingId" name="editingId"><input type="hidden" id="agentEditingId">
       <input type="hidden" id="afAddress">
+      <div class="f" id="afPsWrap"><button type="button" class="ta4-cardbtn" onclick="ta4PsOpenFromForm()">📩 가망고객 문자로 등록 (자동 분석 · 컨설턴트 배정)</button><div class="chip" style="margin-top:6px;">받은 문자를 붙여넣으면 건별로 분석해 가망고객으로 등록하고, 주소로 담당 컨설턴트를 자동 배정합니다. (변경 가능)</div></div>
       <div class="f">
         <label>서비스제공처명 *</label>
         <div class="nm"><input type="text" id="afCompany" required placeholder="현장 정식 명칭" autocomplete="off">

@@ -8634,21 +8634,25 @@ function ta4PsDup(p) {
 const TA4_PS_COLS = ['origin', 'referrer', 'referrer_phone', 'contact_phone', 'wish_product', 'address', 'zone', 'vehicle', 'auto_assigned', 'assign_basis'];   // 서버에 아직 없을 수 있는 컬럼(없으면 빼고 다시 저장)
 
 // ---------- 관리자 화면 ----------
-function ta4PsAdminShow() {
-  if (!el('ta4PsFab')) {
-    const fb = document.createElement('button'); fb.type = 'button'; fb.id = 'ta4PsFab'; fb.title = '가망고객 추가'; fb.setAttribute('aria-label', '가망고객 추가'); fb.textContent = '+';
-    fb.onclick = ta4PsOpenInput;
-    fb.style.cssText = 'position:fixed;right:18px;bottom:calc(20px + env(safe-area-inset-bottom,0px));width:58px;height:58px;border-radius:50%;border:none;background:#16a34a;color:#fff;font-size:34px;line-height:1;font-weight:400;box-shadow:0 6px 18px rgba(0,0,0,.35);cursor:pointer;z-index:900;';
-    document.body.appendChild(fb);
-    const ov = document.createElement('div'); ov.className = 'modal-overlay'; ov.id = 'ta4PsOv'; ov.style.display = 'none';
-    ov.innerHTML = `<div style="background:#fff;border-radius:14px;max-width:760px;width:100%;max-height:92vh;overflow:auto;padding:20px;color:#1a2333;">
+function ta4PsBuildOv() {
+  if (el('ta4PsOv')) return;
+  const ov = document.createElement('div'); ov.className = 'modal-overlay'; ov.id = 'ta4PsOv'; ov.style.display = 'none';
+  ov.innerHTML = `<div style="background:#fff;border-radius:14px;max-width:760px;width:100%;max-height:92vh;overflow:auto;padding:20px;color:#1a2333;">
       <div style="display:flex;align-items:center;margin-bottom:10px;"><h2 style="margin:0;font-size:18px;color:var(--navy,#0f2547);">가망고객 입력</h2><button type="button" onclick="ta4PsCloseInput()" style="margin-left:auto;border:none;background:#eef1f7;border-radius:50%;width:34px;height:34px;cursor:pointer;">✕</button></div>
       <div style="font-size:13px;color:#64748b;margin-bottom:8px;">받은 문자를 그대로 붙여넣으세요. 여러 건을 한꺼번에 붙여넣어도 건별로 나눠 분석합니다. (신규) 문자 · 패밀리넷 대리점 계약 요청 · 패밀리넷 소개 가망고객)</div>
       <textarea id="ta4PsText" rows="8" placeholder="[Web발신] 신규)홍길동 01012345678 주소 [영상보안] 메모..." style="width:100%;border:1px solid #cbd5e1;border-radius:10px;padding:10px;font-size:14px;font-family:inherit;box-sizing:border-box;"></textarea>
       <div style="margin:10px 0;display:flex;gap:8px;"><button type="button" id="ta4PsGo" onclick="ta4PsAnalyze()" style="background:#0f2547;color:#fff;border:none;border-radius:8px;padding:10px 18px;font-weight:800;cursor:pointer;">분석하기</button><button type="button" onclick="ta4PsAddBlank()" style="background:#eef1f7;color:#0f2547;border:none;border-radius:8px;padding:10px 14px;font-weight:700;cursor:pointer;">직접 입력</button></div>
       <div id="ta4PsDraft"></div>
       <div id="ta4PsFoot" style="display:none;margin-top:12px;text-align:right;"><button type="button" id="ta4PsSaveBtn" onclick="ta4PsSaveDraft()" style="background:var(--blue,#2f6bff);color:#fff;border:none;border-radius:8px;padding:11px 22px;font-weight:800;cursor:pointer;">컨설턴트에게 등록</button></div></div>`;
-    document.body.appendChild(ov);
+  document.body.appendChild(ov);
+}
+function ta4PsAdminShow() {
+  if (!el('ta4PsFab')) {
+    const fb = document.createElement('button'); fb.type = 'button'; fb.id = 'ta4PsFab'; fb.title = '가망고객 추가'; fb.setAttribute('aria-label', '가망고객 추가'); fb.textContent = '+';
+    fb.onclick = ta4PsOpenInput;
+    fb.style.cssText = 'position:fixed;right:18px;bottom:calc(20px + env(safe-area-inset-bottom,0px));width:58px;height:58px;border-radius:50%;border:none;background:#16a34a;color:#fff;font-size:34px;line-height:1;font-weight:400;box-shadow:0 6px 18px rgba(0,0,0,.35);cursor:pointer;z-index:900;';
+    document.body.appendChild(fb);
+    ta4PsBuildOv();
   }
   ta4PsAdminRender();
   try { db.from('ta_places').select('lead_id,address').limit(3000).then(r => { TA4.psAddr = {}; ((r && r.data) || []).forEach(x => { TA4.psAddr[x.lead_id] = x.address; }); ta4PsAdminRender(); }); } catch (e) {}
@@ -8673,7 +8677,7 @@ async function ta4PsDel(id) {
   if (!confirm('이 가망고객 안건을 삭제할까요? (컨설턴트의 안건 목록에서도 삭제됩니다)')) return;
   try { const { error } = await db.from('ta_leads').delete().eq('id', id); if (error) throw error; await loadAllFromSupabase(); try { render(); } catch (x) {} ta4PsAdminRender(); } catch (e) { alert('삭제 실패: ' + (e.message || e)); }
 }
-function ta4PsOpenInput() { try { ZoneAssign.load(db); } catch (x) {} el('ta4PsText').value = ''; TA4.psDraft = []; ta4PsDraftRender(); el('ta4PsOv').style.display = 'flex'; const fb = el('ta4PsFab'); if (fb) fb.style.display = 'none'; }
+function ta4PsOpenInput() { ta4PsBuildOv(); try { ZoneAssign.load(db); } catch (x) {} el('ta4PsText').value = ''; TA4.psDraft = []; ta4PsDraftRender(); el('ta4PsOv').style.display = 'flex'; const fb = el('ta4PsFab'); if (fb) fb.style.display = 'none'; }
 function ta4PsCloseInput() { el('ta4PsOv').style.display = 'none'; const fb = el('ta4PsFab'); if (fb) fb.style.display = ''; }
 // 문자 분석: Gemini(AI)로 자연어를 구조화 → 실패하면 기존 규칙 기반 분석으로 대체
 function ta4PsFmtPhone(s) { let d = String(s || '').replace(/\D/g, ''); if (d.startsWith('82') && d.length >= 11) d = '0' + d.slice(2); if (d.startsWith('02')) return d.length === 9 ? `02-${d.slice(2, 5)}-${d.slice(5)}` : d.length === 10 ? `02-${d.slice(2, 6)}-${d.slice(6)}` : d; if (d.length === 11) return `${d.slice(0, 3)}-${d.slice(3, 7)}-${d.slice(7)}`; if (d.length === 10) return `${d.slice(0, 3)}-${d.slice(3, 6)}-${d.slice(6)}`; return String(s || '').trim(); }
@@ -9058,10 +9062,16 @@ function ta4PsSuggest(p) {
   if (!window.ZoneAssign || !ZoneAssign.ready) return null;
   try { return ZoneAssign.resolve({ address: p.address, name: p.name, extra: p.area }); } catch (e) { console.warn('[구역판정]', e); return null; }
 }
+function ta4PsSelf() { try { return CONSULTANTS.includes(currentViewMode) ? currentViewMode : ''; } catch (e) { return ''; } }   // 컨설턴트 앱에서 등록하는 본인 (관리자 화면은 '')
+function ta4PsWho() { return ta4PsSelf() || '관리자'; }
 function ta4PsAutoAssign(i) {
   const p = TA4.psDraft[i]; if (!p) return;
   const r = ta4PsSuggest(p); p.zoneInfo = r;
-  if (!p.manualAssign) p.assigned_to = (r && r.consultant && CONSULTANTS.includes(r.consultant)) ? r.consultant : '';   // 수동으로 바꾼 건은 덮어쓰지 않음
+  if (!p.manualAssign) {   // 수동으로 바꾼 건은 덮어쓰지 않음
+    const sug = (r && r.consultant && CONSULTANTS.includes(r.consultant)) ? r.consultant : '';
+    p.assigned_to = sug || ta4PsSelf();   // 구역을 확정 못 하면 컨설턴트 본인에게 임시 배정
+    p.selfFallback = !sug && !!p.assigned_to;
+  }
   ta4PsAssignUi(i);
 }
 function ta4PsAutoSoon(i) { TA4.psT = TA4.psT || {}; clearTimeout(TA4.psT[i]); TA4.psT[i] = setTimeout(() => ta4PsAutoAssign(i), 300); }
@@ -9097,6 +9107,7 @@ function ta4PsAssignUi(i) {
   } else {
     h = tag('#f1f5f9', '#475569', '판정 불가') + `<span style="color:#64748b;">${e((r && r.basis) || '주소에서 구역을 찾지 못했습니다')} — 직접 선택하세요</span>` + (p.manualAssign ? reset : '');
   }
+  if (p.selfFallback && !p.manualAssign && p.assigned_to) h += `<div style="color:#475569;margin-top:2px;">구역을 확정하지 못해 <b>본인(${e(p.assigned_to)})</b>에게 임시 배정했습니다. 필요하면 위에서 변경하세요.</div>`;
   box.innerHTML = h;
 }
 
@@ -9131,7 +9142,7 @@ async function ta4PsCreate(p) {
     zone: zi && zi.zone || null, vehicle: zi && zi.zone ? (zi.vehicle || null) : null, auto_assigned: zi ? !!(zi.consultant && zi.consultant === who) : null, assign_basis: zi ? String(zi.basis || '').slice(0, 200) : null };
   const { dropped } = await ta4PsInsertLead(row);
   // 첫 노트 (문자 내용 요약)
-  const note = ['[가망고객 · ' + (p.kind || '') + '] 관리자 등록', p.product && '희망 상품: ' + p.product, p.category && '업종: ' + p.category, p.address && '주소: ' + p.address, p.prospect_no && '가망고객번호: ' + p.prospect_no, p.agent_name && (/소개/.test(p.kind) ? '소개자: ' : '대리점 영업사원/소개자: ') + p.agent_name + (p.agent_phone ? ' ' + p.agent_phone : ''), p.req_date && '설계요청일: ' + p.req_date, p.memo && p.memo, dropped.length ? '(참고) 서버에 소개자/분류 컬럼이 없어 일부가 저장되지 않았습니다. 설정 SQL을 실행하세요.' : ''].filter(Boolean).join('\n');
+  const note = ['[가망고객 · ' + (p.kind || '') + '] ' + ta4PsWho() + ' 등록', p.product && '희망 상품: ' + p.product, p.category && '업종: ' + p.category, p.address && '주소: ' + p.address, p.prospect_no && '가망고객번호: ' + p.prospect_no, p.agent_name && (/소개/.test(p.kind) ? '소개자: ' : '대리점 영업사원/소개자: ') + p.agent_name + (p.agent_phone ? ' ' + p.agent_phone : ''), p.req_date && '설계요청일: ' + p.req_date, p.memo && p.memo, dropped.length ? '(참고) 서버에 소개자/분류 컬럼이 없어 일부가 저장되지 않았습니다. 설정 SQL을 실행하세요.' : ''].filter(Boolean).join('\n');
   try { await db.from('ta_notes').insert([{ id: crypto.randomUUID(), lead_id: id, consultant: who, kind: 'memo', content: note, image: null, created_at: now }]); } catch (e) {}
   // 연락처 (이미 같은 번호가 있으면 만들지 않음)
   try {
@@ -9165,7 +9176,7 @@ async function ta4PsSaveDraft() {
   try { await loadAllFromSupabase(); try { await ta3LoadPlaces(); } catch (x) {} try { render(); } catch (x) {} } catch (e) {}
   try { if (typeof ADM !== 'undefined') ADM.placesLoaded = false; } catch (e) {}   // 관리자 지도가 새 위치를 다시 불러오게
   try { if (ok) { ['fConsultant', 'fStage', 'fConfidence', 'fKind'].forEach(id => { if (el(id)) el(id).value = 'all'; }); ['fMonth', 'fSearch'].forEach(id => { if (el(id)) el(id).value = ''; }); if (el('fMonth')) { try { admUTRender(); } catch (x) {} renderLeadTable(); } } } catch (e) {}   // 새 안건이 이달 필터 등에 가려지지 않도록 목록 필터 해제
-  ta4PsAdminShow();
+  if (el('ta4PsBox')) ta4PsAdminShow();
   if (fail.length) alert(`${ok}건 등록, ${fail.length}건 실패\n` + fail.join('\n')); else { ta4PsCloseInput(); alert(`${ok}건을 오늘(${todayStr()}) 등록일로 컨설턴트 안건·연락처·지도에 반영했습니다.` + ((TA4.psGeoFail || []).length ? `\n※ 지도 위치를 찾지 못한 건: ${TA4.psGeoFail.join(', ')}\n(주소는 저장되었습니다. 컨설턴트가 앱을 열면 자동으로 다시 시도하며, 안건 상세의 위치 지정에서 직접 찍을 수도 있습니다)` : '') + (TA4.psDraft.some(p => p.dup) ? `\n(이미 반영된 ${TA4.psDraft.filter(p => p.dup).length}건은 추가 등록하지 않았습니다.)` : '')); }
 }
 
