@@ -8324,7 +8324,7 @@ function ta4WishNorm(v) {
   if (/금고/.test(t)) add('금고');
   if (/영상\s*매각|CCTV\s*매각/i.test(t)) add('영상매각');
   else if (/영상|CCTV|씨씨티비|카메라/i.test(t)) add('영상렌탈');
-  if (/알람|방범|경보|출입|보안\s*서비스|기계경비/.test(t)) add('알람');
+  if (/알람|방범|경보|출입|보안\s*서비스|기계경비|세콤/.test(t)) add('알람');
   if (/기타/.test(t) || !got.length) add('기타');
   return TA4_WISH.filter(k => got.includes(k)).join(', ');
 }
@@ -8712,6 +8712,15 @@ async function ta4PsAiParse(text) {
     return j.items.map(x => ({ kind: String(x.kind || '기타'), name: String(x.name || ''), person: String(x.person || ''), phone: ta4PsFmtPhone(x.phone), address: String(x.address || ''), category: String(x.category || ''), product: String(x.product || ''), memo: String(x.memo || ''), prospect_no: String(x.prospect_no || '').replace(/\D/g, ''), agent_name: String(x.agent_name || ''), agent_phone: ta4PsFmtPhone(x.agent_phone), area: String(x.area || ''), fee: Number(x.fee) || 0, req_date: String(x.req_date || ''), hint: String(x.hint || ''), ai: true, raw: text })).filter(x => x.name || x.person || x.phone || x.prospect_no);
   } finally { clearTimeout(tm); }
 }
+// 상호가 없고 주소만 있으면 주소(예: 도봉동123)를 상호로, 주소가 아파트면 업종을 '주택'으로
+function ta4PsFillDefaults(p) {
+  const addr = String(p.address || '').trim();
+  if (!String(p.name || '').trim() && addr) {
+    const m = /([가-힣0-9]+(?:동|가|리))\s*(산?\d+(?:-\d+)?)(?![0-9]*\s*(?:로|길))/.exec(addr.replace(/\([^)]*\)/g, ' '));
+    p.name = m ? m[1] + m[2] : addr;
+  }
+  if (!String(p.category || '').trim() && /아파트|APT|apt|\d+\s*동\s*\d+\s*호|주공|단지/.test(addr + ' ' + (p.name || ''))) p.category = '주택';
+}
 async function ta4PsAnalyze() {
   const text = el('ta4PsText').value;
   if (!String(text).trim()) { alert('분석할 문자를 붙여넣어 주세요'); return; }
@@ -8723,6 +8732,7 @@ async function ta4PsAnalyze() {
   finally { if (btn) { btn.disabled = false; btn.textContent = old || '분석하기'; } }
   if (!items.length) { alert('분석할 수 있는 내용이 없습니다'); return; }
   TA4.psDraft = items.map(p => Object.assign(p, { product: (raw => { const n = ta4WishNorm(raw); if (n === '기타' && raw && !/기타/.test(raw)) p.memo = ('희망 상품: ' + raw + (p.memo ? ' / ' + p.memo : '')); return n; })(p.product),  assigned_to: '', dup: !!ta4PsDup(p), dupInfo: (d => d ? (d.consultant || '') + ' · 등록 ' + String(d.registeredDate || d.createdAt || '').slice(0, 10) : '')(ta4PsDup(p)) }));
+  TA4.psDraft.forEach(ta4PsFillDefaults);
   try { await ZoneAssign.load(db); } catch (e) {}
   TA4.psDraft.forEach((_, i) => ta4PsAutoAssign(i)); ta4PsDraftRender();
   try { ta3Toast(used === 'ai' ? 'AI(Gemini)로 분석했습니다. 내용을 확인해 주세요' : 'AI 분석 실패(' + why + ') → 기본 분석으로 처리했습니다', 6000); } catch (e) {}
