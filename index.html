@@ -6804,6 +6804,27 @@ async function ta3Reload() {
   await Promise.all([ta3LoadRefs(), ta3LoadPlaces(), ta3LoadScheds(), ta4LoadMotives(), ta4LoadCmts(), ta4LoadCards(), ta4LoadContacts(), ta4LoadProspects()]);
   ta4CtSyncAll(); ta3Refresh(); ta4PsAutoPlace(); ta3Toast('갱신 완료');
 }
+// 소개영업 새 안건 자동 반영: 앱을 다시 열거나 화면으로 돌아올 때 + 1분마다 (소개영업 앱에서 올린 안건이 TA 앱에 바로 보이도록)
+let TA3_AUTO_T = 0, TA3_AUTO_BUSY = false;
+async function ta3AutoRefresh(force) {
+  try {
+    if (document.hidden || !TA3.booted || TA3_AUTO_BUSY || !CONSULTANTS.includes(currentViewMode)) return;
+    const now = Date.now(); if (!force && now - TA3_AUTO_T < 20000) return;
+    TA3_AUTO_T = now; TA3_AUTO_BUSY = true;
+    const { data, error } = await db.from('leads').select('*').eq('assigned_rep', currentViewMode).order('created_at', { ascending: false }).limit(500);
+    if (error || !data) return;   // 실패하면 기존 목록 유지
+    const old = {}; (TA3.refs || []).forEach(r => { old[r.lead_id] = r.updated_at || ''; });
+    const fresh = data.filter(r => !(r.lead_id in old)), changed = data.filter(r => (r.lead_id in old) && (r.updated_at || '') !== old[r.lead_id]);
+    if (!fresh.length && !changed.length && data.length === (TA3.refs || []).length) return;
+    TA3.refs = data; TA3.refErr = '';
+    try { ta4CtSyncAll(); } catch (e) {}   // 새 소개고객 연락처도 반영
+    ta3BuildItems(); ta3Refresh();
+    if (fresh.length) ta3Toast('새 소개영업 안건 ' + fresh.length + '건: ' + (fresh[0].customer_name || '') + (fresh.length > 1 ? ' 외' : ''), 5000);
+  } catch (e) { console.warn('[소개영업 자동갱신]', e); } finally { TA3_AUTO_BUSY = false; }
+}
+document.addEventListener('visibilitychange', () => { if (!document.hidden) ta3AutoRefresh(true); });
+window.addEventListener('focus', () => ta3AutoRefresh(false));
+setInterval(() => ta3AutoRefresh(false), 60000);
 // ---------- 위치 선택기 (중앙 핀) ----------
 let TA3_PK_CB = null, TA3_PK_T = null;
 async function ta3PickOnMap(init, cb) {
