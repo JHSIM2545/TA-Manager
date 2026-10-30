@@ -1673,7 +1673,10 @@ if ('serviceWorker' in navigator) window.addEventListener('load', () => { naviga
       <style>
 #panelActivityLog{display:none !important;}
 body.adm-actlog #panelActivityLog{display:block !important;position:fixed;top:0;left:0;right:0;bottom:0;height:100dvh;z-index:1000000;background:#f4f6fb;overflow:auto;-webkit-overflow-scrolling:touch;padding:14px 16px calc(24px + env(safe-area-inset-bottom,0px));margin:0;border-radius:0;}
-#activityLogScroll{overflow:auto;}
+#activityLogScroll{overflow-x:auto;overflow-y:visible;max-height:none !important;}
+#activityLogScroll table.lead-table{min-width:560px;}
+#activityLogScroll table.lead-table th{position:static !important;background:#eaf5f9;}
+#activityLogScroll table.lead-table td:nth-child(1),#activityLogScroll table.lead-table td:nth-child(2),#activityLogScroll table.lead-table td:nth-child(3){white-space:nowrap;}
 body.adm-actlog{overflow:hidden;}
 </style>
 <!-- 사용자 작업 이력 (Activity Log) - 지사 관리자 전용, 더보기 메뉴에서 열기 -->
