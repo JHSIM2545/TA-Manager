@@ -9597,6 +9597,7 @@ function admLayerSync() {
 // ---------- 더보기 > 사용자 작업 이력 (전체 화면) ----------
 function admActivityOpen() {
   if (!isMasterUser()) return;
+  const pn = el('panelActivityLog'); if (pn && pn.parentNode !== document.body) document.body.appendChild(pn);   // 더보기 탭에서는 main이 숨겨지므로 body로 옮겨 표시
   document.body.classList.add('adm-actlog');
   el('activityLogDate').value = el('activityLogDate').value || todayStr();
   refreshActivityLog(); window.scrollTo(0, 0);
