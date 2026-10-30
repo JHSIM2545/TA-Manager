@@ -2490,7 +2490,7 @@ function productCategory(productType) {
 function isCreatedToday(lead) {
   const t = todayStr();
   if (lead.registeredDate === t) return true;
-  if (lead.createdAt && lead.createdAt.slice(0, 10) === t) return true;
+  if (lead.createdAt && kstDate(lead.createdAt) === t) return true;
   return false;
 }
 
@@ -2807,6 +2807,15 @@ async function loadTargetsFromSupabase(month) {
   }
 }
 
+// 한국 표준시(KST, UTC+9) 기준 시각 변환 — 기기 시간대와 무관하게 항상 한국 시간으로 표시
+function kstParts(ts) {
+  const d = ts instanceof Date ? ts : new Date(/[zZ]|[+-]\d\d:?\d\d$/.test(String(ts)) ? ts : String(ts).replace(' ', 'T') + 'Z');
+  if (isNaN(d.getTime())) return null;
+  const k = new Date(d.getTime() + 9 * 3600000), p = n => String(n).padStart(2, '0');
+  return { y: k.getUTCFullYear(), mo: p(k.getUTCMonth() + 1), d: p(k.getUTCDate()), h: p(k.getUTCHours()), mi: p(k.getUTCMinutes()) };
+}
+function kstDate(ts) { const k = kstParts(ts); return k ? `${k.y}-${k.mo}-${k.d}` : ''; }
+function kstTime(ts) { const k = kstParts(ts); return k ? `${k.h}:${k.mi}` : ''; }
 async function logActivity(consultant, action, company, leadId, changes) {
   try {
     await db.from('activity_logs').insert([{
@@ -3449,8 +3458,8 @@ function admRefLeads() {
       ADM_REFS = (data || []).map(r => ({
         id: 'ref-' + r.lead_id, _rid: r.lead_id, _raw: r, _ref: true, consultant: r.assigned_rep || '', company: r.customer_name || '(고객명 없음)',
         contact: r.contact_person || '', amount: Number(r.contract_amount || r.quote_amount || 0), stage: r.status || '접수대기', confidence: '',
-        origin: '소개', productType: r.product || '', registeredDate: (r.created_at || '').slice(0, 10),
-        expectedDate: r.expected_contract_date || (r.created_at || '').slice(0, 10), memo: r.memo || r.note || '', updatedAt: r.updated_at || r.created_at || ''
+        origin: '소개', productType: r.product || '', registeredDate: kstDate(r.created_at),
+        expectedDate: r.expected_contract_date || kstDate(r.created_at), memo: r.memo || r.note || '', updatedAt: r.updated_at || r.created_at || ''
       }));
       if (changed && typeof renderLeadTable === 'function') renderLeadTable();
     }).catch(() => { ADM_REFS_BUSY = false; });
@@ -3543,8 +3552,8 @@ async function refreshActivityLog() {
   try {
     const { data: logs, error } = await db.from('activity_logs')
       .select('*')
-      .gte('created_at', dateStr + 'T00:00:00')
-      .lte('created_at', dateStr + 'T23:59:59')
+      .gte('created_at', dateStr + 'T00:00:00+09:00')
+      .lte('created_at', dateStr + 'T23:59:59.999+09:00')
       .order('created_at', { ascending: false });
 
     // TA 관리 화면(개별 컨설턴트 TA 등록·수정·삭제) 이력만 엄격 필터링 (영업일보 등 타 시스템 로깅 완전 제외)
@@ -3575,7 +3584,7 @@ async function refreshActivityLog() {
     }
     el('activityLogTbody').innerHTML = taLogs.map(log => {
       const badge = ACTIVITY_BADGE[log.action] || { bg: '#eef1f7', fg: 'var(--muted)' };
-      const timeStr = (log.created_at || '').slice(11, 16);
+      const timeStr = kstTime(log.created_at);
       return `
         <tr>
           <td style="white-space:nowrap;color:var(--muted);font-size:12px;">${escapeHtml(timeStr)}</td>
@@ -5713,7 +5722,7 @@ function ta2DateBtn(field, ds) {
 function ta2RenderInfo() {
   const l = ta2CurLead(); if (!l) return;
   const f = (k, v) => `<div><div class="k">${k}</div><div class="vv">${v}</div></div>`;
-  const regDate = l.registeredDate || (l.createdAt || '').slice(0, 10);
+  const regDate = l.registeredDate || kstDate(l.createdAt);
   el('ta2DInfo').innerHTML = [
     f('서비스제공처명', `<input class="ta2-inp" value="${escapeHtml(l.company)}" onchange="ta2FText('company',this.value)">`),
     f('고객 담당자', `<input class="ta2-inp" value="${escapeHtml(l.contact)}" placeholder="담당자 성명" onchange="ta2FText('contact',this.value)">`),
@@ -5795,7 +5804,7 @@ function ta2FAmount(inp) {
 function ta2FSelect(k, v) { ta2SaveFields({ [k]: v }, true); }
 function ta2EditDate(field) {
   const l = ta2CurLead(); if (!l) return;
-  const cur = field === 'registeredDate' ? (l.registeredDate || (l.createdAt || '').slice(0, 10)) : l[field];
+  const cur = field === 'registeredDate' ? (l.registeredDate || kstDate(l.createdAt)) : l[field];
   ta2PickDate(cur, ds => {
     if (!ds && field === 'expectedDate') { ta2Flash('수주예정일은 비울 수 없습니다', true); return; }
     ta2SaveFields({ [field]: ds }, true);
@@ -5898,8 +5907,8 @@ async function ta2LoadNotes() {
   ta2RenderMemos();
 }
 function ta2FmtTs(ts) {
-  const d = new Date(ts); if (isNaN(d.getTime())) return '';
-  return `${d.getFullYear()}.${TA2_PAD(d.getMonth() + 1)}.${TA2_PAD(d.getDate())} ${TA2_PAD(d.getHours())}:${TA2_PAD(d.getMinutes())}`;
+  const k = kstParts(ts); if (!k) return '';
+  return `${k.y}.${k.mo}.${k.d} ${k.h}:${k.mi}`;
 }
 function ta2Atts(n) {
   if (n.kind === 'memo') { try { const a = JSON.parse(n.image || '[]'); return Array.isArray(a) ? a : []; } catch (e) { return []; } }
@@ -6273,7 +6282,7 @@ function ta3RefLead(r) {
   return {
     id: r.lead_id, _ref: true, company: r.customer_name || '(고객명 없음)', contact: r.contact_person || '',
     contactPhone: String(r.contact_phone || '').replace(/[^0-9]/g, ''), amount: amt, productType: r.product || '',
-    motive: '소개영업', stage: r.status || '접수대기', confidence: '', registeredDate: (r.created_at || '').slice(0, 10),
+    motive: '소개영업', stage: r.status || '접수대기', confidence: '', registeredDate: kstDate(r.created_at),
     expectedDate: r.expected_contract_date || '', contractDate: r.contract_success_date || '', createdAt: r.created_at, memo: '', raw: r
   };
 }
@@ -7104,7 +7113,7 @@ function ta2RenderInfo() {
   const l = ta2CurLead(); if (!l) return;
   if (l._ref) { ta3RenderRefInfo(l); return; }
   const f = (k, v, full) => `<div${full ? ' style="grid-column:1/-1"' : ''}><div class="k">${k}</div><div class="vv">${v}</div></div>`;
-  const regDate = l.registeredDate || (l.createdAt || '').slice(0, 10);
+  const regDate = l.registeredDate || kstDate(l.createdAt);
   const cars = ['없음', '26호', '27호', '28호', '127호', '160호'];
   const won = l.stage === '수주完';
   el('ta2DInfo').innerHTML = [
@@ -8608,7 +8617,7 @@ function ta4PsAdminRender() {
   const rows = ta4PsLeads().sort((a, b) => String(b.createdAt || '').localeCompare(String(a.createdAt || '')));
   el('ta4PsCnt').textContent = rows.length + '건';
   const e = escapeHtml, sel = l => `<select onchange="ta4PsReassign('${e(l.id)}',this.value)" style="padding:5px;border-radius:6px;border:1px solid #cbd5e1;">${CONSULTANTS.map(n => `<option value="${e(n)}"${l.consultant === n ? ' selected' : ''}>${e(n)}</option>`).join('')}</select>`;
-  body.innerHTML = rows.length ? rows.map(l => `<tr><td>${e(String(l.createdAt || '').slice(0, 10))}</td><td>${sel(l)}</td><td><b>${e(l.company)}</b>${l.contact && l.contact !== l.company ? `<br><small>${e(l.contact)}</small>` : ''}</td><td>${l.contactPhone ? `<a href="tel:${e(ta4Num(l.contactPhone))}">${e(ta4FmtPhone(l.contactPhone))}</a>` : ''}</td><td style="min-width:170px;">${e((TA4.psAddr && TA4.psAddr[l.id]) || l.address || '')}</td><td>${e(l.referrer || '')}</td><td style="text-align:right;">${l.amount ? Number(l.amount).toLocaleString('ko-KR') + '원' : ''}</td><td>${e(l.confidence || '')}</td><td>${e(l.stage || '')}</td><td><button type="button" class="small secondary" onclick="ta4PsDel('${e(l.id)}')" style="background:#fee2e2;color:#b91c1c;border:none;border-radius:6px;padding:5px 9px;cursor:pointer;">삭제</button></td></tr>`).join('') : '<tr><td colspan="10" style="text-align:center;color:#94a3b8;padding:24px;">등록된 가망고객이 없습니다</td></tr>';
+  body.innerHTML = rows.length ? rows.map(l => `<tr><td>${e(StringkstDate(l.createdAt))}</td><td>${sel(l)}</td><td><b>${e(l.company)}</b>${l.contact && l.contact !== l.company ? `<br><small>${e(l.contact)}</small>` : ''}</td><td>${l.contactPhone ? `<a href="tel:${e(ta4Num(l.contactPhone))}">${e(ta4FmtPhone(l.contactPhone))}</a>` : ''}</td><td style="min-width:170px;">${e((TA4.psAddr && TA4.psAddr[l.id]) || l.address || '')}</td><td>${e(l.referrer || '')}</td><td style="text-align:right;">${l.amount ? Number(l.amount).toLocaleString('ko-KR') + '원' : ''}</td><td>${e(l.confidence || '')}</td><td>${e(l.stage || '')}</td><td><button type="button" class="small secondary" onclick="ta4PsDel('${e(l.id)}')" style="background:#fee2e2;color:#b91c1c;border:none;border-radius:6px;padding:5px 9px;cursor:pointer;">삭제</button></td></tr>`).join('') : '<tr><td colspan="10" style="text-align:center;color:#94a3b8;padding:24px;">등록된 가망고객이 없습니다</td></tr>';
 }
 async function ta4PsReassign(id, who) {
   try {
