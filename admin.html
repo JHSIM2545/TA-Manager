@@ -1670,17 +1670,24 @@ if ('serviceWorker' in navigator) window.addEventListener('load', () => { naviga
         </div>
       </div>
 
-      <!-- 변경 이력 (Activity Log) - 지사 관리자 전용 -->
+      <style>
+#panelActivityLog{display:none !important;}
+body.adm-actlog #panelActivityLog{display:block !important;position:fixed;inset:0;z-index:3000;background:#f4f6fb;overflow:auto;padding:14px 16px calc(24px + env(safe-area-inset-bottom,0px));margin:0;border-radius:0;}
+#activityLogScroll{overflow:auto;}
+body.adm-actlog{overflow:hidden;}
+</style>
+<!-- 사용자 작업 이력 (Activity Log) - 지사 관리자 전용, 더보기 메뉴에서 열기 -->
       <div class="panel" id="panelActivityLog">
         <div class="panel-toolbar">
-          <h2>변경 이력 <span class="count-tag" id="activityLogCount"></span></h2>
+          <h2>사용자 작업 이력 <span class="count-tag" id="activityLogCount"></span></h2>
           <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
             <input type="date" id="activityLogDate" style="padding:8px 10px;border:1px solid var(--border);border-radius:8px;font-size:13.5px;font-family:inherit;">
             <button type="button" class="small secondary" id="btnActivityToday" style="background:#eef1f7;color:#1a2333;">오늘</button>
             <button type="button" class="small" id="btnActivityRefresh">새로고침</button>
+            <button type="button" class="small secondary" id="btnActivityClose" onclick="admActivityClose()" style="background:#eef1f7;color:#1a2333;">닫기 ✕</button>
           </div>
         </div>
-        <div class="table-scroll" style="max-height:420px;">
+        <div class="table-scroll" id="activityLogScroll">
           <table class="lead-table">
             <thead><tr><th>시간</th><th>컨설턴트</th><th>구분</th><th style="min-width:170px;">서비스제공처명</th><th>변경 내용</th></tr></thead>
             <tbody id="activityLogTbody"></tbody>
@@ -3639,12 +3646,10 @@ const ACTIVITY_BADGE = {
 async function refreshActivityLog() {
   // 지사 관리자(마스터)만 조회 가능하도록 권한 검증
   if (!isMasterUser()) {
-    if (el('panelActivityLog')) el('panelActivityLog').style.display = 'none';
     if (el('activityLogTbody')) el('activityLogTbody').innerHTML = '';
     if (el('activityLogCount')) el('activityLogCount').textContent = '';
     return;
   }
-  if (el('panelActivityLog')) el('panelActivityLog').style.display = 'block';
 
   const dateStr = el('activityLogDate').value || todayStr();
   try {
@@ -9340,6 +9345,7 @@ function admMoreSheet() {
     { ic: '<svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.6-3.6 3.2-5.5 6.5-5.5s5.9 1.9 6.5 5.5"/><path d="M16 4.7a3.5 3.5 0 010 6.6M18 14.8c2 .6 3.2 2.2 3.5 5.2"/></svg>', t: '사용자 관리', s: '', fn: () => openUserManageModal() },
     { ic: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.2"/></svg>', t: '목표 현황', s: '영업일보 기준 · 보기 전용', fn: () => admTargetView() },
     { ic: '<svg viewBox="0 0 24 24"><path d="M4 10v4a1 1 0 001 1h2l6 4V5L7 9H5a1 1 0 00-1 1z"/><path d="M16.5 8.5a5 5 0 010 7M19 6a8.5 8.5 0 010 12"/></svg>', t: '공지사항 관리', s: '', fn: () => openNoticeModal() },
+    { ic: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>', t: '사용자 작업 이력', s: '', fn: () => admActivityOpen() },
     { ic: '<svg viewBox="0 0 24 24"><path d="M9 4H5a1 1 0 00-1 1v14a1 1 0 001 1h4"/><path d="M16 8l4 4-4 4M20 12H9"/></svg>', t: '로그아웃', s: '', fn: () => doLogout() }
   ]);
 }
@@ -9588,6 +9594,14 @@ function admLayerSync() {
 })();
 
 
+// ---------- 더보기 > 사용자 작업 이력 (전체 화면) ----------
+function admActivityOpen() {
+  if (!isMasterUser()) return;
+  document.body.classList.add('adm-actlog');
+  el('activityLogDate').value = el('activityLogDate').value || todayStr();
+  refreshActivityLog(); window.scrollTo(0, 0);
+}
+function admActivityClose() { document.body.classList.remove('adm-actlog'); }
 // ---------- 더보기 (전체 페이지) ----------
 function admMoreRender() {
   const u = (typeof currentUser !== 'undefined' && currentUser) || {}, e = escapeHtml;
@@ -9595,6 +9609,7 @@ function admMoreRender() {
     { ic: ADM_IC.users, t: '사용자 관리', fn: 'openUserManageModal()' },
     { ic: ADM_IC.target, t: '목표 현황', s: '영업일보 기준 · 보기 전용', fn: 'admTargetView()' },
     { ic: ADM_IC.bell, t: '공지사항 관리', fn: 'openNoticeModal()' },
+    { ic: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>', t: '사용자 작업 이력', s: '컨설턴트 등록·수정·삭제 기록 (한국시간)', fn: 'admActivityOpen()' },
     { ic: ADM_IC.out, t: '로그아웃', fn: 'doLogout()' }
   ];
   el('admMoreView').innerHTML = `
