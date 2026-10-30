@@ -1672,7 +1672,7 @@ if ('serviceWorker' in navigator) window.addEventListener('load', () => { naviga
 
       <style>
 #panelActivityLog{display:none !important;}
-body.adm-actlog #panelActivityLog{display:block !important;position:fixed;inset:0;z-index:3000;background:#f4f6fb;overflow:auto;padding:14px 16px calc(24px + env(safe-area-inset-bottom,0px));margin:0;border-radius:0;}
+body.adm-actlog #panelActivityLog{display:block !important;position:fixed;top:0;left:0;right:0;bottom:0;height:100dvh;z-index:1000000;background:#f4f6fb;overflow:auto;-webkit-overflow-scrolling:touch;padding:14px 16px calc(24px + env(safe-area-inset-bottom,0px));margin:0;border-radius:0;}
 #activityLogScroll{overflow:auto;}
 body.adm-actlog{overflow:hidden;}
 </style>
