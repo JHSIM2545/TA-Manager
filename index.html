@@ -934,6 +934,9 @@
   .ta3-chip{flex:0 0 auto;background:var(--sf) !important;color:var(--mute) !important;border:1px solid var(--line) !important;border-radius:999px !important;padding:8px 14px !important;font-size:13px !important;font-weight:700 !important;white-space:nowrap;}
   .ta3-chip b{margin-left:5px;opacity:.6;font-weight:800;}
   .ta3-chip.on{background:var(--navy) !important;color:#fff !important;border-color:var(--navy) !important;}
+  .ta3-n{display:inline-block;margin-left:4px;background:#e11d1d;color:#fff !important;border-radius:99px;font-size:10px;font-weight:800;padding:1px 6px;font-style:normal;line-height:1.35;vertical-align:top;letter-spacing:0;}
+  .ta3-tab.has-new{position:relative;}
+  .ta3-tab.has-new::after{content:'N';position:absolute;top:4px;left:calc(50% + 6px);background:#e11d1d;color:#fff;border-radius:99px;font-size:9px;font-weight:800;padding:1px 5px;line-height:1.3;}
   .ta3-seg{display:inline-flex;background:#e9ecf2;border-radius:12px;padding:3px;margin-bottom:8px;}
   .ta3-seg button{background:none !important;color:var(--mute) !important;border:none;border-radius:9px !important;padding:7px 15px !important;font-size:13px !important;font-weight:700 !important;}
   .ta3-seg button.on{background:#fff !important;color:var(--ink) !important;box-shadow:0 1px 3px rgba(16,24,40,.12);}
@@ -6237,6 +6240,7 @@ async function ta2DelSched(id) {
 let PHONE_COL_OK = null;
 async function leadWriteWithPhone(mode, id, phone, row) {
   const build = withPhone => (withPhone ? Object.assign({}, row, { contact_phone: phone || null }) : row);
+  if (mode !== 'update') ta3NewMark(id);   // 내가 직접 등록한 안건은 새 안건 표시 제외
   const run = r => mode === 'update' ? db.from('ta_leads').update(r).eq('id', id) : db.from('ta_leads').insert([r]);
   if (PHONE_COL_OK === false) return run(build(false));
   let res = await run(build(true));
@@ -6331,6 +6335,7 @@ async function ta3LoadRefs() {
     if (error) throw error;
     TA3.refs = data || []; TA3.refErr = '';
   } catch (e) { TA3.refs = []; TA3.refErr = (e && e.message) || String(e); }
+  TA3.refsLoaded = true;
 }
 async function ta3LoadPlaces() {
   if (await ta2Probe('ta_places') === 'remote') {
@@ -6581,6 +6586,7 @@ function ta3Back() { if (PG.st.length) history.back(); }
 function ta3Refresh() {
   ta4ApplyBarTheme();
   ta3BuildItems();
+  ta3NewSync();
   const t = TA3.tab;
   if (t === 'home') ta3RenderHome();
   else if (t === 'items') ta3RenderItems();
@@ -6607,7 +6613,7 @@ function ta3CardHtml(it) {
   const srcTag = it.src === 'ref' ? '<span class="ta3-tag" style="background:#dbeafe;color:#1d4ed8;">소개고객</span>' : it.src === 'ps' ? '<span class="ta3-tag" style="background:#dcfce7;color:#15803d;">가망고객</span>' : '<span class="ta3-tag" style="background:#fee2e2;color:#b91c1c;">TA</span>';
   const stBg = it.src !== 'ref' ? (STAGE_BG[it.raw.stage] || '#eee') : '#eef1f7', stCl = it.src !== 'ref' ? (STAGE_COLOR[it.raw.stage] || '#374151') : g.c;
   return `<div class="ta3-card" style="--c:${g.c}" onclick="ta3Open('${escapeHtml(it.id)}')">
-    <div class="r1"><div class="nm">${escapeHtml(it.name)}</div></div>
+    <div class="r1"><div class="nm">${escapeHtml(it.name)}${ta3NewIds().has(it.id) ? '<i class="ta3-n">N</i>' : ''}</div></div>
     ${it.amount ? `<div class="amt">${formatCurrency(it.amount)}</div>` : ''}
     <div class="r2">${srcTag}<span class="ta3-tag" style="background:${stBg};color:${stCl};">${escapeHtml(it.stage)}</span>${it.conf ? `<span class="ta3-tag" style="background:#f3f4f6;color:#374151;">확도 ${escapeHtml(it.conf)}</span>` : ''}${it.product ? `<span class="ta3-tag" style="background:#f3f4f6;color:#374151;">${escapeHtml(it.product)}</span>` : ''}${ta4CmBadge(it.id)}</div>
     <div class="r3">📅 ${ta3SchedLabel(it)}${it.contact ? ' · 👤 ' + escapeHtml(it.contact) : ''}<br>${pl && pl.lat ? '📍 ' : '📌 '}${it.address ? escapeHtml(it.address) : '<span style="color:#b6bcc8;">위치 미지정</span>'}</div>
@@ -6686,7 +6692,31 @@ function ta3Sorted(a) {
   return a.slice().sort((x, y) => ord[x.group] - ord[y.group] || (x.group === 'ing' || x.group === 'hold' ? (x.date || '9999').localeCompare(y.date || '9999') : (y.date || y.updated || '').localeCompare(x.date || x.updated || '')));
 }
 function ta3SegHtml(cur, fn) {
-  return [['all', '전체'], ['ta', 'TA'], ['ref', '소개고객'], ['ps', '가망고객']].map(([v, l]) => `<button type="button" class="${cur === v ? 'on' : ''}" onclick="${fn}('${v}')">${l}</button>`).join('');
+  const nw = ta3NewIds(), cnt = v => v === 'all' ? nw.size : TA3.items.filter(i => i.src === v && nw.has(i.id)).length;
+  return [['all', '전체'], ['ta', 'TA'], ['ref', '소개고객'], ['ps', '가망고객']].map(([v, l]) => { const n = cnt(v); return `<button type="button" class="${cur === v ? 'on' : ''}" onclick="${fn}('${v}')">${l}${n ? '<i class="ta3-n">N</i>' : ''}</button>`; }).join('');
+}
+// ---------- 새 안건 'N' 표시 (내가 등록하지 않은 안건이 새로 들어오면 표시, 열어서 확인하면 사라짐) ----------
+function ta3NewActive() { try { return !!(currentUser && !isMasterUser() && CONSULTANTS.includes(currentViewMode)); } catch (e) { return false; } }
+function ta3NewKey() { return 'S1_NEW_SEEN_' + currentViewMode; }
+function ta3NewSeen() { try { return JSON.parse(localStorage.getItem(ta3NewKey()) || 'null'); } catch (e) { return null; } }
+function ta3NewSave(arr) { try { localStorage.setItem(ta3NewKey(), JSON.stringify(arr.slice(-3000))); } catch (e) {} }
+function ta3NewIds() {
+  const out = new Set(); if (!ta3NewActive()) return out;
+  const seen = ta3NewSeen(); if (!seen) return out;
+  const S = new Set(seen); TA3.items.forEach(i => { if (!S.has(i.id)) out.add(i.id); });
+  return out;
+}
+function ta3NewMark(id) {
+  if (!ta3NewActive() || !id) return;
+  const seen = ta3NewSeen(); if (seen === null || seen.includes(id)) return; seen.push(id); ta3NewSave(seen);
+  try { ta3NewSync(); } catch (e) {}
+}
+function ta3NewSync() {
+  if (!ta3NewActive()) { try { if (navigator.clearAppBadge) navigator.clearAppBadge(); } catch (e) {} return; }
+  if (ta3NewSeen() === null && TA3.refsLoaded && TA3.items.length >= 0) ta3NewSave(TA3.items.map(i => i.id));   // 처음 사용 시: 현재 안건은 모두 '확인함'으로 기준 설정
+  const n = ta3NewIds().size;
+  document.querySelectorAll('.ta3-tab[data-t="items"]').forEach(b => b.classList.toggle('has-new', n > 0));
+  try { if (n > 0) { if (navigator.setAppBadge) navigator.setAppBadge(n); } else if (navigator.clearAppBadge) navigator.clearAppBadge(); } catch (e) {}
 }
 function ta3ChipsHtml(base, cur, fn) {
   const cnt = g => g === 'all' ? base.length : base.filter(i => i.group === g).length;
@@ -7224,7 +7254,7 @@ async function ta2OpenDetail(id, tab, date) {
   el('ta4PlBtn').style.display = 'none';
   ta4Show('ta2DetailOverlay', () => { ta4SubClose(); ta4VoiceStop(); TA2.leadId = null; MP.open = false; ta3Refresh(); });
   ta2Tab(tab === 'cal' ? 'cal' : 'memo');
-  ta4MarkSeen(id);
+  ta4MarkSeen(id); ta3NewMark(id);
   if (tab === 'cmt') setTimeout(() => { const c = el('ta4PaneCmt'); if (c) c.scrollIntoView({ block: 'start' }); }, 250);
   await Promise.all([ta2Probe('ta_notes'), ta2Probe('ta_schedules'), ta2Probe('ta_comments')]);
   if (TA2.leadId !== id) return;
@@ -9077,6 +9107,7 @@ function ta4PsAssignUi(i) {
 
 // ---------- 등록: 안건 + 첫 노트 + 연락처 + 지도 ----------
 async function ta4PsInsertLead(row) {
+  if (row && row.id && row.consultant === currentViewMode) ta3NewMark(row.id);   // 내가 직접 등록한 가망은 새 안건 표시 제외
   let r = Object.assign({}, row); const dropped = [];
   for (let n = 0; n < 6; n++) {
     const { error } = await db.from('ta_leads').insert([r]);

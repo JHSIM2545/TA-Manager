@@ -14,6 +14,7 @@ self.addEventListener('push', e => {
   let d = {}; try { d = e.data ? e.data.json() : {}; } catch (x) {}
   e.waitUntil(self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then(cs => {
     const vis = cs.find(c => c.visibilityState === 'visible');
+    try { if (self.navigator && navigator.setAppBadge) navigator.setAppBadge(); } catch (x) {}   // 앱 아이콘에 새 안건 표시 (앱을 열면 개수로 갱신/해제)
     if (vis) { vis.postMessage({ type: 'push-refresh', lead: d.lead || '' }); return; }   // 앱을 보고 있으면 팝업 대신 화면만 새로고침
     return self.registration.showNotification(d.title || 'TA 관리 포털', { body: d.body || '', tag: d.tag || 'ta', icon: './icon-192.png', badge: './icon-192.png', data: { lead: d.lead || '' } });
   }));
