@@ -1416,6 +1416,8 @@ header.topbar .brand{color:#9aa3b2 !important;opacity:1 !important;letter-spacin
 header.topbar .page-title{font-size:20px !important;color:#fff !important;}
 #btnLogout{background:none !important;border:none !important;color:#fff !important;font-weight:800;font-size:14px;padding:6px 4px !important;}
 #btnLogout::after{content:' ›';}
+#btnCardReg{display:inline-flex !important;align-items:center;gap:6px;background:#fff !important;color:#111 !important;border:none !important;border-radius:999px !important;padding:7px 14px !important;font-size:13px;font-weight:800;cursor:pointer;white-space:nowrap;}
+#btnCardReg [data-ic] svg{width:16px;height:16px;}
 #dateBanner{background:#f6f7f9 !important;border:none !important;box-shadow:none !important;}
 #dateBanner .date-text{color:#111827 !important;}
 #dateBanner .workdays-badge{background:#e8f3f8 !important;color:#0b6e8f !important;}
@@ -1618,6 +1620,7 @@ if ('serviceWorker' in navigator) window.addEventListener('load', () => { naviga
       <button type="button" id="btnUserManage" class="small" onclick="openUserManageModal()" style="background:#e6f4ea;color:#137333;border:1px solid #ceead6;font-weight:700;display:none;">👥 사용자 관리</button>
       <button type="button" id="btnTopbarTarget" class="small" onclick="openTargetModal()" style="background:#2563eb;color:#fff;display:none;">🎯 목표 설정</button>
       <button type="button" id="btnNoticeManage" class="small">공지사항 관리</button>
+      <button type="button" id="btnCardReg" onclick="ta4CardOpen('phone')" aria-label="명함등록"><span data-ic="card"></span>명함등록</button>
       <button type="button" id="btnLogout" class="small secondary">로그아웃</button>
       <div id="connStatus" style="display:none;"></div>
     </div>
@@ -7889,7 +7892,8 @@ function ta4CardFill(c) { const F = ta4CardFields(); Object.keys(F).forEach(k =>
 function ta4CardOpen(mode) {
   TA4.card = { mode, img: null, full: null, crop: null, busy: false };
   let c = null;
-  if (mode === 'book') { c = {}; el('ta4CdName').textContent = '연락처에 저장'; }
+  if (mode === 'phone') { c = {}; el('ta4CdName').textContent = '휴대폰 연락처에 바로 등록'; }
+  else if (mode === 'book') { c = {}; el('ta4CdName').textContent = '연락처에 저장'; }
   else if (mode === 'ctedit') { c = {}; Object.keys(ta4CardFields()).forEach(k => { c[k] = (el(TA4_CT_F[k]) || {}).value || ''; }); el('ta4CdName').textContent = ''; }
   else if (mode === 'lead') { const l = ta2CurLead(); if (!l) return; c = Object.assign({}, TA4.cards[l.id] || {}); if (!c.name) c.name = l.contact || ''; if (!c.mobile && !c.tel && l.contactPhone) c.mobile = ta4FmtPhone(l.contactPhone); el('ta4CdName').textContent = l.company || ''; }
   else { c = Object.assign({}, TA4.formCard || {}); if (!c.name) c.name = el('afContact').value.trim(); if (!c.mobile && !c.tel) c.mobile = ta4FmtPhone(el('afContactPhone').value); el('ta4CdName').textContent = el('afCompany').value.trim(); }
@@ -7897,9 +7901,10 @@ function ta4CardOpen(mode) {
   el('cdImg').style.display = 'none'; el('cdImg').removeAttribute('src'); el('cdRaw').textContent = ''; el('cdStatus').textContent = ''; el('cdStatus').className = 'cd-st';
   let o = {}; try { o = JSON.parse(localStorage.getItem(TA4_LS_CARDOPT) || '{}'); } catch (e) {}
   el('cdSave').checked = o.save !== false; el('cdPhoto').checked = o.photo !== false; el('cdBook').checked = o.book !== false; el('cdCrop').checked = o.crop !== false;
-  const pm = mode === 'book' || mode === 'ctedit';
-  el('cdSaveRow').style.display = mode === 'ctedit' ? 'none' : ''; el('cdPhotoRow').style.display = pm ? 'none' : ''; el('cdBookRow').style.display = pm ? 'none' : '';
-  el('cdApply').textContent = mode === 'book' ? '연락처에 저장' : mode === 'ctedit' ? '입력란에 적용' : '고객 정보에 적용';
+  const pm = mode === 'book' || mode === 'ctedit' || mode === 'phone';
+  el('cdSaveRow').style.display = (mode === 'ctedit' || mode === 'phone') ? 'none' : ''; el('cdPhotoRow').style.display = pm ? 'none' : ''; el('cdBookRow').style.display = pm ? 'none' : '';
+  el('cdCropRow').style.display = mode === 'phone' ? 'none' : '';
+  el('cdApply').textContent = mode === 'phone' ? '휴대폰 연락처에 등록' : mode === 'book' ? '연락처에 저장' : mode === 'ctedit' ? '입력란에 적용' : '고객 정보에 적용';
   ta4Show('ta4CardPg', ta4CardCamStop);
   ta4CardCamStart();   // 카메라 바로 실행(실시간 화면)
 }
@@ -8060,6 +8065,10 @@ function ta2SaveContact() {
 async function ta4CardApply() {
   const c = ta4CardRead();
   if (!c.name && !c.mobile && !c.tel && !c.email) { ta3Toast('저장할 정보가 없습니다'); return; }
+  if (TA4.card.mode === 'phone') {   // 관리자 상단 명함등록: 앱에는 저장하지 않고 휴대폰 연락처로만 등록
+    c.memo = '명함등록';
+    ta4VcardShare(c, c.company); ta4Close('ta4CardPg'); ta3Toast('연락처 앱에서 저장해 주세요 ✓'); return;
+  }
   const mode = TA4.card.mode, wantSave = el('cdSave').checked, wantPhoto = el('cdPhoto').checked, wantBook = el('cdBook').checked, img = el('cdCrop').checked && TA4.card.crop ? TA4.card.crop : (TA4.card.full || TA4.card.img);
   try { localStorage.setItem(TA4_LS_CARDOPT, JSON.stringify({ save: wantSave, photo: wantPhoto, book: wantBook, crop: el('cdCrop').checked })); } catch (e) {}
   const phone = c.mobile || c.tel;
