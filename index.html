@@ -6796,6 +6796,14 @@ function ta5Render() {
 // ---- 실행: 같은 숫자면 하루 한 번만 요청, 홈이 여러 번 그려져도 합쳐서 처리 ----
 function ta5Hash(s) { let h = 5381; for (let i = 0; i < s.length; i++) h = ((h << 5) + h + s.charCodeAt(i)) | 0; return (h >>> 0).toString(36); }
 function ta5Kick() { clearTimeout(TA5.timer); TA5.timer = setTimeout(() => { try { ta5Run(false); } catch (e) { console.warn('[ta5]', e); } }, 600); }
+async function ta5Post(body, ms) {
+  const ctl = new AbortController(), to = setTimeout(() => ctl.abort(), ms);
+  try {
+    const r = await fetch(SUPABASE_URL + '/functions/v1/ta-ai-comment', { method: 'POST', signal: ctl.signal, headers: { 'Content-Type': 'application/json', apikey: SUPABASE_ANON_KEY }, body: JSON.stringify(Object.assign({ phone: (currentUser && currentUser.phone) || '' }, body)) });
+    const j = await r.json().catch(() => ({}));
+    return { ok: r.ok, j };
+  } finally { clearTimeout(to); }
+}
 async function ta5Run(force) {
   const name = currentViewMode; if (!name || !el('ta5Box')) return;
   const m = ta5Metrics(), h = ta5Hash(JSON.stringify(m)), key = name + '|' + h;
@@ -6803,20 +6811,37 @@ async function ta5Run(force) {
   TA5.key = key; TA5.name = name;
   if (!m.ingCnt && !m.wonAllCnt && !m.failAllCnt) { TA5.res = ta5Rules(m, name); TA5.src = 'rule'; TA5.err = '등록된 안건 없음'; TA5.busy = false; ta5Render(); return; }
   const ck = TA5_LS + name; let c = null; try { c = JSON.parse(localStorage.getItem(ck) || 'null'); } catch (e) {}
-  if (!force && c && c.h === h && c.d === todayStr() && c.res && Array.isArray(c.res.lines)) { TA5.res = c.res; TA5.src = 'ai'; TA5.at = c.at || ''; TA5.err = ''; TA5.busy = false; ta5Render(); return; }
-  TA5.res = null; TA5.busy = true; ta5Render();   // 분석 중 애니메이션
-  const ctl = new AbortController(), to = setTimeout(() => ctl.abort(), 70000);
+  const okRes = x => x && Array.isArray(x.lines) && x.lines.length;
+  if (!force && c && c.h === h && c.d === todayStr() && okRes(c.res)) { TA5.res = c.res; TA5.src = 'ai'; TA5.at = c.at || ''; TA5.err = ''; TA5.busy = false; ta5Render(); return; }
+  // 1) 미리 만들어 둔 분석(서버 사전 분석 또는 지난번 분석)이 있으면 바로 보여 준다 -> 기다림 없음
+  let shown = false;
+  if (!force) {
+    if (c && okRes(c.res)) { TA5.res = c.res; TA5.src = 'ai'; TA5.at = c.at || ''; TA5.err = ''; TA5.busy = false; shown = true; ta5Render(); }
+    try {
+      const L = await ta5Post({ action: 'latest', consultant: name }, 8000);
+      if (TA5.key !== key) return;
+      if (L.ok && L.j && okRes(L.j.insight)) {
+        const lm = L.j.insight.metrics; delete L.j.insight.metrics;
+        const fresh = L.j.at && String(L.j.at).slice(0, 10) >= new Date(Date.now() - 86400000 * 1.5).toISOString().slice(0, 10);
+        if (fresh || !shown) { TA5.res = L.j.insight; TA5.src = 'ai'; TA5.at = L.j.at || ''; TA5.err = ''; TA5.busy = false; shown = true; ta5Render(); }
+        // 서버가 같은 숫자로 분석해 둔 거라면 다시 분석할 필요 없다
+        if (lm && ta5Hash(JSON.stringify(lm)) === h) { try { localStorage.setItem(ck, JSON.stringify({ h, d: todayStr(), res: TA5.res, at: TA5.at })); } catch (e) {} return; }
+      }
+    } catch (e) { console.warn('[ta5 latest]', e); }
+  }
+  // 2) 숫자가 바뀌었거나 미리 만든 게 없을 때: 새로 분석 (이미 보여 줄 게 있으면 조용히 갱신, 없으면 분석 중 애니메이션)
+  if (!shown) { TA5.res = null; TA5.busy = true; ta5Render(); }
   try {
-    const r = await fetch(SUPABASE_URL + '/functions/v1/ta-ai-comment', { method: 'POST', signal: ctl.signal, headers: { 'Content-Type': 'application/json', apikey: SUPABASE_ANON_KEY }, body: JSON.stringify({ phone: (currentUser && currentUser.phone) || '', consultant: name, data: m, force: !!force }) });
-    const j = await r.json().catch(() => ({}));
-    if (!r.ok || !j.insight || !Array.isArray(j.insight.lines)) throw new Error((j.error || 'HTTP ' + r.status) + (j.tried ? ' ' + JSON.stringify(j.tried).slice(0, 240) : ''));
+    const R = await ta5Post({ consultant: name, data: m, force: !!force }, 70000);
+    const j = R.j;
+    if (!R.ok || !j.insight || !Array.isArray(j.insight.lines)) throw new Error((j.error || 'HTTP') + (j.tried ? ' ' + JSON.stringify(j.tried).slice(0, 240) : ''));
     if (TA5.key !== key) return;
     TA5.res = j.insight; TA5.src = 'ai'; TA5.at = j.at || new Date().toISOString(); TA5.err = '';
     try { localStorage.setItem(ck, JSON.stringify({ h, d: todayStr(), res: j.insight, at: TA5.at })); } catch (e) {}
   } catch (e) {
-    if (TA5.key === key) { TA5.res = ta5Rules(m, name); TA5.src = 'rule'; TA5.err = (e && e.message) || String(e); }
+    if (TA5.key === key && !shown) { TA5.res = ta5Rules(m, name); TA5.src = 'rule'; TA5.err = (e && e.message) || String(e); }
     console.warn('[ta-ai-comment]', e);
-  } finally { clearTimeout(to); if (TA5.key === key) TA5.busy = false; ta5Render(); }
+  } finally { if (TA5.key === key) TA5.busy = false; ta5Render(); }
 }
 
 // ---------- 홈 ----------
