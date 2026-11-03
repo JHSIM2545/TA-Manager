@@ -885,6 +885,24 @@
 
   .ta3-screen{display:none;padding:14px 16px 6px;max-width:760px;margin:0 auto;}
   .ta3-screen.on{display:block;}
+  /* AI 코멘트 박스 */
+  .ta5{background:#fff;border:1px solid var(--line);border-radius:18px;padding:14px 14px 10px;margin:0 0 14px;box-shadow:0 1px 2px rgba(17,24,39,.04);}
+  .ta5-top{display:flex;align-items:center;gap:12px;}
+  .ta5-art{flex:none;width:68px;height:68px;}
+  .ta5-art svg{width:100%;height:100%;display:block;}
+  .ta5-tx{min-width:0;flex:1;}
+  .ta5-tag{font-size:11.5px;font-weight:800;color:var(--soft);letter-spacing:.2px;margin-bottom:3px;}
+  .ta5-hd{font-size:16px;font-weight:800;color:var(--ink);letter-spacing:-.4px;line-height:1.35;word-break:keep-all;}
+  .ta5.m-alert .ta5-tag{color:#b91c1c;}.ta5.m-warn .ta5-tag{color:#b45309;}.ta5.m-good .ta5-tag{color:#15803d;}.ta5.m-ok .ta5-tag{color:#2563eb;}
+  .ta5-fs{margin-top:10px;display:flex;flex-direction:column;gap:9px;}
+  .ta5-f{display:flex;flex-direction:column;gap:4px;}
+  .ta5-pill{align-self:flex-start;font-size:11.5px;font-weight:800;padding:2px 9px;border-radius:999px;}
+  .ta5-ft{font-size:13.5px;line-height:1.5;color:#374151;word-break:keep-all;}
+  .ta5-act{margin-top:10px;background:#f6f7f9;border-radius:12px;padding:10px 12px;font-size:13px;line-height:1.6;color:#374151;}
+  .ta5-act b{display:block;font-size:12px;color:var(--mute);margin-bottom:2px;}
+  .ta5-ft2{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:10px;padding-top:8px;border-top:1px solid var(--line);font-size:11.5px;font-weight:700;color:var(--soft);}
+  .ta5-ft2 button{background:none;border:none;padding:4px 2px 4px 10px;font-size:12px;font-weight:800;color:var(--mute);cursor:pointer;}
+  .ta5-ft2 button:disabled{opacity:.4;}
   .ta3-h{display:flex;align-items:baseline;justify-content:space-between;margin:22px 2px 9px;}
   .ta3-h b{font-size:15px;font-weight:800;color:var(--ink);letter-spacing:-.2px;}
   .ta3-h span{font-size:12.5px;font-weight:700;color:var(--soft);}
@@ -1696,6 +1714,7 @@ if ('serviceWorker' in navigator) window.addEventListener('load', () => { naviga
 
       <!-- 홈 -->
       <section class="ta3-screen on" id="ta3ScrHome">
+        <div id="ta5Box"></div>
         <div class="ta3-hello"><span class="d" id="ta3HDate"></span><span class="c" id="ta3HChips"></span></div>
         <div class="ta3-kpi" id="ta3Kpi"></div>
         <div class="ta3-today"><div><div class="t">금일 수주 예정</div><div class="a" id="ta3TodayAmt">0원</div></div>
@@ -6627,6 +6646,134 @@ function ta3RowHtml(timeLabel, title, sub, onclick) {
   return `<div class="ta3-row" onclick="${onclick}"><div class="tm">${timeLabel}</div><div style="flex:1;min-width:0;"><div class="ti">${escapeHtml(title)}</div>${sub ? `<div class="su">${sub}</div>` : ''}</div><span style="color:#c4c8d0;">›</span></div>`;
 }
 
+// ==========================================================================
+// AI 코멘트 박스 (홈 맨 위): 안건 집계 숫자 -> Edge Function ta-ai-comment(Gemini) -> 코멘트 + 삽화
+// AI 연결이 안 되면 같은 숫자로 만든 '기본 분석'(규칙 기반)을 대신 보여준다. 고객명·전화번호는 서버로 보내지 않는다.
+// ==========================================================================
+const TA5 = { key: '', busy: false, res: null, src: '', model: '', at: '', err: '', timer: null };
+const TA5_LS = 'S1_TA5_AI_', TA5_LS_OPEN = 'S1_TA5_OPEN';
+const TA5_LV = { bad: { l: '위험', c: '#b91c1c', b: '#fdecec', r: 0 }, warn: { l: '주의', c: '#b45309', b: '#fff4e0', r: 1 }, info: { l: '참고', c: '#475569', b: '#eef1f5', r: 3 }, good: { l: '양호', c: '#15803d', b: '#e8f7ef', r: 2 } };
+const TA5_MOOD = { good: '양호', ok: '보통', warn: '주의', alert: '위험' };
+
+function ta5Metrics() {
+  const name = currentViewMode, month = currentMonthStr(), today = todayStr(), w = ta2WorkdayInfo();
+  const leads = ta2Leads(name).filter(l => !l._ref);
+  const num = v => Number(v || 0), sum = a => a.reduce((s, l) => s + num(l.amount), 0);
+  const ing = leads.filter(l => l.stage === '진행중'), won = leads.filter(l => l.stage === '수주完'), fail = leads.filter(l => l.stage === '실패'), hold = leads.filter(l => l.stage === '보류');
+  const wonM = won.filter(l => (l.contractDate || '').slice(0, 7) === month), wonAmt = sum(wonM);
+  const target = num(getConsultantTarget(name, month, 'all')), remainTarget = Math.max(0, target - wonAmt);
+  const ingM = ing.filter(l => (l.expectedDate || '').slice(0, 7) === month), ingMonthAmt = sum(ingM);
+  const conf = {}; ['A', 'B', 'C'].forEach(k => { const a = ing.filter(l => String(l.confidence || '').toUpperCase() === k); conf[k] = { cnt: a.length, amt: sum(a) }; });
+  const od = ing.filter(l => l.expectedDate && l.expectedDate < today);
+  const t0 = new Date(today + 'T00:00:00');
+  const stale = ing.filter(l => { const u = String(l.updatedAt || '').slice(0, 10); return u && (t0 - new Date(u + 'T00:00:00')) / 86400000 > 14; });
+  const amts = ing.map(l => num(l.amount)).filter(v => v > 0).sort((a, b) => a - b), h = amts.length >> 1;
+  const med = amts.length ? (amts.length % 2 ? amts[h] : Math.round((amts[h - 1] + amts[h]) / 2)) : 0;
+  const wonAvg = won.length ? Math.round(sum(won) / won.length) : 0;
+  const decided = won.length + fail.length;
+  return {
+    month, target, wonAmt, wonCnt: wonM.length, workElapsed: w.elapsed, workTotal: w.total, workLeft: w.left, workRatioPct: w.total ? Math.round(w.elapsed / w.total * 1000) / 10 : 0,
+    ingCnt: ing.length, ingAmt: sum(ing), ingMonthCnt: ingM.length, ingMonthAmt, remainTarget, coverageX: remainTarget > 0 ? Math.round(ingMonthAmt / remainTarget * 100) / 100 : null,
+    conf, overdueCnt: od.length, overdueAmt: sum(od), overdueMaxDays: od.length ? Math.max(...od.map(l => -ta2DayDiff(l.expectedDate))) : 0, stale14Cnt: stale.length,
+    zeroAmtCnt: ing.filter(l => !num(l.amount)).length, avgIngAmt: ing.length ? Math.round(sum(ing) / ing.length) : 0, medianIngAmt: med, avgWonAmtAll: wonAvg,
+    wonAllCnt: won.length, failAllCnt: fail.length, winRatePct: decided ? Math.round(won.length / decided * 1000) / 10 : null,
+    failMonthCnt: fail.filter(l => String(l.updatedAt || '').slice(0, 7) === month).length, holdCnt: hold.length
+  };
+}
+
+// ---- 기본 분석(규칙 기반): AI 연결 실패 시 대체 ----
+function ta5Rules(m) {
+  const F = [], won = formatCurrency, f = (topic, level, text) => F.push({ topic, level, text });
+  if (!m.ingCnt && !m.wonAllCnt && !m.failAllCnt) {
+    return { headline: '아직 등록된 안건이 없습니다', mood: 'alert', findings: [{ topic: '안건수준', level: 'bad', text: '진행중 안건이 없습니다. 오늘 방문·소개 가능한 고객부터 첫 안건을 등록해 주세요.' }], actions: ['신규 TA 1건 등록하기'] };
+  }
+  if (m.target > 0) {
+    if (m.coverageX === null) f('안건수준', 'good', `이달 목표 ${won(m.target)}를 이미 달성했습니다. 다음 달 안건을 미리 쌓아 두세요.`);
+    else if (m.coverageX < 1) f('안건수준', 'bad', `이달 예정 안건 ${won(m.ingMonthAmt)}으로 남은 목표 ${won(m.remainTarget)}에 못 미칩니다(${m.coverageX}배). 안건 발굴이 시급합니다.`);
+    else if (m.coverageX < 2) f('안건수준', 'warn', `이달 예정 안건이 남은 목표의 ${m.coverageX}배입니다. 수주 전환율${m.winRatePct != null ? '(' + m.winRatePct + '%)' : ''}을 감안하면 여유가 크지 않으니 안건을 더 확보하세요.`);
+    else f('안건수준', 'good', `이달 예정 안건이 남은 목표의 ${m.coverageX}배로 충분합니다. 확도 높은 안건부터 마무리하세요.`);
+    const pct = Math.round(m.wonAmt / m.target * 1000) / 10;
+    f('목표달성', pct >= m.workRatioPct ? 'good' : pct >= m.workRatioPct * 0.6 ? 'warn' : 'bad', `이달 수주 ${won(m.wonAmt)}로 목표의 ${pct}%이며 영업일은 ${m.workRatioPct}% 지났습니다.${pct >= m.workRatioPct ? ' 경과 속도보다 앞서고 있습니다.' : ' 경과 속도보다 뒤처져 있어 수주 마무리 일정이 필요합니다.'}`);
+  } else f('목표달성', 'info', '이달 수주 목표가 설정되어 있지 않아 목표 대비 분석은 생략합니다.');
+  const dec = m.wonAllCnt + m.failAllCnt;
+  if (dec >= 5) { const fr = Math.round(m.failAllCnt / dec * 1000) / 10; f('수주실패', fr >= 40 ? 'bad' : fr >= 25 ? 'warn' : 'good', `누적 실패율 ${fr}%(수주 ${m.wonAllCnt}건·실패 ${m.failAllCnt}건), 이달 실패 처리 ${m.failMonthCnt}건입니다.${fr >= 25 ? ' 확도 낮은 안건 선별과 견적 방식을 점검해 보세요.' : ''}`); }
+  if (m.overdueCnt || m.stale14Cnt) f('지연안건', m.overdueCnt >= 3 || m.overdueMaxDays >= 7 ? 'bad' : 'warn', `수주예정일이 지난 진행중 안건 ${m.overdueCnt}건(${won(m.overdueAmt)}, 최장 ${m.overdueMaxDays}일), 14일 넘게 수정 없는 안건 ${m.stale14Cnt}건입니다. 예정일을 다시 잡거나 실패·보류로 정리해 주세요.`);
+  else f('지연안건', 'good', '예정일이 지난 채 남은 안건이 없습니다. 업데이트가 잘 되고 있습니다.');
+  if (m.zeroAmtCnt) f('단가', 'warn', `금액이 0원인 진행중 안건이 ${m.zeroAmtCnt}건 있습니다. 예상 금액을 입력해야 목표 분석이 정확해집니다.`);
+  else if (m.ingCnt && m.avgWonAmtAll && m.medianIngAmt && m.medianIngAmt < m.avgWonAmtAll * 0.5) f('단가', 'warn', `진행중 안건 중앙 금액 ${won(m.medianIngAmt)}이 지금까지 수주 평균 ${won(m.avgWonAmtAll)}의 절반 미만입니다. 단가 높은 안건 발굴을 병행하세요.`);
+  else if (m.ingCnt) f('단가', 'info', `진행중 안건 평균 ${won(m.avgIngAmt)}, 중앙 ${won(m.medianIngAmt)}입니다(수주 평균 ${won(m.avgWonAmtAll)}).`);
+  if (m.ingCnt) {
+    const c = m.conf, share = Math.round(c.C.cnt / m.ingCnt * 100);
+    f('확도', share >= 70 ? 'warn' : 'info', `진행중 ${m.ingCnt}건 중 확도 A ${c.A.cnt}건·B ${c.B.cnt}건·C ${c.C.cnt}건(C ${share}%)입니다.${share >= 70 ? ' 확도 C가 대부분이라 방문·견적·제안 일정을 잡아 확도를 올려야 합니다.' : ''}`);
+  }
+  F.sort((a, b) => TA5_LV[a.level].r - TA5_LV[b.level].r);
+  const bad = F.filter(x => x.level === 'bad').length, warn = F.filter(x => x.level === 'warn').length;
+  const mood = bad >= 2 ? 'alert' : bad >= 1 || warn >= 2 ? 'warn' : warn === 1 ? 'ok' : 'good';
+  const head = { alert: '안건 관리에 즉시 손봐야 할 곳이 여럿 있습니다', warn: '몇 가지 점검이 필요합니다', ok: '대체로 무난하지만 한 가지 챙겨 주세요', good: '안건 관리가 안정적으로 진행되고 있습니다' }[mood];
+  const act = F.filter(x => x.level === 'bad' || x.level === 'warn').slice(0, 3).map(x => ({ 안건수준: '이달 예정 안건 추가 발굴하기', 목표달성: '수주 가능 안건 마무리 일정 잡기', 수주실패: '확도 C 안건 선별 점검하기', 지연안건: '지난 예정일 안건 정리하기', 단가: '금액 입력·단가 점검하기', 확도: '확도 낮은 안건 방문·견적 잡기', '활동·로그인': '매일 안건 업데이트하기' }[x.topic]));
+  return { headline: head, mood, findings: F, actions: act.length ? act : ['오늘 예정 안건 진행 상황 업데이트하기'] };
+}
+
+// ---- 삽화(분위기별) ----
+function ta5Art(mood) {
+  const a = {
+    good: '<circle cx="48" cy="48" r="44" fill="#e8f7ef"/><rect x="23" y="54" width="11" height="20" rx="3" fill="#a7e3c4"/><rect x="42" y="44" width="11" height="30" rx="3" fill="#6fd0a0"/><rect x="61" y="32" width="11" height="42" rx="3" fill="#16a34a"/><polyline points="21,46 39,34 51,40 71,22" fill="none" stroke="#0f7a37" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/><polyline points="62,21 71,22 70,31" fill="none" stroke="#0f7a37" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/><polygon points="78,8 79.9,12.8 85,13.1 81,16.4 82.3,21.4 78,18.6 73.7,21.4 75,16.4 71,13.1 76.1,12.8" fill="#f5b301"/>',
+    ok: '<circle cx="48" cy="48" r="44" fill="#eaf1ff"/><circle cx="46" cy="52" r="29" fill="#cfe0ff"/><circle cx="46" cy="52" r="20" fill="#fff"/><circle cx="46" cy="52" r="11" fill="#9db9f5"/><circle cx="46" cy="52" r="4.5" fill="#2563eb"/><line x1="48" y1="50" x2="80" y2="18" stroke="#1d4ed8" stroke-width="3.5" stroke-linecap="round"/><polyline points="68,17 80,18 79,30" fill="none" stroke="#1d4ed8" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>',
+    warn: '<circle cx="48" cy="48" r="44" fill="#fff4e0"/><rect x="21" y="26" width="54" height="50" rx="8" fill="#fff" stroke="#f59e0b" stroke-width="3"/><path d="M21 34a8 8 0 0 1 8-8h38a8 8 0 0 1 8 8v6H21z" fill="#f59e0b"/><rect x="33" y="19" width="5" height="12" rx="2.5" fill="#b45309"/><rect x="58" y="19" width="5" height="12" rx="2.5" fill="#b45309"/><rect x="45" y="46" width="6" height="16" rx="3" fill="#d97706"/><circle cx="48" cy="69" r="3.5" fill="#d97706"/>',
+    alert: '<circle cx="48" cy="48" r="44" fill="#fdecec"/><rect x="20" y="38" width="11" height="34" rx="3" fill="#f5b5b5"/><rect x="38" y="48" width="11" height="24" rx="3" fill="#ef8686"/><rect x="56" y="58" width="11" height="14" rx="3" fill="#dc2626"/><polyline points="20,32 38,42 54,52" fill="none" stroke="#b91c1c" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/><polygon points="76,16 92,46 60,46" fill="#dc2626" stroke="#dc2626" stroke-width="3" stroke-linejoin="round"/><rect x="74.5" y="26" width="3" height="10" rx="1.5" fill="#fff"/><circle cx="76" cy="41" r="1.9" fill="#fff"/>'
+  };
+  return `<svg viewBox="0 0 96 96" aria-hidden="true">${a[mood] || a.ok}</svg>`;
+}
+
+// ---- 표시 ----
+function ta5Open() { try { return localStorage.getItem(TA5_LS_OPEN) === '1'; } catch (e) { return false; } }
+function ta5Toggle() { try { localStorage.setItem(TA5_LS_OPEN, ta5Open() ? '0' : '1'); } catch (e) {} ta5Render(); }
+function ta5Render() {
+  const box = el('ta5Box'); if (!box) return;
+  const r = TA5.res;
+  if (!r) { box.innerHTML = `<div class="ta5"><div class="ta5-top"><div class="ta5-art">${ta5Art('ok')}</div><div class="ta5-tx"><div class="ta5-tag">AI 코멘트</div><div class="ta5-hd">안건 현황을 분석하고 있습니다…</div></div></div></div>`; return; }
+  const F = (r.findings || []).slice().sort((a, b) => (TA5_LV[a.level] || TA5_LV.info).r - (TA5_LV[b.level] || TA5_LV.info).r);
+  const open = ta5Open(), show = open ? F : F.slice(0, 2);
+  const rows = show.map(x => { const v = TA5_LV[x.level] || TA5_LV.info; return `<div class="ta5-f"><span class="ta5-pill" style="background:${v.b};color:${v.c};">${escapeHtml(x.topic)} · ${v.l}</span><div class="ta5-ft">${escapeHtml(x.text)}</div></div>`; }).join('');
+  const acts = open && (r.actions || []).length ? `<div class="ta5-act"><b>오늘 할 일</b>${r.actions.map(a => `<div>✔ ${escapeHtml(a)}</div>`).join('')}</div>` : '';
+  let t = '';
+  if (TA5.busy) t = 'AI 분석 중…';
+  else if (TA5.src === 'ai') t = `Gemini 분석 · ${TA5.at ? new Date(TA5.at).toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit', hour12: false, timeZone: 'Asia/Seoul' }) : ''} 기준`;
+  else t = `<span title="${escapeHtml(TA5.err)}">AI 연결 실패 — 기본 분석입니다</span>`;
+  box.innerHTML = `<div class="ta5 m-${escapeHtml(r.mood || 'ok')}">
+    <div class="ta5-top"><div class="ta5-art">${ta5Art(r.mood)}</div>
+      <div class="ta5-tx"><div class="ta5-tag">AI 코멘트 · ${TA5_MOOD[r.mood] || '보통'}</div><div class="ta5-hd">${escapeHtml(r.headline)}</div></div></div>
+    <div class="ta5-fs">${rows}</div>${acts}
+    <div class="ta5-ft2"><span>${t}</span><span>${F.length > 2 ? `<button type="button" onclick="ta5Toggle()">${open ? '접기 ▴' : '전체 ' + F.length + '개 보기 ▾'}</button>` : ''}<button type="button" onclick="ta5Run(true)" ${TA5.busy ? 'disabled' : ''}>↻ 다시 분석</button></span></div></div>`;
+}
+
+// ---- 실행: 같은 숫자면 하루 한 번만 요청, 홈이 여러 번 그려져도 합쳐서 처리 ----
+function ta5Hash(s) { let h = 5381; for (let i = 0; i < s.length; i++) h = ((h << 5) + h + s.charCodeAt(i)) | 0; return (h >>> 0).toString(36); }
+function ta5Kick() { clearTimeout(TA5.timer); TA5.timer = setTimeout(() => { try { ta5Run(false); } catch (e) { console.warn('[ta5]', e); } }, 600); }
+async function ta5Run(force) {
+  const name = currentViewMode; if (!name || !el('ta5Box')) return;
+  const m = ta5Metrics(), h = ta5Hash(JSON.stringify(m)), key = name + '|' + h;
+  if (!force && TA5.key === key && TA5.res) { ta5Render(); return; }
+  if (TA5.busy && TA5.key === key && !force) return;
+  TA5.key = key;
+  if (!m.ingCnt && !m.wonAllCnt && !m.failAllCnt) { TA5.res = ta5Rules(m); TA5.src = 'rule'; TA5.err = '등록된 안건 없음'; TA5.busy = false; ta5Render(); return; }
+  const ck = TA5_LS + name; let c = null; try { c = JSON.parse(localStorage.getItem(ck) || 'null'); } catch (e) {}
+  if (!force && c && c.h === h && c.d === todayStr() && c.res) { TA5.res = c.res; TA5.src = 'ai'; TA5.model = c.model || ''; TA5.at = c.at || ''; TA5.err = ''; ta5Render(); return; }
+  TA5.res = ta5Rules(m); TA5.src = 'rule'; TA5.err = '분석 요청 중'; TA5.busy = true; ta5Render();   // 기본 분석을 먼저 보여주고 AI 결과로 교체
+  const ctl = new AbortController(), to = setTimeout(() => ctl.abort(), 70000);
+  try {
+    const r = await fetch(SUPABASE_URL + '/functions/v1/ta-ai-comment', { method: 'POST', signal: ctl.signal, headers: { 'Content-Type': 'application/json', apikey: SUPABASE_ANON_KEY }, body: JSON.stringify({ phone: (currentUser && currentUser.phone) || '', consultant: name, data: m, force: !!force }) });
+    const j = await r.json().catch(() => ({}));
+    if (!r.ok || !j.insight) throw new Error((j.error || 'HTTP ' + r.status) + (j.tried ? ' ' + JSON.stringify(j.tried).slice(0, 240) : ''));
+    if (TA5.key !== key) return;
+    TA5.res = j.insight; TA5.src = 'ai'; TA5.model = j.model || ''; TA5.at = j.at || new Date().toISOString(); TA5.err = '';
+    try { localStorage.setItem(ck, JSON.stringify({ h, d: todayStr(), res: j.insight, model: TA5.model, at: TA5.at })); } catch (e) {}
+  } catch (e) {
+    if (TA5.key === key) { TA5.err = (e && e.message) || String(e); TA5.src = 'rule'; }
+    console.warn('[ta-ai-comment]', e);
+  } finally { clearTimeout(to); if (TA5.key === key) TA5.busy = false; ta5Render(); }
+}
+
 // ---------- 홈 ----------
 function ta3RenderHome() {
   const name = currentViewMode, w = ta2WorkdayInfo(), month = currentMonthStr(), today = todayStr();
@@ -6674,6 +6821,7 @@ function ta3RenderHome() {
   const late = TA3.items.filter(i => i.group === 'ing' && i.date && i.date < today).sort((a, b) => a.date.localeCompare(b.date));
   el('ta3LateCnt').textContent = late.length ? late.length + '건' : '';
   el('ta3LateList').innerHTML = late.slice(0, 6).map(i => ta3RowHtml(`<span style="color:#b91c1c">${-ta2DayDiff(i.date)}일</span>`, i.name, `${i.src === 'ref' ? '소개고객' : i.src === 'ps' ? '가망고객' : 'TA'} · ${escapeHtml(i.stage)}${i.amount ? ' · ' + formatCurrency(i.amount) : ''}`, `ta3Open('${escapeHtml(i.id)}')`)).join('') + (late.length > 6 ? `<div class="ta3-empty" style="padding:8px;">외 ${late.length - 6}건</div>` : '') || '<div class="ta3-empty">없음</div>';
+  ta5Kick();
 }
 
 // ---------- 안건 ----------
