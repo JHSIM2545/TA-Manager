@@ -2775,7 +2775,7 @@ function consultantLeads(name) {
 
 function todayLeadsAll() {
   const today = todayStr();
-  return allLeads().filter(l => l.expectedDate === today);
+  return allLeads().filter(l => l.stage === '진행중' && l.expectedDate === today);   // 수주完·실패·보류 건은 제외
 }
 
 function computeMetrics(leads, target, month) {

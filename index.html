@@ -2665,7 +2665,7 @@ function consultantLeads(name) {
 
 function todayLeadsAll() {
   const today = todayStr();
-  return allLeads().filter(l => l.expectedDate === today);
+  return allLeads().filter(l => l.stage === '진행중' && l.expectedDate === today);
 }
 
 function computeMetrics(leads, target, month) {
