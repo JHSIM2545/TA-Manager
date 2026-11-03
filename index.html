@@ -886,23 +886,30 @@
   .ta3-screen{display:none;padding:14px 16px 6px;max-width:760px;margin:0 auto;}
   .ta3-screen.on{display:block;}
   /* AI 코멘트 박스 */
-  .ta5{background:#fff;border:1px solid var(--line);border-radius:18px;padding:14px 14px 10px;margin:0 0 14px;box-shadow:0 1px 2px rgba(17,24,39,.04);}
-  .ta5-top{display:flex;align-items:center;gap:12px;}
-  .ta5-art{flex:none;width:68px;height:68px;}
-  .ta5-art svg{width:100%;height:100%;display:block;}
-  .ta5-tx{min-width:0;flex:1;}
-  .ta5-tag{font-size:11.5px;font-weight:800;color:var(--soft);letter-spacing:.2px;margin-bottom:3px;}
-  .ta5-hd{font-size:16px;font-weight:800;color:var(--ink);letter-spacing:-.4px;line-height:1.35;word-break:keep-all;}
-  .ta5.m-alert .ta5-tag{color:#b91c1c;}.ta5.m-warn .ta5-tag{color:#b45309;}.ta5.m-good .ta5-tag{color:#15803d;}.ta5.m-ok .ta5-tag{color:#2563eb;}
-  .ta5-fs{margin-top:10px;display:flex;flex-direction:column;gap:9px;}
-  .ta5-f{display:flex;flex-direction:column;gap:4px;}
-  .ta5-pill{align-self:flex-start;font-size:11.5px;font-weight:800;padding:2px 9px;border-radius:999px;}
-  .ta5-ft{font-size:13.5px;line-height:1.5;color:#374151;word-break:keep-all;}
-  .ta5-act{margin-top:10px;background:#f6f7f9;border-radius:12px;padding:10px 12px;font-size:13px;line-height:1.6;color:#374151;}
-  .ta5-act b{display:block;font-size:12px;color:var(--mute);margin-bottom:2px;}
-  .ta5-ft2{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:10px;padding-top:8px;border-top:1px solid var(--line);font-size:11.5px;font-weight:700;color:var(--soft);}
-  .ta5-ft2 button{background:none;border:none;padding:4px 2px 4px 10px;font-size:12px;font-weight:800;color:var(--mute);cursor:pointer;}
+  .ta5{background:#fff;border:1px solid var(--line);border-radius:20px;padding:12px 14px 10px;margin:0 0 14px;box-shadow:0 1px 3px rgba(17,24,39,.05);}
+  .ta5-scene{height:118px;border-radius:14px;display:flex;align-items:center;justify-content:center;overflow:hidden;margin-bottom:12px;}
+  .ta5-scene svg{height:100%;width:auto;display:block;}
+  .ta5-body p{margin:0 0 9px;font-size:18px;font-weight:800;line-height:1.55;letter-spacing:-.4px;color:#111827;word-break:keep-all;}
+  .ta5-body p:first-child{font-size:19px;}
+  .ta5-body mark{background:linear-gradient(transparent 56%,rgba(255,206,84,.8) 56%);color:inherit;padding:0 1px;}
+  .ta5.m-alert .ta5-body mark{background:linear-gradient(transparent 56%,rgba(255,138,128,.6) 56%);}
+  .ta5.m-good .ta5-body mark{background:linear-gradient(transparent 56%,rgba(120,220,160,.65) 56%);}
+  .ta5-ft2{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:6px;padding-top:8px;border-top:1px solid var(--line);font-size:11.5px;font-weight:700;color:var(--soft);}
+  .ta5-ft2 button{background:none;border:none;padding:4px 0 4px 10px;font-size:12px;font-weight:800;color:var(--mute);cursor:pointer;}
   .ta5-ft2 button:disabled{opacity:.4;}
+  .ta5-ld{display:flex;align-items:center;gap:10px;padding:13px 14px;margin:0 0 10px;border-radius:16px;font-size:15px;font-weight:800;color:#3b3f8f;line-height:1.4;background:linear-gradient(100deg,#eaf1ff,#f3e8ff,#e1f3ff,#eaf1ff);background-size:300% 100%;animation:ta5bg 3.2s linear infinite;}
+  .ta5-ld span{word-break:keep-all;}
+  .ta5-ld b{font-weight:900;}
+  .ta5-sp{flex:none;width:26px;height:26px;animation:ta5spin 2.4s ease-in-out infinite;}
+  .ta5-dots u{text-decoration:none;opacity:.25;animation:ta5dot 1.2s infinite;}
+  .ta5-dots u:nth-child(2){animation-delay:.2s;}.ta5-dots u:nth-child(3){animation-delay:.4s;}
+  .ta5-sk .ta5-scene{background:linear-gradient(90deg,#f1f3f7 25%,#e5e8ef 37%,#f1f3f7 63%);background-size:400% 100%;animation:ta5sh 1.4s ease infinite;}
+  .ta5-bar{height:16px;border-radius:8px;margin:10px 0;background:linear-gradient(90deg,#f1f3f7 25%,#e5e8ef 37%,#f1f3f7 63%);background-size:400% 100%;animation:ta5sh 1.4s ease infinite;}
+  @keyframes ta5spin{0%{transform:rotate(0) scale(1);}50%{transform:rotate(180deg) scale(1.28);}100%{transform:rotate(360deg) scale(1);}}
+  @keyframes ta5bg{to{background-position:-300% 0;}}
+  @keyframes ta5dot{0%,60%,100%{opacity:.25;}30%{opacity:1;}}
+  @keyframes ta5sh{0%{background-position:100% 50%;}100%{background-position:0 50%;}}
+  @media (prefers-reduced-motion:reduce){.ta5-ld,.ta5-sp,.ta5-dots u,.ta5-sk .ta5-scene,.ta5-bar{animation:none;}}
   .ta3-h{display:flex;align-items:baseline;justify-content:space-between;margin:22px 2px 9px;}
   .ta3-h b{font-size:15px;font-weight:800;color:var(--ink);letter-spacing:-.2px;}
   .ta3-h span{font-size:12.5px;font-weight:700;color:var(--soft);}
@@ -6647,13 +6654,12 @@ function ta3RowHtml(timeLabel, title, sub, onclick) {
 }
 
 // ==========================================================================
-// AI 코멘트 박스 (홈 맨 위): 안건 집계 숫자 -> Edge Function ta-ai-comment(Gemini) -> 코멘트 + 삽화
-// AI 연결이 안 되면 같은 숫자로 만든 '기본 분석'(규칙 기반)을 대신 보여준다. 고객명·전화번호는 서버로 보내지 않는다.
+// AI 코멘트 박스 (홈 맨 위): 안건 집계 숫자 -> Edge Function ta-ai-comment(Gemini) -> 구어체 코멘트 + 만화 삽화
+// 분석 중에는 "재미나이가 ○○ 컨설턴트님의 TA를 분석하고 있습니다" 애니메이션. AI 연결이 안 되면 같은 숫자로 만든 기본 분석을 보여준다.
+// 고객명·전화번호는 서버로 보내지 않는다.
 // ==========================================================================
-const TA5 = { key: '', busy: false, res: null, src: '', model: '', at: '', err: '', timer: null };
-const TA5_LS = 'S1_TA5_AI_', TA5_LS_OPEN = 'S1_TA5_OPEN';
-const TA5_LV = { bad: { l: '위험', c: '#b91c1c', b: '#fdecec', r: 0 }, warn: { l: '주의', c: '#b45309', b: '#fff4e0', r: 1 }, info: { l: '참고', c: '#475569', b: '#eef1f5', r: 3 }, good: { l: '양호', c: '#15803d', b: '#e8f7ef', r: 2 } };
-const TA5_MOOD = { good: '양호', ok: '보통', warn: '주의', alert: '위험' };
+const TA5 = { key: '', name: '', busy: false, res: null, src: '', at: '', err: '', timer: null };
+const TA5_LS = 'S1_TA5_AI2_';
 
 function ta5Metrics() {
   const name = currentViewMode, month = currentMonthStr(), today = todayStr(), w = ta2WorkdayInfo();
@@ -6681,70 +6687,110 @@ function ta5Metrics() {
   };
 }
 
-// ---- 기본 분석(규칙 기반): AI 연결 실패 시 대체 ----
-function ta5Rules(m) {
-  const F = [], won = formatCurrency, f = (topic, level, text) => F.push({ topic, level, text });
-  if (!m.ingCnt && !m.wonAllCnt && !m.failAllCnt) {
-    return { headline: '아직 등록된 안건이 없습니다', mood: 'alert', findings: [{ topic: '안건수준', level: 'bad', text: '진행중 안건이 없습니다. 오늘 방문·소개 가능한 고객부터 첫 안건을 등록해 주세요.' }], actions: ['신규 TA 1건 등록하기'] };
-  }
+// ---- 기본 분석(규칙 기반, 구어체): AI 연결 실패 시 대체 ----
+function ta5Rules(m, name) {
+  const nm = name + ' 컨설턴트님', won = formatCurrency, I = [], add = (sev, scene, text, tip) => I.push({ sev, scene, text, tip });
+  if (!m.ingCnt && !m.wonAllCnt && !m.failAllCnt) return { lines: [nm + ', 아직 등록하신 TA가 없어요.', '오늘 방문하셨거나 소개받으신 고객 한 곳부터 등록해 볼까요?'], scene: 'empty', mood: 'warn' };
   if (m.target > 0) {
-    if (m.coverageX === null) f('안건수준', 'good', `이달 목표 ${won(m.target)}를 이미 달성했습니다. 다음 달 안건을 미리 쌓아 두세요.`);
-    else if (m.coverageX < 1) f('안건수준', 'bad', `이달 예정 안건 ${won(m.ingMonthAmt)}으로 남은 목표 ${won(m.remainTarget)}에 못 미칩니다(${m.coverageX}배). 안건 발굴이 시급합니다.`);
-    else if (m.coverageX < 2) f('안건수준', 'warn', `이달 예정 안건이 남은 목표의 ${m.coverageX}배입니다. 수주 전환율${m.winRatePct != null ? '(' + m.winRatePct + '%)' : ''}을 감안하면 여유가 크지 않으니 안건을 더 확보하세요.`);
-    else f('안건수준', 'good', `이달 예정 안건이 남은 목표의 ${m.coverageX}배로 충분합니다. 확도 높은 안건부터 마무리하세요.`);
+    if (m.coverageX === null) add(0, 'cheer', `이번 달 목표 ${won(m.target)}을 벌써 달성하셨어요.`, '다음 달 TA를 미리 쌓아 두시면 더 든든할 거예요.');
+    else if (m.coverageX < 1) add(3, 'empty', `이번 달 등록하신 TA는 ${won(m.ingMonthAmt)}인데, 남은 목표 ${won(m.remainTarget)}에는 많이 모자라요.`, '오늘은 새 TA를 한 건이라도 먼저 발굴해 보세요.');
+    else if (m.coverageX < 2) add(2, 'empty', `이번 달 예정 TA가 남은 목표의 ${m.coverageX}배라서 조금 빠듯해요.`, '오늘은 TA를 한두 건만 더 등록해 보세요.');
+    else add(0, 'cheer', `이번 달 예정 TA가 남은 목표의 ${m.coverageX}배나 돼서 든든해요.`, '확도 높은 건부터 마무리해 보세요.');
     const pct = Math.round(m.wonAmt / m.target * 1000) / 10;
-    f('목표달성', pct >= m.workRatioPct ? 'good' : pct >= m.workRatioPct * 0.6 ? 'warn' : 'bad', `이달 수주 ${won(m.wonAmt)}로 목표의 ${pct}%이며 영업일은 ${m.workRatioPct}% 지났습니다.${pct >= m.workRatioPct ? ' 경과 속도보다 앞서고 있습니다.' : ' 경과 속도보다 뒤처져 있어 수주 마무리 일정이 필요합니다.'}`);
-  } else f('목표달성', 'info', '이달 수주 목표가 설정되어 있지 않아 목표 대비 분석은 생략합니다.');
-  const dec = m.wonAllCnt + m.failAllCnt;
-  if (dec >= 5) { const fr = Math.round(m.failAllCnt / dec * 1000) / 10; f('수주실패', fr >= 40 ? 'bad' : fr >= 25 ? 'warn' : 'good', `누적 실패율 ${fr}%(수주 ${m.wonAllCnt}건·실패 ${m.failAllCnt}건), 이달 실패 처리 ${m.failMonthCnt}건입니다.${fr >= 25 ? ' 확도 낮은 안건 선별과 견적 방식을 점검해 보세요.' : ''}`); }
-  if (m.overdueCnt || m.stale14Cnt) f('지연안건', m.overdueCnt >= 3 || m.overdueMaxDays >= 7 ? 'bad' : 'warn', `수주예정일이 지난 진행중 안건 ${m.overdueCnt}건(${won(m.overdueAmt)}, 최장 ${m.overdueMaxDays}일), 14일 넘게 수정 없는 안건 ${m.stale14Cnt}건입니다. 예정일을 다시 잡거나 실패·보류로 정리해 주세요.`);
-  else f('지연안건', 'good', '예정일이 지난 채 남은 안건이 없습니다. 업데이트가 잘 되고 있습니다.');
-  if (m.zeroAmtCnt) f('단가', 'warn', `금액이 0원인 진행중 안건이 ${m.zeroAmtCnt}건 있습니다. 예상 금액을 입력해야 목표 분석이 정확해집니다.`);
-  else if (m.ingCnt && m.avgWonAmtAll && m.medianIngAmt && m.medianIngAmt < m.avgWonAmtAll * 0.5) f('단가', 'warn', `진행중 안건 중앙 금액 ${won(m.medianIngAmt)}이 지금까지 수주 평균 ${won(m.avgWonAmtAll)}의 절반 미만입니다. 단가 높은 안건 발굴을 병행하세요.`);
-  else if (m.ingCnt) f('단가', 'info', `진행중 안건 평균 ${won(m.avgIngAmt)}, 중앙 ${won(m.medianIngAmt)}입니다(수주 평균 ${won(m.avgWonAmtAll)}).`);
-  if (m.ingCnt) {
-    const c = m.conf, share = Math.round(c.C.cnt / m.ingCnt * 100);
-    f('확도', share >= 70 ? 'warn' : 'info', `진행중 ${m.ingCnt}건 중 확도 A ${c.A.cnt}건·B ${c.B.cnt}건·C ${c.C.cnt}건(C ${share}%)입니다.${share >= 70 ? ' 확도 C가 대부분이라 방문·견적·제안 일정을 잡아 확도를 올려야 합니다.' : ''}`);
+    if (pct < m.workRatioPct * 0.6) add(3, 'target', `수주는 목표의 ${pct}%인데 영업일은 벌써 ${m.workRatioPct}%나 지났어요.`, '오늘은 가능성 높은 건 하나의 마무리 일정을 잡아 보세요.');
+    else if (pct < m.workRatioPct) add(1, 'target', `수주는 목표의 ${pct}%로, 영업일 진행(${m.workRatioPct}%)보다 살짝 느려요.`, '오늘은 계약 직전 건을 한 번 더 챙겨 보세요.');
+    else add(0, 'cheer', `수주는 목표의 ${pct}%로 영업일 진행(${m.workRatioPct}%)보다 앞서가고 있어요.`, '이 페이스를 꾸준히 이어 가 보세요.');
   }
-  F.sort((a, b) => TA5_LV[a.level].r - TA5_LV[b.level].r);
-  const bad = F.filter(x => x.level === 'bad').length, warn = F.filter(x => x.level === 'warn').length;
-  const mood = bad >= 2 ? 'alert' : bad >= 1 || warn >= 2 ? 'warn' : warn === 1 ? 'ok' : 'good';
-  const head = { alert: '안건 관리에 즉시 손봐야 할 곳이 여럿 있습니다', warn: '몇 가지 점검이 필요합니다', ok: '대체로 무난하지만 한 가지 챙겨 주세요', good: '안건 관리가 안정적으로 진행되고 있습니다' }[mood];
-  const act = F.filter(x => x.level === 'bad' || x.level === 'warn').slice(0, 3).map(x => ({ 안건수준: '이달 예정 안건 추가 발굴하기', 목표달성: '수주 가능 안건 마무리 일정 잡기', 수주실패: '확도 C 안건 선별 점검하기', 지연안건: '지난 예정일 안건 정리하기', 단가: '금액 입력·단가 점검하기', 확도: '확도 낮은 안건 방문·견적 잡기', '활동·로그인': '매일 안건 업데이트하기' }[x.topic]));
-  return { headline: head, mood, findings: F, actions: act.length ? act : ['오늘 예정 안건 진행 상황 업데이트하기'] };
+  if (m.overdueCnt) add(m.overdueCnt >= 3 || m.overdueMaxDays >= 7 ? 3 : 2, 'overdue', `예정일이 지난 TA가 ${m.overdueCnt}건이나 남아 있어요, 가장 오래된 건은 ${m.overdueMaxDays}일 전이에요.`, '오늘은 지난 건의 날짜를 다시 잡거나 정리해 주세요.');
+  else if (m.stale14Cnt) add(1, 'overdue', `2주 넘게 수정이 없는 TA가 ${m.stale14Cnt}건 있어요.`, '오늘은 진행 상황을 한 줄씩만 남겨 주세요.');
+  const dec = m.wonAllCnt + m.failAllCnt, fr = dec ? Math.round(m.failAllCnt / dec * 1000) / 10 : 0;
+  if (dec >= 5 && fr >= 25) add(fr >= 40 ? 3 : 2, 'fail', `수주 실패가 ${m.failAllCnt}건이라 실패율이 ${fr}%예요.`, '오늘은 확도 낮은 건을 미리 걸러 보세요.');
+  if (m.zeroAmtCnt) add(2, 'coin', `금액이 비어 있는 TA가 ${m.zeroAmtCnt}건 있어요.`, '오늘은 예상 금액을 채워 주세요, 그래야 분석이 정확해져요.');
+  else if (m.avgWonAmtAll && m.medianIngAmt && m.medianIngAmt < m.avgWonAmtAll * 0.5) add(1, 'coin', `진행 중인 TA 금액 중앙값이 ${won(m.medianIngAmt)}으로, 수주 평균 ${won(m.avgWonAmtAll)}의 절반도 안 돼요.`, '오늘은 단가 높은 고객도 한 곳 찾아보세요.');
+  if (m.ingCnt >= 3) { const sh = Math.round(m.conf.C.cnt / m.ingCnt * 100); if (sh >= 70) add(1, 'fail', `진행 중인 TA의 ${sh}%가 확도 C예요.`, '오늘은 방문이나 견적 일정을 잡아서 확도를 올려 보세요.'); }
+  I.sort((a, b) => b.sev - a.sev);
+  const bad = I.filter(x => x.sev >= 1), pick = (bad.length ? bad : I).slice(0, 3);
+  const lines = pick.map((x, i) => (i === 0 ? nm + ', ' : '') + x.text);
+  lines.push(pick[0].tip);
+  const mx = pick[0].sev, n3 = I.filter(x => x.sev === 3).length;
+  return { lines, scene: pick[0].scene, mood: mx === 3 ? (n3 >= 2 ? 'alert' : 'warn') : mx === 2 ? 'warn' : mx === 1 ? 'ok' : 'good' };
 }
 
-// ---- 삽화(분위기별) ----
-function ta5Art(mood) {
-  const a = {
-    good: '<circle cx="48" cy="48" r="44" fill="#e8f7ef"/><rect x="23" y="54" width="11" height="20" rx="3" fill="#a7e3c4"/><rect x="42" y="44" width="11" height="30" rx="3" fill="#6fd0a0"/><rect x="61" y="32" width="11" height="42" rx="3" fill="#16a34a"/><polyline points="21,46 39,34 51,40 71,22" fill="none" stroke="#0f7a37" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/><polyline points="62,21 71,22 70,31" fill="none" stroke="#0f7a37" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/><polygon points="78,8 79.9,12.8 85,13.1 81,16.4 82.3,21.4 78,18.6 73.7,21.4 75,16.4 71,13.1 76.1,12.8" fill="#f5b301"/>',
-    ok: '<circle cx="48" cy="48" r="44" fill="#eaf1ff"/><circle cx="46" cy="52" r="29" fill="#cfe0ff"/><circle cx="46" cy="52" r="20" fill="#fff"/><circle cx="46" cy="52" r="11" fill="#9db9f5"/><circle cx="46" cy="52" r="4.5" fill="#2563eb"/><line x1="48" y1="50" x2="80" y2="18" stroke="#1d4ed8" stroke-width="3.5" stroke-linecap="round"/><polyline points="68,17 80,18 79,30" fill="none" stroke="#1d4ed8" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>',
-    warn: '<circle cx="48" cy="48" r="44" fill="#fff4e0"/><rect x="21" y="26" width="54" height="50" rx="8" fill="#fff" stroke="#f59e0b" stroke-width="3"/><path d="M21 34a8 8 0 0 1 8-8h38a8 8 0 0 1 8 8v6H21z" fill="#f59e0b"/><rect x="33" y="19" width="5" height="12" rx="2.5" fill="#b45309"/><rect x="58" y="19" width="5" height="12" rx="2.5" fill="#b45309"/><rect x="45" y="46" width="6" height="16" rx="3" fill="#d97706"/><circle cx="48" cy="69" r="3.5" fill="#d97706"/>',
-    alert: '<circle cx="48" cy="48" r="44" fill="#fdecec"/><rect x="20" y="38" width="11" height="34" rx="3" fill="#f5b5b5"/><rect x="38" y="48" width="11" height="24" rx="3" fill="#ef8686"/><rect x="56" y="58" width="11" height="14" rx="3" fill="#dc2626"/><polyline points="20,32 38,42 54,52" fill="none" stroke="#b91c1c" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/><polygon points="76,16 92,46 60,46" fill="#dc2626" stroke="#dc2626" stroke-width="3" stroke-linejoin="round"/><rect x="74.5" y="26" width="3" height="10" rx="1.5" fill="#fff"/><circle cx="76" cy="41" r="1.9" fill="#fff"/>'
+// ---- 만화풍 삽화 (장면별): 캐릭터 + 소품 ----
+const TA5_OL = '#2b2f3a';
+function ta5Face(cx, cy, e) {
+  const ol = TA5_OL, eyY = cy + 2, L = cx - 6.5, R = cx + 6.5;
+  const dot = x => `<circle cx="${x}" cy="${eyY}" r="2.3" fill="${ol}"/>`;
+  const arc = (x, up) => `<path d="M${x - 3.6} ${eyY + (up ? 1.6 : -1.6)}Q${x} ${eyY + (up ? -3.6 : 3.6)} ${x + 3.6} ${eyY + (up ? 1.6 : -1.6)}" fill="none" stroke="${ol}" stroke-width="2.2" stroke-linecap="round"/>`;
+  const brow = (x1, y1, x2, y2) => `<path d="M${x1} ${y1}L${x2} ${y2}" stroke="${ol}" stroke-width="2" stroke-linecap="round"/>`;
+  const blush = `<ellipse cx="${cx - 11}" cy="${cy + 8}" rx="3.4" ry="2" fill="#ff9d8f" opacity=".6"/><ellipse cx="${cx + 11}" cy="${cy + 8}" rx="3.4" ry="2" fill="#ff9d8f" opacity=".6"/>`;
+  let s = `<circle cx="${cx}" cy="${cy}" r="17" fill="#ffd9b8" stroke="${ol}" stroke-width="2.5"/>`;
+  s += `<path d="M${cx - 17} ${cy - 1}C${cx - 21} ${cy - 25} ${cx + 21} ${cy - 25} ${cx + 17} ${cy - 1}C${cx + 9} ${cy - 11} ${cx - 4} ${cy - 8} ${cx - 17} ${cy - 1}Z" fill="#3a2a22" stroke="${ol}" stroke-width="2" stroke-linejoin="round"/>`;
+  if (e === 'happy') s += arc(L, true) + arc(R, true) + blush + `<path d="M${cx - 6} ${cy + 8}Q${cx} ${cy + 17} ${cx + 6} ${cy + 8}Z" fill="#c2342a" stroke="${ol}" stroke-width="1.8" stroke-linejoin="round"/>`;
+  else if (e === 'smile') s += dot(L) + dot(R) + blush + `<path d="M${cx - 4.5} ${cy + 9}Q${cx} ${cy + 13.5} ${cx + 4.5} ${cy + 9}" fill="none" stroke="${ol}" stroke-width="2" stroke-linecap="round"/>`;
+  else if (e === 'worry') s += dot(L) + dot(R) + brow(L - 4, eyY - 5, L + 3, eyY - 8) + brow(R - 3, eyY - 8, R + 4, eyY - 5) + `<path d="M${cx - 5} ${cy + 11}q2.5 -2.5 5 0t5 0" fill="none" stroke="${ol}" stroke-width="2" stroke-linecap="round"/><path d="M${cx + 19} ${cy - 10}q-5 7 0 10q5 -3 0 -10z" fill="#8fd0ff" stroke="${ol}" stroke-width="1.4"/>`;
+  else if (e === 'sad') s += dot(L) + dot(R) + brow(L - 4, eyY - 5, L + 3, eyY - 8) + brow(R - 3, eyY - 8, R + 4, eyY - 5) + `<path d="M${cx - 5} ${cy + 13}Q${cx} ${cy + 7.5} ${cx + 5} ${cy + 13}" fill="none" stroke="${ol}" stroke-width="2" stroke-linecap="round"/><path d="M${L - 1} ${eyY + 4}q-2 5 0 6q2 -1 0 -6z" fill="#8fd0ff"/>`;
+  else if (e === 'think') s += dot(L) + dot(R) + brow(L - 4, eyY - 6, L + 3, eyY - 6) + brow(R - 3, eyY - 9, R + 4, eyY - 7) + `<circle cx="${cx + 1}" cy="${cy + 11}" r="2" fill="#c2342a" stroke="${ol}" stroke-width="1.4"/>`;
+  else if (e === 'sleep') s += arc(L, false) + arc(R, false) + `<path d="M${cx - 3} ${cy + 10}Q${cx} ${cy + 13} ${cx + 3} ${cy + 10}" fill="none" stroke="${ol}" stroke-width="2" stroke-linecap="round"/>`;
+  return s;
+}
+function ta5Limb(x1, y1, x2, y2) { return `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${TA5_OL}" stroke-width="10.5" stroke-linecap="round"/><line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="#4c6ef5" stroke-width="5.5" stroke-linecap="round"/><circle cx="${x2}" cy="${y2}" r="4.6" fill="#ffd9b8" stroke="${TA5_OL}" stroke-width="2.2"/>`; }
+function ta5Guy(cx, cy, e, arms) {
+  // arms: [[x,y],[x,y]] 손 위치(왼,오). 몸통은 cy+17 ~ cy+47
+  const ol = TA5_OL, sh = [[cx - 12, cy + 25], [cx + 12, cy + 25]];
+  let s = `<line x1="${cx - 6}" y1="${cy + 46}" x2="${cx - 6}" y2="${cy + 62}" stroke="${ol}" stroke-width="5" stroke-linecap="round"/><line x1="${cx + 6}" y1="${cy + 46}" x2="${cx + 6}" y2="${cy + 62}" stroke="${ol}" stroke-width="5" stroke-linecap="round"/>`;
+  s += `<rect x="${cx - 15}" y="${cy + 16}" width="30" height="32" rx="11" fill="#4c6ef5" stroke="${ol}" stroke-width="2.5"/><path d="M${cx - 4} ${cy + 16}l4 7l4 -7" fill="#fff" stroke="${ol}" stroke-width="2" stroke-linejoin="round"/>`;
+  s += ta5Face(cx, cy, e);
+  s += ta5Limb(sh[0][0], sh[0][1], arms[0][0], arms[0][1]) + ta5Limb(sh[1][0], sh[1][1], arms[1][0], arms[1][1]);
+  return s;
+}
+const ta5Star = (x, y, r, f) => { const p = []; for (let i = 0; i < 10; i++) { const a = -Math.PI / 2 + i * Math.PI / 5, R = i % 2 ? r * .45 : r; p.push((x + R * Math.cos(a)).toFixed(1) + ',' + (y + R * Math.sin(a)).toFixed(1)); } return `<polygon points="${p.join(' ')}" fill="${f}" stroke="${TA5_OL}" stroke-width="1.6" stroke-linejoin="round"/>`; };
+const TA5_SCENE_BG = { cheer: '#e6f7ee', target: '#e8f0ff', empty: '#fff3df', overdue: '#ffeee3', fail: '#eceff7', coin: '#fff8d9', sleepy: '#efe9fb' };
+function ta5Art(scene) {
+  const ol = TA5_OL, g = '#e9c98f';
+  const sc = {
+    cheer: () => `<circle cx="22" cy="20" r="3" fill="#ff6b6b"/><rect x="40" y="10" width="7" height="3.5" rx="1" fill="#fcc419" transform="rotate(25 43 12)"/><circle cx="118" cy="40" r="3" fill="#4dabf7"/><rect x="18" y="62" width="7" height="3.5" rx="1" fill="#51cf66" transform="rotate(-30 21 64)"/><circle cx="112" cy="56" r="2.6" fill="#ff6b6b"/>` + ta5Star(22, 44, 9, '#ffd43b') +
+      `<rect x="130" y="70" width="18" height="26" rx="3" fill="#96e0b4" stroke="${ol}" stroke-width="2.2"/><rect x="154" y="52" width="18" height="44" rx="3" fill="#51cf66" stroke="${ol}" stroke-width="2.2"/><rect x="178" y="30" width="18" height="66" rx="3" fill="#2f9e44" stroke="${ol}" stroke-width="2.2"/><path d="M130 62L158 44L172 48L196 22" fill="none" stroke="${ol}" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><polyline points="184,21 196,22 195,34" fill="none" stroke="${ol}" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>` +
+      ta5Guy(72, 34, 'happy', [[42, 6], [102, 6]]),
+    target: () => `<circle cx="168" cy="50" r="32" fill="#fff" stroke="${ol}" stroke-width="2.5"/><circle cx="168" cy="50" r="23" fill="#ff8787" stroke="${ol}" stroke-width="2"/><circle cx="168" cy="50" r="14" fill="#fff" stroke="${ol}" stroke-width="2"/><circle cx="168" cy="50" r="6" fill="#e03131" stroke="${ol}" stroke-width="2"/><line x1="168" y1="82" x2="168" y2="98" stroke="${ol}" stroke-width="4" stroke-linecap="round"/>` +
+      `<line x1="168" y1="50" x2="140" y2="28" stroke="${ol}" stroke-width="3" stroke-linecap="round"/><path d="M140 28l-9 -2m9 2l-3 -9m3 9l-6 -3" stroke="#e03131" stroke-width="3" stroke-linecap="round" fill="none"/><path d="M104 30Q118 14 132 24" stroke="${ol}" stroke-width="2" stroke-dasharray="3 4" fill="none" stroke-linecap="round"/>` +
+      ta5Guy(66, 34, 'smile', [[44, 56], [100, 30]]),
+    empty: () => `<path d="M128 66l10 -10h44l10 10z" fill="#f2dba7" stroke="${ol}" stroke-width="2.2" stroke-linejoin="round"/><rect x="128" y="66" width="64" height="32" rx="3" fill="${g}" stroke="${ol}" stroke-width="2.4"/><rect x="146" y="66" width="28" height="9" fill="#d9b574" stroke="${ol}" stroke-width="1.8"/><path d="M160 18q0 -9 9 -9t9 8q0 6 -7 9v4" fill="none" stroke="#f08c00" stroke-width="5" stroke-linecap="round"/><circle cx="171" cy="38" r="3" fill="#f08c00"/><path d="M104 20q0 -6 6 -6t6 5q0 4 -5 6v3" fill="none" stroke="#f08c00" stroke-width="3.6" stroke-linecap="round" opacity=".8"/><circle cx="111" cy="34" r="2.2" fill="#f08c00" opacity=".8"/>` +
+      ta5Guy(66, 34, 'think', [[34, 56], [96, 56]]),
+    overdue: () => `<rect x="126" y="12" width="70" height="68" rx="7" fill="#fff" stroke="${ol}" stroke-width="2.5"/><path d="M126 19a7 7 0 0 1 7 -7h56a7 7 0 0 1 7 7v11h-70z" fill="#ff6b6b" stroke="${ol}" stroke-width="2.5" stroke-linejoin="round"/><line x1="143" y1="7" x2="143" y2="17" stroke="${ol}" stroke-width="3.5" stroke-linecap="round"/><line x1="179" y1="7" x2="179" y2="17" stroke="${ol}" stroke-width="3.5" stroke-linecap="round"/>` +
+      [0, 1, 2].map(r => [0, 1, 2, 3].map(c => `<circle cx="${139 + c * 16}" cy="${42 + r * 13}" r="2.6" fill="#ced4da"/>`).join('')).join('') + `<circle cx="187" cy="70" r="15" fill="#fff" stroke="${ol}" stroke-width="2.4"/><path d="M187 61v9l6 4" fill="none" stroke="${ol}" stroke-width="2.4" stroke-linecap="round"/><path d="M104 28l-6 -8m10 10l4 -9" stroke="#fa5252" stroke-width="2.6" stroke-linecap="round"/>` +
+      ta5Guy(66, 34, 'worry', [[40, 14], [96, 56]]),
+    fail: () => `<g><ellipse cx="66" cy="9" rx="22" ry="8" fill="#adb5bd" stroke="${ol}" stroke-width="2.2"/><ellipse cx="50" cy="12" rx="12" ry="6.5" fill="#adb5bd" stroke="${ol}" stroke-width="2.2"/><ellipse cx="82" cy="12" rx="12" ry="6.5" fill="#adb5bd" stroke="${ol}" stroke-width="2.2"/><ellipse cx="66" cy="13" rx="22" ry="6.5" fill="#adb5bd"/></g><path d="M52 20l-2 7m14 -7l-2 7m14 -7l-2 7" stroke="#4dabf7" stroke-width="2.6" stroke-linecap="round"/>` +
+      `<rect x="132" y="22" width="54" height="68" rx="5" fill="#fff" stroke="${ol}" stroke-width="2.4" transform="rotate(5 159 56)"/><g transform="rotate(5 159 56)"><line x1="141" y1="36" x2="176" y2="36" stroke="#ced4da" stroke-width="3" stroke-linecap="round"/><line x1="141" y1="46" x2="170" y2="46" stroke="#ced4da" stroke-width="3" stroke-linecap="round"/><path d="M146 56l26 26m0 -26l-26 26" stroke="#e03131" stroke-width="6" stroke-linecap="round"/></g>` +
+      ta5Guy(66, 42, 'sad', [[44, 74], [88, 74]]),
+    coin: () => `<circle cx="164" cy="50" r="27" fill="#e7f5ff" fill-opacity=".7" stroke="${ol}" stroke-width="3.2"/><line x1="184" y1="70" x2="204" y2="92" stroke="${ol}" stroke-width="8" stroke-linecap="round"/><line x1="184" y1="70" x2="204" y2="92" stroke="#e8a838" stroke-width="3.6" stroke-linecap="round"/><circle cx="164" cy="50" r="9" fill="#ffd43b" stroke="${ol}" stroke-width="2.2"/><text x="164" y="54" text-anchor="middle" font-size="11" font-weight="800" fill="${ol}" font-family="sans-serif">₩</text><path d="M150 32l-5 -6m9 4l-1 -8" stroke="#f08c00" stroke-width="2.4" stroke-linecap="round"/>` +
+      ta5Guy(70, 34, 'think', [[44, 56], [118, 44]]),
+    sleepy: () => `<rect x="108" y="74" width="100" height="8" rx="3" fill="#c69c6d" stroke="${ol}" stroke-width="2.4"/><line x1="118" y1="82" x2="118" y2="98" stroke="${ol}" stroke-width="4" stroke-linecap="round"/><line x1="198" y1="82" x2="198" y2="98" stroke="${ol}" stroke-width="4" stroke-linecap="round"/><rect x="152" y="46" width="24" height="28" rx="4" fill="#495057" stroke="${ol}" stroke-width="2.4"/><rect x="156" y="51" width="16" height="18" rx="2" fill="#868e96"/><text x="164" y="64" text-anchor="middle" font-size="9" font-weight="800" fill="#fff" font-family="sans-serif">zz</text>` +
+      `<text x="98" y="22" font-size="17" font-weight="900" fill="#7048e8" font-family="sans-serif">Z</text><text x="112" y="12" font-size="13" font-weight="900" fill="#9775fa" font-family="sans-serif">z</text><text x="123" y="5" font-size="10" font-weight="900" fill="#b197fc" font-family="sans-serif">z</text>` +
+      ta5Guy(70, 34, 'sleep', [[48, 60], [100, 72]])
   };
-  return `<svg viewBox="0 0 96 96" aria-hidden="true">${a[mood] || a.ok}</svg>`;
+  return `<svg viewBox="0 0 220 108" aria-hidden="true">${(sc[scene] || sc.target)()}</svg>`;
 }
 
 // ---- 표시 ----
-function ta5Open() { try { return localStorage.getItem(TA5_LS_OPEN) === '1'; } catch (e) { return false; } }
-function ta5Toggle() { try { localStorage.setItem(TA5_LS_OPEN, ta5Open() ? '0' : '1'); } catch (e) {} ta5Render(); }
+const TA5_MOOD_TXT = { good: '양호', ok: '보통', warn: '주의', alert: '위험' };
+function ta5Hl(t) { return String(t || '').split(/(\d[\d,]*(?:\.\d+)?\s?(?:원|건|%|일|배|명|개)?)/g).map((p, i) => i % 2 ? '<mark>' + escapeHtml(p) + '</mark>' : escapeHtml(p)).join(''); }
+const TA5_SPARK = '<svg class="ta5-sp" viewBox="0 0 24 24" aria-hidden="true"><defs><linearGradient id="ta5g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#4285f4"/><stop offset=".55" stop-color="#9b72cb"/><stop offset="1" stop-color="#d96570"/></linearGradient></defs><path d="M12 1C12.6 7.4 16.6 11.4 23 12C16.6 12.6 12.6 16.6 12 23C11.4 16.6 7.4 12.6 1 12C7.4 11.4 11.4 7.4 12 1Z" fill="url(#ta5g)"/></svg>';
 function ta5Render() {
   const box = el('ta5Box'); if (!box) return;
-  const r = TA5.res;
-  if (!r) { box.innerHTML = `<div class="ta5"><div class="ta5-top"><div class="ta5-art">${ta5Art('ok')}</div><div class="ta5-tx"><div class="ta5-tag">AI 코멘트</div><div class="ta5-hd">안건 현황을 분석하고 있습니다…</div></div></div></div>`; return; }
-  const F = (r.findings || []).slice().sort((a, b) => (TA5_LV[a.level] || TA5_LV.info).r - (TA5_LV[b.level] || TA5_LV.info).r);
-  const open = ta5Open(), show = open ? F : F.slice(0, 2);
-  const rows = show.map(x => { const v = TA5_LV[x.level] || TA5_LV.info; return `<div class="ta5-f"><span class="ta5-pill" style="background:${v.b};color:${v.c};">${escapeHtml(x.topic)} · ${v.l}</span><div class="ta5-ft">${escapeHtml(x.text)}</div></div>`; }).join('');
-  const acts = open && (r.actions || []).length ? `<div class="ta5-act"><b>오늘 할 일</b>${r.actions.map(a => `<div>✔ ${escapeHtml(a)}</div>`).join('')}</div>` : '';
-  let t = '';
-  if (TA5.busy) t = 'AI 분석 중…';
-  else if (TA5.src === 'ai') t = `Gemini 분석 · ${TA5.at ? new Date(TA5.at).toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit', hour12: false, timeZone: 'Asia/Seoul' }) : ''} 기준`;
-  else t = `<span title="${escapeHtml(TA5.err)}">AI 연결 실패 — 기본 분석입니다</span>`;
-  box.innerHTML = `<div class="ta5 m-${escapeHtml(r.mood || 'ok')}">
-    <div class="ta5-top"><div class="ta5-art">${ta5Art(r.mood)}</div>
-      <div class="ta5-tx"><div class="ta5-tag">AI 코멘트 · ${TA5_MOOD[r.mood] || '보통'}</div><div class="ta5-hd">${escapeHtml(r.headline)}</div></div></div>
-    <div class="ta5-fs">${rows}</div>${acts}
-    <div class="ta5-ft2"><span>${t}</span><span>${F.length > 2 ? `<button type="button" onclick="ta5Toggle()">${open ? '접기 ▴' : '전체 ' + F.length + '개 보기 ▾'}</button>` : ''}<button type="button" onclick="ta5Run(true)" ${TA5.busy ? 'disabled' : ''}>↻ 다시 분석</button></span></div></div>`;
+  const nm = (TA5.name || currentViewMode || '') + ' 컨설턴트님', r = TA5.res;
+  let h = '';
+  if (TA5.busy) h += `<div class="ta5-ld">${TA5_SPARK}<span>재미나이가 <b>${escapeHtml(nm)}</b>의 TA를 분석하고 있습니다<i class="ta5-dots"><u>.</u><u>.</u><u>.</u></i></span></div>`;
+  if (!r) {
+    if (TA5.busy) h += '<div class="ta5 ta5-sk"><div class="ta5-scene"></div><div class="ta5-bar" style="width:92%"></div><div class="ta5-bar" style="width:78%"></div><div class="ta5-bar" style="width:86%"></div></div>';
+    box.innerHTML = h; return;
+  }
+  const sc = TA5_SCENE_BG[r.scene] ? r.scene : 'target';
+  const t = TA5.src === 'ai' ? `Gemini 분석 · ${TA5.at ? new Date(TA5.at).toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit', hour12: false, timeZone: 'Asia/Seoul' }) : ''} 기준` : `<span title="${escapeHtml(TA5.err)}">AI 연결 실패 · 기본 분석이에요</span>`;
+  h += `<div class="ta5 m-${escapeHtml(r.mood || 'ok')}"><div class="ta5-scene" style="background:${TA5_SCENE_BG[sc]}">${ta5Art(sc)}</div>
+    <div class="ta5-body">${(r.lines || []).map(l => `<p>${ta5Hl(l)}</p>`).join('')}</div>
+    <div class="ta5-ft2"><span>${t}</span><button type="button" onclick="ta5Run(true)" ${TA5.busy ? 'disabled' : ''}>↻ 다시 분석</button></div></div>`;
+  box.innerHTML = h;
 }
 
 // ---- 실행: 같은 숫자면 하루 한 번만 요청, 홈이 여러 번 그려져도 합쳐서 처리 ----
@@ -6753,23 +6799,22 @@ function ta5Kick() { clearTimeout(TA5.timer); TA5.timer = setTimeout(() => { try
 async function ta5Run(force) {
   const name = currentViewMode; if (!name || !el('ta5Box')) return;
   const m = ta5Metrics(), h = ta5Hash(JSON.stringify(m)), key = name + '|' + h;
-  if (!force && TA5.key === key && TA5.res) { ta5Render(); return; }
-  if (TA5.busy && TA5.key === key && !force) return;
-  TA5.key = key;
-  if (!m.ingCnt && !m.wonAllCnt && !m.failAllCnt) { TA5.res = ta5Rules(m); TA5.src = 'rule'; TA5.err = '등록된 안건 없음'; TA5.busy = false; ta5Render(); return; }
+  if (!force && TA5.key === key && (TA5.res || TA5.busy)) { ta5Render(); return; }
+  TA5.key = key; TA5.name = name;
+  if (!m.ingCnt && !m.wonAllCnt && !m.failAllCnt) { TA5.res = ta5Rules(m, name); TA5.src = 'rule'; TA5.err = '등록된 안건 없음'; TA5.busy = false; ta5Render(); return; }
   const ck = TA5_LS + name; let c = null; try { c = JSON.parse(localStorage.getItem(ck) || 'null'); } catch (e) {}
-  if (!force && c && c.h === h && c.d === todayStr() && c.res) { TA5.res = c.res; TA5.src = 'ai'; TA5.model = c.model || ''; TA5.at = c.at || ''; TA5.err = ''; ta5Render(); return; }
-  TA5.res = ta5Rules(m); TA5.src = 'rule'; TA5.err = '분석 요청 중'; TA5.busy = true; ta5Render();   // 기본 분석을 먼저 보여주고 AI 결과로 교체
+  if (!force && c && c.h === h && c.d === todayStr() && c.res && Array.isArray(c.res.lines)) { TA5.res = c.res; TA5.src = 'ai'; TA5.at = c.at || ''; TA5.err = ''; TA5.busy = false; ta5Render(); return; }
+  TA5.res = null; TA5.busy = true; ta5Render();   // 분석 중 애니메이션
   const ctl = new AbortController(), to = setTimeout(() => ctl.abort(), 70000);
   try {
     const r = await fetch(SUPABASE_URL + '/functions/v1/ta-ai-comment', { method: 'POST', signal: ctl.signal, headers: { 'Content-Type': 'application/json', apikey: SUPABASE_ANON_KEY }, body: JSON.stringify({ phone: (currentUser && currentUser.phone) || '', consultant: name, data: m, force: !!force }) });
     const j = await r.json().catch(() => ({}));
-    if (!r.ok || !j.insight) throw new Error((j.error || 'HTTP ' + r.status) + (j.tried ? ' ' + JSON.stringify(j.tried).slice(0, 240) : ''));
+    if (!r.ok || !j.insight || !Array.isArray(j.insight.lines)) throw new Error((j.error || 'HTTP ' + r.status) + (j.tried ? ' ' + JSON.stringify(j.tried).slice(0, 240) : ''));
     if (TA5.key !== key) return;
-    TA5.res = j.insight; TA5.src = 'ai'; TA5.model = j.model || ''; TA5.at = j.at || new Date().toISOString(); TA5.err = '';
-    try { localStorage.setItem(ck, JSON.stringify({ h, d: todayStr(), res: j.insight, model: TA5.model, at: TA5.at })); } catch (e) {}
+    TA5.res = j.insight; TA5.src = 'ai'; TA5.at = j.at || new Date().toISOString(); TA5.err = '';
+    try { localStorage.setItem(ck, JSON.stringify({ h, d: todayStr(), res: j.insight, at: TA5.at })); } catch (e) {}
   } catch (e) {
-    if (TA5.key === key) { TA5.err = (e && e.message) || String(e); TA5.src = 'rule'; }
+    if (TA5.key === key) { TA5.res = ta5Rules(m, name); TA5.src = 'rule'; TA5.err = (e && e.message) || String(e); }
     console.warn('[ta-ai-comment]', e);
   } finally { clearTimeout(to); if (TA5.key === key) TA5.busy = false; ta5Render(); }
 }
