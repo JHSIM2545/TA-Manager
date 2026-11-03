@@ -4417,7 +4417,7 @@ async function handleAgentModalSubmit(e) {
     stage: stage,
     confidence: el('afConfidence').value,
     registeredDate: el('afRegisteredDate').value,
-    expectedDate: expectedDate,
+    expectedDate: (stage === '수주完' && contractDate) ? contractDate : expectedDate,   // 수주完이면 수주예정일 = 계약일
     contractDate: contractDate,
     baseDate: baseDate,
     vehicleNumber: vehicleNumber,
@@ -5879,6 +5879,7 @@ async function ta2SaveFields(patch, rerender) {
     next.contractDate = patch.expectedDate;
     if (!next.baseDate) next.baseDate = patch.expectedDate;
   }
+  if (next.stage === '수주完' && next.contractDate) next.expectedDate = next.contractDate;   // 수주完이면 수주예정일 = 계약일 자동 일치
   next.updatedAt = new Date().toISOString();
   ta2Flash('저장 중...');
   let res;
@@ -7378,6 +7379,7 @@ async function ta2SaveFields(patch, rerender, leadArg) {
     next.contractDate = patch.expectedDate;
     if (!next.baseDate) next.baseDate = patch.expectedDate;
   }
+  if (next.stage === '수주完' && next.contractDate) next.expectedDate = next.contractDate;   // 수주完이면 수주예정일 = 계약일 자동 일치
   next.updatedAt = new Date().toISOString();
   ta2Flash('저장 중');
   let res;
@@ -7736,7 +7738,7 @@ async function handleAgentModalSubmit(e) {
   const payload = {
     company: el('afCompany').value.trim(), contact: el('afContact').value.trim(), contactPhone: el('afContactPhone').value.trim(),
     amount: parseCurrency(el('afAmount').value), productType: el('afProductType').value, motive: el('afMotive').value, stage: stage,
-    confidence: el('afConfidence').value, registeredDate: el('afRegisteredDate').value, expectedDate: expectedDate,
+    confidence: el('afConfidence').value, registeredDate: el('afRegisteredDate').value, expectedDate: (stage === '수주完' && contractDate) ? contractDate : expectedDate,
     contractDate: contractDate, baseDate: baseDate, vehicleNumber: vehicleNumber, memo: ''
   };
   if (!payload.company) { ta3Toast('서비스제공처명을 입력하세요'); return; }
