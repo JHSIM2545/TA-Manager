@@ -8209,6 +8209,26 @@ function ta4Vcard(c, company) {
 }
 function ta4VcardShare(c, company) {
   const text = ta4Vcard(c, company), fname = ((c.name || '연락처').replace(/[^\w가-힣]/g, '_')) + '.vcf';
+  // 공유 창을 거치지 않고 휴대폰 연락처 저장 화면을 바로 연다 (웹 앱은 연락처에 몰래 저장할 수 없어서 마지막 '저장' 한 번은 필요)
+  const ua = navigator.userAgent || '';
+  try {
+    if (/Android/i.test(ua)) {   // 안드로이드: 연락처 앱의 '새 연락처' 화면에 정보가 채워진 채로 열림
+      const e = v => encodeURIComponent(String(v || '')), org = c.company || company || '';
+      const ph = s => String(s || '').replace(/[^0-9+]/g, '');
+      let it = 'intent:#Intent;action=android.intent.action.INSERT;type=vnd.android.cursor.dir/contact;S.name=' + e(c.name || '고객담당자');
+      if (c.mobile || c.tel) it += ';S.phone=' + e(ph(c.mobile || c.tel));
+      if (c.mobile && c.tel) it += ';S.secondary_phone=' + e(ph(c.tel));
+      if (c.email) it += ';S.email=' + e(c.email);
+      if (org) it += ';S.company=' + e(org);
+      if (c.title) it += ';S.job_title=' + e(c.title);
+      if (c.address) it += ';S.postal=' + e(c.address);
+      it += ';S.notes=' + e(c.memo || '에스원 북서울지사 TA 고객담당자') + ';end';
+      location.href = it; return;
+    }
+    if (/iPhone|iPad|iPod/i.test(ua)) {   // 아이폰: .vcf 를 바로 열면 '연락처 추가' 화면이 뜸
+      location.href = 'data:text/vcard;charset=utf-8,' + encodeURIComponent(text); return;
+    }
+  } catch (e) {}
   try {
     const file = new File([text], fname, { type: 'text/vcard' });
     if (navigator.canShare && navigator.canShare({ files: [file] }) && navigator.share) { navigator.share({ files: [file], title: c.name || '연락처' }).catch(() => {}); return; }
