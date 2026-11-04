@@ -8240,7 +8240,7 @@ function ta2SaveContact() {
   const l = ta2CurLead(); if (!l) return;
   const c = Object.assign({}, TA4.cards[l.id] || {}); c.name = c.name || l.contact; if (!c.mobile && !c.tel && l.contactPhone) c.mobile = ta4FmtPhone(l.contactPhone);
   if (!c.mobile && !c.tel) { ta3Toast('전화번호를 먼저 입력해주세요'); return; }
-  ta4VcardShare(c, l.company); ta2Flash('연락처 앱에서 저장해 주세요 ✓');
+  ta4VcardShare(c, l.company); ta2Flash('연락처 저장 화면이 열립니다 · 저장만 누르세요');
 }
 async function ta4CardApply() {
   const c = ta4CardRead();

@@ -8084,14 +8084,14 @@ function ta2SaveContact() {
   const l = ta2CurLead(); if (!l) return;
   const c = Object.assign({}, TA4.cards[l.id] || {}); c.name = c.name || l.contact; if (!c.mobile && !c.tel && l.contactPhone) c.mobile = ta4FmtPhone(l.contactPhone);
   if (!c.mobile && !c.tel) { ta3Toast('전화번호를 먼저 입력해주세요'); return; }
-  ta4VcardShare(c, l.company); ta2Flash('연락처 앱에서 저장해 주세요 ✓');
+  ta4VcardShare(c, l.company); ta2Flash('연락처 저장 화면이 열립니다 · 저장만 누르세요');
 }
 async function ta4CardApply() {
   const c = ta4CardRead();
   if (!c.name && !c.mobile && !c.tel && !c.email) { ta3Toast('저장할 정보가 없습니다'); return; }
   if (TA4.card.mode === 'phone') {   // 관리자 상단 명함등록: 앱에는 저장하지 않고 휴대폰 연락처로만 등록
     c.memo = '명함등록';
-    ta4VcardShare(c, c.company); ta4Close('ta4CardPg'); ta3Toast('연락처 앱에서 저장해 주세요 ✓'); return;
+    ta4VcardShare(c, c.company); ta4Close('ta4CardPg'); ta3Toast('연락처 저장 화면이 열립니다 · 저장만 누르세요'); return;
   }
   const mode = TA4.card.mode, wantSave = el('cdSave').checked, wantPhoto = el('cdPhoto').checked, wantBook = el('cdBook').checked, img = el('cdCrop').checked && TA4.card.crop ? TA4.card.crop : (TA4.card.full || TA4.card.img);
   try { localStorage.setItem(TA4_LS_CARDOPT, JSON.stringify({ save: wantSave, photo: wantPhoto, book: wantBook, crop: el('cdCrop').checked })); } catch (e) {}
