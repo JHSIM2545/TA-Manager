@@ -8254,21 +8254,27 @@ function ta4Vcard(c, company) {
   L.push('END:VCARD');
   return L.join('\r\n');
 }
-function ta4VcardShare(c, company) {
+async function ta4VcardShare(c, company) {
   // 연락처 앱이 .vcf 를 받아 사진까지 함께 등록한다. (웹 앱은 연락처에 몰래 저장할 수 없어 마지막 '저장' 한 번은 필요)
   const text = ta4Vcard(c, company), fname = ((c.name || '연락처').replace(/[^\w가-힣]/g, '_')) + '.vcf';
+  let why = '';
   try {
     const file = new File([text], fname, { type: 'text/vcard' });
-    if (navigator.canShare && navigator.canShare({ files: [file] }) && navigator.share) { navigator.share({ files: [file], title: c.name || '연락처' }).catch(() => {}); return; }
-  } catch (e) {}
-  const url = URL.createObjectURL(new Blob([text], { type: 'text/vcard;charset=utf-8' })), a = document.createElement('a');
-  a.href = url; a.download = fname; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(url), 4000);
+    if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+      try { await navigator.share({ files: [file], title: c.name || '연락처' }); return; }
+      catch (e) { if (e && e.name === 'AbortError') return; why = (e && e.name) || 'share'; }
+    } else why = '공유 미지원';
+  } catch (e) { why = (e && e.name) || 'file'; }
+  // 공유 창을 못 열면 .vcf 파일을 내려받는다 (알림/내 파일에서 눌러 열면 연락처 앱이 열림)
+  const url = URL.createObjectURL(new Blob([text], { type: 'text/x-vcard;charset=utf-8' })), a = document.createElement('a');
+  a.href = url; a.download = fname; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(url), 8000);
+  ta3Toast('연락처 파일(' + fname + ')을 내려받았어요. 상단 알림이나 내 파일에서 눌러 열면 연락처 앱이 열려요 [' + why + ']', 9000);
 }
 function ta2SaveContact() {
   const l = ta2CurLead(); if (!l) return;
   const c = Object.assign({}, TA4.cards[l.id] || {}); c.name = c.name || l.contact; if (!c.mobile && !c.tel && l.contactPhone) c.mobile = ta4FmtPhone(l.contactPhone);
   if (!c.mobile && !c.tel) { ta3Toast('전화번호를 먼저 입력해주세요'); return; }
-  ta4VcardShare(c, l.company); ta2Flash('공유 창에서 연락처를 선택해 저장하세요');
+  ta4VcardShare(c, l.company);
 }
 async function ta4CardApply() {
   const c = ta4CardRead();
