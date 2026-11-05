@@ -1230,7 +1230,8 @@
   #ta4CardPg [data-s]{display:none;}
   #ta4CardPg[data-st="cam"] [data-s~="cam"],#ta4CardPg[data-st="crop"] [data-s~="crop"],#ta4CardPg[data-st="manual"] [data-s~="manual"],#ta4CardPg[data-st="work"] [data-s~="work"],#ta4CardPg[data-st="fail"] [data-s~="fail"],#ta4CardPg[data-st="ok"] [data-s~="ok"]{display:block;}
   #ta4CardPg[data-st="cam"] .cd2-ft[data-s~="cam"],#ta4CardPg[data-st="crop"] .cd2-ft[data-s~="crop"],#ta4CardPg[data-st="manual"] .cd2-ft[data-s~="manual"],#ta4CardPg[data-st="work"] .cd2-ft[data-s~="work"],#ta4CardPg[data-st="fail"] .cd2-ft[data-s~="fail"],#ta4CardPg[data-st="ok"] .cd2-ft[data-s~="ok"]{display:flex;}
-  .cd2-live{position:relative;width:100%;height:min(66vh,560px);border-radius:14px;overflow:hidden;background:#000;}
+  .cd2-live{position:relative;width:100%;aspect-ratio:4/3;border-radius:14px;overflow:hidden;background:#000;}
+  .cd2-live .cd-frame{left:6%;right:6%;top:16.5%;bottom:16.5%;}
   .cd2-live video{width:100%;height:100%;object-fit:cover;display:block;}
   .cd2-cropbox{background:#0f172a;border-radius:14px;padding:10px;display:flex;justify-content:center;} .cd2-cropbox img{max-width:100%;max-height:52vh;border-radius:6px;background:#fff;}
   .cd2-note{margin:10px 2px 0;font-size:14px;font-weight:700;color:var(--mute);line-height:1.45;} .cd2-note.ok{color:#15803d;} .cd2-note.err{color:#b91c1c;} .cd2-note.busy{color:var(--accent);}
@@ -1244,10 +1245,10 @@
   .cd2-lnk{margin:-4px 0 12px;} .cd2-lnk button{background:none;border:none;color:var(--accent);font-size:14px;font-weight:800;text-decoration:underline;padding:6px 2px;}
   .cd2-pf{padding-top:12px;} .cd2-ft{align-items:center;}
   .cd2-ft[data-s~="cam"]{justify-content:space-between;}
-  .cd2-side{flex:none;width:72px;display:flex;flex-direction:column;align-items:center;gap:2px;background:none !important;color:var(--navy) !important;padding:4px 0 !important;font-size:12px !important;}
+  .ta4-pf .cd2-side{flex:none;width:72px;display:flex;flex-direction:column;align-items:center;gap:2px;background:none !important;color:var(--navy) !important;padding:4px 0 !important;font-size:12px !important;}
   .cd2-side [data-ic] svg{width:30px;height:30px;}
-  .cd2-shutter{width:76px;height:76px;border-radius:50% !important;padding:0 !important;background:#fff !important;border:4px solid var(--navy) !important;display:flex;align-items:center;justify-content:center;margin:0 auto;box-shadow:0 2px 10px rgba(0,0,0,.2);}
-  .cd2-shutter i{display:block;width:56px;height:56px;border-radius:50%;background:var(--navy);} .cd2-shutter:active i{transform:scale(.9);}
+  .ta4-pf .cd2-shutter{flex:none;width:76px;height:76px;border-radius:50% !important;padding:0 !important;background:#fff !important;border:4px solid var(--navy) !important;display:flex;align-items:center;justify-content:center;margin:0 auto;box-shadow:0 2px 10px rgba(0,0,0,.2);}
+  .cd2-shutter i{display:block;flex:none;width:56px;height:56px;border-radius:50%;background:var(--navy);} .cd2-shutter:active i{transform:scale(.9);}
   /* 휴대폰 저장 안내 */
   .ph-who{font-size:16px;font-weight:800;color:var(--ink);margin:2px 0 8px;} .ph-msg{font-size:15px;line-height:1.5;color:var(--ink);margin-bottom:12px;}
   .ph-step{display:flex;gap:10px;align-items:flex-start;padding:10px 12px;background:#f4f7ff;border-radius:12px;margin-bottom:8px;font-size:15px;line-height:1.45;} .ph-step i{flex:none;width:24px;height:24px;border-radius:50%;background:var(--accent);color:#fff;font-style:normal;font-weight:800;display:flex;align-items:center;justify-content:center;font-size:13px;}
@@ -8148,7 +8149,11 @@ function ta4CardCamStop() {
 async function ta4CardShoot() {
   if (!TA4.card.stream) { await ta4CardCamStart(); return; }
   const v = el('cdVideo'); if (!v.videoWidth) { ta4CardStatus('카메라 준비 중입니다. 잠시 후 다시 눌러주세요', 'busy'); return; }
-  const c = document.createElement('canvas'); c.width = v.videoWidth; c.height = v.videoHeight; c.getContext('2d').drawImage(v, 0, 0);
+  // 화면에 보이는 4:3 창(명함 틀)과 같은 범위만 촬영한다
+  const vw = v.videoWidth, vh = v.videoHeight, ra = 4 / 3; let sw = vw, sh = vh;
+  if (vw / vh < ra) sh = Math.round(vw / ra); else sw = Math.round(vh * ra);
+  const sx = Math.round((vw - sw) / 2), sy = Math.round((vh - sh) / 2);
+  const c = document.createElement('canvas'); c.width = sw; c.height = sh; c.getContext('2d').drawImage(v, sx, sy, sw, sh, 0, 0, sw, sh);
   const blob = await new Promise(r => c.toBlob(r, 'image/jpeg', 0.92));
   ta4CardCamStop(); ta4CardGot(new File([blob], 'card.jpg', { type: 'image/jpeg' }));
 }
@@ -8167,6 +8172,7 @@ async function ta4CardGot(f) {
     if (!crop) { let box = null; try { box = ta4CardAutoCrop(img); } catch (x) {} if (box) { crop = ta4CardCropImg(img, box); how = 'box'; } }
     if (!crop) { crop = ta4CardCropImg(img, null); how = 'none'; }
     ta4CardSetCrop(crop, how);
+    if (how === 'none') { ta4CardManual(); }   // 명함을 못 찾으면 바로 직접 자르기 화면으로
   } catch (e) { el('cdCropNote').textContent = '이미지를 읽지 못했어요. 재촬영해 주세요. (' + ((e && e.message) || '오류') + ')'; el('cdCropNote').className = 'cd2-note err'; }
   C.busy = false;
 }
@@ -8301,37 +8307,58 @@ function ta4BoxOk(b) {
   const h = b[2] - b[0], w = b[3] - b[1]; return b[0] >= 0 && b[1] >= 0 && b[2] <= 1000 && b[3] <= 1000 && h > 150 && w > 150 && h * w >= 120000;
 }
 // 명함을 찾아 기울기를 바로잡아(수평 조정) 명함 부분만 잘라낸다. 실패하면 null
+// 밝은 영역/어두운 영역 중 '명함처럼 반듯한 사각형'인 덩어리를 찾는다 (배경이 복잡해도 동작)
+function ta4MinRect(pts, sampleMax) {
+  const step = Math.max(1, Math.floor(pts.length / sampleMax)), P = [];
+  for (let k = 0; k < pts.length; k += step) P.push(pts[k]);
+  const fit = deg => {
+    const t = deg * Math.PI / 180, cs = Math.cos(t), sn = Math.sin(t); let x0 = 1e9, x1 = -1e9, y0 = 1e9, y1 = -1e9;
+    for (const p of P) { const x = p[0] * cs + p[1] * sn, y = -p[0] * sn + p[1] * cs; if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y; }
+    return { d: deg, cs, sn, x0, x1, y0, y1, area: (x1 - x0) * (y1 - y0) };
+  };
+  let best = null;
+  for (let d = -45; d < 45; d += 1.5) { const f = fit(d); if (!best || f.area < best.area) best = f; }
+  for (let d = best.d - 1.5; d <= best.d + 1.5; d += 0.25) { const f = fit(d); if (f.area < best.area) best = f; }
+  return best;
+}
 function ta4CardDeskew(img, outMax) {
   try {
-    const iw = img.naturalWidth, ih = img.naturalHeight, W = 240, sc = W / Math.max(iw, ih), w = Math.max(8, Math.round(iw * sc)), h = Math.max(8, Math.round(ih * sc));
+    const iw = img.naturalWidth, ih = img.naturalHeight, W = 200, sc = W / Math.max(iw, ih), w = Math.max(8, Math.round(iw * sc)), h = Math.max(8, Math.round(ih * sc)), N = w * h;
     const c = document.createElement('canvas'); c.width = w; c.height = h; const x = c.getContext('2d'); x.drawImage(img, 0, 0, w, h);
-    const a = x.getImageData(0, 0, w, h).data, px = (i, j) => (j * w + i) * 4; let r = 0, g = 0, b = 0, n = 0;
-    for (let i = 0; i < w; i++) for (const j of [0, 1, h - 2, h - 1]) { const p = px(i, j); r += a[p]; g += a[p + 1]; b += a[p + 2]; n++; }
-    for (let j = 2; j < h - 2; j++) for (const i of [0, 1, w - 2, w - 1]) { const p = px(i, j); r += a[p]; g += a[p + 1]; b += a[p + 2]; n++; }
-    r /= n; g /= n; b /= n;
-    const pts = [];
-    for (let j = 0; j < h; j++) for (let i = 0; i < w; i++) { const p = px(i, j); if (Math.abs(a[p] - r) + Math.abs(a[p + 1] - g) + Math.abs(a[p + 2] - b) > 70) pts.push(i, j); }
-    if (pts.length / 2 < w * h * 0.08 || pts.length / 2 > w * h * 0.97) return null;
-    const fit = deg => {
-      const t = deg * Math.PI / 180, cs = Math.cos(t), sn = Math.sin(t), xs = [], ys = [];
-      for (let k = 0; k < pts.length; k += 2) { xs.push(pts[k] * cs + pts[k + 1] * sn); ys.push(-pts[k] * sn + pts[k + 1] * cs); }
-      xs.sort((p, q) => p - q); ys.sort((p, q) => p - q); const lo = Math.floor(xs.length * 0.01), hi = xs.length - 1 - lo;   // 극단 1% 는 잡티로 보고 버린다
-      const x0 = xs[lo], x1 = xs[hi], y0 = ys[lo], y1 = ys[hi];
-      return { cs, sn, x0, x1, y0, y1, area: (x1 - x0) * (y1 - y0) };
-    };
+    const a = x.getImageData(0, 0, w, h).data, g = new Float32Array(N), b = new Float32Array(N);
+    for (let i = 0; i < N; i++) g[i] = a[i * 4] * 0.299 + a[i * 4 + 1] * 0.587 + a[i * 4 + 2] * 0.114;
+    for (let j = 0; j < h; j++) for (let i = 0; i < w; i++) { let s = 0, n = 0; for (let dj = -1; dj <= 1; dj++) for (let di = -1; di <= 1; di++) { const ii = i + di, jj = j + dj; if (ii >= 0 && jj >= 0 && ii < w && jj < h) { s += g[jj * w + ii]; n++; } } b[j * w + i] = s / n; }
+    const hist = new Array(256).fill(0); for (let i = 0; i < N; i++) hist[b[i] | 0]++;
+    let sum = 0; for (let k = 0; k < 256; k++) sum += k * hist[k];
+    let wB = 0, sB = 0, mx = -1, thr = 128;
+    for (let k = 0; k < 256; k++) { wB += hist[k]; if (!wB) continue; const wF = N - wB; if (!wF) break; sB += k * hist[k]; const mB = sB / wB, mF = (sum - sB) / wF, v = wB * wF * (mB - mF) * (mB - mF); if (v > mx) { mx = v; thr = k; } }
     let best = null;
-    for (let d = -45; d <= 45; d += 1.5) { const f = fit(d); f.d = d; if (!best || f.area < best.area) best = f; }
-    for (let d = best.d - 1.5; d <= best.d + 1.5; d += 0.25) { const f = fit(d); f.d = d; if (f.area < best.area) best = f; }
+    for (const pol of [1, -1]) {
+      const mask = new Uint8Array(N); for (let i = 0; i < N; i++) mask[i] = (pol > 0 ? b[i] > thr : b[i] <= thr) ? 1 : 0;
+      const seen = new Uint8Array(N);
+      for (let s0 = 0; s0 < N; s0++) {
+        if (!mask[s0] || seen[s0]) continue;
+        const st = [s0], idx = []; seen[s0] = 1;
+        while (st.length) { const p = st.pop(); idx.push(p); const px = p % w, py = (p / w) | 0; if (px > 0 && mask[p - 1] && !seen[p - 1]) { seen[p - 1] = 1; st.push(p - 1); } if (px < w - 1 && mask[p + 1] && !seen[p + 1]) { seen[p + 1] = 1; st.push(p + 1); } if (py > 0 && mask[p - w] && !seen[p - w]) { seen[p - w] = 1; st.push(p - w); } if (py < h - 1 && mask[p + w] && !seen[p + w]) { seen[p + w] = 1; st.push(p + w); } }
+        const area = idx.length; if (area < N * 0.04 || area > N * 0.9) continue;
+        let bt = 0; const pts = idx.map(p => { const px = p % w, py = (p / w) | 0; if (px <= 1 || py <= 1 || px >= w - 2 || py >= h - 2) bt++; return [px, py]; });
+        const r = ta4MinRect(pts, 2500), rw = r.x1 - r.x0, rh = r.y1 - r.y0, fill = area / r.area, asp = Math.max(rw, rh) / Math.min(rw, rh);
+        if (fill < 0.75 || asp > 3) continue;
+        const score = fill - 2.5 * bt / area - ((asp < 1.2 || asp > 2.4) ? 0.35 : 0) + 0.25 * (area / N);
+        if (!best || score > best.score) best = Object.assign(r, { score, area });
+      }
+    }
+    if (!best || best.score < 0.5) return null;
     let { cs, sn, x0, x1, y0, y1 } = best;
-    const inset = 0.012 * Math.min(x1 - x0, y1 - y0); x0 += inset; x1 -= inset; y0 += inset; y1 -= inset;
-    const rw = x1 - x0, rh = y1 - y0; if (rw < w * 0.2 || rh < h * 0.2) return null;
-    const cx = (x0 + x1) / 2, cy = (y0 + y1) / 2, ox = (cx * cs - cy * sn) / sc, oy = (cx * sn + cy * cs) / sc;   // 원본 좌표계의 명함 중심
+    const inset = 0.01 * Math.min(x1 - x0, y1 - y0); x0 += inset; x1 -= inset; y0 += inset; y1 -= inset;
+    const rw = x1 - x0, rh = y1 - y0; if (rw < w * 0.15 || rh < h * 0.15) return null;
+    const cx = (x0 + x1) / 2, cy = (y0 + y1) / 2, ox = (cx * cs - cy * sn) / sc, oy = (cx * sn + cy * cs) / sc;
     const OW = rw / sc, OH = rh / sc, k = Math.min(1, (outMax || 1100) / Math.max(OW, OH));
     const o = document.createElement('canvas'); o.width = Math.max(1, Math.round(OW * k)); o.height = Math.max(1, Math.round(OH * k));
     const q = o.getContext('2d'); q.fillStyle = '#fff'; q.fillRect(0, 0, o.width, o.height);
     q.setTransform(cs * k, -sn * k, sn * k, cs * k, o.width / 2 - (ox * cs + oy * sn) * k, o.height / 2 - (-ox * sn + oy * cs) * k);
     q.drawImage(img, 0, 0);
-    return o.toDataURL('image/jpeg', 0.85);
+    return o.toDataURL('image/jpeg', 0.88);
   } catch (e) { return null; }
 }
 // 연락처 사진용: 작은 JPEG (vCard 에 넣어도 가볍게)
