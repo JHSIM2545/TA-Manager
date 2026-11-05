@@ -1209,6 +1209,32 @@
 
   .ta4-cardbtn{display:inline-flex;align-items:center;gap:8px;height:42px;padding:0 16px;border-radius:12px;border:1px solid var(--line);background:#fff;color:var(--navy);font-size:14px;font-weight:800;}
   .ta4-cardbtn [data-ic] svg{width:22px;height:22px;}
+  /* 음성으로 TA 등록 (운전 중 사용) */
+  .tv-open{width:100%;display:flex;align-items:center;gap:12px;text-align:left;padding:12px 14px;border-radius:14px;border:1.5px solid var(--navy);background:var(--navy);color:#fff;font-size:15px;font-weight:800;}
+  .tv-open [data-ic] svg{width:26px;height:26px;flex:none;}
+  .tv-open small{display:block;font-size:12px;font-weight:600;color:#c9d3ea;margin-top:2px;}
+  body.tv-lock{overflow:hidden;}
+  .tv-ov{position:fixed;inset:0;z-index:3000000;background:#0b1220;color:#fff;display:none;flex-direction:column;padding:env(safe-area-inset-top,0px) 18px calc(14px + env(safe-area-inset-bottom,0px));}
+  .tv-ov.on{display:flex;}
+  .tv-top{display:flex;align-items:center;justify-content:space-between;height:56px;flex:none;}
+  .tv-top b{font-size:17px;font-weight:800;letter-spacing:-.2px;}
+  .tv-x{width:48px;height:48px;border-radius:50%;border:none;background:#1c2740;color:#fff;font-size:20px;}
+  .tv-mid{flex:1;min-height:0;display:flex;flex-direction:column;justify-content:center;gap:18px;padding:6px 2px;overflow:auto;}
+  .tv-ai{font-size:26px;line-height:1.4;font-weight:800;letter-spacing:-.4px;word-break:keep-all;}
+  .tv-me{font-size:21px;line-height:1.4;font-weight:700;color:#7fb0ff;min-height:30px;word-break:keep-all;}
+  .tv-sum{flex:none;display:grid;grid-template-columns:1fr 1fr;gap:4px 14px;padding:10px 12px;margin:6px 0 12px;border-radius:14px;background:#121c31;font-size:13px;}
+  .tv-sum .r{display:flex;gap:6px;min-width:0;color:#5f6e8c;}
+  .tv-sum .r span{flex:none;width:62px;font-weight:700;}
+  .tv-sum .r b{font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .tv-sum .r.ok{color:#e5ecfb;}
+  .tv-mic{flex:none;align-self:center;width:112px;height:112px;border-radius:50%;border:none;background:#243453;color:#fff;display:flex;align-items:center;justify-content:center;}
+  .tv-mic [data-ic] svg{width:50px;height:50px;}
+  .tv-mic.listen{background:#dc2626;animation:tvpulse 1.1s infinite;}
+  .tv-mic.ai{background:#2f6bff;}
+  .tv-mic.pause{background:#f59e0b;}
+  @keyframes tvpulse{0%{box-shadow:0 0 0 0 rgba(220,38,38,.55);}100%{box-shadow:0 0 0 30px rgba(220,38,38,0);}}
+  .tv-st{flex:none;text-align:center;margin-top:12px;font-size:16px;font-weight:800;min-height:22px;}
+  .tv-hint{flex:none;text-align:center;margin-top:8px;font-size:12px;color:#7d8aa6;}
   .ta4-cardsum{margin-top:8px;font-size:13.5px;}
   .ta4-cardsum .r{display:flex;gap:10px;padding:3px 0;color:var(--ink);font-weight:600;}
   .ta4-cardsum .r span{flex:none;width:62px;color:var(--mute);font-weight:700;}
@@ -7970,6 +7996,427 @@ async function handleAgentModalSubmit(e) {
 }
 window.handleAgentModalSubmit = handleAgentModalSubmit;
 
+// ---------- 음성으로 TA 등록 (스무고개 방식 · 운전 중 사용) ----------
+// AI가 음성(TTS)으로 묻고 → 대답을 음성인식(STT)으로 받아 → 신규 TA 등록 폼에 채워 자동 저장한다.
+// 앞 질문으로: "이전" / 중단: "취소"
+// <<TV-PURE>>
+const TV_KO_DIGIT = { '영': 0, '공': 0, '일': 1, '이': 2, '삼': 3, '사': 4, '오': 5, '육': 6, '륙': 6, '칠': 7, '팔': 8, '구': 9 };
+const TV_DIGIT_WORD = ['공', '일', '이', '삼', '사', '오', '육', '칠', '팔', '구'];
+const TV_PRODUCTS = [
+  ['알람', /알람|알라|알램/],
+  ['정보보안', /정보|보안/],
+  ['블루스캔', /블루|블러|불루|스캔/],
+  ['안전상품', /안전/],
+  ['유지보수', /유지|보수/],
+  ['휴엔', /휴엔|휴앤|휴인|휴안|휴원|흉엔|hue/i]
+];
+const TV_MOTIVE_ALIAS = { '시내소개': '사내소개', '사네소개': '사내소개', '내부소개': '사내소개', '개척영업': '개척', '콜': '콜센터' };
+
+function tvNorm(t) { return String(t || '').toLowerCase().replace(/[\s.,!?~。…'"“”]/g, ''); }
+// 숫자/한글숫자/단위(십백천만억)가 섞인 금액 문구 → 원 단위 정수 (못 알아들으면 null)
+function tvParseMoney(t) {
+  let s = String(t || '').replace(/[\s,]/g, '');
+  if (s.indexOf('원') >= 0) s = s.split('원')[0];
+  else s = s.replace(/(입니다|이에요|이요|이야|이고요|예요|에요|이다)$/, '');
+  let total = 0, section = 0, num = 0, any = false;
+  for (let i = 0; i < s.length;) {
+    const ch = s[i];
+    if (/[0-9]/.test(ch)) {
+      const m = s.slice(i).match(/^[0-9]+(\.[0-9]+)?/);
+      num = Number(m[0]); any = true; i += m[0].length; continue;
+    }
+    if (TV_KO_DIGIT[ch] !== undefined) { num = TV_KO_DIGIT[ch]; any = true; i++; continue; }
+    if (ch === '십' || ch === '백' || ch === '천') {
+      const u = ch === '십' ? 10 : ch === '백' ? 100 : 1000;
+      section += (num || 1) * u; num = 0; any = true; i++; continue;
+    }
+    if (ch === '만' || ch === '억') {
+      const u = ch === '만' ? 1e4 : 1e8;
+      section += num; total += (section || 1) * u; section = 0; num = 0; any = true; i++; continue;
+    }
+    i++;
+  }
+  total += section + num;
+  if (!any || !isFinite(total)) return null;
+  return Math.round(total);
+}
+// 정수 → 읽기 쉬운 금액 (예: 100000 → "10만원", 15050000 → "1505만 원" 이 아니라 "1505만원")
+function tvMoneyToKo(n) {
+  n = Math.round(Number(n) || 0);
+  if (n === 0) return '0원';
+  const eok = Math.floor(n / 1e8), rest = n % 1e8, man = Math.floor(rest / 1e4), low = rest % 1e4;
+  const p = [];
+  if (eok) p.push(eok + '억');
+  if (man) p.push(man + '만');
+  if (low) p.push(String(low));
+  return p.join(' ') + '원';
+}
+function tvIsSkip(t) { return /^(모름|몰라|모르|없음|없어|없습니다|없다|패스|건너|나중|공백|스킵|넘어가|다음)/.test(tvNorm(t)); }
+function tvYesNo(t) {
+  const s = tvNorm(t);
+  if (/^(아니|아뇨|아냐|틀렸|틀려|땡|no$|다시)/.test(s)) return 'no';
+  if (/^(네|넵|예|응|어$|맞|그래|그렇|옳|좋|오케이|ok|okay|yes|확인|동의|등록|진행|시작|해주세요|해줘|해요|할게|하겠)/.test(s)) return 'yes';
+  return null;
+}
+// "아니 대와마트" → "대와마트"
+function tvNoRest(t) {
+  return String(t || '').replace(/^\s*(아니(요|야|오)?|아뇨|아냐|틀렸(어|어요|습니다)?|땡|다시)[\s,.:]*/, '').trim();
+}
+function tvCleanName(t) {
+  let s = String(t || '').trim();
+  s = s.replace(/^(음+|어+|그+|저+)[\s,]+/, '');
+  s = s.replace(/^(서비스\s*제공처명?(은|는)?|상호(는|은)?|고객\s*담당자(는|은)?|담당자(는|은)?|이름(은|는)?)\s*/, '');
+  s = s.replace(/\s*(입니다|이에요|예요|이요|이라고\s*합니다|라고\s*합니다|이라고요|라고요|이야|이고요)\.?$/, '');
+  return s.trim();
+}
+// 받침 유무에 따른 조사
+function tvHasBatchim(word) {
+  const c = String(word || '').trim().slice(-1); if (!c) return false;
+  const code = c.charCodeAt(0);
+  if (code >= 0xAC00 && code <= 0xD7A3) return (code - 0xAC00) % 28 !== 0;
+  if (/[0-9]/.test(c)) return [1, 1, 0, 1, 0, 0, 1, 1, 1, 0][Number(c)] === 1 || c === '0';
+  return false;
+}
+function tvJosa(word, withB, noB) { return word + (tvHasBatchim(word) ? withB : noB); }
+
+function tvParsePhone(t) {
+  let s = String(t || '').replace(/[영공일이삼사오육륙칠팔구]/g, ch => String(TV_KO_DIGIT[ch]));
+  let d = s.replace(/[^0-9]/g, '');
+  if (/^10\d{8}$/.test(d)) d = '0' + d;
+  if (!/^0\d{8,10}$/.test(d)) return null;
+  if (d.length === 11) return d.replace(/^(\d{3})(\d{4})(\d{4})$/, '$1-$2-$3');
+  if (d.startsWith('02')) return d.length === 9 ? d.replace(/^(\d{2})(\d{3})(\d{4})$/, '$1-$2-$3') : d.replace(/^(\d{2})(\d{4})(\d{4})$/, '$1-$2-$3');
+  if (d.length === 10) return d.replace(/^(\d{3})(\d{3})(\d{4})$/, '$1-$2-$3');
+  return d;
+}
+function tvPhoneToKo(p) { return String(p).split('').map(c => /[0-9]/.test(c) ? TV_DIGIT_WORD[Number(c)] : ',').join(' '); }
+
+function tvParseProduct(t) {
+  const s = tvNorm(t), hit = TV_PRODUCTS.filter(p => p[1].test(s)).map(p => p[0]);
+  return hit.length === 1 ? hit[0] : null;
+}
+function tvParseMotive(t, list) {
+  const ns = tvNorm(t).replace(/\//g, '');
+  let best = null;
+  list.forEach(m => { const nm = tvNorm(m).replace(/\//g, ''); if (nm && ns.includes(nm) && (!best || nm.length > tvNorm(best).replace(/\//g, '').length)) best = m; });
+  if (best) return best;
+  for (const k in TV_MOTIVE_ALIAS) { if (ns.includes(k) && list.includes(TV_MOTIVE_ALIAS[k])) return TV_MOTIVE_ALIAS[k]; }
+  return null;
+}
+function tvParseConf(t) {
+  let s = tvNorm(t).replace(/^(수주)?확도(는|가|은)?/, '');
+  if (/^(a|에이|애이|상)/.test(s)) return 'A';
+  if (/^(b|비|삐|중)/.test(s)) return 'B';
+  if (/^(c|씨|시|하)/.test(s)) return 'C';
+  const m = String(t || '').match(/(^|[^a-zA-Z])([abcABC])([^a-zA-Z]|$)/);
+  return m ? m[2].toUpperCase() : null;
+}
+
+// 한글 숫자가 섞인 날짜 문구("십일월 이십일") → 아라비아 숫자("11월 20일")
+function tvKoToInt(str) {
+  let sum = 0, num = 0, any = false;
+  for (const ch of str) {
+    if (TV_KO_DIGIT[ch] !== undefined) { num = TV_KO_DIGIT[ch]; any = true; }
+    else if (ch === '십') { sum += (num || 1) * 10; num = 0; any = true; }
+    else if (ch === '백') { sum += (num || 1) * 100; num = 0; any = true; }
+    else return null;
+  }
+  return any ? sum + num : null;
+}
+function tvDateNumerals(s) {
+  return s.replace(/([영공일이삼사오육륙칠팔구십백]+)(년|월|일)/g, (all, k, u) => {
+    const n = tvKoToInt(k); return n === null ? all : n + u;
+  });
+}
+// 날짜 문구 → {y,m,d,iso,ko}. 연도 생략 시 올해(이미 지났으면 내년), "20일"만 말하면 이번 달(지났으면 다음 달)
+function tvParseDate(text, now) {
+  now = now || new Date();
+  let s = tvDateNumerals(String(text || '').replace(/\s+/g, ''));
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const pack = d => {
+    const y = d.getFullYear(), m = d.getMonth() + 1, dd = d.getDate();
+    return { y, m, d: dd, iso: y + '-' + String(m).padStart(2, '0') + '-' + String(dd).padStart(2, '0'), ko: y + '년 ' + m + '월 ' + dd + '일' };
+  };
+  const addDays = n => { const d = new Date(today); d.setDate(d.getDate() + n); return d; };
+  const valid = (y, m, d) => { const x = new Date(y, m - 1, d); return x.getFullYear() === y && x.getMonth() === m - 1 && x.getDate() === d; };
+
+  if (/내일모레/.test(s)) return pack(addDays(2));
+  if (/오늘|금일/.test(s)) return pack(addDays(0));
+  if (/내일/.test(s)) return pack(addDays(1));
+  if (/모레/.test(s)) return pack(addDays(2));
+  if (/글피/.test(s)) return pack(addDays(3));
+
+  const wk = s.match(/(이번주|금주|다음주|담주|다다음주)?([월화수목금토일])요일/);
+  if (wk) {
+    const idx = '일월화수목금토'.indexOf(wk[2]);
+    if (wk[1]) {
+      const off = /다다음주/.test(wk[1]) ? 14 : /다음주|담주/.test(wk[1]) ? 7 : 0;
+      const monday = addDays(-((today.getDay() + 6) % 7));
+      const d = new Date(monday); d.setDate(monday.getDate() + off + ((idx + 6) % 7)); return pack(d);
+    }
+    return pack(addDays((idx - today.getDay() + 7) % 7));
+  }
+
+  // 2026-11-20 / 11/20 / 11.20
+  let m = s.match(/^(\d{4})[-./](\d{1,2})[-./](\d{1,2})$/);
+  if (m && valid(+m[1], +m[2], +m[3])) return pack(new Date(+m[1], +m[2] - 1, +m[3]));
+  m = s.match(/^(\d{1,2})[-./](\d{1,2})$/);
+  if (m && valid(now.getFullYear(), +m[1], +m[2])) {
+    let d = new Date(now.getFullYear(), +m[1] - 1, +m[2]); if (d < today) d = new Date(now.getFullYear() + 1, +m[1] - 1, +m[2]); return pack(d);
+  }
+
+  let y = null, mo = null, da = null, ym = null;
+  const yy = s.match(/(\d{2,4})년/);
+  if (yy) { y = +yy[1]; if (y < 100) y += 2000; }
+  else if (/내후년/.test(s)) y = now.getFullYear() + 2;
+  else if (/내년/.test(s)) y = now.getFullYear() + 1;
+  else if (/올해|금년/.test(s)) y = now.getFullYear();
+  const mm = s.match(/(\d{1,2})월/);
+  if (mm) mo = +mm[1];
+  else if (/다다음달/.test(s)) ym = 2;
+  else if (/다음달|내달/.test(s)) ym = 1;
+  else if (/이번달|금월/.test(s)) ym = 0;
+  const dd = s.match(/(\d{1,2})일/);
+  if (dd) da = +dd[1];
+  if (ym !== null) { const b = new Date(now.getFullYear(), now.getMonth() + ym, 1); y = y || b.getFullYear(); mo = b.getMonth() + 1; }
+  if (mo && /말$|말일|월말/.test(s) && !da) da = new Date(y || now.getFullYear(), mo, 0).getDate();
+  if (da === null) return null;
+  if (mo === null) {
+    let d = new Date(now.getFullYear(), now.getMonth(), da);
+    if (!valid(d.getFullYear(), d.getMonth() + 1, da)) return null;
+    if (d < today) { d = new Date(now.getFullYear(), now.getMonth() + 1, da); if (d.getDate() !== da) return null; }
+    return pack(d);
+  }
+  if (mo < 1 || mo > 12) return null;
+  const explicitYear = y !== null;
+  let yr = explicitYear ? y : now.getFullYear();
+  if (!valid(yr, mo, da)) return null;
+  let d = new Date(yr, mo - 1, da);
+  if (!explicitYear && d < today) { yr += 1; if (!valid(yr, mo, da)) return null; d = new Date(yr, mo - 1, da); }
+  return pack(d);
+}
+// <</TV-PURE>>
+
+const TV = { on: false, rec: null, data: {}, paused: false, resume: null, speaking: false, listening: false, sayFin: null, wake: null, voice: null };
+const TV_RE_CANCEL = /^(취소|그만|종료|중단|스톱|stop)/;
+const TV_RE_BACK = /^(이전|뒤로|정정)/;
+
+function tvVoicePick() {
+  try {
+    const vs = speechSynthesis.getVoices() || [];
+    TV.voice = vs.find(v => /^ko[-_]KR$/i.test(v.lang) && /google|구글/i.test(v.name)) || vs.find(v => /^ko/i.test(v.lang)) || null;
+  } catch (e) { TV.voice = null; }
+}
+function tvSetStatus(mode) {   // 'ai' 말하는 중 · 'listen' 듣는 중 · 'pause' 일시정지 · 'idle'
+  const mic = el('tvMic'), st = el('tvSt'); if (!mic || !st) return;
+  mic.classList.toggle('listen', mode === 'listen'); mic.classList.toggle('ai', mode === 'ai'); mic.classList.toggle('pause', mode === 'pause');
+  st.textContent = mode === 'listen' ? '듣고 있습니다… 말씀하세요' : mode === 'ai' ? '질문 중…' : mode === 'pause' ? '마이크를 눌러 다시 시작' : '';
+}
+function tvRenderSum() {
+  const d = TV.data, row = (k, v) => `<div class="r${v ? ' ok' : ''}"><span>${k}</span><b>${v ? escapeHtml(String(v)) : '—'}</b></div>`;
+  const box = el('tvSum'); if (!box) return;
+  box.innerHTML = row('서비스제공처', d.company) + row('담당자', d.contact) + row('전화', d.phone) +
+    row('용역료', d.amount !== undefined ? tvMoneyToKo(d.amount) : '') + row('상품', d.product) + row('영업동기', d.motive) + row('수주확도', d.conf) + row('계약예정일', d.dateKo);
+}
+function tvSay(text) {
+  return new Promise(res => {
+    if (!TV.on) { res(); return; }
+    const ai = el('tvAi'); if (ai) ai.textContent = text;
+    const me = el('tvMe'); if (me) me.textContent = '';
+    tvSetStatus('ai');
+    let done = false, tm = null;
+    const fin = () => { if (done) return; done = true; clearTimeout(tm); TV.speaking = false; TV.sayFin = null; res(); };
+    TV.sayFin = fin;
+    if (!('speechSynthesis' in window)) { tm = setTimeout(fin, Math.min(5000, 800 + text.length * 140)); return; }
+    try { speechSynthesis.cancel(); } catch (e) {}
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = 'ko-KR'; u.rate = 1.0; u.pitch = 1.0; if (TV.voice) u.voice = TV.voice;
+    u.onend = fin; u.onerror = fin;
+    tm = setTimeout(fin, 2500 + text.length * 260);   // 일부 기기에서 onend가 안 오는 경우 대비
+    TV.speaking = true;
+    try { speechSynthesis.speak(u); } catch (e) { fin(); }
+  });
+}
+function tvListen() {
+  return new Promise(res => {
+    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SR || !TV.on) { res({ text: '', err: 'unsupported' }); return; }
+    let final = '', interim = '', err = null, settled = false, tm = null;
+    const r = new SR(); r.lang = 'ko-KR'; r.interimResults = true; r.continuous = false; r.maxAlternatives = 1;
+    const fin = () => {
+      if (settled) return; settled = true; clearTimeout(tm); TV.rec = null; TV.listening = false;
+      res({ text: (final || interim).trim(), err });
+    };
+    r.onresult = e => {
+      let f = '', i = '';
+      for (let k = 0; k < e.results.length; k++) { const x = e.results[k]; if (x.isFinal) f += x[0].transcript; else i += x[0].transcript; }
+      final = f; interim = i; const me = el('tvMe'); if (me) me.textContent = '“' + (f + i).trim() + '”';
+    };
+    r.onerror = e => { err = e.error; };
+    r.onend = fin;
+    tm = setTimeout(() => { try { r.stop(); } catch (e) {} }, 12000);
+    TV.rec = r; TV.listening = true; tvSetStatus('listen');
+    setTimeout(() => { if (settled) return; try { r.start(); } catch (e) { err = 'start'; fin(); } }, 250);   // 스피커 소리가 마이크에 섞이지 않도록 잠깐 쉼
+  });
+}
+function tvWaitResume() {
+  return new Promise(res => { TV.paused = true; tvSetStatus('pause'); TV.resume = () => { TV.paused = false; TV.resume = null; res(); }; });
+}
+function tvTap() {
+  if (!TV.on) return;
+  if (TV.paused && TV.resume) { TV.resume(); return; }
+  if (TV.speaking) { try { speechSynthesis.cancel(); } catch (e) {} if (TV.sayFin) TV.sayFin(); return; }   // 질문 건너뛰고 바로 대답
+  if (TV.listening && TV.rec) { try { TV.rec.stop(); } catch (e) {} }                                        // 말 끝났을 때 바로 처리
+}
+// 질문 하나를 말하고 대답(텍스트)을 받는다. "취소"/"이전"은 신호로 던진다.
+async function tvTurn(prompt) {
+  let tries = 0;
+  await tvSay(prompt);
+  while (true) {
+    if (!TV.on) throw { tv: 'cancel' };
+    const r = await tvListen();
+    if (!TV.on) throw { tv: 'cancel' };
+    if (r.err === 'not-allowed' || r.err === 'service-not-allowed') { ta4MicHelp(); throw { tv: 'abort' }; }
+    if (r.err === 'unsupported') { ta3Toast('이 브라우저는 음성인식을 지원하지 않습니다', 3500); throw { tv: 'abort' }; }
+    const t = r.text;
+    if (t) {
+      const s = tvNorm(t);
+      if (TV_RE_CANCEL.test(s)) throw { tv: 'cancel' };
+      if (TV_RE_BACK.test(s)) throw { tv: 'back' };
+      return t;
+    }
+    if (++tries >= 3) { await tvWaitResume(); if (!TV.on) throw { tv: 'cancel' }; tries = 0; await tvSay(prompt); continue; }
+    await tvSay('잘 듣지 못했습니다. 다시 말씀해 주세요.');
+  }
+}
+// 한 항목: 질문 → (대답 해석) → 확인 질문(필요 시) → 저장. 틀렸으면 "아니 OOO"로 바로 정정.
+async function tvStep(o) {
+  let prompt = o.ask;
+  while (true) {
+    const t = await tvTurn(prompt);
+    if (o.optional && tvIsSkip(t)) {
+      TV.data[o.key] = o.skipVal !== undefined ? o.skipVal : ''; if (o.onSet) o.onSet(TV.data[o.key]); tvRenderSum();
+      if (o.skipMsg) await tvSay(o.skipMsg);
+      return;
+    }
+    let v = o.parse(t);
+    if (v === null || v === undefined || v === '') { prompt = o.retry || '잘 알아듣지 못했습니다. 다시 말씀해 주세요.'; continue; }
+    if (!o.confirm) {   // 확인 없이 알려주기만 하는 항목(상품·수주확도)
+      TV.data[o.key] = v; if (o.onSet) o.onSet(v); tvRenderSum();
+      if (o.announce) await tvSay(o.announce(v));
+      return;
+    }
+    let reask = false;
+    while (!reask) {
+      const a = await tvTurn(o.confirm(v));
+      const yn = tvYesNo(a);
+      if (yn === 'yes') { TV.data[o.key] = v; if (o.onSet) o.onSet(v); tvRenderSum(); if (o.announce) await tvSay(o.announce(v)); return; }
+      const rest = yn === 'no' ? tvNoRest(a) : a;
+      const nv = rest ? o.parse(rest) : null;
+      if (nv !== null && nv !== undefined && nv !== '') { v = nv; continue; }   // "아니 대와마트" 또는 그냥 다시 말한 경우 → 새 값으로 다시 확인
+      if (yn === 'no') { reask = true; prompt = o.ask; break; }
+      await tvSay('네 또는 아니오로 대답해 주세요.');
+    }
+  }
+}
+function tvSteps() {
+  const motives = ta4MotiveList('').filter(m => m !== '콜/패밀리넷');
+  const eg = motives.slice(0, 3).join(', ');
+  return [
+    { key: 'start', run: async () => {
+      while (true) {
+        const a = await tvTurn('신규 TA를 등록하시겠습니까?'); const yn = tvYesNo(a);
+        if (yn === 'yes') return;
+        if (yn === 'no') { await tvSay('등록을 취소합니다.'); throw { tv: 'cancel', silent: true }; }
+        await tvSay('네 또는 아니오로 대답해 주세요.');
+      }
+    } },
+    { key: 'company', run: () => tvStep({ key: 'company', ask: '서비스제공처명은 무엇입니까?', parse: tvCleanName,
+      confirm: v => tvJosa(v, '이', '가') + ' 맞습니까?' }) },
+    { key: 'addr', silent: true, run: () => tvSay('주소지는 나중에 지도에서 찾아 입력해 주십시오.') },
+    { key: 'contact', run: () => tvStep({ key: 'contact', ask: '고객 담당자는 누구입니까?', optional: true, parse: tvCleanName,
+      skipMsg: '담당자는 나중에 직접 입력하시면 됩니다.', confirm: v => tvJosa(v, '이', '가') + ' 맞습니까?' }) },
+    { key: 'phone', run: () => tvStep({ key: 'phone', ask: '담당자 전화번호는 무엇입니까?', optional: true, parse: tvParsePhone,
+      retry: '전화번호를 알아듣지 못했습니다. 숫자로 다시 말씀해 주시거나, 모르면 모름이라고 말씀해 주세요.',
+      skipMsg: '전화번호는 나중에 직접 입력하시면 됩니다.', confirm: v => '전화번호는 ' + tvPhoneToKo(v) + ', 맞습니까?' }) },
+    { key: 'amount', run: () => tvStep({ key: 'amount', ask: '예상용역료는 얼마입니까?', optional: true, skipVal: 0, parse: v => { const n = tvParseMoney(v); return n === null ? null : n; },
+      retry: '금액을 알아듣지 못했습니다. 예를 들어 십만원, 삼백오십만원처럼 말씀해 주세요.',
+      skipMsg: '예상용역료는 나중에 직접 입력하시면 됩니다.', confirm: v => '예상용역료가 ' + tvMoneyToKo(v) + ' 입니까?' }) },
+    { key: 'product', run: () => tvStep({ key: 'product', ask: '상품 종류는 무엇입니까? 알람, 정보보안, 블루스캔, 안전상품, 유지보수, 휴엔 중에 말씀해 주세요.', parse: tvParseProduct,
+      retry: '상품을 알아듣지 못했습니다. 알람, 정보보안, 블루스캔, 안전상품, 유지보수, 휴엔 중에 하나만 말씀해 주세요.', announce: v => v + ' 선택되었습니다.' }) },
+    { key: 'motive', run: () => tvStep({ key: 'motive', ask: '영업 동기는 무엇입니까? ' + eg + '와 같이 말씀해 주세요.', parse: v => tvParseMotive(v, motives),
+      retry: '영업 동기를 알아듣지 못했습니다. ' + motives.join(', ') + ' 중에 말씀해 주세요.', confirm: v => v + (tvHasBatchim(v) ? '이시군요?' : '시군요?') }) },
+    { key: 'conf', run: () => tvStep({ key: 'conf', ask: '수주확도는 A, B, C 중 어떻게 되나요?', parse: tvParseConf,
+      retry: '수주확도를 알아듣지 못했습니다. 에이, 비, 씨 중에 말씀해 주세요.', announce: v => '수주확도가 ' + v + ' 이군요.' }) },
+    { key: 'date', run: () => tvStep({ key: 'date', ask: '계약예정일은 언제입니까?', parse: v => { const d = tvParseDate(v); return d ? d.iso : null; },
+      retry: '날짜를 알아듣지 못했습니다. 예를 들어 11월 20일, 또는 내일처럼 말씀해 주세요.',
+      onSet: v => { const [y, m, d] = v.split('-').map(Number); TV.data.dateKo = y + '. ' + m + '. ' + d; },
+      confirm: v => { const [y, m, d] = v.split('-').map(Number); return y + '년 ' + m + '월 ' + d + '일이 맞나요?'; } }) },
+    { key: 'today', silent: true, run: () => tvSay('등록일자는 오늘로 입력하겠습니다.') }
+  ];
+}
+function tvApplyToForm(d) {
+  el('afCompany').value = d.company || '';
+  el('afContact').value = d.contact || '';
+  el('afContactPhone').value = d.phone || '';
+  el('afAmount').value = d.amount ? Number(d.amount).toLocaleString('ko-KR') : '0';
+  el('afProductType').value = d.product;
+  const ms = el('afMotive'); if (ms && !Array.from(ms.options).some(o => o.value === d.motive)) ms.insertAdjacentHTML('afterbegin', `<option value="${escapeHtml(d.motive)}">${escapeHtml(d.motive)}</option>`);
+  ms.value = d.motive;
+  el('afConfidence').value = d.conf;
+  el('afExpectedDate').value = d.date;
+  try { onAgentExpectedDateChange(d.date); } catch (e) {}
+}
+async function tvOpen() {
+  if (TV.on) return;
+  if (!('speechSynthesis' in window) || !(window.SpeechRecognition || window.webkitSpeechRecognition)) { ta3Toast('이 브라우저는 음성 등록을 지원하지 않습니다 (크롬 권장)', 3800); return; }
+  if (!(await ta4MicPerm())) { ta4MicHelp(); return; }
+  TV.on = true; TV.data = {}; TV.paused = false; TV.resume = null;
+  tvVoicePick(); try { speechSynthesis.onvoiceschanged = tvVoicePick; } catch (e) {}
+  try { if (navigator.wakeLock && navigator.wakeLock.request) TV.wake = await navigator.wakeLock.request('screen'); } catch (e) { TV.wake = null; }
+  el('tvOv').classList.add('on'); document.body.classList.add('tv-lock');
+  el('tvAi').textContent = ''; el('tvMe').textContent = ''; tvRenderSum(); tvSetStatus('ai');
+  tvRun();
+}
+async function tvRun() {
+  const steps = tvSteps();
+  let i = 0, outcome = 'cancel';
+  try {
+    while (TV.on && i < steps.length) {
+      try { await steps[i].run(); i++; }
+      catch (e) {
+        if (e && e.tv === 'back') { do { i = Math.max(0, i - 1); } while (i > 0 && steps[i].silent); continue; }
+        throw e;
+      }
+    }
+    if (TV.on && i >= steps.length) {
+      tvApplyToForm(TV.data);
+      tvSetStatus('idle'); el('tvAi').textContent = '저장 중입니다…'; el('tvMe').textContent = '';
+      await handleAgentModalSubmit({ preventDefault() {} });
+      if (PG.st.includes('agentLeadModalOverlay')) {   // 저장 실패 → 폼에 채워진 채로 남겨 직접 저장하게 함
+        await tvSay('저장하지 못했습니다. 화면에서 내용을 확인하고 직접 저장해 주세요.'); outcome = 'fail';
+      } else {
+        await tvSay('TA 신규등록이 모두 완료되었습니다. 좋은 성과를 기대합니다.'); outcome = 'ok';
+      }
+    }
+  } catch (e) {
+    if (e && e.tv === 'cancel' && !e.silent && TV.on) { await tvSay('등록을 취소합니다.'); }
+    else if (e && !e.tv) { console.warn('[음성등록]', e); ta3Toast('음성 등록 중 오류: ' + (e.message || e), 3500); }
+  }
+  tvClose(false);
+}
+function tvClose(user) {
+  if (user && TV.on && !confirm('음성 등록을 중단할까요?')) return;
+  TV.on = false;
+  try { speechSynthesis.cancel(); } catch (e) {}
+  try { if (TV.rec) TV.rec.abort(); } catch (e) {}
+  if (TV.sayFin) TV.sayFin(); if (TV.resume) TV.resume();
+  try { if (TV.wake) TV.wake.release(); } catch (e) {} TV.wake = null;
+  const ov = el('tvOv'); if (ov) ov.classList.remove('on'); document.body.classList.remove('tv-lock');
+}
+window.tvOpen = tvOpen; window.tvTap = tvTap; window.tvClose = tvClose;
+
+
 // ---------- 금일 수주 예정 (전체 화면) ----------
 function openTodayExpectedModal() {
   const today = todayStr();
@@ -10124,6 +10571,7 @@ function ta8nDetail(i) {
     <form id="agentModalLeadForm" onsubmit="handleAgentModalSubmit(event)" class="ta4-form">
       <input type="hidden" id="afEditingId" name="editingId"><input type="hidden" id="agentEditingId">
       <input type="hidden" id="afAddress">
+      <div class="f"><button type="button" class="tv-open" onclick="tvOpen()"><span data-ic="mic"></span><span>음성으로 등록<small>AI가 묻는 질문에 말로 대답하면 자동 등록됩니다 (운전 중 사용)</small></span></button></div>
       <div class="f">
         <label>서비스제공처명 *</label>
         <div class="nm"><input type="text" id="afCompany" required placeholder="현장 정식 명칭" autocomplete="off">
@@ -10162,6 +10610,16 @@ function ta8nDetail(i) {
   <div class="ta4-pf"><div class="in"><button type="submit" form="agentModalLeadForm" id="afSubmitBtn" class="go">TA 등록</button></div></div>
   <!-- 가망고객 문자 등록 (신규 등록 화면 우측 하단 빨간 버튼) -->
   <button type="button" id="afPsFab" onclick="ta4PsOpenFromForm()" aria-label="가망고객 문자로 등록" title="가망고객 문자로 등록" style="position:absolute;right:16px;bottom:calc(82px + env(safe-area-inset-bottom,0px));width:58px;height:58px;border-radius:50%;border:none;background:#dc2626;color:#fff;font-size:15px;font-weight:800;line-height:1;box-shadow:0 6px 16px rgba(220,38,38,.45);cursor:pointer;z-index:5;">가망</button>
+</div>
+
+<!-- 음성으로 TA 등록 -->
+<div class="tv-ov" id="tvOv" role="dialog" aria-label="음성으로 TA 등록">
+  <div class="tv-top"><b>음성으로 TA 등록</b><button type="button" class="tv-x" onclick="tvClose(true)" aria-label="중단">✕</button></div>
+  <div class="tv-mid"><div class="tv-ai" id="tvAi"></div><div class="tv-me" id="tvMe"></div></div>
+  <div class="tv-sum" id="tvSum"></div>
+  <button type="button" class="tv-mic" id="tvMic" onclick="tvTap()" aria-label="마이크"><span data-ic="mic"></span></button>
+  <div class="tv-st" id="tvSt"></div>
+  <div class="tv-hint">앞 질문으로: “이전” · 중단: “취소” · 마이크를 누르면 질문을 건너뛰고 바로 대답할 수 있습니다</div>
 </div>
 
 <!-- 금일 수주 예정 -->
