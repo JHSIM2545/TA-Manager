@@ -8095,7 +8095,7 @@ function ta4CardOpen(mode) {
   else if (mode === 'ctedit') { Object.keys(ta4CardFields()).forEach(k => { c[k] = (el(TA4_CT_F[k]) || {}).value || ''; }); }
   else if (mode === 'lead') { const l = ta2CurLead(); if (!l) return; c = Object.assign({}, TA4.cards[l.id] || {}); if (!c.name) c.name = l.contact || ''; if (!c.mobile && !c.tel && l.contactPhone) c.mobile = ta4FmtPhone(l.contactPhone); sub = l.company || ''; }
   else { c = Object.assign({}, TA4.formCard || {}); if (!c.name) c.name = el('afContact').value.trim(); if (!c.mobile && !c.tel) c.mobile = ta4FmtPhone(el('afContactPhone').value); sub = el('afCompany').value.trim(); }
-  el('ta4CdName').textContent = sub;
+  el('ta4CdName').textContent = (sub ? sub + ' · ' : '') + 'v1105c';   // 화면 버전 표시(최신 반영 확인용)
   ta4CardFill(c);
   el('cdRaw').textContent = ''; ta4CardStatus('', ''); el('cdThumb').removeAttribute('src'); el('cdBadges').innerHTML = '';
   let o = {}; try { o = JSON.parse(localStorage.getItem(TA4_LS_CARDOPT) || '{}'); } catch (e) {}
