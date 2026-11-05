@@ -1234,6 +1234,8 @@
   .cd2-live .cd-frame{left:6%;right:6%;top:16.5%;bottom:16.5%;}
   .cd2-live video{width:100%;height:100%;object-fit:cover;display:block;}
   .cd2-cropbox{background:#0f172a;border-radius:14px;padding:10px;display:flex;justify-content:center;} .cd2-cropbox img{max-width:100%;max-height:52vh;border-radius:6px;background:#fff;}
+  .cd2-exp{align-items:center;gap:10px;margin:10px 4px 0;font-size:13px;font-weight:800;color:var(--mute);} .cd2-exp input{flex:1;height:28px;}
+  .cd2-tip{margin:10px 2px 0;font-size:13px;color:var(--mute);line-height:1.5;}
   .cd2-note{margin:10px 2px 0;font-size:14px;font-weight:700;color:var(--mute);line-height:1.45;} .cd2-note.ok{color:#15803d;} .cd2-note.err{color:#b91c1c;} .cd2-note.busy{color:var(--accent);}
   .cd2-man{position:relative;margin-top:10px;touch-action:none;user-select:none;-webkit-user-select:none;} .cd2-man img{width:100%;display:block;border-radius:8px;pointer-events:none;}
   .cd2-box{position:absolute;border:3px solid #22c55e;box-shadow:0 0 0 999px rgba(0,0,0,.45);box-sizing:border-box;cursor:move;}
@@ -8095,7 +8097,7 @@ function ta4CardOpen(mode) {
   else if (mode === 'ctedit') { Object.keys(ta4CardFields()).forEach(k => { c[k] = (el(TA4_CT_F[k]) || {}).value || ''; }); }
   else if (mode === 'lead') { const l = ta2CurLead(); if (!l) return; c = Object.assign({}, TA4.cards[l.id] || {}); if (!c.name) c.name = l.contact || ''; if (!c.mobile && !c.tel && l.contactPhone) c.mobile = ta4FmtPhone(l.contactPhone); sub = l.company || ''; }
   else { c = Object.assign({}, TA4.formCard || {}); if (!c.name) c.name = el('afContact').value.trim(); if (!c.mobile && !c.tel) c.mobile = ta4FmtPhone(el('afContactPhone').value); sub = el('afCompany').value.trim(); }
-  el('ta4CdName').textContent = (sub ? sub + ' · ' : '') + 'v1105c';   // 화면 버전 표시(최신 반영 확인용)
+  el('ta4CdName').textContent = (sub ? sub + ' · ' : '') + 'v1105d';   // 화면 버전 표시(최신 반영 확인용)
   ta4CardFill(c);
   el('cdRaw').textContent = ''; ta4CardStatus('', ''); el('cdThumb').removeAttribute('src'); el('cdBadges').innerHTML = '';
   let o = {}; try { o = JSON.parse(localStorage.getItem(TA4_LS_CARDOPT) || '{}'); } catch (e) {}
@@ -8127,13 +8129,31 @@ function ta4CardPrep(img) {
   x.putImageData(d, 0, 0); return c;
 }
 // 실시간 카메라(휴대폰에서 바로 카메라 화면이 뜸). 안 되면 사진 앱/앨범으로 대체
+// 카메라 설정: 플래시 끄기·연속 초점·노출 낮추기(빛 반사 줄이기). 지원하는 폰에서만 적용된다.
+async function ta4CardCamTune(st) {
+  try {
+    const tr = st.getVideoTracks()[0], cp = (tr && tr.getCapabilities) ? tr.getCapabilities() : {}, row = el('cdExpRow'), sl = el('cdExp');
+    const put = async c => { try { await tr.applyConstraints({ advanced: [c] }); } catch (e) {} };
+    if (cp.torch) await put({ torch: false });
+    if (cp.focusMode && cp.focusMode.includes('continuous')) await put({ focusMode: 'continuous' });
+    if (cp.whiteBalanceMode && cp.whiteBalanceMode.includes('continuous')) await put({ whiteBalanceMode: 'continuous' });
+    if (cp.exposureMode && cp.exposureMode.includes('continuous')) await put({ exposureMode: 'continuous' });
+    const ec = cp.exposureCompensation;
+    if (ec && ec.max > ec.min) {
+      const def = Math.max(ec.min, Math.min(ec.max, -1)); await put({ exposureCompensation: def });
+      sl.min = ec.min; sl.max = ec.max; sl.step = ec.step || 0.5; sl.value = def; row.style.display = 'flex';
+      sl.oninput = () => put({ exposureCompensation: Number(sl.value) });
+    } else if (row) row.style.display = 'none';
+  } catch (e) {}
+}
 async function ta4CardCamStart() {
   ta4CardCamStop();
   const v = el('cdVideo');
   if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) { ta4CardStatus('실시간 카메라를 쓸 수 없어 사진 앱으로 촬영합니다', 'err'); try { el('cdCam').click(); } catch (e) {} return false; }
   try {
-    const st = await navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: 'environment' }, width: { ideal: 1920 }, height: { ideal: 1080 } }, audio: false });
+    const st = await navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: 'environment' }, width: { ideal: 2560 }, height: { ideal: 1440 } }, audio: false });
     TA4.card.stream = st; v.srcObject = st; try { await v.play(); } catch (e) {}
+    ta4CardCamTune(st);   // 반사가 심한 명함용: 플래시 끄고 노출을 낮추고 초점을 계속 맞춘다
     ta4CardStatus('명함을 틀 안에 맞추고 아래 촬영 버튼을 누르세요', 'busy'); return true;
   } catch (e) {
     const denied = e && (e.name === 'NotAllowedError' || e.name === 'SecurityError');
@@ -8145,6 +8165,7 @@ function ta4CardCamStop() {
   const s = TA4.card && TA4.card.stream; if (s) s.getTracks().forEach(t => t.stop());
   if (TA4.card) TA4.card.stream = null;
   const v = el('cdVideo'); if (v) v.srcObject = null;
+  const er = el('cdExpRow'); if (er) er.style.display = 'none';
 }
 async function ta4CardShoot() {
   if (!TA4.card.stream) { await ta4CardCamStart(); return; }
@@ -8321,9 +8342,72 @@ function ta4MinRect(pts, sampleMax) {
   for (let d = best.d - 1.5; d <= best.d + 1.5; d += 0.25) { const f = fit(d); if (f.area < best.area) best = f; }
   return best;
 }
+
+// 명함 덩어리의 네 모서리(왼위·오른위·오른아래·왼아래). 이상하면 null
+function ta4CardQuad(best, w, h) {
+  const { cs, sn, pts } = best, R = pts.map(p => [p[0] * cs + p[1] * sn, -p[0] * sn + p[1] * cs]);
+  const dirs = [[-1, -1], [1, -1], [1, 1], [-1, 1]], m = Math.max(2, Math.round(R.length * 0.0004)), C = [];
+  for (const d of dirs) {
+    const arr = R.map(p => [p[0] * d[0] + p[1] * d[1], p]).sort((u, v) => v[0] - u[0]).slice(0, m);
+    const mx = arr.reduce((s, e) => s + e[1][0], 0) / m, my = arr.reduce((s, e) => s + e[1][1], 0) / m;
+    C.push([mx * cs - my * sn, mx * sn + my * cs]);   // 원래 좌표로 되돌림
+  }
+  let A = 0; for (let i = 0; i < 4; i++) { const p = C[i], q = C[(i + 1) % 4]; A += p[0] * q[1] - q[0] * p[1]; } A = Math.abs(A) / 2;
+  const fill = pts.length / A; if (!(fill > 0.8 && fill < 1.2)) return null;   // 사각형이 덩어리와 안 맞으면 포기
+  const cx = C.reduce((s, p) => s + p[0], 0) / 4, cy = C.reduce((s, p) => s + p[1], 0) / 4;
+  return C.map(p => [cx + (p[0] - cx) * 0.985, cy + (p[1] - cy) * 0.985]);   // 가장자리 배경이 안 묻도록 살짝 안쪽
+}
+// 원근 보정: 네 모서리를 반듯한 직사각형으로 편다
+function ta4Warp(img, Q, outMax) {
+  try {
+    const d = (a, b) => Math.hypot(a[0] - b[0], a[1] - b[1]);
+    let W = (d(Q[0], Q[1]) + d(Q[3], Q[2])) / 2, H = (d(Q[0], Q[3]) + d(Q[1], Q[2])) / 2; if (W < 40 || H < 40) return null;
+    const k = Math.min(1, outMax / Math.max(W, H)); W = Math.max(2, Math.round(W * k)); H = Math.max(2, Math.round(H * k));
+    const sw = Math.min(img.naturalWidth, 2400), ks = sw / img.naturalWidth, sh = Math.round(img.naturalHeight * ks);
+    const sc = document.createElement('canvas'); sc.width = sw; sc.height = sh; const sx = sc.getContext('2d'); sx.drawImage(img, 0, 0, sw, sh);
+    const S = sx.getImageData(0, 0, sw, sh).data, q = Q.map(p => [p[0] * ks, p[1] * ks]);
+    const dst = [[0, 0], [W, 0], [W, H], [0, H]], M = [], B = [];   // dst(u,v) -> src(x,y) 의 호모그래피 8개 계수
+    for (let i = 0; i < 4; i++) { const [u, v] = dst[i], [x, y] = q[i]; M.push([u, v, 1, 0, 0, 0, -u * x, -v * x]); B.push(x); M.push([0, 0, 0, u, v, 1, -u * y, -v * y]); B.push(y); }
+    for (let i = 0; i < 8; i++) {
+      let p = i; for (let r = i + 1; r < 8; r++) if (Math.abs(M[r][i]) > Math.abs(M[p][i])) p = r;
+      [M[i], M[p]] = [M[p], M[i]]; [B[i], B[p]] = [B[p], B[i]]; const pv = M[i][i]; if (Math.abs(pv) < 1e-9) return null;
+      for (let r = 0; r < 8; r++) if (r !== i) { const f = M[r][i] / pv; for (let c = i; c < 8; c++) M[r][c] -= f * M[i][c]; B[r] -= f * B[i]; }
+    }
+    const hh = B.map((v, i) => v / M[i][i]), o = document.createElement('canvas'); o.width = W; o.height = H;
+    const ox = o.getContext('2d'), out = ox.createImageData(W, H), D = out.data;
+    for (let v = 0; v < H; v++) for (let u = 0; u < W; u++) {
+      const z = hh[6] * u + hh[7] * v + 1, x = (hh[0] * u + hh[1] * v + hh[2]) / z, y = (hh[3] * u + hh[4] * v + hh[5]) / z, o4 = (v * W + u) * 4;
+      const x0 = Math.floor(x), y0 = Math.floor(y); if (x0 < 0 || y0 < 0 || x0 >= sw - 1 || y0 >= sh - 1) { D[o4] = D[o4 + 1] = D[o4 + 2] = 255; D[o4 + 3] = 255; continue; }
+      const fx = x - x0, fy = y - y0, i00 = (y0 * sw + x0) * 4, i10 = i00 + 4, i01 = i00 + sw * 4, i11 = i01 + 4;
+      for (let c = 0; c < 3; c++) D[o4 + c] = S[i00 + c] * (1 - fx) * (1 - fy) + S[i10 + c] * fx * (1 - fy) + S[i01 + c] * (1 - fx) * fy + S[i11 + c] * fx * fy;
+      D[o4 + 3] = 255;
+    }
+    ox.putImageData(out, 0, 0);
+    return ta4Flat(o).toDataURL('image/jpeg', 0.88);
+  } catch (e) { return null; }
+}
+// 조명 얼룩·그림자를 고르게 펴고 약간 선명하게 (스캔한 느낌)
+function ta4Flat(c) {
+  try {
+    const W = c.width, H = c.height, g = Math.max(8, Math.round(Math.max(W, H) / 40)), sw = Math.ceil(W / g), sh = Math.ceil(H / g);
+    const sm = document.createElement('canvas'); sm.width = sw; sm.height = sh; const sx = sm.getContext('2d'); sx.drawImage(c, 0, 0, sw, sh);
+    const sd = sx.getImageData(0, 0, sw, sh).data, L = new Float32Array(sw * sh);
+    for (let i = 0; i < sw * sh; i++) L[i] = sd[i * 4] * 0.299 + sd[i * 4 + 1] * 0.587 + sd[i * 4 + 2] * 0.114;
+    const mx = new Float32Array(sw * sh);   // 글자에 영향받지 않도록 주변 최댓값 → 부드럽게
+    for (let j = 0; j < sh; j++) for (let i = 0; i < sw; i++) { let m = 0; for (let dj = -2; dj <= 2; dj++) for (let di = -2; di <= 2; di++) { const ii = i + di, jj = j + dj; if (ii >= 0 && jj >= 0 && ii < sw && jj < sh) m = Math.max(m, L[jj * sw + ii]); } mx[j * sw + i] = m; }
+    const gm = document.createElement('canvas'); gm.width = sw; gm.height = sh; const gx = gm.getContext('2d'), gd = gx.createImageData(sw, sh);
+    for (let i = 0; i < sw * sh; i++) { const gain = Math.max(0.85, Math.min(1.7, 238 / Math.max(60, mx[i]))); const v = Math.round((gain - 0.5) / 1.5 * 255); gd.data[i * 4] = gd.data[i * 4 + 1] = gd.data[i * 4 + 2] = v; gd.data[i * 4 + 3] = 255; }
+    gx.putImageData(gd, 0, 0);
+    const bg = document.createElement('canvas'); bg.width = W; bg.height = H; const bx = bg.getContext('2d'); bx.imageSmoothingEnabled = true; bx.imageSmoothingQuality = 'high'; bx.drawImage(gm, 0, 0, W, H);
+    const gdat = bx.getImageData(0, 0, W, H).data, x = c.getContext('2d'), img = x.getImageData(0, 0, W, H), D = img.data;
+    for (let i = 0; i < W * H; i++) { const gain = gdat[i * 4] / 255 * 1.5 + 0.5; for (let k = 0; k < 3; k++) { const v = (D[i * 4 + k] * gain - 128) * 1.08 + 128; D[i * 4 + k] = v < 0 ? 0 : v > 255 ? 255 : v; } }
+    x.putImageData(img, 0, 0);
+  } catch (e) {}
+  return c;
+}
 function ta4CardDeskew(img, outMax) {
   try {
-    const iw = img.naturalWidth, ih = img.naturalHeight, W = 200, sc = W / Math.max(iw, ih), w = Math.max(8, Math.round(iw * sc)), h = Math.max(8, Math.round(ih * sc)), N = w * h;
+    const iw = img.naturalWidth, ih = img.naturalHeight, W = 300, sc = W / Math.max(iw, ih), w = Math.max(8, Math.round(iw * sc)), h = Math.max(8, Math.round(ih * sc)), N = w * h;
     const c = document.createElement('canvas'); c.width = w; c.height = h; const x = c.getContext('2d'); x.drawImage(img, 0, 0, w, h);
     const a = x.getImageData(0, 0, w, h).data, g = new Float32Array(N), b = new Float32Array(N);
     for (let i = 0; i < N; i++) g[i] = a[i * 4] * 0.299 + a[i * 4 + 1] * 0.587 + a[i * 4 + 2] * 0.114;
@@ -8345,20 +8429,24 @@ function ta4CardDeskew(img, outMax) {
         const r = ta4MinRect(pts, 2500), rw = r.x1 - r.x0, rh = r.y1 - r.y0, fill = area / r.area, asp = Math.max(rw, rh) / Math.min(rw, rh);
         if (fill < 0.75 || asp > 3) continue;
         const score = fill - 2.5 * bt / area - ((asp < 1.2 || asp > 2.4) ? 0.35 : 0) + 0.25 * (area / N);
-        if (!best || score > best.score) best = Object.assign(r, { score, area });
+        if (!best || score > best.score) best = Object.assign(r, { score, area, pts });
       }
     }
     if (!best || best.score < 0.5) return null;
+    // 1순위: 4개 모서리를 찾아 원근을 펴서 스캔한 것처럼 반듯하게 (비스듬히 찍어도 직사각형)
+    const q = ta4CardQuad(best, w, h);
+    if (q) { const o = ta4Warp(img, q.map(p => [p[0] / sc, p[1] / sc]), outMax || 1100); if (o) return o; }
+    // 2순위: 기울기만 바로잡아 자르기
     let { cs, sn, x0, x1, y0, y1 } = best;
     const inset = 0.01 * Math.min(x1 - x0, y1 - y0); x0 += inset; x1 -= inset; y0 += inset; y1 -= inset;
     const rw = x1 - x0, rh = y1 - y0; if (rw < w * 0.15 || rh < h * 0.15) return null;
     const cx = (x0 + x1) / 2, cy = (y0 + y1) / 2, ox = (cx * cs - cy * sn) / sc, oy = (cx * sn + cy * cs) / sc;
     const OW = rw / sc, OH = rh / sc, k = Math.min(1, (outMax || 1100) / Math.max(OW, OH));
     const o = document.createElement('canvas'); o.width = Math.max(1, Math.round(OW * k)); o.height = Math.max(1, Math.round(OH * k));
-    const q = o.getContext('2d'); q.fillStyle = '#fff'; q.fillRect(0, 0, o.width, o.height);
-    q.setTransform(cs * k, -sn * k, sn * k, cs * k, o.width / 2 - (ox * cs + oy * sn) * k, o.height / 2 - (-ox * sn + oy * cs) * k);
-    q.drawImage(img, 0, 0);
-    return o.toDataURL('image/jpeg', 0.88);
+    const qx = o.getContext('2d'); qx.fillStyle = '#fff'; qx.fillRect(0, 0, o.width, o.height);
+    qx.setTransform(cs * k, -sn * k, sn * k, cs * k, o.width / 2 - (ox * cs + oy * sn) * k, o.height / 2 - (-ox * sn + oy * cs) * k);
+    qx.drawImage(img, 0, 0);
+    return ta4Flat(o).toDataURL('image/jpeg', 0.88);
   } catch (e) { return null; }
 }
 // 연락처 사진용: 작은 JPEG (vCard 에 넣어도 가볍게)
@@ -9997,6 +10085,8 @@ function ta8nDetail(i) {
   <div class="ta4-pb"><div class="in ta4-form">
     <div class="cd2-sec" data-s="cam">
       <div class="cd2-live"><video id="cdVideo" playsinline autoplay muted></video><div class="cd-frame"></div></div>
+      <div id="cdExpRow" class="cd2-exp" style="display:none;"><span>어둡게</span><input type="range" id="cdExp" min="-2" max="2" step="0.5" value="-1"><span>밝게</span></div>
+      <div class="cd2-tip">💡 명함이 번쩍이면 <b>밝기를 낮추거나</b> 명함을 살짝 기울여 조명이 비치지 않게 찍어 보세요. 비스듬히 찍어도 반듯하게 펴 드려요.</div>
     </div>
     <div class="cd2-sec" data-s="crop">
       <div class="cd2-cropbox"><img id="cdCropImg" alt="자른 명함"></div>
