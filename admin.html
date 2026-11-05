@@ -7946,7 +7946,7 @@ function ta4CardOpen(mode) {
   else if (mode === 'ctedit') { Object.keys(ta4CardFields()).forEach(k => { c[k] = (el(TA4_CT_F[k]) || {}).value || ''; }); }
   else if (mode === 'lead') { const l = ta2CurLead(); if (!l) return; c = Object.assign({}, TA4.cards[l.id] || {}); if (!c.name) c.name = l.contact || ''; if (!c.mobile && !c.tel && l.contactPhone) c.mobile = ta4FmtPhone(l.contactPhone); sub = l.company || ''; }
   else { c = Object.assign({}, TA4.formCard || {}); if (!c.name) c.name = el('afContact').value.trim(); if (!c.mobile && !c.tel) c.mobile = ta4FmtPhone(el('afContactPhone').value); sub = el('afCompany').value.trim(); }
-  el('ta4CdName').textContent = (sub ? sub + ' · ' : '') + 'v1105h';   // 화면 버전 표시(최신 반영 확인용)
+  el('ta4CdName').textContent = (sub ? sub + ' · ' : '') + 'v1105i';   // 화면 버전 표시(최신 반영 확인용)
   ta4CardFill(c);
   el('cdRaw').textContent = ''; ta4CardStatus('', ''); el('cdThumb').removeAttribute('src'); el('cdBadges').innerHTML = '';
   let o = {}; try { o = JSON.parse(localStorage.getItem(TA4_LS_CARDOPT) || '{}'); } catch (e) {}
@@ -7999,26 +7999,53 @@ async function ta4CardCamTune(st) {
 // 화면을 톡 누르면 그 지점으로 초점·노출을 맞춘다 (지원하지 않는 폰은 자동 초점을 다시 맞춘다)
 async function ta4CardTapFocus(ev) {
   const C = TA4.card, st = C && C.stream, v = el('cdVideo'), box = el('cdLive'); if (!st || !v || !v.videoWidth) return;
+  if (C.afBusy) return;
   const r = box.getBoundingClientRect(), px = ev.clientX - r.left, py = ev.clientY - r.top;
   const ring = el('cdRing'); ring.style.left = px + 'px'; ring.style.top = py + 'px'; ring.classList.remove('go'); void ring.offsetWidth; ring.classList.add('go');
   const sc = Math.max(r.width / v.videoWidth, r.height / v.videoHeight), dw = v.videoWidth * sc, dh = v.videoHeight * sc;
   const nx = Math.min(1, Math.max(0, (px + (dw - r.width) / 2) / dw)), ny = Math.min(1, Math.max(0, (py + (dh - r.height) / 2) / dh));
   const tr = st.getVideoTracks()[0]; if (!tr) return;
-  let cp = {}, se = {}; try { cp = tr.getCapabilities ? tr.getCapabilities() : {}; se = tr.getSettings ? tr.getSettings() : {}; } catch (e) {}
+  let cp = {}; try { cp = tr.getCapabilities ? tr.getCapabilities() : {}; } catch (e) {}
   const put = async c => { try { await tr.applyConstraints({ advanced: [c] }); return true; } catch (e) { return false; } };
-  const modes = cp.focusMode || [], poi = ('pointsOfInterest' in se) || ('pointsOfInterest' in cp);
-  const pt = [{ x: nx, y: ny }];
-  ta4CardStatus('초점을 맞추는 중…', 'busy');
-  if (poi) {
-    if (modes.includes('single-shot')) await put({ focusMode: 'single-shot', pointsOfInterest: pt }); else await put({ focusMode: 'continuous', pointsOfInterest: pt });
-    if ((cp.exposureMode || []).includes('single-shot')) await put({ exposureMode: 'single-shot', pointsOfInterest: pt }); else if ((cp.exposureMode || []).includes('continuous')) await put({ exposureMode: 'continuous', pointsOfInterest: pt });
-  } else if (modes.includes('single-shot')) { await put({ focusMode: 'single-shot' }); }
-  else if (modes.includes('manual') && modes.includes('continuous')) { await put({ focusMode: 'manual' }); await new Promise(r2 => setTimeout(r2, 120)); }
-  clearTimeout(C.focusT);
-  C.focusT = setTimeout(async () => {
-    if (modes.includes('continuous')) await put(poi ? { focusMode: 'continuous', pointsOfInterest: pt } : { focusMode: 'continuous' });
-    ta4CardStatus(poi ? '초점을 맞췄어요. 글자가 또렷하면 촬영 버튼을 누르세요' : '초점을 다시 맞췄어요. 명함을 폰에서 15~25cm 떨어뜨리면 더 또렷해요', 'ok');
-  }, 1100);
+  const modes = cp.focusMode || [], fd = cp.focusDistance, pt = [{ x: nx, y: ny }];
+  C.afBusy = true;
+  try {
+    // 1) 폰이 지점 초점을 지원하면(지원 표시가 없어도 일단 요청) 그 지점으로 초점·노출을 맞춘다
+    ta4CardStatus('초점을 맞추는 중…', 'busy');
+    await put({ focusMode: modes.includes('single-shot') ? 'single-shot' : 'continuous', pointsOfInterest: pt });
+    await put({ exposureMode: (cp.exposureMode || []).includes('single-shot') ? 'single-shot' : 'continuous', pointsOfInterest: pt });
+    // 2) 수동 초점이 되는 폰: 눌린 지점의 선명도를 직접 재면서 가장 또렷한 거리를 찾는다
+    if (modes.includes('manual') && fd && fd.max > fd.min) {
+      const lo = Math.max(fd.min, 0.05), hi = Math.min(fd.max, 0.9), N = 11;
+      const ds = []; for (let i = 0; i < N; i++) { const dio = 1 / lo + (1 / hi - 1 / lo) * (i / (N - 1)); ds.push(1 / dio); }
+      await put({ focusMode: 'manual' });
+      let best = null;
+      const score = async d => { await put({ focusMode: 'manual', focusDistance: d }); await new Promise(res => setTimeout(res, 230)); return ta4CardSharp(v, nx, ny); };
+      const res = []; for (const d of ds) { const s = await score(d); res.push({ d, s }); if (!best || s > best.s) best = { d, s }; }
+      // 가장 좋은 곳 주변을 한 번 더 촘촘히
+      const bi = res.findIndex(x => x.d === best.d), a = res[Math.max(0, bi - 1)].d, b = res[Math.min(res.length - 1, bi + 1)].d;
+      for (let i = 1; i <= 4; i++) { const d = a + (b - a) * (i / 5); const s = await score(d); if (s > best.s) best = { d, s }; }
+      await put({ focusMode: 'manual', focusDistance: best.d });
+      ta4CardStatus('초점을 맞췄어요(수동 탐색). 다른 곳을 누르면 다시 맞춰요', 'ok');
+      return;
+    }
+    clearTimeout(C.focusT);
+    C.focusT = setTimeout(async () => {
+      if (modes.includes('continuous')) await put({ focusMode: 'continuous', pointsOfInterest: pt });
+      ta4CardStatus('초점을 맞췄어요. 글자가 흐리면 폰을 15~25cm 떨어뜨려 보세요', 'ok');
+    }, 1100);
+  } finally { C.afBusy = false; }
+}
+// 눌린 지점 주변의 선명도(라플라시안 분산) — 클수록 또렷하다
+function ta4CardSharp(v, nx, ny) {
+  const S = 120, c = ta4CardSharp.c || (ta4CardSharp.c = document.createElement('canvas')); c.width = S; c.height = S;
+  const rw = Math.max(80, Math.round(v.videoWidth * 0.22)), x0 = Math.min(v.videoWidth - rw, Math.max(0, Math.round(nx * v.videoWidth - rw / 2))), y0 = Math.min(v.videoHeight - rw, Math.max(0, Math.round(ny * v.videoHeight - rw / 2)));
+  const g = c.getContext('2d', { willReadFrequently: true }); g.drawImage(v, x0, y0, rw, rw, 0, 0, S, S);
+  const d = g.getImageData(0, 0, S, S).data, gr = new Float32Array(S * S);
+  for (let i = 0; i < S * S; i++) gr[i] = d[i * 4] * 0.3 + d[i * 4 + 1] * 0.59 + d[i * 4 + 2] * 0.11;
+  let sum = 0, sq = 0, n = 0;
+  for (let y = 1; y < S - 1; y++) for (let x = 1; x < S - 1; x++) { const i = y * S + x, l = 4 * gr[i] - gr[i - 1] - gr[i + 1] - gr[i - S] - gr[i + S]; sum += l; sq += l * l; n++; }
+  const m = sum / n; return sq / n - m * m;
 }
 // 대비(콘트라스트): 미리보기와 촬영본에 같은 값을 적용 + 글자 선명도(샤프닝)
 function ta4CardCon() { const s = el('cdCon'); const v = s ? Number(s.value) : 1.25; return isFinite(v) ? v : 1.25; }
@@ -8060,6 +8087,15 @@ function ta4CardCamStop() {
   const v = el('cdVideo'); if (v) v.srcObject = null;
   const er = el('cdExpRow'); if (er) er.style.display = 'none';
 }
+function ta4CardSharpCv(cv) {
+  const S = 160, t = document.createElement('canvas'); t.width = S; t.height = S; const g = t.getContext('2d', { willReadFrequently: true });
+  g.drawImage(cv, cv.width * 0.2, cv.height * 0.2, cv.width * 0.6, cv.height * 0.6, 0, 0, S, S);
+  const d = g.getImageData(0, 0, S, S).data, gr = new Float32Array(S * S);
+  for (let i = 0; i < S * S; i++) gr[i] = d[i * 4] * 0.3 + d[i * 4 + 1] * 0.59 + d[i * 4 + 2] * 0.11;
+  let sum = 0, sq = 0, n = 0;
+  for (let y = 1; y < S - 1; y++) for (let x = 1; x < S - 1; x++) { const i = y * S + x, l = 4 * gr[i] - gr[i - 1] - gr[i + 1] - gr[i - S] - gr[i + S]; sum += l; sq += l * l; n++; }
+  const m = sum / n; return sq / n - m * m;
+}
 async function ta4CardShoot() {
   if (!TA4.card.stream) { await ta4CardCamStart(); return; }
   const v = el('cdVideo'); if (!v.videoWidth) { ta4CardStatus('카메라 준비 중입니다. 잠시 후 다시 눌러주세요', 'busy'); return; }
@@ -8067,7 +8103,14 @@ async function ta4CardShoot() {
   const vw = v.videoWidth, vh = v.videoHeight, ra = 4 / 3; let sw = vw, sh = vh;
   if (vw / vh < ra) sh = Math.round(vw / ra); else sw = Math.round(vh * ra);
   const sx = Math.round((vw - sw) / 2), sy = Math.round((vh - sh) / 2);
-  const c = document.createElement('canvas'); c.width = sw; c.height = sh; c.getContext('2d').drawImage(v, sx, sy, sw, sh, 0, 0, sw, sh);
+  // 손떨림·초점 흔들림 대비: 짧게 5장 받아 가장 선명한 한 장을 쓴다
+  let c = null, bestS = -1;
+  for (let k = 0; k < 5; k++) {
+    const t = document.createElement('canvas'); t.width = sw; t.height = sh; t.getContext('2d').drawImage(v, sx, sy, sw, sh, 0, 0, sw, sh);
+    let sc2 = 0; try { sc2 = ta4CardSharpCv(t); } catch (x) {}
+    if (sc2 > bestS) { bestS = sc2; c = t; }
+    if (k < 4) await new Promise(res => setTimeout(res, 90));
+  }
   try { ta4CardEnhance(c, ta4CardCon()); } catch (x) {}
   const blob = await new Promise(r => c.toBlob(r, 'image/jpeg', 0.92));
   ta4CardCamStop(); ta4CardGot(new File([blob], 'card.jpg', { type: 'image/jpeg' }));
