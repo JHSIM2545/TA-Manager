@@ -1196,6 +1196,9 @@
   .cd-live video{width:100%;height:100%;object-fit:cover;display:block;}
   .cd-frame{position:absolute;left:7%;right:7%;top:16%;bottom:16%;border:2.5px dashed rgba(255,255,255,.9);border-radius:10px;box-shadow:0 0 0 999px rgba(0,0,0,.28);pointer-events:none;}
   /* 명함 인식 공용 화면 */
+  #ta4CardPg .ck{display:flex;align-items:center;gap:10px;padding:11px 2px;font-size:14.5px;font-weight:700;color:var(--ink);}
+  #ta4CardPg .ck input{flex:none;width:22px;height:22px;margin:0;accent-color:var(--navy);}
+  #ta4CardPg .ck small{color:var(--soft);font-weight:600;margin-left:auto;font-size:12px;text-align:right;max-width:46%;}
   #ta4CardPg [data-s]{display:none;}
   #ta4CardPg[data-st="cam"] [data-s~="cam"],#ta4CardPg[data-st="crop"] [data-s~="crop"],#ta4CardPg[data-st="manual"] [data-s~="manual"],#ta4CardPg[data-st="work"] [data-s~="work"],#ta4CardPg[data-st="fail"] [data-s~="fail"],#ta4CardPg[data-st="ok"] [data-s~="ok"]{display:block;}
   #ta4CardPg[data-st="cam"] .cd2-ft[data-s~="cam"],#ta4CardPg[data-st="crop"] .cd2-ft[data-s~="crop"],#ta4CardPg[data-st="manual"] .cd2-ft[data-s~="manual"],#ta4CardPg[data-st="work"] .cd2-ft[data-s~="work"],#ta4CardPg[data-st="fail"] .cd2-ft[data-s~="fail"],#ta4CardPg[data-st="ok"] .cd2-ft[data-s~="ok"]{display:flex;}
@@ -7939,13 +7942,14 @@ function ta4CardOpen(mode) {
   else if (mode === 'ctedit') { Object.keys(ta4CardFields()).forEach(k => { c[k] = (el(TA4_CT_F[k]) || {}).value || ''; }); }
   else if (mode === 'lead') { const l = ta2CurLead(); if (!l) return; c = Object.assign({}, TA4.cards[l.id] || {}); if (!c.name) c.name = l.contact || ''; if (!c.mobile && !c.tel && l.contactPhone) c.mobile = ta4FmtPhone(l.contactPhone); sub = l.company || ''; }
   else { c = Object.assign({}, TA4.formCard || {}); if (!c.name) c.name = el('afContact').value.trim(); if (!c.mobile && !c.tel) c.mobile = ta4FmtPhone(el('afContactPhone').value); sub = el('afCompany').value.trim(); }
-  el('ta4CdName').textContent = (sub ? sub + ' · ' : '') + 'v1105d';   // 화면 버전 표시(최신 반영 확인용)
+  el('ta4CdName').textContent = (sub ? sub + ' · ' : '') + 'v1105e';   // 화면 버전 표시(최신 반영 확인용)
   ta4CardFill(c);
   el('cdRaw').textContent = ''; ta4CardStatus('', ''); el('cdThumb').removeAttribute('src'); el('cdBadges').innerHTML = '';
   let o = {}; try { o = JSON.parse(localStorage.getItem(TA4_LS_CARDOPT) || '{}'); } catch (e) {}
   el('cdPhoto').checked = o.photo !== false;
+  el('cdPhoneOpt').checked = mode === 'phone' ? true : !!o.phone; el('cdPhoneRow').style.display = mode === 'ctedit' ? 'none' : '';
   el('cdPhotoRow').style.display = (mode === 'lead' || mode === 'form') ? '' : 'none';
-  el('cdApply').textContent = mode === 'phone' ? '완료' : mode === 'book' ? '연락처에 저장' : mode === 'ctedit' ? '입력란에 적용' : '고객 정보에 적용';
+  el('cdApply').textContent = mode === 'ctedit' ? '입력란에 적용' : '저장';
   ta4CardStage('cam');
   ta4Show('ta4CardPg', ta4CardCamStop);
   ta4CardCamStart();   // 카메라 바로 실행(실시간 화면)
@@ -8102,13 +8106,12 @@ async function ta4CardRecognize() {
     try { C.small = ta4PhotoSmall(await ta4LoadImg(C.crop)); } catch (x) { C.small = ''; }
     C.busy = false;
     if (!n) { ta4CardFail('글자를 인식하지 못했어요.' + (via === 'ocr' && why ? '\n(AI 인식 실패: ' + why + ')' : '')); return; }
-    ta4CardStage('ok'); ta4CardStatus(`인식 완료${via === 'ocr' ? '(기본 인식)' : ''} — ${n}개 항목. 잘못된 곳은 고쳐주세요.`, 'ok');
-    try { await ta4CardToBook(); } catch (e) { ta3Toast('TA 연락처 저장 실패: ' + ((e && e.message) || e), 3500); }
+    ta4CardStage('ok'); ta4CardStatus(`인식 완료${via === 'ocr' ? '(기본 인식)' : ''} — ${n}개 항목. 잘못된 곳은 고친 뒤 [저장]을 눌러 주세요.`, 'ok');
     ta4CardBadges();
   } catch (e) { C.busy = false; ta4CardFail('인식 중 오류: ' + ((e && e.message) || e)); }
 }
 function ta4CardFail(msg) { ta4CardStage('fail'); ta4CardStatus(msg + '\n[재시도] 또는 [재촬영]을 눌러 주세요.', 'err'); ta4CardBadges(); }
-function ta4CardManualInput() { ta4CardStage('ok'); ta4CardStatus('직접 입력한 뒤 저장해 주세요.', 'busy'); }
+function ta4CardManualInput() { ta4CardStage('ok'); ta4CardStatus('직접 입력한 뒤 [저장]을 눌러 주세요.', 'busy'); }
 // 인식되면 바로 TA 개인 연락처에 저장한다(같은 사람이면 갱신)
 async function ta4CardToBook() {
   const C = TA4.card; if (C.mode === 'ctedit') return null;
@@ -8126,7 +8129,7 @@ async function ta4CardToBook() {
 }
 function ta4CardBadges() {
   const C = TA4.card, b = el('cdBadges'); if (!b) return;
-  b.innerHTML = (C.ctId ? '<span class="cd2-b ok">✓ TA 연락처에 저장됨</span>' : '') + (C.ctId || C.mode === 'phone' ? (ta4PhIs(C.ctId) ? '<span class="cd2-b ok">📱 휴대폰 저장됨</span>' : '<span class="cd2-b">📱 휴대폰 미저장</span>') : '');
+  b.innerHTML = (C.ctId ? '<span class="cd2-b ok">✓ TA 연락처에 저장됨</span>' : '') + (C.ctId ? (ta4PhIs(C.ctId) ? '<span class="cd2-b ok">📱 휴대폰 저장됨</span>' : '<span class="cd2-b">📱 휴대폰 미저장</span>') : '');
   const pb = el('cdPhoneBtn'); if (pb) pb.textContent = ta4PhIs(C.ctId) ? '📱 휴대폰에 다시 저장' : '📱 휴대폰에 저장';
 }
 // 휴대폰 연락처에 저장 (.vcf 를 연락처 앱으로 넘김 — 사진 포함)
@@ -8139,13 +8142,15 @@ async function ta4CardApply() {
   const C = TA4.card, c = ta4CardRead();
   if (!c.name && !c.mobile && !c.tel && !c.email) { ta3Toast('저장할 정보가 없습니다'); return; }
   const mode = C.mode, wantPhoto = el('cdPhoto').checked, img = C.crop || C.srcUrl;
-  try { localStorage.setItem(TA4_LS_CARDOPT, JSON.stringify({ photo: wantPhoto })); } catch (e) {}
+  const wantPhone = mode !== 'ctedit' && el('cdPhoneOpt').checked;
+  try { localStorage.setItem(TA4_LS_CARDOPT, JSON.stringify({ photo: wantPhoto, phone: mode === 'phone' ? (JSON.parse(localStorage.getItem(TA4_LS_CARDOPT) || '{}').phone || false) : wantPhone })); } catch (e) {}
   const phone = c.mobile || c.tel;
   if (mode === 'ctedit') {
     Object.keys(ta4CardFields()).forEach(k => { if (c[k]) el(TA4_CT_F[k]).value = c[k]; });
     if (img) TA4.ct.ed.card_img = img; ta4CtEdMedia(); ta4Close('ta4CardPg'); ta3Toast('명함 정보 입력됨'); return;
   }
-  try { await ta4CardToBook(); } catch (e) { ta3Toast('TA 연락처 저장 실패: ' + ((e && e.message) || e), 3500); }
+  if (wantPhone) { const pc = Object.assign({}, c); if (C.small) pc.photo = C.small; if (mode === 'phone') pc.memo = '명함등록'; ta4PhoneSave(pc, c.company || '', C.ctId, true); }   // 누른 직후 바로 공유 창을 연다
+  try { await ta4CardToBook(); if (wantPhone) TA4PH.id = C.ctId; } catch (e) { ta3Toast('TA 연락처 저장 실패: ' + ((e && e.message) || e), 3500); return; }
   if (mode === 'book' || mode === 'phone') { ta4Close('ta4CardPg'); ta3Toast('TA 연락처에 저장됨'); return; }
   if (mode === 'form') {
     el('afContact').value = c.name; el('afContactPhone').value = phone;
@@ -10260,7 +10265,7 @@ if ('serviceWorker' in navigator) navigator.serviceWorker.addEventListener('mess
         <div class="row2 f"><div><label>팩스</label><input type="tel" inputmode="tel" id="cdFax"></div><div><label>이메일</label><input type="email" inputmode="email" id="cdEmail" autocapitalize="off"></div></div>
         <div class="f" style="margin-bottom:0;"><label>주소</label><input type="text" id="cdAddr"></div>
       </div>
-      <div class="box" style="padding:6px 14px;" id="cdPhotoRow"><label class="ck"><input type="checkbox" id="cdPhoto" checked> 명함 사진을 노트에 첨부</label></div>
+      <div class="box" style="padding:6px 14px;"><label class="ck" id="cdPhoneRow"><input type="checkbox" id="cdPhoneOpt"> 내 휴대폰 연락처에도 같이 저장<small>저장 후 연락처 앱의 저장 화면이 열려요</small></label><label class="ck" id="cdPhotoRow"><input type="checkbox" id="cdPhoto" checked> 명함 사진을 노트에 첨부</label></div>
       <details class="cd-raw"><summary>인식된 원문</summary><pre id="cdRaw"></pre></details>
     </div>
     <div class="cd-st" id="cdStatusCam" data-s="cam"></div>
@@ -10273,7 +10278,7 @@ if ('serviceWorker' in navigator) navigator.serviceWorker.addEventListener('mess
     <div class="in cd2-ft" data-s="manual"><button type="button" class="tool" onclick="ta4CardSetCrop(TA4.card.crop, TA4.card.how)">취소</button><button type="button" class="go" onclick="ta4CardManualDone()">자르기 완료</button></div>
     <div class="in cd2-ft" data-s="work"><button type="button" class="tool" style="flex:1;" onclick="ta4CardRetake()">재촬영</button></div>
     <div class="in cd2-ft" data-s="fail"><button type="button" class="tool" style="flex:1;" onclick="ta4CardRetake()">재촬영</button><button type="button" class="go" onclick="ta4CardRecognize()">재시도</button></div>
-    <div class="in cd2-ft" data-s="ok"><button type="button" class="tool" id="cdPhoneBtn" style="flex:1;" onclick="ta4CardPhone()">📱 휴대폰에 저장</button><button type="button" class="go" id="cdApply" onclick="ta4CardApply()">고객 정보에 적용</button></div>
+    <div class="in cd2-ft" data-s="ok"><button type="button" class="go" id="cdApply" onclick="ta4CardApply()">저장</button></div>
   </div>
 </div>
 
