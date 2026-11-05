@@ -1195,6 +1195,33 @@
   .cd-live{position:relative;width:100%;aspect-ratio:4/3;max-height:340px;border-radius:12px;overflow:hidden;background:#000;margin-bottom:10px;}
   .cd-live video{width:100%;height:100%;object-fit:cover;display:block;}
   .cd-frame{position:absolute;left:7%;right:7%;top:16%;bottom:16%;border:2.5px dashed rgba(255,255,255,.9);border-radius:10px;box-shadow:0 0 0 999px rgba(0,0,0,.28);pointer-events:none;}
+  /* 명함 인식 공용 화면 */
+  #ta4CardPg [data-s]{display:none;}
+  #ta4CardPg[data-st="cam"] [data-s~="cam"],#ta4CardPg[data-st="crop"] [data-s~="crop"],#ta4CardPg[data-st="manual"] [data-s~="manual"],#ta4CardPg[data-st="work"] [data-s~="work"],#ta4CardPg[data-st="fail"] [data-s~="fail"],#ta4CardPg[data-st="ok"] [data-s~="ok"]{display:block;}
+  #ta4CardPg[data-st="cam"] .cd2-ft[data-s~="cam"],#ta4CardPg[data-st="crop"] .cd2-ft[data-s~="crop"],#ta4CardPg[data-st="manual"] .cd2-ft[data-s~="manual"],#ta4CardPg[data-st="work"] .cd2-ft[data-s~="work"],#ta4CardPg[data-st="fail"] .cd2-ft[data-s~="fail"],#ta4CardPg[data-st="ok"] .cd2-ft[data-s~="ok"]{display:flex;}
+  .cd2-live{position:relative;width:100%;height:min(66vh,560px);border-radius:14px;overflow:hidden;background:#000;}
+  .cd2-live video{width:100%;height:100%;object-fit:cover;display:block;}
+  .cd2-cropbox{background:#0f172a;border-radius:14px;padding:10px;display:flex;justify-content:center;} .cd2-cropbox img{max-width:100%;max-height:52vh;border-radius:6px;background:#fff;}
+  .cd2-note{margin:10px 2px 0;font-size:14px;font-weight:700;color:var(--mute);line-height:1.45;} .cd2-note.ok{color:#15803d;} .cd2-note.err{color:#b91c1c;} .cd2-note.busy{color:var(--accent);}
+  .cd2-man{position:relative;margin-top:10px;touch-action:none;user-select:none;-webkit-user-select:none;} .cd2-man img{width:100%;display:block;border-radius:8px;pointer-events:none;}
+  .cd2-box{position:absolute;border:3px solid #22c55e;box-shadow:0 0 0 999px rgba(0,0,0,.45);box-sizing:border-box;cursor:move;}
+  .cd2-box i{position:absolute;width:30px;height:30px;background:#22c55e;border:3px solid #fff;border-radius:50%;box-sizing:border-box;}
+  .cd2-box i[data-h=tl]{left:-15px;top:-15px;} .cd2-box i[data-h=tr]{right:-15px;top:-15px;} .cd2-box i[data-h=bl]{left:-15px;bottom:-15px;} .cd2-box i[data-h=br]{right:-15px;bottom:-15px;}
+  .cd2-res{display:flex;gap:12px;align-items:flex-start;margin-bottom:12px;} .cd2-res img{width:132px;max-height:100px;object-fit:contain;border-radius:8px;background:#f1f3f8;border:1px solid var(--line);flex:none;} .cd2-resr{flex:1;min-width:0;}
+  .cd2-bs{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:6px;} .cd2-b{padding:4px 10px;border-radius:99px;background:#eef1f7;color:var(--mute);font-size:12.5px;font-weight:800;} .cd2-b.ok{background:#dcfce7;color:#15803d;}
+  .cd2-resr .cd-st{margin-top:0;}
+  .cd2-lnk{margin:-4px 0 12px;} .cd2-lnk button{background:none;border:none;color:var(--accent);font-size:14px;font-weight:800;text-decoration:underline;padding:6px 2px;}
+  .cd2-pf{padding-top:12px;} .cd2-ft{align-items:center;}
+  .cd2-ft[data-s~="cam"]{justify-content:space-between;}
+  .cd2-side{flex:none;width:72px;display:flex;flex-direction:column;align-items:center;gap:2px;background:none !important;color:var(--navy) !important;padding:4px 0 !important;font-size:12px !important;}
+  .cd2-side [data-ic] svg{width:30px;height:30px;}
+  .cd2-shutter{width:76px;height:76px;border-radius:50% !important;padding:0 !important;background:#fff !important;border:4px solid var(--navy) !important;display:flex;align-items:center;justify-content:center;margin:0 auto;box-shadow:0 2px 10px rgba(0,0,0,.2);}
+  .cd2-shutter i{display:block;width:56px;height:56px;border-radius:50%;background:var(--navy);} .cd2-shutter:active i{transform:scale(.9);}
+  /* 휴대폰 저장 안내 */
+  .ph-who{font-size:16px;font-weight:800;color:var(--ink);margin:2px 0 8px;} .ph-msg{font-size:15px;line-height:1.5;color:var(--ink);margin-bottom:12px;}
+  .ph-step{display:flex;gap:10px;align-items:flex-start;padding:10px 12px;background:#f4f7ff;border-radius:12px;margin-bottom:8px;font-size:15px;line-height:1.45;} .ph-step i{flex:none;width:24px;height:24px;border-radius:50%;background:var(--accent);color:#fff;font-style:normal;font-weight:800;display:flex;align-items:center;justify-content:center;font-size:13px;}
+  .ph-btn{display:block;width:100%;margin-top:10px;padding:15px;border:none;border-radius:14px;background:var(--navy);color:#fff;font-size:17px;font-weight:800;} .ph-btn.sub{background:#eef1f7;color:var(--navy);font-size:15px;padding:12px;}
+  .ct-row .cdi.ph{font-size:15px;color:inherit;}
 
   .ta4-more{flex:none;width:48px;height:48px;border-radius:13px !important;border:1px solid var(--line) !important;background:#fff !important;color:var(--navy) !important;font-size:22px;font-weight:900;padding:0 !important;line-height:1;}
   .ta4-more.has{background:#eef3ff !important;border-color:#bcd0ff !important;}
@@ -7893,26 +7920,34 @@ function ta4CardParse(raw) {
 function ta4CardFields() { return { name: 'cdName', title: 'cdTitle', company: 'cdCompany', mobile: 'cdMobile', tel: 'cdTel', fax: 'cdFax', email: 'cdEmail', address: 'cdAddr' }; }
 function ta4CardRead() { const c = {}, F = ta4CardFields(); Object.keys(F).forEach(k => { c[k] = (el(F[k]).value || '').trim(); }); return c; }
 function ta4CardFill(c) { const F = ta4CardFields(); Object.keys(F).forEach(k => { el(F[k]).value = (c && c[k]) || ''; }); }
+// ===== 명함 인식 (공용 화면) =====
+// 흐름: 촬영/앨범 → 크롭(자동 수평·자르기, 필요하면 직접 자르기) → 글자 인식 → TA 연락처에 자동 저장 → 필요하면 휴대폰 연락처에 저장
+// 모든 진입점(관리자 상단 명함등록·안건·신규등록·연락처)이 이 화면 하나를 mode 만 바꿔 호출한다.
+const TA4_LS_PHSAVED = 'S1_TA4_PHSAVED';
+function ta4PhGet() { try { return JSON.parse(localStorage.getItem(TA4_LS_PHSAVED) || '{}'); } catch (e) { return {}; } }
+function ta4PhIs(id) { return !!(id && ta4PhGet()[id]); }
+function ta4PhMark(id) { if (!id) return; const m = ta4PhGet(); m[id] = new Date().toISOString(); try { localStorage.setItem(TA4_LS_PHSAVED, JSON.stringify(m)); } catch (e) {} }
+function ta4CardStage(st) { TA4.card.stage = st; el('ta4CardPg').dataset.st = st; }
 function ta4CardOpen(mode) {
-  TA4.card = { mode, img: null, full: null, crop: null, small: '', busy: false };
-  let c = null;
-  if (mode === 'phone') { c = {}; el('ta4CdName').textContent = '휴대폰 연락처에 바로 등록'; }
-  else if (mode === 'book') { c = {}; el('ta4CdName').textContent = '연락처에 저장'; }
-  else if (mode === 'ctedit') { c = {}; Object.keys(ta4CardFields()).forEach(k => { c[k] = (el(TA4_CT_F[k]) || {}).value || ''; }); el('ta4CdName').textContent = ''; }
-  else if (mode === 'lead') { const l = ta2CurLead(); if (!l) return; c = Object.assign({}, TA4.cards[l.id] || {}); if (!c.name) c.name = l.contact || ''; if (!c.mobile && !c.tel && l.contactPhone) c.mobile = ta4FmtPhone(l.contactPhone); el('ta4CdName').textContent = l.company || ''; }
-  else { c = Object.assign({}, TA4.formCard || {}); if (!c.name) c.name = el('afContact').value.trim(); if (!c.mobile && !c.tel) c.mobile = ta4FmtPhone(el('afContactPhone').value); el('ta4CdName').textContent = el('afCompany').value.trim(); }
+  TA4.card = { mode, src: null, srcUrl: '', crop: '', how: '', small: '', ctId: '', busy: false, stage: 'cam', man: null };
+  let c = {}, sub = '';
+  if (mode === 'phone') sub = '휴대폰 연락처 등록';
+  else if (mode === 'book') sub = '연락처에 저장';
+  else if (mode === 'ctedit') { Object.keys(ta4CardFields()).forEach(k => { c[k] = (el(TA4_CT_F[k]) || {}).value || ''; }); }
+  else if (mode === 'lead') { const l = ta2CurLead(); if (!l) return; c = Object.assign({}, TA4.cards[l.id] || {}); if (!c.name) c.name = l.contact || ''; if (!c.mobile && !c.tel && l.contactPhone) c.mobile = ta4FmtPhone(l.contactPhone); sub = l.company || ''; }
+  else { c = Object.assign({}, TA4.formCard || {}); if (!c.name) c.name = el('afContact').value.trim(); if (!c.mobile && !c.tel) c.mobile = ta4FmtPhone(el('afContactPhone').value); sub = el('afCompany').value.trim(); }
+  el('ta4CdName').textContent = sub;
   ta4CardFill(c);
-  el('cdImg').style.display = 'none'; el('cdImg').removeAttribute('src'); el('cdRaw').textContent = ''; el('cdStatus').textContent = ''; el('cdStatus').className = 'cd-st';
+  el('cdRaw').textContent = ''; ta4CardStatus('', ''); el('cdThumb').removeAttribute('src'); el('cdBadges').innerHTML = '';
   let o = {}; try { o = JSON.parse(localStorage.getItem(TA4_LS_CARDOPT) || '{}'); } catch (e) {}
-  el('cdSave').checked = o.save !== false; el('cdPhoto').checked = o.photo !== false; el('cdBook').checked = o.book !== false; el('cdCrop').checked = o.crop !== false;
-  const pm = mode === 'book' || mode === 'ctedit' || mode === 'phone';
-  el('cdSaveRow').style.display = (mode === 'ctedit' || mode === 'phone') ? 'none' : ''; el('cdPhotoRow').style.display = pm ? 'none' : ''; el('cdBookRow').style.display = pm ? 'none' : '';
-  el('cdCropRow').style.display = mode === 'phone' ? 'none' : '';
-  el('cdApply').textContent = mode === 'phone' ? '휴대폰 연락처에 등록' : mode === 'book' ? '연락처에 저장' : mode === 'ctedit' ? '입력란에 적용' : '고객 정보에 적용';
+  el('cdPhoto').checked = o.photo !== false;
+  el('cdPhotoRow').style.display = (mode === 'lead' || mode === 'form') ? '' : 'none';
+  el('cdApply').textContent = mode === 'phone' ? '완료' : mode === 'book' ? '연락처에 저장' : mode === 'ctedit' ? '입력란에 적용' : '고객 정보에 적용';
+  ta4CardStage('cam');
   ta4Show('ta4CardPg', ta4CardCamStop);
   ta4CardCamStart();   // 카메라 바로 실행(실시간 화면)
 }
-function ta4CardStatus(t, cls) { const s = el('cdStatus'); s.textContent = t; s.className = 'cd-st ' + (cls || ''); }
+function ta4CardStatus(t, cls) { ['cdStatus', 'cdStatusCam'].forEach(id => { const s = el(id); if (s) { s.textContent = t; s.className = 'cd-st ' + (cls || ''); } }); }
 function ta4LoadScript(src) {
   return new Promise((res, rej) => { if (window.Tesseract) return res(); const s = document.createElement('script'); s.src = src; s.onload = res; s.onerror = () => rej(new Error('script')); document.head.appendChild(s); });
 }
@@ -7940,10 +7975,8 @@ async function ta4CardCamStart() {
   try {
     const st = await navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: 'environment' }, width: { ideal: 1920 }, height: { ideal: 1080 } }, audio: false });
     TA4.card.stream = st; v.srcObject = st; try { await v.play(); } catch (e) {}
-    el('cdLive').style.display = 'block'; el('cdImg').style.display = 'none';
-    ta4CardStatus('명함을 틀 안에 맞추고 촬영을 누르세요', 'busy'); return true;
+    ta4CardStatus('명함을 틀 안에 맞추고 아래 촬영 버튼을 누르세요', 'busy'); return true;
   } catch (e) {
-    el('cdLive').style.display = 'none';
     const denied = e && (e.name === 'NotAllowedError' || e.name === 'SecurityError');
     ta4CardStatus(denied ? '카메라 권한이 꺼져 있습니다. 주소창 자물쇠 > 권한 > 카메라를 허용하거나, 앨범 버튼을 이용하세요' : '카메라를 시작하지 못했습니다(' + ((e && e.name) || '오류') + '). 앨범 버튼을 이용하세요', 'err');
     return false;
@@ -7953,29 +7986,76 @@ function ta4CardCamStop() {
   const s = TA4.card && TA4.card.stream; if (s) s.getTracks().forEach(t => t.stop());
   if (TA4.card) TA4.card.stream = null;
   const v = el('cdVideo'); if (v) v.srcObject = null;
-  const l = el('cdLive'); if (l) l.style.display = 'none';
 }
 async function ta4CardShoot() {
   if (!TA4.card.stream) { await ta4CardCamStart(); return; }
   const v = el('cdVideo'); if (!v.videoWidth) { ta4CardStatus('카메라 준비 중입니다. 잠시 후 다시 눌러주세요', 'busy'); return; }
   const c = document.createElement('canvas'); c.width = v.videoWidth; c.height = v.videoHeight; c.getContext('2d').drawImage(v, 0, 0);
   const blob = await new Promise(r => c.toBlob(r, 'image/jpeg', 0.92));
-  ta4CardCamStop(); ta4CardProcess(new File([blob], 'card.jpg', { type: 'image/jpeg' }));
+  ta4CardCamStop(); ta4CardGot(new File([blob], 'card.jpg', { type: 'image/jpeg' }));
 }
-function ta4CardPick(inp) { const f = inp.files && inp.files[0]; inp.value = ''; if (f) { ta4CardCamStop(); ta4CardProcess(f); } }
-function ta4BusyUi(on) { if (!on) TA4.card.busy = false; const e = el('ta4Busy'); if (e) e.classList.toggle('on', !!on); }
-async function ta4CardProcess(f) {
-  if (!f || TA4.card.busy) return;
-  TA4.card.busy = true; ta4BusyUi(true); ta4CardStatus('이미지 처리 중…', 'busy');
+function ta4CardPick(inp) { const f = inp.files && inp.files[0]; inp.value = ''; if (f) { ta4CardCamStop(); ta4CardGot(f); } }
+function ta4CardRetake() {   // 재촬영: 촬영부터 다시
+  TA4.card.crop = ''; TA4.card.how = ''; TA4.card.small = ''; TA4.card.busy = false;
+  ta4CardStage('cam'); ta4CardStatus('', ''); ta4CardCamStart();
+}
+// 1단계: 크롭 먼저 — 명함을 찾아 기울기를 바로잡고 명함 부분만 자른다
+async function ta4CardGot(f) {
+  const C = TA4.card; if (!f || C.busy) return;
+  C.busy = true; ta4CardStage('crop'); el('cdCropImg').removeAttribute('src'); el('cdCropNote').textContent = '명함을 찾는 중…'; el('cdCropNote').className = 'cd2-note busy';
   try {
-    const url = await ta2Compress(f, 1800, 0.88); TA4.card.img = url;
-    const img = new Image(); await new Promise((res, rej) => { img.onload = res; img.onerror = () => rej(new Error('이미지를 읽을 수 없습니다')); img.src = url; });
-    el('cdImg').src = url; el('cdImg').style.display = 'block'; TA4.card.full = url; TA4.card.crop = null;
-    // 1순위: Claude 이미지 인식(Supabase 함수 card-ocr) / 실패 시 2순위: 브라우저 OCR
-    let c = null, via = '', why = '';
+    const url = await ta2Compress(f, 1800, 0.88), img = await ta4LoadImg(url); C.src = img; C.srcUrl = url;
+    let crop = ta4CardDeskew(img, 1400), how = 'auto';
+    if (!crop) { let box = null; try { box = ta4CardAutoCrop(img); } catch (x) {} if (box) { crop = ta4CardCropImg(img, box); how = 'box'; } }
+    if (!crop) { crop = ta4CardCropImg(img, null); how = 'none'; }
+    ta4CardSetCrop(crop, how);
+  } catch (e) { el('cdCropNote').textContent = '이미지를 읽지 못했어요. 재촬영해 주세요. (' + ((e && e.message) || '오류') + ')'; el('cdCropNote').className = 'cd2-note err'; }
+  C.busy = false;
+}
+function ta4CardSetCrop(crop, how) {
+  const C = TA4.card; C.crop = crop; C.how = how; C.small = '';
+  el('cdCropImg').src = crop; ta4CardStage('crop');
+  const n = el('cdCropNote');
+  n.textContent = how === 'auto' ? '명함을 찾아 수평으로 맞춰 잘랐어요. 맞으면 [인식하기]를 누르세요' : how === 'box' ? '명함 부분을 잘랐어요. 틀어졌으면 [직접 자르기]를 눌러 주세요' : how === 'manual' ? '직접 자른 이미지예요. 맞으면 [인식하기]를 누르세요' : '명함을 정확히 찾지 못했어요. [직접 자르기]로 명함 부분을 맞춰 주세요';
+  n.className = 'cd2-note ' + (how === 'none' ? 'err' : 'ok');
+}
+// 직접 자르기: 사각형을 끌어 명함에 맞춘다
+function ta4CardManual() {
+  const C = TA4.card; if (!C.srcUrl) return;
+  ta4CardStage('manual'); el('cdManImg').src = C.srcUrl; C.man = { x0: .08, y0: .12, x1: .92, y1: .88 };
+  try { const b = ta4CardAutoCrop(C.src); if (b) C.man = { x0: b[1] / 1000, y0: b[0] / 1000, x1: b[3] / 1000, y1: b[2] / 1000 }; } catch (x) {}   // 자동으로 찾은 명함 위치에서 시작
+  const w = el('cdManWrap');
+  if (!w._bound) {
+    w._bound = true; let drag = null; const im = el('cdManImg'), cl = v => Math.max(0, Math.min(1, v));
+    w.addEventListener('pointerdown', e => { const t = e.target.closest('[data-h]'); if (!t) return; drag = { h: t.dataset.h, sx: e.clientX, sy: e.clientY, m: Object.assign({}, TA4.card.man) }; try { w.setPointerCapture(e.pointerId); } catch (x) {} e.preventDefault(); });
+    w.addEventListener('pointermove', e => {
+      if (!drag) return; const r = im.getBoundingClientRect(), dx = (e.clientX - drag.sx) / r.width, dy = (e.clientY - drag.sy) / r.height, m = Object.assign({}, drag.m), h = drag.h;
+      if (h === 'mv') { const w0 = m.x1 - m.x0, h0 = m.y1 - m.y0; m.x0 = Math.max(0, Math.min(drag.m.x0 + dx, 1 - w0)); m.y0 = Math.max(0, Math.min(drag.m.y0 + dy, 1 - h0)); m.x1 = m.x0 + w0; m.y1 = m.y0 + h0; }
+      else {
+        if (h.includes('l')) m.x0 = cl(Math.min(drag.m.x0 + dx, m.x1 - .1)); if (h.includes('r')) m.x1 = cl(Math.max(drag.m.x1 + dx, m.x0 + .1));
+        if (h.includes('t')) m.y0 = cl(Math.min(drag.m.y0 + dy, m.y1 - .1)); if (h.includes('b')) m.y1 = cl(Math.max(drag.m.y1 + dy, m.y0 + .1));
+      }
+      TA4.card.man = m; ta4ManDraw();
+    });
+    ['pointerup', 'pointercancel'].forEach(ev => w.addEventListener(ev, () => { drag = null; }));
+  }
+  ta4ManDraw();
+}
+function ta4ManDraw() { const m = TA4.card.man, b = el('cdManBox'); if (!m || !b) return; b.style.left = m.x0 * 100 + '%'; b.style.top = m.y0 * 100 + '%'; b.style.width = (m.x1 - m.x0) * 100 + '%'; b.style.height = (m.y1 - m.y0) * 100 + '%'; }
+function ta4CardManualDone() {
+  const C = TA4.card, m = C.man; if (!m || !C.src) return;
+  const crop = ta4CardCropImg(C.src, [Math.round(m.y0 * 1000), Math.round(m.x0 * 1000), Math.round(m.y1 * 1000), Math.round(m.x1 * 1000)]);
+  ta4CardSetCrop(crop, 'manual');
+}
+// 2단계: 글자 인식 (Claude 이미지 인식 → 실패하면 브라우저 OCR). 실패하면 [재시도]/[재촬영]
+async function ta4CardRecognize() {
+  const C = TA4.card; if (!C.crop || C.busy) return;
+  C.busy = true; ta4CardStage('work'); el('cdThumb').src = C.crop; el('cdBadges').innerHTML = '';
+  ta4CardStatus('AI가 명함을 읽는 중…', 'busy');
+  let c = null, via = '', why = '';
+  try {
     try {
-      ta4CardStatus('AI가 명함을 읽는 중…', 'busy');
-      const r = await Promise.race([db.functions.invoke('card-ocr', { body: { image: url } }), new Promise((_, rej) => setTimeout(() => rej(new Error('응답 시간 초과(50초)')), 50000))]);
+      const r = await Promise.race([db.functions.invoke('card-ocr', { body: { image: C.crop } }), new Promise((_, rej) => setTimeout(() => rej(new Error('응답 시간 초과(50초)')), 50000))]);
       if (r && !r.error && r.data && !r.data.error) { c = r.data; via = 'claude'; el('cdRaw').textContent = JSON.stringify(c, null, 1); }
       else {
         const er = (r && r.error) || {}; let msg = er.message || (r && r.data && r.data.error) || '알 수 없는 오류';
@@ -7986,23 +8066,77 @@ async function ta4CardProcess(f) {
     if (why) console.warn('[card-ocr]', why);
     if (!c) {
       let text = '';
-      try { ta4CardStatus('기본 인식으로 처리 중…', 'busy'); const w = await ta4OcrWorker(); const r = await w.recognize(ta4CardPrep(img)); text = (r && r.data && r.data.text) || ''; }
-      catch (e) { ta4CardStatus('자동 인식을 사용할 수 없습니다(인터넷 연결 확인). 아래에 직접 입력해 주세요.', 'err'); ta4BusyUi(false); return; }
+      try { ta4CardStatus('기본 인식으로 처리 중…', 'busy'); const w = await ta4OcrWorker(); const r = await w.recognize(ta4CardPrep(await ta4LoadImg(C.crop))); text = (r && r.data && r.data.text) || ''; }
+      catch (e) { C.busy = false; ta4CardFail('자동 인식을 사용할 수 없어요(인터넷 연결 확인).'); return; }
       el('cdRaw').textContent = text.trim(); c = ta4CardParse(text); via = 'ocr';
     }
-    const F = ta4CardFields();
-    Object.keys(F).forEach(k => { if (c[k]) el(F[k]).value = String(c[k]).trim(); });
-    TA4.card.full = ta4CardCropImg(img, null);
-    let box = ta4BoxOk(c.card_box) ? c.card_box : null; if (!box) { try { box = ta4CardAutoCrop(img); } catch (x) { box = null; } }
-    const straight = ta4CardDeskew(img, 1100);   // 기울어진 명함은 수평으로 바로잡아 명함 부분만
-    TA4.card.crop = straight || (box ? ta4CardCropImg(img, box) : null);
-    try { const base = TA4.card.crop || TA4.card.full; TA4.card.small = base ? ta4PhotoSmall(await ta4LoadImg(base)) : ''; } catch (x) { TA4.card.small = ''; }
-    ta4CardCropToggle();
-    const n = Object.keys(F).filter(k => c[k]).length;
-    ta4CardStatus(n ? `인식 완료${via === 'ocr' ? '(기본 인식)' : ' (AI)'} — ${n}개 항목. 잘못된 곳은 고쳐주세요.${via === 'ocr' && why ? '\nAI 인식 실패 사유: ' + why : ''}` : '글자를 찾지 못했습니다. 다시 촬영하거나 직접 입력해 주세요.', n ? 'ok' : 'err');
-  } catch (e) { ta4CardStatus(e.message || '인식 오류', 'err'); }
-  ta4BusyUi(false);
+    const F = ta4CardFields(); let n = 0;
+    Object.keys(F).forEach(k => { if (c[k]) { el(F[k]).value = String(c[k]).trim(); n++; } });
+    try { C.small = ta4PhotoSmall(await ta4LoadImg(C.crop)); } catch (x) { C.small = ''; }
+    C.busy = false;
+    if (!n) { ta4CardFail('글자를 인식하지 못했어요.' + (via === 'ocr' && why ? '\n(AI 인식 실패: ' + why + ')' : '')); return; }
+    ta4CardStage('ok'); ta4CardStatus(`인식 완료${via === 'ocr' ? '(기본 인식)' : ''} — ${n}개 항목. 잘못된 곳은 고쳐주세요.`, 'ok');
+    try { await ta4CardToBook(); } catch (e) { ta3Toast('TA 연락처 저장 실패: ' + ((e && e.message) || e), 3500); }
+    ta4CardBadges();
+  } catch (e) { C.busy = false; ta4CardFail('인식 중 오류: ' + ((e && e.message) || e)); }
 }
+function ta4CardFail(msg) { ta4CardStage('fail'); ta4CardStatus(msg + '\n[재시도] 또는 [재촬영]을 눌러 주세요.', 'err'); ta4CardBadges(); }
+function ta4CardManualInput() { ta4CardStage('ok'); ta4CardStatus('직접 입력한 뒤 저장해 주세요.', 'busy'); }
+// 인식되면 바로 TA 개인 연락처에 저장한다(같은 사람이면 갱신)
+async function ta4CardToBook() {
+  const C = TA4.card; if (C.mode === 'ctedit') return null;
+  const c = ta4CardRead(); if (!c.name && !c.mobile && !c.tel && !c.email) return null;
+  const coName = C.mode === 'form' ? el('afCompany').value.trim() : C.mode === 'lead' ? (ta2CurLead() || {}).company || '' : '';
+  const old = (C.ctId && ta4CtFind(C.ctId)) || ta4CtMatch(c) || {}, m = Object.assign({}, old);
+  ['name', 'title', 'company', 'mobile', 'tel', 'fax', 'email', 'address'].forEach(k => { if (c[k]) m[k] = ['mobile', 'tel', 'fax'].includes(k) ? (ta4FmtPhone(c[k]) || c[k]) : c[k]; });
+  if (!m.company && coName) m.company = coName;
+  if (C.crop) m.card_img = C.crop;
+  const lid = C.mode === 'lead' ? (ta2CurLead() || {}).id : ''; if (lid) m.lead_id = lid;
+  if (!m.reg_path && !m.group_name) m.reg_path = lid ? 'TA등록' : '직접';
+  const row = await ta4CtSave(m); C.ctId = row.id;
+  try { ta4CtRender(); } catch (e) {}
+  return row;
+}
+function ta4CardBadges() {
+  const C = TA4.card, b = el('cdBadges'); if (!b) return;
+  b.innerHTML = (C.ctId ? '<span class="cd2-b ok">✓ TA 연락처에 저장됨</span>' : '') + (C.ctId || C.mode === 'phone' ? (ta4PhIs(C.ctId) ? '<span class="cd2-b ok">📱 휴대폰 저장됨</span>' : '<span class="cd2-b">📱 휴대폰 미저장</span>') : '');
+  const pb = el('cdPhoneBtn'); if (pb) pb.textContent = ta4PhIs(C.ctId) ? '📱 휴대폰에 다시 저장' : '📱 휴대폰에 저장';
+}
+// 휴대폰 연락처에 저장 (.vcf 를 연락처 앱으로 넘김 — 사진 포함)
+function ta4CardPhone() {
+  const C = TA4.card, c = ta4CardRead();
+  if (C.small) c.photo = C.small; if (C.mode === 'phone') c.memo = '명함등록';
+  ta4PhoneSave(c, c.company || '', C.ctId, true);
+}
+async function ta4CardApply() {
+  const C = TA4.card, c = ta4CardRead();
+  if (!c.name && !c.mobile && !c.tel && !c.email) { ta3Toast('저장할 정보가 없습니다'); return; }
+  const mode = C.mode, wantPhoto = el('cdPhoto').checked, img = C.crop || C.srcUrl;
+  try { localStorage.setItem(TA4_LS_CARDOPT, JSON.stringify({ photo: wantPhoto })); } catch (e) {}
+  const phone = c.mobile || c.tel;
+  if (mode === 'ctedit') {
+    Object.keys(ta4CardFields()).forEach(k => { if (c[k]) el(TA4_CT_F[k]).value = c[k]; });
+    if (img) TA4.ct.ed.card_img = img; ta4CtEdMedia(); ta4Close('ta4CardPg'); ta3Toast('명함 정보 입력됨'); return;
+  }
+  try { await ta4CardToBook(); } catch (e) { ta3Toast('TA 연락처 저장 실패: ' + ((e && e.message) || e), 3500); }
+  if (mode === 'book' || mode === 'phone') { ta4Close('ta4CardPg'); ta3Toast('TA 연락처에 저장됨'); return; }
+  if (mode === 'form') {
+    el('afContact').value = c.name; el('afContactPhone').value = phone;
+    if (c.company && !el('afCompany').value.trim()) el('afCompany').value = c.company;
+    TA4.formCard = c;
+    if (wantPhoto && img) { TA4.formNote = TA4.formNote || { text: '', atts: [] }; TA4.formNote.atts.push({ t: 'photo', d: img }); ta4FormNoteRender(); }
+    ta4FormCardRender(); ta4Close('ta4CardPg'); ta3Toast('명함 정보 입력됨'); return;
+  }
+  const l = ta2CurLead(); if (!l) return;
+  try {
+    const patch = {}; if (c.name) patch.contact = c.name; if (phone) patch.contactPhone = phone.replace(/\D/g, '');
+    if (Object.keys(patch).length) await ta2SaveFields(patch, false);
+    await ta4CardSave(l.id, c);
+    if (wantPhoto && img) { try { const row = await ta4NoteInsert({ lead_id: l.id, kind: 'memo', content: '📇 명함 · ' + (c.name || '') + (c.title ? ' ' + c.title : ''), image: JSON.stringify([{ t: 'photo', d: img }]) }); TA2.notes.unshift(row); ta2RenderMemos(); } catch (e) { ta3Toast('명함 사진 첨부 실패', 3000); } }
+    ta2RenderInfo(); ta4Close('ta4CardPg'); ta3Toast('명함 정보 저장됨');
+  } catch (e) { ta3Toast('저장 실패: ' + (e.message || e), 3500); }
+}
+
 // 명함 부분만 잘라내기: AI가 알려준 위치(card_box, 0~1000) 우선 / 없으면 배경과 다른 영역을 자동 탐지
 function ta4BoxOk(b) {
   if (!Array.isArray(b) || b.length !== 4) return false; b = b.map(Number); if (b.some(v => !isFinite(v))) return false;
@@ -8079,11 +8213,6 @@ function ta4CardAutoCrop(img) {
   const area = (box[2] - box[0]) * (box[3] - box[1]); if (!ta4BoxOk(box) || area > 960000) return null;   // 너무 작거나 거의 전체면 실패로 본다
   return box;
 }
-function ta4CardCropToggle() {
-  const C = TA4.card, e = el('cdImg'), use = el('cdCrop').checked && C.crop;
-  if (C.full) { e.src = use ? C.crop : C.full; e.style.display = 'block'; }
-  C.img = use ? C.crop : C.full;
-}
 // 내 전화기 연락처 저장: 웹은 연락처에 직접 쓸 수 없어 vCard를 공유/열기 → 연락처 앱에서 저장 1탭
 function ta4Vcard(c, company) {
   const esc = s => String(s || '').replace(/[\;,]/g, m => '\\' + m).replace(/\r?\n/g, ' ');
@@ -8098,65 +8227,60 @@ function ta4Vcard(c, company) {
   L.push('END:VCARD');
   return L.join('\r\n');
 }
+// ===== 휴대폰 연락처에 저장 (.vcf → 연락처 앱) =====
+// 웹 앱은 폰 연락처에 직접 쓸 수 없어서 .vcf 를 연락처 앱으로 넘긴다. 화면에 안내를 크게 띄우고, 저장했다고 확인하면 '저장됨'으로 표시한다.
 async function ta4VcardShare(c, company) {
-  // 연락처 앱이 .vcf 를 받아 사진까지 함께 등록한다. (웹 앱은 연락처에 몰래 저장할 수 없어 마지막 '저장' 한 번은 필요)
   const text = ta4Vcard(c, company), fname = ((c.name || '연락처').replace(/[^\w가-힣]/g, '_')) + '.vcf';
-  let why = '';
   try {
     const file = new File([text], fname, { type: 'text/vcard' });
     if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
-      try { await navigator.share({ files: [file], title: c.name || '연락처' }); return; }
-      catch (e) { if (e && e.name === 'AbortError') return; why = (e && e.name) || 'share'; }
-    } else why = '공유 미지원';
-  } catch (e) { why = (e && e.name) || 'file'; }
-  // 공유 창을 못 열면 .vcf 파일을 내려받는다 (알림/내 파일에서 눌러 열면 연락처 앱이 열림)
+      try { await navigator.share({ files: [file], title: c.name || '연락처' }); return { r: 'shared', fname }; }
+      catch (e) { if (e && e.name === 'AbortError') return { r: 'cancel', fname }; }
+    }
+  } catch (e) {}
   const url = URL.createObjectURL(new Blob([text], { type: 'text/x-vcard;charset=utf-8' })), a = document.createElement('a');
   a.href = url; a.download = fname; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(url), 8000);
-  ta3Toast('연락처 파일(' + fname + ')을 내려받았어요. 상단 알림이나 내 파일에서 눌러 열면 연락처 앱이 열려요 [' + why + ']', 9000);
+  return { r: 'download', fname };
+}
+const TA4PH = { c: null, co: '', id: '', fname: '' };
+async function ta4PhoneSave(c, company, ctId, auto) {
+  if (!c || (!c.name && !c.mobile && !c.tel && !c.email)) { ta3Toast('이름이나 전화번호를 먼저 입력해 주세요'); return; }
+  Object.assign(TA4PH, { c, co: company || '', id: ctId || '', fname: '' });
+  el('ta4PhSh').classList.add('on');
+  if (auto) { ta4PhRender('wait'); ta4PhGo(); return; }   // 방금 누른 터치로 바로 공유 창을 연다
+  ta4PhRender('wait');
+  if (!c.photo && c.card_img) { try { c.photo = ta4PhotoSmall(await ta4LoadImg(c.card_img)); } catch (e) {} }
+  ta4PhRender('ready');   // 사진 준비가 끝나면 새 터치로 열도록 버튼을 보여 준다
+}
+async function ta4PhGo() {
+  ta4PhRender('wait');
+  const o = await ta4VcardShare(TA4PH.c, TA4PH.co); TA4PH.fname = o.fname;
+  ta4PhRender(o.r === 'download' ? 'dl' : o.r === 'cancel' ? 'cancel' : 'shared');
+}
+function ta4PhRender(st) {
+  const c = TA4PH.c || {}, nm = escapeHtml((c.name || '연락처') + (c.company ? ' (' + c.company + ')' : '')), fn = escapeHtml(TA4PH.fname || '연락처.vcf');
+  const step = (n, t) => `<div class="ph-step"><i>${n}</i><span>${t}</span></div>`;
+  const big = (lbl, on, cls) => `<button type="button" class="ph-btn ${cls || ''}" onclick="${on}">${lbl}</button>`;
+  let h = `<div class="ph-who">${nm}</div>`;
+  if (st === 'wait') h += '<div class="ph-msg">연락처 파일을 만들고 있어요…</div>';
+  else if (st === 'ready') h += '<div class="ph-msg">사진이 포함된 연락처 파일을 준비했어요.</div>' + big('연락처 파일 열기', 'ta4PhGo()');
+  else if (st === 'shared') h += '<div class="ph-msg">공유 창이 열렸다면 아래 순서로 저장해 주세요.</div>' + step(1, '공유 창에서 <b>연락처</b>를 누릅니다') + step(2, '연락처 앱에서 <b>저장</b>을 누릅니다') + big('저장했어요 ✓', 'ta4PhDone()') + big('공유 창 다시 열기', 'ta4PhGo()', 'sub');
+  else if (st === 'dl') h += `<div class="ph-msg">공유 창을 쓸 수 없어 <b>${fn}</b> 파일을 내려받았어요.<br>파일은 아래 순서로 열어야 해요.</div>` + step(1, '화면 <b>맨 위를 아래로 쓸어 내려</b> 알림창을 엽니다') + step(2, `알림창의 <b>${fn}</b>을 누릅니다 (또는 <b>내 파일 → 다운로드</b>)`) + step(3, '연락처 앱을 선택하고 <b>저장</b>을 누릅니다') + big('저장했어요 ✓', 'ta4PhDone()') + big('파일 다시 받기', 'ta4PhGo()', 'sub');
+  else if (st === 'cancel') h += '<div class="ph-msg">공유가 취소됐어요.</div>' + big('다시 열기', 'ta4PhGo()') + big('닫기', 'ta4PhClose()', 'sub');
+  el('ta4PhShBody').innerHTML = h;
+}
+function ta4PhClose() { el('ta4PhSh').classList.remove('on'); }
+function ta4PhDone() {
+  ta4PhMark(TA4PH.id); ta4PhClose(); ta3Toast('휴대폰 저장으로 표시했어요 ✓');
+  try { if (TA4.card && el('ta4CardPg').classList.contains('ta4-on')) ta4CardBadges(); } catch (e) {}
+  try { ta4CtRender(); if (TA4.ct && TA4.ct.cur && el('ta4CtDet').classList.contains('ta4-on')) ta4CtDetRender(); } catch (e) {}
 }
 function ta2SaveContact() {
   const l = ta2CurLead(); if (!l) return;
   const c = Object.assign({}, TA4.cards[l.id] || {}); c.name = c.name || l.contact; if (!c.mobile && !c.tel && l.contactPhone) c.mobile = ta4FmtPhone(l.contactPhone);
   if (!c.mobile && !c.tel) { ta3Toast('전화번호를 먼저 입력해주세요'); return; }
-  ta4VcardShare(c, l.company);
-}
-async function ta4CardApply() {
-  const c = ta4CardRead();
-  if (!c.name && !c.mobile && !c.tel && !c.email) { ta3Toast('저장할 정보가 없습니다'); return; }
-  if (TA4.card.small) c.photo = TA4.card.small;   // 연락처 사진 = 수평 조정한 명함
-  if (TA4.card.mode === 'phone') {   // 관리자 상단 명함등록: 앱에는 저장하지 않고 휴대폰 연락처로만 등록
-    c.memo = '명함등록';
-    ta4VcardShare(c, c.company); ta4Close('ta4CardPg'); return;
-  }
-  const mode = TA4.card.mode, wantSave = el('cdSave').checked, wantPhoto = el('cdPhoto').checked, wantBook = el('cdBook').checked, img = el('cdCrop').checked && TA4.card.crop ? TA4.card.crop : (TA4.card.full || TA4.card.img);
-  try { localStorage.setItem(TA4_LS_CARDOPT, JSON.stringify({ save: wantSave, photo: wantPhoto, book: wantBook, crop: el('cdCrop').checked })); } catch (e) {}
-  const phone = c.mobile || c.tel;
-  const coName = mode === 'lead' ? (ta2CurLead() || {}).company : mode === 'form' ? el('afCompany').value.trim() : '';
-  if (wantSave && mode !== 'ctedit') ta4VcardShare(c, coName);   // 사용자 터치 직후 즉시 실행
-  if (mode === 'ctedit') {
-    Object.keys(ta4CardFields()).forEach(k => { if (c[k]) el(TA4_CT_F[k]).value = c[k]; });
-    if (img && TA4.card.full) TA4.ct.ed.card_img = img; ta4CtEdMedia(); ta4Close('ta4CardPg'); ta3Toast('명함 정보 입력됨'); return;
-  }
-  if (mode === 'book') {
-    try { await ta4CtFromCard(c, img, ''); ta4CtRender(); ta4Close('ta4CardPg'); ta3Toast('연락처에 저장됨'); } catch (e) { ta3Toast('저장 실패: ' + (e.message || e), 3500); }
-    return;
-  }
-  if (wantBook) { try { await ta4CtFromCard(Object.assign({}, c, { company: c.company || coName }), TA4.card.full ? img : '', mode === 'lead' ? (ta2CurLead() || {}).id : ''); } catch (e) { ta3Toast('연락처 목록 저장 실패', 3000); } }
-  if (mode === 'form') {
-    el('afContact').value = c.name; el('afContactPhone').value = phone;
-    if (c.company && !el('afCompany').value.trim()) el('afCompany').value = c.company;
-    TA4.formCard = c;
-    if (wantPhoto && img) { TA4.formNote = TA4.formNote || { text: '', atts: [] }; TA4.formNote.atts.push({ t: 'photo', d: img }); ta4FormNoteRender(); }
-    ta4FormCardRender(); ta4Close('ta4CardPg'); ta3Toast('명함 정보 입력됨'); return;
-  }
-  const l = ta2CurLead(); if (!l) return;
-  try {
-    const patch = {}; if (c.name) patch.contact = c.name; if (phone) patch.contactPhone = phone.replace(/\D/g, '');
-    if (Object.keys(patch).length) await ta2SaveFields(patch, false);
-    await ta4CardSave(l.id, c);
-    if (wantPhoto && img) { try { const row = await ta4NoteInsert({ lead_id: l.id, kind: 'memo', content: '📇 명함 · ' + (c.name || '') + (c.title ? ' ' + c.title : ''), image: JSON.stringify([{ t: 'photo', d: img }]) }); TA2.notes.unshift(row); ta2RenderMemos(); } catch (e) { ta3Toast('명함 사진 노트 저장 실패', 3000); } }
-    ta2RenderInfo(); ta4Close('ta4CardPg'); ta3Toast('명함 정보 저장됨');
-  } catch (e) { ta3Toast('저장 실패: ' + (e.message || e), 3500); }
+  const m = ta4CtMatch(c) || {}, cc = Object.assign({}, c, { card_img: m.card_img || '', photo: c.photo || m.photo || '' });
+  ta4PhoneSave(cc, l.company, m.id, !cc.card_img || !!cc.photo);
 }
 function ta4FormCardRender() {
   const c = TA4.formCard, e = el('afCardInfo'); if (!e) return;
@@ -8527,6 +8651,7 @@ function ta4CtRender() {
       const no = ta4CtCallNo(c), sub = [c.company, c.title].filter(Boolean).join(' · ') || (c.mobile || c.tel || ''), pth = ta4CtPath(c);
       return `<div class="ct-row" onclick="ta4CtView('${escapeHtml(c.id)}')">${ta4CtAvatar(c)}<div class="tx"><b>${escapeHtml(c.name || '(이름 없음)')}<i class="ct-pth p${TA4_CT_PATHS.indexOf(pth)}">${pth}</i></b><small>${escapeHtml(sub)}</small></div>` +
         (c.card_img ? '<span class="cdi" title="명함 있음"><span data-ic="card"></span></span>' : '') +
+        (ta4PhIs(c.id) ? '<span class="cdi ph" title="휴대폰 저장됨">📱</span>' : '') +
         (no ? `<a class="call" href="tel:${escapeHtml(no)}" onclick="event.stopPropagation()" aria-label="전화"><span data-ic="phone"></span></a>` : '') + '</div>';
     }).join('')).join('');
   el('ctIdx').innerHTML = by === 'name' && keys.length > 2 ? keys.map((k, i) => `<button type="button" onclick="ta4CtJump(${i})">${escapeHtml(k)}</button>`).join('') : '';
@@ -8546,14 +8671,14 @@ function ta4CtDetRender() {
   const act = (ic, lb, h, on) => `<${h ? 'a href="' + h + '"' : 'button type="button" onclick="' + on + '"'} class="ac${h || on ? '' : ' off'}"><span data-ic="${ic}"></span><small>${lb}</small></${h ? 'a' : 'button'}>`;
   const no = ta4CtCallNo(c), sm = String(c.mobile || '').replace(/[^0-9+]/g, '');
   el('ctDetBody').innerHTML =
-    `<div class="ct-hero">${ta4CtAvatar(c, true)}<h2>${escapeHtml(c.name || '(이름 없음)')}</h2><p>${escapeHtml([c.company, c.title].filter(Boolean).join(' · '))}</p>${c.group_name ? `<span class="ct-chip">${escapeHtml(c.group_name)}</span>` : ''}</div>` +
-    `<div class="ct-acts">${act('phone', '전화', no ? 'tel:' + escapeHtml(no) : '', '')}${act('sms', '문자', sm ? 'sms:' + escapeHtml(sm) : '', '')}${act('mail', '메일', c.email ? 'mailto:' + escapeHtml(c.email) : '', '')}${act('dl', '내 폰에 저장', '', 'ta4CtToPhone()')}</div>` +
+    `<div class="ct-hero">${ta4CtAvatar(c, true)}<h2>${escapeHtml(c.name || '(이름 없음)')}</h2><p>${escapeHtml([c.company, c.title].filter(Boolean).join(' · '))}</p>${c.group_name ? `<span class="ct-chip">${escapeHtml(c.group_name)}</span>` : ''}${ta4PhIs(c.id) ? '<span class="ct-chip" style="background:#dcfce7;color:#15803d;margin-left:6px;">📱 휴대폰 저장됨</span>' : ''}</div>` +
+    `<div class="ct-acts">${act('phone', '전화', no ? 'tel:' + escapeHtml(no) : '', '')}${act('sms', '문자', sm ? 'sms:' + escapeHtml(sm) : '', '')}${act('mail', '메일', c.email ? 'mailto:' + escapeHtml(c.email) : '', '')}${act('dl', ta4PhIs(c.id) ? '폰에 다시 저장' : '내 폰에 저장', '', 'ta4CtToPhone()')}</div>` +
     `<div class="box ct-info">` + row('휴대폰', lnk('tel', c.mobile)) + row('회사전화', lnk('tel', c.tel)) + row('팩스', escapeHtml(c.fax)) + row('이메일', lnk('mailto', c.email)) + row('주소', escapeHtml(c.address)) + row('회사', escapeHtml(c.company)) + row('메모', escapeHtml(c.memo).replace(/\n/g, '<br>')) + row('등록일', escapeHtml(String(c.created_at || '').slice(0, 10))) + row('등록경로', escapeHtml(ta4CtPath(c))) + `</div>` +
     (c.card_img ? `<div class="box"><div class="ct-cardhd">명함</div><img class="ct-cardimg" src="${c.card_img}" alt="명함" onclick="ta4CtImgView(this.src)"></div>` : '');
   ta4IcInit();
 }
 function ta4CtImgView(src) { const o = el('ta4CtImgOv'); el('ta4CtImgBig').src = src; o.classList.add('on'); }
-function ta4CtToPhone() { const c = ta4CtFind(TA4.ct.cur); if (!c) return; ta4VcardShare(c, c.company); ta3Toast('연락처 앱에서 저장해 주세요'); }
+function ta4CtToPhone() { const c = ta4CtFind(TA4.ct.cur); if (!c) return; ta4PhoneSave(Object.assign({}, c), c.company, c.id, !c.card_img || !!c.photo); }
 async function ta4CtDeleteCur() {
   const c = ta4CtFind(TA4.ct.cur); if (!c) return;
   if (!confirm((c.name || '이 연락처') + ' 연락처를 삭제할까요?')) return;
@@ -9991,39 +10116,55 @@ if ('serviceWorker' in navigator) navigator.serviceWorker.addEventListener('mess
   <div class="ta4-pf"><div class="in"><button type="button" class="go" id="rpGo" onclick="ta4RpSubmit()">보고하기</button></div></div>
 </div>
 
-<!-- 명함 인식 -->
-<div class="ta4-pg" id="ta4CardPg">
+<!-- 명함 인식 (공용 화면: 촬영 → 크롭 → 인식 → 저장) -->
+<div class="ta4-pg" id="ta4CardPg" data-st="cam">
   <div class="ta4-ph"><button type="button" class="back" onclick="ta3Back()" aria-label="뒤로">‹</button><div class="ttl"><h3>명함 인식</h3><div class="bd"><span id="ta4CdName" style="font-size:12px;font-weight:700;color:var(--mute);"></span></div></div></div>
   <div class="ta4-pb"><div class="in ta4-form">
-    <div class="box">
-      <div class="cd-shot">
-        <div class="cd-live" id="cdLive" style="display:none;"><video id="cdVideo" playsinline autoplay muted></video><div class="cd-frame"></div></div>
-        <img id="cdImg" alt="" style="display:none;">
-        <div class="cd-btns">
-          <button type="button" onclick="ta4CardShoot()"><span data-ic="cam"></span>촬영</button>
-          <button type="button" onclick="el('cdAlb').click()"><span data-ic="album"></span>앨범</button>
-        </div>
-        <div class="cd-st" id="cdStatus"></div>
-        <input type="file" id="cdCam" accept="image/*" capture="environment" style="display:none;" onchange="ta4CardPick(this)">
-        <input type="file" id="cdAlb" accept="image/*" style="display:none;" onchange="ta4CardPick(this)">
+    <div class="cd2-sec" data-s="cam">
+      <div class="cd2-live"><video id="cdVideo" playsinline autoplay muted></video><div class="cd-frame"></div></div>
+    </div>
+    <div class="cd2-sec" data-s="crop">
+      <div class="cd2-cropbox"><img id="cdCropImg" alt="자른 명함"></div>
+      <div class="cd2-note" id="cdCropNote"></div>
+    </div>
+    <div class="cd2-sec" data-s="manual">
+      <div class="cd2-note ok" style="margin-top:0;">모서리나 안쪽을 끌어 명함 부분에 맞추고 [자르기 완료]를 누르세요</div>
+      <div class="cd2-man" id="cdManWrap"><img id="cdManImg" alt=""><div class="cd2-box" id="cdManBox" data-h="mv"><i data-h="tl"></i><i data-h="tr"></i><i data-h="bl"></i><i data-h="br"></i></div></div>
+    </div>
+    <div class="cd2-sec" data-s="work fail ok">
+      <div class="cd2-res"><img id="cdThumb" alt="명함"><div class="cd2-resr"><div id="cdBadges" class="cd2-bs"></div><div class="cd-st" id="cdStatus"></div></div></div>
+      <div data-s="fail" class="cd2-lnk"><button type="button" onclick="ta4CardManualInput()">직접 입력해서 계속하기</button></div>
+    </div>
+    <div class="cd2-sec" data-s="fail ok">
+      <div class="box">
+        <div class="row2 f"><div><label>고객 담당자</label><input type="text" id="cdName"></div><div><label>직책</label><input type="text" id="cdTitle"></div></div>
+        <div class="f"><label>회사</label><input type="text" id="cdCompany"></div>
+        <div class="row2 f"><div><label>연락처(휴대폰)</label><input type="tel" inputmode="tel" id="cdMobile"></div><div><label>회사 전화</label><input type="tel" inputmode="tel" id="cdTel"></div></div>
+        <div class="row2 f"><div><label>팩스</label><input type="tel" inputmode="tel" id="cdFax"></div><div><label>이메일</label><input type="email" inputmode="email" id="cdEmail" autocapitalize="off"></div></div>
+        <div class="f" style="margin-bottom:0;"><label>주소</label><input type="text" id="cdAddr"></div>
       </div>
+      <div class="box" style="padding:6px 14px;" id="cdPhotoRow"><label class="ck"><input type="checkbox" id="cdPhoto" checked> 명함 사진을 노트에 첨부</label></div>
+      <details class="cd-raw"><summary>인식된 원문</summary><pre id="cdRaw"></pre></details>
     </div>
-    <div class="box">
-      <div class="row2 f"><div><label>고객 담당자</label><input type="text" id="cdName"></div><div><label>직책</label><input type="text" id="cdTitle"></div></div>
-      <div class="f"><label>회사</label><input type="text" id="cdCompany"></div>
-      <div class="row2 f"><div><label>연락처(휴대폰)</label><input type="tel" inputmode="tel" id="cdMobile"></div><div><label>회사 전화</label><input type="tel" inputmode="tel" id="cdTel"></div></div>
-      <div class="row2 f"><div><label>팩스</label><input type="tel" inputmode="tel" id="cdFax"></div><div><label>이메일</label><input type="email" inputmode="email" id="cdEmail" autocapitalize="off"></div></div>
-      <div class="f" style="margin-bottom:0;"><label>주소</label><input type="text" id="cdAddr"></div>
-    </div>
-    <div class="box" style="padding:6px 14px;">
-      <label class="ck" id="cdSaveRow"><input type="checkbox" id="cdSave" checked> 내 연락처로 동시 저장<small>휴대폰 연락처 앱</small></label>
-      <label class="ck" id="cdPhotoRow"><input type="checkbox" id="cdPhoto" checked> 명함 사진을 노트에 첨부</label>
-      <label class="ck" id="cdBookRow"><input type="checkbox" id="cdBook" checked> 연락처 목록에도 저장<small>앱 내 연락처</small></label>
-      <label class="ck" id="cdCropRow"><input type="checkbox" id="cdCrop" checked onchange="ta4CardCropToggle()"> 명함 부분만 잘라서 저장</label>
-    </div>
-    <details class="cd-raw"><summary>인식된 원문</summary><pre id="cdRaw"></pre></details>
+    <div class="cd-st" id="cdStatusCam" data-s="cam"></div>
+    <input type="file" id="cdCam" accept="image/*" capture="environment" style="display:none;" onchange="ta4CardPick(this)">
+    <input type="file" id="cdAlb" accept="image/*" style="display:none;" onchange="ta4CardPick(this)">
   </div></div>
-  <div class="ta4-pf"><div class="in"><button type="button" class="go" id="cdApply" onclick="ta4CardApply()">고객 정보에 적용</button></div></div>
+  <div class="ta4-pf cd2-pf">
+    <div class="in cd2-ft" data-s="cam"><button type="button" class="cd2-side" onclick="el('cdAlb').click()"><span data-ic="album"></span><small>앨범</small></button><button type="button" class="cd2-shutter" onclick="ta4CardShoot()" aria-label="촬영"><i></i></button><span class="cd2-side"></span></div>
+    <div class="in cd2-ft" data-s="crop"><button type="button" class="tool" onclick="ta4CardRetake()">재촬영</button><button type="button" class="tool" onclick="ta4CardManual()">직접 자르기</button><button type="button" class="go" onclick="ta4CardRecognize()">인식하기</button></div>
+    <div class="in cd2-ft" data-s="manual"><button type="button" class="tool" onclick="ta4CardSetCrop(TA4.card.crop, TA4.card.how)">취소</button><button type="button" class="go" onclick="ta4CardManualDone()">자르기 완료</button></div>
+    <div class="in cd2-ft" data-s="work"><button type="button" class="tool" style="flex:1;" onclick="ta4CardRetake()">재촬영</button></div>
+    <div class="in cd2-ft" data-s="fail"><button type="button" class="tool" style="flex:1;" onclick="ta4CardRetake()">재촬영</button><button type="button" class="go" onclick="ta4CardRecognize()">재시도</button></div>
+    <div class="in cd2-ft" data-s="ok"><button type="button" class="tool" id="cdPhoneBtn" style="flex:1;" onclick="ta4CardPhone()">📱 휴대폰에 저장</button><button type="button" class="go" id="cdApply" onclick="ta4CardApply()">고객 정보에 적용</button></div>
+  </div>
+</div>
+
+<div class="ta4-sheet" id="ta4PhSh" style="z-index:300000;" onclick="if(event.target===this)ta4PhClose()">
+  <div class="in">
+    <div class="hd"><b>📱 휴대폰 연락처에 저장</b><button type="button" onclick="ta4PhClose()" aria-label="닫기">✕</button></div>
+    <div class="bd" id="ta4PhShBody"></div>
+  </div>
 </div>
 
 <div class="ta4-sheet" id="ta4PsDet" onclick="if(event.target===this)ta4PsDetClose()">
