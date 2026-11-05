@@ -8104,7 +8104,7 @@ function ta4CardOpen(mode) {
   else if (mode === 'ctedit') { Object.keys(ta4CardFields()).forEach(k => { c[k] = (el(TA4_CT_F[k]) || {}).value || ''; }); }
   else if (mode === 'lead') { const l = ta2CurLead(); if (!l) return; c = Object.assign({}, TA4.cards[l.id] || {}); if (!c.name) c.name = l.contact || ''; if (!c.mobile && !c.tel && l.contactPhone) c.mobile = ta4FmtPhone(l.contactPhone); sub = l.company || ''; }
   else { c = Object.assign({}, TA4.formCard || {}); if (!c.name) c.name = el('afContact').value.trim(); if (!c.mobile && !c.tel) c.mobile = ta4FmtPhone(el('afContactPhone').value); sub = el('afCompany').value.trim(); }
-  el('ta4CdName').textContent = (sub ? sub + ' · ' : '') + 'v1105g';   // 화면 버전 표시(최신 반영 확인용)
+  el('ta4CdName').textContent = (sub ? sub + ' · ' : '') + 'v1105h';   // 화면 버전 표시(최신 반영 확인용)
   ta4CardFill(c);
   el('cdRaw').textContent = ''; ta4CardStatus('', ''); el('cdThumb').removeAttribute('src'); el('cdBadges').innerHTML = '';
   let o = {}; try { o = JSON.parse(localStorage.getItem(TA4_LS_CARDOPT) || '{}'); } catch (e) {}
@@ -8284,7 +8284,7 @@ function ta4CardManualDone() {
   const crop = ta4CardCropImg(C.src, [Math.round(m.y0 * 1000), Math.round(m.x0 * 1000), Math.round(m.y1 * 1000), Math.round(m.x1 * 1000)]);
   ta4CardSetCrop(crop, 'manual');
 }
-// 2단계: 글자 인식 (Claude 이미지 인식 → 실패하면 브라우저 OCR). 실패하면 [재시도]/[재촬영]
+// 2단계: 글자 인식 (Groq → Gemini → Claude 순서로 AI 이미지 인식). 실패하면 [재시도]/[재촬영]
 async function ta4CardRecognize() {
   const C = TA4.card; if (!C.crop || C.busy) return;
   C.busy = true; ta4CardStage('work'); el('cdThumb').src = C.crop; el('cdBadges').innerHTML = '';
@@ -8301,26 +8301,23 @@ async function ta4CardRecognize() {
       }
     } catch (e) { why = (e && e.message) || String(e); }
     if (why) console.warn('[card-ocr]', why);
-    if (!c) {
-      let text = '';
-      try { ta4CardStatus('기본 인식으로 처리 중…', 'busy'); const w = await ta4OcrWorker(); const r = await w.recognize(ta4CardPrep(await ta4LoadImg(C.crop))); text = (r && r.data && r.data.text) || ''; }
-      catch (e) { C.busy = false; ta4CardFail('AI 인식 실패: ' + ta4CardWhy(why) + '\n기본 인식도 사용할 수 없어요(인터넷 연결 확인).', true); return; }
-      el('cdRaw').textContent = text.trim(); c = ta4CardParse(text); via = 'ocr'; eng = 'Tesseract OCR (기기 내 기본 인식)';
-    }
+    if (!c) { C.busy = false; const ls = String(why || '').replace(/^모든 AI 인식 실패:\s*/, '').split(' / ').filter(Boolean).map(x => '· ' + x.slice(0, 70)); ta4CardFail('AI 인식 실패 (' + ta4CardWhy(why) + ')' + (ls.length ? '\n' + ls.join('\n') : ''), true); return; }
     const F = ta4CardFields(); let n = 0;
     Object.keys(F).forEach(k => { if (c[k]) { el(F[k]).value = String(c[k]).trim(); n++; } });
     try { C.small = ta4PhotoSmall(await ta4LoadImg(C.crop)); } catch (x) { C.small = ''; }
     C.busy = false;
-    if (!n) { ta4CardFail('글자를 인식하지 못했어요.' + (via === 'ocr' && why ? '\n(AI 인식 실패: ' + ta4CardWhy(why) + ')' : ''), true); return; }
-    ta4CardEngine(eng); ta4CardStage('ok'); ta4CardStatus(`인식 완료${via === 'ocr' ? '(기본 인식' + (why ? ' · AI 실패: ' + ta4CardWhy(why) : '') + ')' : ''} — ${n}개 항목. 잘못된 곳은 고친 뒤 [저장]을 눌러 주세요.`, 'ok');
+    if (!n) { ta4CardFail('글자를 인식하지 못했어요. 명함이 또렷하게 나오도록 다시 찍어 보세요.', true); return; }
+    ta4CardEngine(eng); ta4CardStage('ok'); ta4CardStatus(`인식 완료 — ${n}개 항목. 잘못된 곳은 고친 뒤 [저장]을 눌러 주세요.`, 'ok');
     ta4CardBadges();
   } catch (e) { C.busy = false; ta4CardFail('인식 중 오류: ' + ta4CardWhy((e && e.message) || e), true); }
 }
+function ta4CardCancel() { try { ta4CardCamStop(); } catch (e) {} ta3Back(); }
 function ta4CardEngine(t) { const e = el('cdEngine'); if (e) e.textContent = t ? '인식: ' + t : ''; }
 // 실패 사유를 짧게 요약
 function ta4CardWhy(w) {
   const t = String(w || ''); let s = '';
-  if (/429|quota|exceeded|rate/i.test(t)) s = 'AI 사용량 한도 초과(잠시 뒤 재시도)';
+  if (/credit balance|크레딧|billing/i.test(t) && !/429|quota|사용량/.test(t)) s = 'AI 크레딧/요금 문제';
+  else if (/429|quota|exceeded|rate|사용량/i.test(t)) s = 'AI 사용량 한도 초과(잠시 뒤 재시도)';
   else if (/시간 초과|timeout|timed out|abort/i.test(t)) s = '응답 시간 초과';
   else if (/401|403|api.?key|permission|unauthor|jwt/i.test(t)) s = '인증/키 오류';
   else if (/404|not.?found|does not exist/i.test(t)) s = 'AI 모델을 찾을 수 없음';
@@ -10194,7 +10191,7 @@ function ta8nDetail(i) {
     <div class="in cd2-ft" data-s="manual"><button type="button" class="tool" onclick="ta4CardSetCrop(TA4.card.crop, TA4.card.how)">취소</button><button type="button" class="go" onclick="ta4CardManualDone()">자르기 완료</button></div>
     <div class="in cd2-ft" data-s="work"><button type="button" class="tool" style="flex:1;" onclick="ta4CardRetake()">재촬영</button></div>
     <div class="in cd2-ft" data-s="fail"><button type="button" class="tool" style="flex:1;" onclick="ta4CardRetake()">재촬영</button><button type="button" class="go" onclick="ta4CardRecognize()">재시도</button></div>
-    <div class="in cd2-ft" data-s="ok"><button type="button" class="go" id="cdApply" onclick="ta4CardApply()">저장</button></div>
+    <div class="in cd2-ft" data-s="ok"><button type="button" class="tool" onclick="ta4CardCancel()">취소</button><button type="button" class="tool" onclick="ta4CardRetake()">재촬영</button><button type="button" class="tool" onclick="ta4CardRecognize()">재시도</button><button type="button" class="go" id="cdApply" onclick="ta4CardApply()">저장</button></div>
   </div>
 </div>
 
