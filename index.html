@@ -1245,6 +1245,9 @@
   .cd2-box i{position:absolute;width:30px;height:30px;background:#22c55e;border:3px solid #fff;border-radius:50%;box-sizing:border-box;}
   .cd2-box i[data-h=tl]{left:-15px;top:-15px;} .cd2-box i[data-h=tr]{right:-15px;top:-15px;} .cd2-box i[data-h=bl]{left:-15px;bottom:-15px;} .cd2-box i[data-h=br]{right:-15px;bottom:-15px;}
   .cd2-res{display:flex;gap:12px;align-items:flex-start;margin-bottom:12px;} .cd2-res img{width:132px;max-height:100px;object-fit:contain;border-radius:8px;background:#f1f3f8;border:1px solid var(--line);flex:none;} .cd2-resr{flex:1;min-width:0;}
+  .cd2-fring{position:absolute;width:64px;height:64px;margin:-32px 0 0 -32px;border:2.5px solid #fde047;border-radius:50%;pointer-events:none;opacity:0;box-shadow:0 0 0 1px rgba(0,0,0,.35);}
+  .cd2-fring.go{animation:cd2f 1.1s ease-out forwards;} @keyframes cd2f{0%{opacity:1;transform:scale(1.5);}25%{opacity:1;transform:scale(1);}80%{opacity:1;}100%{opacity:0;transform:scale(1);}}
+  .cd2-live{touch-action:manipulation;}
   #ta4CardPg .ta4-ph{position:relative;} .cd2-eng{position:absolute;right:10px;top:3px;font-size:9.5px;font-weight:600;color:var(--mute);opacity:.5;pointer-events:none;max-width:48%;text-align:right;line-height:1.2;}
   .cd2-bs{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:6px;} .cd2-b{padding:4px 10px;border-radius:99px;background:#eef1f7;color:var(--mute);font-size:12.5px;font-weight:800;} .cd2-b.ok{background:#dcfce7;color:#15803d;}
   .cd2-resr .cd-st{margin-top:0;}
@@ -8101,7 +8104,7 @@ function ta4CardOpen(mode) {
   else if (mode === 'ctedit') { Object.keys(ta4CardFields()).forEach(k => { c[k] = (el(TA4_CT_F[k]) || {}).value || ''; }); }
   else if (mode === 'lead') { const l = ta2CurLead(); if (!l) return; c = Object.assign({}, TA4.cards[l.id] || {}); if (!c.name) c.name = l.contact || ''; if (!c.mobile && !c.tel && l.contactPhone) c.mobile = ta4FmtPhone(l.contactPhone); sub = l.company || ''; }
   else { c = Object.assign({}, TA4.formCard || {}); if (!c.name) c.name = el('afContact').value.trim(); if (!c.mobile && !c.tel) c.mobile = ta4FmtPhone(el('afContactPhone').value); sub = el('afCompany').value.trim(); }
-  el('ta4CdName').textContent = (sub ? sub + ' · ' : '') + 'v1105f';   // 화면 버전 표시(최신 반영 확인용)
+  el('ta4CdName').textContent = (sub ? sub + ' · ' : '') + 'v1105g';   // 화면 버전 표시(최신 반영 확인용)
   ta4CardFill(c);
   el('cdRaw').textContent = ''; ta4CardStatus('', ''); el('cdThumb').removeAttribute('src'); el('cdBadges').innerHTML = '';
   let o = {}; try { o = JSON.parse(localStorage.getItem(TA4_LS_CARDOPT) || '{}'); } catch (e) {}
@@ -8151,6 +8154,48 @@ async function ta4CardCamTune(st) {
     } else if (row) row.style.display = 'none';
   } catch (e) {}
 }
+// 화면을 톡 누르면 그 지점으로 초점·노출을 맞춘다 (지원하지 않는 폰은 자동 초점을 다시 맞춘다)
+async function ta4CardTapFocus(ev) {
+  const C = TA4.card, st = C && C.stream, v = el('cdVideo'), box = el('cdLive'); if (!st || !v || !v.videoWidth) return;
+  const r = box.getBoundingClientRect(), px = ev.clientX - r.left, py = ev.clientY - r.top;
+  const ring = el('cdRing'); ring.style.left = px + 'px'; ring.style.top = py + 'px'; ring.classList.remove('go'); void ring.offsetWidth; ring.classList.add('go');
+  const sc = Math.max(r.width / v.videoWidth, r.height / v.videoHeight), dw = v.videoWidth * sc, dh = v.videoHeight * sc;
+  const nx = Math.min(1, Math.max(0, (px + (dw - r.width) / 2) / dw)), ny = Math.min(1, Math.max(0, (py + (dh - r.height) / 2) / dh));
+  const tr = st.getVideoTracks()[0]; if (!tr) return;
+  let cp = {}, se = {}; try { cp = tr.getCapabilities ? tr.getCapabilities() : {}; se = tr.getSettings ? tr.getSettings() : {}; } catch (e) {}
+  const put = async c => { try { await tr.applyConstraints({ advanced: [c] }); return true; } catch (e) { return false; } };
+  const modes = cp.focusMode || [], poi = ('pointsOfInterest' in se) || ('pointsOfInterest' in cp);
+  const pt = [{ x: nx, y: ny }];
+  ta4CardStatus('초점을 맞추는 중…', 'busy');
+  if (poi) {
+    if (modes.includes('single-shot')) await put({ focusMode: 'single-shot', pointsOfInterest: pt }); else await put({ focusMode: 'continuous', pointsOfInterest: pt });
+    if ((cp.exposureMode || []).includes('single-shot')) await put({ exposureMode: 'single-shot', pointsOfInterest: pt }); else if ((cp.exposureMode || []).includes('continuous')) await put({ exposureMode: 'continuous', pointsOfInterest: pt });
+  } else if (modes.includes('single-shot')) { await put({ focusMode: 'single-shot' }); }
+  else if (modes.includes('manual') && modes.includes('continuous')) { await put({ focusMode: 'manual' }); await new Promise(r2 => setTimeout(r2, 120)); }
+  clearTimeout(C.focusT);
+  C.focusT = setTimeout(async () => {
+    if (modes.includes('continuous')) await put(poi ? { focusMode: 'continuous', pointsOfInterest: pt } : { focusMode: 'continuous' });
+    ta4CardStatus(poi ? '초점을 맞췄어요. 글자가 또렷하면 촬영 버튼을 누르세요' : '초점을 다시 맞췄어요. 명함을 폰에서 15~25cm 떨어뜨리면 더 또렷해요', 'ok');
+  }, 1100);
+}
+// 대비(콘트라스트): 미리보기와 촬영본에 같은 값을 적용 + 글자 선명도(샤프닝)
+function ta4CardCon() { const s = el('cdCon'); const v = s ? Number(s.value) : 1.25; return isFinite(v) ? v : 1.25; }
+function ta4CardConPreview() { const v = el('cdVideo'); if (v) v.style.filter = 'contrast(' + ta4CardCon() + ')'; }
+function ta4CardEnhance(c, con) {
+  const x = c.getContext('2d'), w = c.width, h = c.height, im = x.getImageData(0, 0, w, h), d = im.data, src = new Uint8ClampedArray(d);
+  // 선명도: 3x3 언샤프 (중심 +, 주변 -)
+  const k = 0.6;
+  for (let y = 1; y < h - 1; y++) for (let xx = 1; xx < w - 1; xx++) {
+    const i = (y * w + xx) * 4;
+    for (let ch = 0; ch < 3; ch++) {
+      const v = src[i + ch] * (1 + 4 * k) - k * (src[i - 4 + ch] + src[i + 4 + ch] + src[i - w * 4 + ch] + src[i + w * 4 + ch]);
+      d[i + ch] = v;
+    }
+  }
+  // 대비: 128 기준으로 늘린다
+  if (Math.abs(con - 1) > 0.01) for (let i = 0; i < d.length; i += 4) { d[i] = (d[i] - 128) * con + 128; d[i + 1] = (d[i + 1] - 128) * con + 128; d[i + 2] = (d[i + 2] - 128) * con + 128; }
+  x.putImageData(im, 0, 0);
+}
 async function ta4CardCamStart() {
   ta4CardCamStop();
   const v = el('cdVideo');
@@ -8158,6 +8203,7 @@ async function ta4CardCamStart() {
   try {
     const st = await navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: 'environment' }, width: { ideal: 2560 }, height: { ideal: 1440 } }, audio: false });
     TA4.card.stream = st; v.srcObject = st; try { await v.play(); } catch (e) {}
+    try { const lv = el('cdLive'), cs = el('cdCon'); lv.onpointerdown = ta4CardTapFocus; cs.oninput = ta4CardConPreview; ta4CardConPreview(); } catch (x) {}
     ta4CardCamTune(st);   // 반사가 심한 명함용: 플래시 끄고 노출을 낮추고 초점을 계속 맞춘다
     ta4CardStatus('명함을 틀 안에 맞추고 아래 촬영 버튼을 누르세요', 'busy'); return true;
   } catch (e) {
@@ -8180,6 +8226,7 @@ async function ta4CardShoot() {
   if (vw / vh < ra) sh = Math.round(vw / ra); else sw = Math.round(vh * ra);
   const sx = Math.round((vw - sw) / 2), sy = Math.round((vh - sh) / 2);
   const c = document.createElement('canvas'); c.width = sw; c.height = sh; c.getContext('2d').drawImage(v, sx, sy, sw, sh, 0, 0, sw, sh);
+  try { ta4CardEnhance(c, ta4CardCon()); } catch (x) {}
   const blob = await new Promise(r => c.toBlob(r, 'image/jpeg', 0.92));
   ta4CardCamStop(); ta4CardGot(new File([blob], 'card.jpg', { type: 'image/jpeg' }));
 }
@@ -10109,9 +10156,10 @@ function ta8nDetail(i) {
   <div class="ta4-ph"><button type="button" class="back" onclick="ta3Back()" aria-label="뒤로">‹</button><div class="ttl"><h3>명함 인식</h3><div class="bd"><span id="ta4CdName" style="font-size:12px;font-weight:700;color:var(--mute);"></span><span id="cdEngine" class="cd2-eng"></span></div></div></div>
   <div class="ta4-pb"><div class="in ta4-form">
     <div class="cd2-sec" data-s="cam">
-      <div class="cd2-live"><video id="cdVideo" playsinline autoplay muted></video><div class="cd-frame"></div></div>
+      <div class="cd2-live" id="cdLive"><video id="cdVideo" playsinline autoplay muted></video><div class="cd-frame"></div><div class="cd2-fring" id="cdRing"></div></div>
+      <div id="cdConRow" class="cd2-exp"><span>대비 낮게</span><input type="range" id="cdCon" min="0.8" max="1.8" step="0.05" value="1.25"><span>높게</span></div>
       <div id="cdExpRow" class="cd2-exp" style="display:none;"><span>어둡게</span><input type="range" id="cdExp" min="-2" max="2" step="0.5" value="-1"><span>밝게</span></div>
-      <div class="cd2-tip">💡 명함이 번쩍이면 <b>밝기를 낮추거나</b> 명함을 살짝 기울여 조명이 비치지 않게 찍어 보세요. 비스듬히 찍어도 반듯하게 펴 드려요.</div>
+      <div class="cd2-tip">👆 <b>명함 글자를 손가락으로 톡 누르면</b> 그 부분에 초점을 맞춰요. 💡 명함이 번쩍이면 <b>밝기를 낮추거나</b> 명함을 살짝 기울여 조명이 비치지 않게 찍어 보세요. 비스듬히 찍어도 반듯하게 펴 드려요.</div>
     </div>
     <div class="cd2-sec" data-s="crop">
       <div class="cd2-cropbox"><img id="cdCropImg" alt="자른 명함"></div>
