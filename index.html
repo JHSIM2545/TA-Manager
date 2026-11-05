@@ -1245,6 +1245,7 @@
   .cd2-box i{position:absolute;width:30px;height:30px;background:#22c55e;border:3px solid #fff;border-radius:50%;box-sizing:border-box;}
   .cd2-box i[data-h=tl]{left:-15px;top:-15px;} .cd2-box i[data-h=tr]{right:-15px;top:-15px;} .cd2-box i[data-h=bl]{left:-15px;bottom:-15px;} .cd2-box i[data-h=br]{right:-15px;bottom:-15px;}
   .cd2-res{display:flex;gap:12px;align-items:flex-start;margin-bottom:12px;} .cd2-res img{width:132px;max-height:100px;object-fit:contain;border-radius:8px;background:#f1f3f8;border:1px solid var(--line);flex:none;} .cd2-resr{flex:1;min-width:0;}
+  #ta4CardPg .ta4-ph{position:relative;} .cd2-eng{position:absolute;right:10px;top:3px;font-size:9.5px;font-weight:600;color:var(--mute);opacity:.5;pointer-events:none;max-width:48%;text-align:right;line-height:1.2;}
   .cd2-bs{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:6px;} .cd2-b{padding:4px 10px;border-radius:99px;background:#eef1f7;color:var(--mute);font-size:12.5px;font-weight:800;} .cd2-b.ok{background:#dcfce7;color:#15803d;}
   .cd2-resr .cd-st{margin-top:0;}
   .cd2-lnk{margin:-4px 0 12px;} .cd2-lnk button{background:none;border:none;color:var(--accent);font-size:14px;font-weight:800;text-decoration:underline;padding:6px 2px;}
@@ -8100,7 +8101,7 @@ function ta4CardOpen(mode) {
   else if (mode === 'ctedit') { Object.keys(ta4CardFields()).forEach(k => { c[k] = (el(TA4_CT_F[k]) || {}).value || ''; }); }
   else if (mode === 'lead') { const l = ta2CurLead(); if (!l) return; c = Object.assign({}, TA4.cards[l.id] || {}); if (!c.name) c.name = l.contact || ''; if (!c.mobile && !c.tel && l.contactPhone) c.mobile = ta4FmtPhone(l.contactPhone); sub = l.company || ''; }
   else { c = Object.assign({}, TA4.formCard || {}); if (!c.name) c.name = el('afContact').value.trim(); if (!c.mobile && !c.tel) c.mobile = ta4FmtPhone(el('afContactPhone').value); sub = el('afCompany').value.trim(); }
-  el('ta4CdName').textContent = (sub ? sub + ' · ' : '') + 'v1105e';   // 화면 버전 표시(최신 반영 확인용)
+  el('ta4CdName').textContent = (sub ? sub + ' · ' : '') + 'v1105f';   // 화면 버전 표시(최신 반영 확인용)
   ta4CardFill(c);
   el('cdRaw').textContent = ''; ta4CardStatus('', ''); el('cdThumb').removeAttribute('src'); el('cdBadges').innerHTML = '';
   let o = {}; try { o = JSON.parse(localStorage.getItem(TA4_LS_CARDOPT) || '{}'); } catch (e) {}
@@ -8241,11 +8242,11 @@ async function ta4CardRecognize() {
   const C = TA4.card; if (!C.crop || C.busy) return;
   C.busy = true; ta4CardStage('work'); el('cdThumb').src = C.crop; el('cdBadges').innerHTML = '';
   ta4CardStatus('AI가 명함을 읽는 중…', 'busy');
-  let c = null, via = '', why = '';
+  let c = null, via = '', why = '', eng = ''; ta4CardEngine('');
   try {
     try {
       const r = await Promise.race([db.functions.invoke('card-ocr', { body: { image: C.crop } }), new Promise((_, rej) => setTimeout(() => rej(new Error('응답 시간 초과(50초)')), 50000))]);
-      if (r && !r.error && r.data && !r.data.error) { c = r.data; via = 'claude'; el('cdRaw').textContent = JSON.stringify(c, null, 1); }
+      if (r && !r.error && r.data && !r.data.error) { c = r.data; via = 'ai'; eng = String(c.engine || 'AI'); delete c.engine; el('cdRaw').textContent = JSON.stringify(c, null, 1); }
       else {
         const er = (r && r.error) || {}; let msg = er.message || (r && r.data && r.data.error) || '알 수 없는 오류';
         try { if (er.context && er.context.json) { const b = await er.context.json(); if (b && (b.error || b.message)) msg = (er.context.status ? er.context.status + ' ' : '') + (b.error || b.message); } } catch (x) {}
@@ -8256,19 +8257,38 @@ async function ta4CardRecognize() {
     if (!c) {
       let text = '';
       try { ta4CardStatus('기본 인식으로 처리 중…', 'busy'); const w = await ta4OcrWorker(); const r = await w.recognize(ta4CardPrep(await ta4LoadImg(C.crop))); text = (r && r.data && r.data.text) || ''; }
-      catch (e) { C.busy = false; ta4CardFail('자동 인식을 사용할 수 없어요(인터넷 연결 확인).'); return; }
-      el('cdRaw').textContent = text.trim(); c = ta4CardParse(text); via = 'ocr';
+      catch (e) { C.busy = false; ta4CardFail('AI 인식 실패: ' + ta4CardWhy(why) + '\n기본 인식도 사용할 수 없어요(인터넷 연결 확인).', true); return; }
+      el('cdRaw').textContent = text.trim(); c = ta4CardParse(text); via = 'ocr'; eng = 'Tesseract OCR (기기 내 기본 인식)';
     }
     const F = ta4CardFields(); let n = 0;
     Object.keys(F).forEach(k => { if (c[k]) { el(F[k]).value = String(c[k]).trim(); n++; } });
     try { C.small = ta4PhotoSmall(await ta4LoadImg(C.crop)); } catch (x) { C.small = ''; }
     C.busy = false;
-    if (!n) { ta4CardFail('글자를 인식하지 못했어요.' + (via === 'ocr' && why ? '\n(AI 인식 실패: ' + why + ')' : '')); return; }
-    ta4CardStage('ok'); ta4CardStatus(`인식 완료${via === 'ocr' ? '(기본 인식)' : ''} — ${n}개 항목. 잘못된 곳은 고친 뒤 [저장]을 눌러 주세요.`, 'ok');
+    if (!n) { ta4CardFail('글자를 인식하지 못했어요.' + (via === 'ocr' && why ? '\n(AI 인식 실패: ' + ta4CardWhy(why) + ')' : ''), true); return; }
+    ta4CardEngine(eng); ta4CardStage('ok'); ta4CardStatus(`인식 완료${via === 'ocr' ? '(기본 인식' + (why ? ' · AI 실패: ' + ta4CardWhy(why) : '') + ')' : ''} — ${n}개 항목. 잘못된 곳은 고친 뒤 [저장]을 눌러 주세요.`, 'ok');
     ta4CardBadges();
-  } catch (e) { C.busy = false; ta4CardFail('인식 중 오류: ' + ((e && e.message) || e)); }
+  } catch (e) { C.busy = false; ta4CardFail('인식 중 오류: ' + ta4CardWhy((e && e.message) || e), true); }
 }
-function ta4CardFail(msg) { ta4CardStage('fail'); ta4CardStatus(msg + '\n[재시도] 또는 [재촬영]을 눌러 주세요.', 'err'); ta4CardBadges(); }
+function ta4CardEngine(t) { const e = el('cdEngine'); if (e) e.textContent = t ? '인식: ' + t : ''; }
+// 실패 사유를 짧게 요약
+function ta4CardWhy(w) {
+  const t = String(w || ''); let s = '';
+  if (/429|quota|exceeded|rate/i.test(t)) s = 'AI 사용량 한도 초과(잠시 뒤 재시도)';
+  else if (/시간 초과|timeout|timed out|abort/i.test(t)) s = '응답 시간 초과';
+  else if (/401|403|api.?key|permission|unauthor|jwt/i.test(t)) s = '인증/키 오류';
+  else if (/404|not.?found|does not exist/i.test(t)) s = 'AI 모델을 찾을 수 없음';
+  else if (/413|너무 큽니다|too large/i.test(t)) s = '이미지가 너무 큼';
+  else if (/이미지 형식|400|invalid/i.test(t)) s = '이미지 형식/요청 오류';
+  else if (/50\d|혼잡|unavailable|overload/i.test(t)) s = 'AI 서버 혼잡/오류';
+  else if (/fetch|network|연결|Failed to send/i.test(t)) s = '네트워크 연결 실패';
+  else if (/미설정/.test(t)) s = 'AI 키 미설정';
+  else s = t.replace(/\s+/g, ' ').slice(0, 60) || '알 수 없는 오류';
+  return s;
+}
+function ta4CardFail(msg, pop) {
+  ta4CardEngine(''); ta4CardStage('fail'); ta4CardStatus(msg + '\n[재시도] 또는 [재촬영]을 눌러 주세요.', 'err'); ta4CardBadges();
+  if (pop) { try { setTimeout(() => alert('명함 인식 실패\n\n' + msg), 60); } catch (e) {} }
+}
 function ta4CardManualInput() { ta4CardStage('ok'); ta4CardStatus('직접 입력한 뒤 [저장]을 눌러 주세요.', 'busy'); }
 // 인식되면 바로 TA 개인 연락처에 저장한다(같은 사람이면 갱신)
 async function ta4CardToBook() {
@@ -10086,7 +10106,7 @@ function ta8nDetail(i) {
 
 <!-- 명함 인식 (공용 화면: 촬영 → 크롭 → 인식 → 저장) -->
 <div class="ta4-pg" id="ta4CardPg" data-st="cam">
-  <div class="ta4-ph"><button type="button" class="back" onclick="ta3Back()" aria-label="뒤로">‹</button><div class="ttl"><h3>명함 인식</h3><div class="bd"><span id="ta4CdName" style="font-size:12px;font-weight:700;color:var(--mute);"></span></div></div></div>
+  <div class="ta4-ph"><button type="button" class="back" onclick="ta3Back()" aria-label="뒤로">‹</button><div class="ttl"><h3>명함 인식</h3><div class="bd"><span id="ta4CdName" style="font-size:12px;font-weight:700;color:var(--mute);"></span><span id="cdEngine" class="cd2-eng"></span></div></div></div>
   <div class="ta4-pb"><div class="in ta4-form">
     <div class="cd2-sec" data-s="cam">
       <div class="cd2-live"><video id="cdVideo" playsinline autoplay muted></video><div class="cd-frame"></div></div>
