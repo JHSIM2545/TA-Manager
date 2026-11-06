@@ -81,6 +81,15 @@
       '@keyframes wxflake{0%{transform:translate(0,-3px);opacity:0;}20%{opacity:1;}100%{transform:translate(2px,10px);opacity:0;}}',
       '@keyframes wxbolt{0%,60%,100%{opacity:1;}70%,80%{opacity:.25;}}',
       '@keyframes wxpulse{0%,100%{transform:scale(1);}50%{transform:scale(1.07);}}',
+      /* 간단형(컴팩트) 배너 */
+      '.wx{display:flex;align-items:center;gap:10px;padding:8px 14px;margin:0 0 10px;border-radius:16px;box-shadow:0 3px 12px rgba(16,24,40,.14);}',
+      '.wx-ic{width:44px;height:44px;}',
+      '.wx-c1{flex:1;min-width:0;}',
+      '.wx-line{display:flex;align-items:baseline;gap:8px;white-space:nowrap;}',
+      '.wx-t{font-size:28px;letter-spacing:-1px;}.wx-t sup{font-size:14px;top:2px;}',
+      '.wx-d{font-size:14px;font-weight:800;margin:0;}.wx-s{font-size:12px;margin:0;}',
+      '.wx-loc{font-size:12px;opacity:.95;}',
+      '.wx-sk{height:60px;}',
       '@media (prefers-reduced-motion:reduce){.wx-ic *,.wx-p i,.wx-sk{animation:none !important;}}'
     ].join('\n');
     document.head.appendChild(st);
@@ -254,17 +263,12 @@
       if (cur.wind != null) chips.push('🍃 바람 ' + Number(cur.wind).toFixed(1) + 'm/s');
       if (cur.hum != null) chips.push('습도 ' + Math.round(cur.hum) + '%');
       var sameCond = dayI.t === curI.t ? '' : '오늘 하루 ' + dayI.t;
+      var pin = '<svg viewBox="0 0 24 24"><path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg>';
       html = '<div class="wx" role="link" tabindex="0" data-wx="open" style="background:' + bg(curI.k, cur.day) + '" aria-label="' + esc(name + ' 현재 ' + Math.round(cur.temp) + '도 ' + curI.t + '. 눌러서 상세 일기예보 보기') + '">' +
-        '<div class="wx-glow"></div>' + particles(curI.k) +
-        '<div class="wx-top"><div class="wx-loc"><svg viewBox="0 0 24 24"><path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg><span>' + esc(name) + (S.loc && S.loc.fallback ? ' (기본)' : '') + '</span></div><div class="wx-upd">' + esc(hhmm(cur.time)) + ' 기준</div></div>' +
-        '<div class="wx-main"><div class="wx-l">' + icon(curI.k, cur.day) +
-        '<div><div class="wx-t">' + Math.round(cur.temp) + '<sup>°</sup></div><div class="wx-d">' + esc(curI.t) + '</div>' +
-        '<div class="wx-s">체감 ' + Math.round(cur.feel) + '°' + (sameCond ? ' · ' + esc(sameCond) : '') + '</div></div></div>' +
-        '<div class="wx-r"><div class="k">오늘</div><div class="hi"><span class="k">최고 </span><b>' + Math.round(day.tmax) + '°</b></div><div class="lo"><span class="k">최저 </span><b>' + Math.round(day.tmin) + '°</b></div></div></div>' +
-        chart(D.hourly, nowH) +
-        (t ? '<div class="wx-tip">' + esc(t) + '</div>' : '') +
-        '<div class="wx-foot"><div class="wx-chips">' + chips.map(function (c) { return '<span class="wx-chip">' + esc(c) + '</span>'; }).join('') + '</div><div class="wx-go">상세 예보 ›</div></div>' +
-        (S.note ? '<div class="wx-note">' + esc(S.note) + '</div>' : '') + '</div>';
+        icon(curI.k, cur.day) +
+        '<div class="wx-c1"><div class="wx-loc">' + pin + '<span>' + esc(name) + (S.loc && S.loc.fallback ? ' (기본)' : '') + '</span></div>' +
+        '<div class="wx-line"><span class="wx-t">' + Math.round(cur.temp) + '<sup>°</sup></span><span class="wx-d">' + esc(curI.t) + '</span><span class="wx-s">체감 ' + Math.round(cur.feel) + '°</span></div></div>' +
+        '<div class="wx-go">상세 ›</div></div>';
     }
     if (html === S.sig) return;          // 변화 없으면 다시 그리지 않음 (깜빡임 방지)
     S.sig = html; box.innerHTML = html;
