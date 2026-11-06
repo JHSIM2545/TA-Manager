@@ -1784,6 +1784,7 @@ if ('serviceWorker' in navigator) window.addEventListener('load', () => { naviga
 
       <!-- 홈 -->
       <section class="ta3-screen on" id="ta3ScrHome">
+        <div id="taWxBox"></div>
         <div id="ta5Box"></div>
         <div class="ta3-hello"><span class="d" id="ta3HDate"></span><span class="c" id="ta3HChips"></span></div>
         <div class="ta3-kpi" id="ta3Kpi"></div>
@@ -2111,6 +2112,7 @@ if ('serviceWorker' in navigator) window.addEventListener('load', () => { naviga
 
 
 
+<script src="weather-banner.js"></script>
 <script>
 // ==========================================
 // 1. Supabase 연동 설정 & 기본 헬퍼
@@ -6911,6 +6913,7 @@ async function ta5Run(force) {
 function ta3RenderHome() {
   const name = currentViewMode, w = ta2WorkdayInfo(), month = currentMonthStr(), today = todayStr();
   el('ta3HDate').textContent = todayLabel();
+  if (window.TAWeather) { try { TAWeather.mount('taWxBox'); } catch (e) { console.warn('[weather]', e); } }   // 날씨 배너 (weather-banner.js)
   el('ta3Sw').innerHTML = isMasterUser() ? `<select class="ta4-sw" onchange="switchView(this.value)">${CONSULTANTS.map(n => `<option value="${n}"${n === name ? ' selected' : ''}>${n}</option>`).join('')}</select>` : '';
   el('ta3HChips').innerHTML = w.todayWork ? `<span class="ta3-pill">영업일 ${w.elapsed}/${w.total}</span><span class="ta3-pill am">잔여 ${w.left}일</span>` : `<span class="ta3-pill am">휴무</span><span class="ta3-pill am">잔여 ${w.left}일</span>`;
 
