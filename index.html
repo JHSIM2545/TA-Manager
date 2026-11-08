@@ -7153,6 +7153,7 @@ function ta3RenderMy() {
   el('ta3MyName').textContent = name;
   el('ta3MyJob').textContent = (currentUser && currentUser.job) || '컨설턴트';
   let m = `<button type="button" onclick="ta4OpenRef('')">소개영업 앱 열기</button>
+    <button type="button" onclick="window.open('https://ijaesig04-hash.github.io/report/directmall.html?v=31#kakao','_blank','noopener')">다이렉트몰 홍보 메일·카톡 만들기</button>
     <button type="button" onclick="ta3Reload()">데이터 새로고침</button>`;
   if (master) {
     m += `<button type="button" onclick="location.href='admin.html?admin=1'">통합 대시보드(관리자)</button>`;
