@@ -1457,6 +1457,7 @@
       if (updates.이름) patch.name = updates.이름;
       if (updates.권한) patch.role = updates.권한;
       if (updates.직무) patch.job = updates.직무;
+      if (updates.사원번호 !== undefined) patch.emp_no = String(updates.사원번호 || '').trim() || null;
       if (updates.비밀번호) patch.password = updates.비밀번호;
       const { error } = await client.from('app_users').update(patch).eq('phone', phone);
       if (error) throw error;

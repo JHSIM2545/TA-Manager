@@ -1572,6 +1572,10 @@ if ('serviceWorker' in navigator) window.addEventListener('load', () => { naviga
           <input id="regName" type="text" placeholder="예: 홍길동" required>
         </div>
         <div class="login-field">
+          <label>사원번호 <span style="font-size:11.5px;color:#64748b;font-weight:normal;">(선택)</span></label>
+          <input id="regEmpNo" type="text" inputmode="numeric" maxlength="20" placeholder="사원번호">
+        </div>
+        <div class="login-field">
           <label>직무 구분 선택 <span style="color:#dc2626;">*</span></label>
           <select id="regJob" required style="width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:14px;background:#fff;box-sizing:border-box;">
             <option value="컨설턴트" selected>컨설턴트</option>
@@ -1982,12 +1986,13 @@ body.adm-actlog{overflow:hidden;}
           <tr>
             <th>이름</th>
             <th>전화번호</th>
+            <th>사원번호</th>
             <th>직무</th>
             <th style="text-align:center;">관리</th>
           </tr>
         </thead>
         <tbody id="userTableBody">
-          <tr><td colspan="4" style="text-align:center;padding:20px;color:#9aa0a6;">사용자 목록 로딩 중...</td></tr>
+          <tr><td colspan="5" style="text-align:center;padding:20px;color:#9aa0a6;">사용자 목록 로딩 중...</td></tr>
         </tbody>
       </table>
     </div>
@@ -2012,6 +2017,10 @@ body.adm-actlog{overflow:hidden;}
             <option value="컨설턴트">컨설턴트</option>
             <option value="기술사원">기술사원</option>
           </select>
+        </div>
+        <div style="flex:1;min-width:140px;">
+          <label style="display:block;font-size:0.82rem;font-weight:700;color:#3c4043;margin-bottom:5px;">사원번호</label>
+          <input type="text" id="editUserEmpNoInput" inputmode="numeric" maxlength="20" placeholder="예: 1234567" style="width:100%;padding:8px 10px;border:1.5px solid #dadce0;border-radius:6px;font-size:14px;box-sizing:border-box;">
         </div>
         <div style="flex:1;min-width:140px;">
           <label style="display:block;font-size:0.82rem;font-weight:700;color:#3c4043;margin-bottom:5px;">권한</label>
@@ -4813,7 +4822,8 @@ async function doLogin() {
       name: user.name,
       phone: user.phone,
       job: user.job,
-      role: user.role || (user.job.includes('관리자') ? 'master' : 'user')
+      role: user.role || (user.job.includes('관리자') ? 'master' : 'user'),
+      empNo: user.emp_no || ''
     };
     const targetScreen = (user.job === '컨설턴트' && CONSULTANTS.includes(user.name)) ? user.name : 'master';
     saveUserSession(currentUser, targetScreen);
@@ -4906,6 +4916,7 @@ function saveUserSession(user, screen, modal) {
       name: user.name || '',
       job: user.job || '컨설턴트',
       role: user.role || (isMasterUser() ? 'master' : 'user'),
+      empNo: user.empNo || '',
       screen: screen || currentViewMode || 'master',
       modal: modal || null,
       savedAt: Date.now()
@@ -4953,7 +4964,8 @@ function restoreUserSession() {
       phone: data.phone,
       name: data.name,
       job: data.job || '컨설턴트',
-      role: userRole
+      role: userRole,
+      empNo: data.empNo || ''
     };
     window.currentUser = currentUser;
 
@@ -5178,7 +5190,7 @@ async function loadAllUsers() {
   var countEl = el('totalUserCount');
   if (!tbody || !db) return;
 
-  tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:20px; color:#9aa0a6;">사용자 목록 불러오는 중...</td></tr>';
+  tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:20px; color:#9aa0a6;">사용자 목록 불러오는 중...</td></tr>';
 
   try {
     var res = await db.from('app_users').select('*').order('name', { ascending: true });
@@ -5230,7 +5242,7 @@ async function loadAllUsers() {
     if (countEl) countEl.innerText = users.length;
 
     if (users.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:20px; color:#9aa0a6;">등록된 사용자가 없습니다.</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:20px; color:#9aa0a6;">등록된 사용자가 없습니다.</td></tr>';
       return;
     }
 
@@ -5240,9 +5252,10 @@ async function loadAllUsers() {
       html += '<tr>'
         + '<td><strong>' + escapeHtml(u.name || '-') + '</strong></td>'
         + '<td style="white-space:nowrap;">' + escapeHtml(String(u.phone || '').replace(/[^0-9]/g, '')) + '</td>'
+        + '<td style="white-space:nowrap;">' + escapeHtml(u.emp_no || '-') + '</td>'
         + '<td>' + renderJobBadge(u.job) + '</td>'
         + '<td style="text-align:center; white-space:nowrap;">'
-        + '<button type="button" class="btn-user-edit" data-phone="' + escapeHtml(u.phone) + '" data-name="' + escapeHtml(u.name || '') + '" data-job="' + escapeHtml(u.job || 'CS근무자') + '" title="수정" aria-label="수정"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 013 3L7 19l-4 1 1-4z"/></svg></button>'
+        + '<button type="button" class="btn-user-edit" data-phone="' + escapeHtml(u.phone) + '" data-name="' + escapeHtml(u.name || '') + '" data-job="' + escapeHtml(u.job || 'CS근무자') + '" data-empno="' + escapeHtml(u.emp_no || '') + '" title="수정" aria-label="수정"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 013 3L7 19l-4 1 1-4z"/></svg></button>'
         + '<button type="button" class="btn-user-del" data-phone="' + escapeHtml(u.phone) + '" data-name="' + escapeHtml(u.name || '') + '" title="삭제" aria-label="삭제"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/></svg></button>'
         + '</td>'
         + '</tr>';
@@ -5255,7 +5268,7 @@ async function loadAllUsers() {
         var p = this.getAttribute('data-phone');
         var n = this.getAttribute('data-name');
         var j = this.getAttribute('data-job');
-        openUserEditForm(p, n, j);
+        openUserEditForm(p, n, j, this.getAttribute('data-empno') || '');
       });
     });
 
@@ -5269,15 +5282,16 @@ async function loadAllUsers() {
 
   } catch (err) {
     console.error('사용자 로드 실패:', err);
-    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:20px; color:#d93025;">사용자 목록 로드 오류: ' + escapeHtml(err.message || String(err)) + '</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:20px; color:#d93025;">사용자 목록 로드 오류: ' + escapeHtml(err.message || String(err)) + '</td></tr>';
   }
 }
 
-function openUserEditForm(phone, name, job) {
+function openUserEditForm(phone, name, job, empNo) {
   var box = el('userEditBox');
   if (!box) return;
   el('editUserTargetPhone').value = phone;
   el('editUserNameInput').value = name;
+  if (el('editUserEmpNoInput')) el('editUserEmpNoInput').value = empNo || '';
 
   var normalizedJob = job || 'CS근무자';
   if (normalizedJob.indexOf('본사') !== -1) normalizedJob = '본사관리자';
@@ -5323,7 +5337,8 @@ async function saveUserEdit() {
   var updateData = {
     name: name,
     job: job,
-    role: userRole
+    role: userRole,
+    emp_no: (el('editUserEmpNoInput') ? el('editUserEmpNoInput').value.trim() : '') || null
   };
 
   if (newPwd) {
@@ -5425,6 +5440,7 @@ async function doSignup() {
   const phone = (el('regPhone').value || '').replace(/[^0-9]/g, '');
   const name = (el('regName').value || '').trim();
   const job = el('regJob').value;
+  const empNo = ((el('regEmpNo') && el('regEmpNo').value) || '').trim();
   const pwd = (el('regPwd').value || '').trim();
   const pwdConfirm = (el('regPwdConfirm').value || '').trim();
   const msgEl = el('signupMsg');
@@ -5487,7 +5503,8 @@ async function doSignup() {
       name: name,
       job: job,
       role: userRole,
-      hash: hashedPwd
+      hash: hashedPwd,
+      emp_no: empNo || null
     }]);
 
     if (insErr) throw insErr;
@@ -5498,7 +5515,8 @@ async function doSignup() {
       name: name,
       phone: phone,
       job: job,
-      role: userRole
+      role: userRole,
+      empNo: empNo
     };
     const targetScreen = (userRole !== 'master' && CONSULTANTS.includes(name)) ? name : 'master';
     saveUserSession(currentUser, targetScreen);
