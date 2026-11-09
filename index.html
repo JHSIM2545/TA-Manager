@@ -8021,6 +8021,7 @@ window.handleAgentModalSubmit = handleAgentModalSubmit;
 // ---------- 음성으로 TA 등록 (스무고개 방식 · 운전 중 사용) ----------
 // AI가 음성(TTS)으로 묻고 → 대답을 음성인식(STT)으로 받아 → 신규 TA 등록 폼에 채워 자동 저장한다.
 // 앞 질문으로: "이전" / 중단: "취소"
+// 음성: Gemini(엣지 함수 ta-tts) 우선, 실패하면 브라우저 내장 음성으로 자동 전환
 // <<TV-PURE>>
 const TV_KO_DIGIT = { '영': 0, '공': 0, '일': 1, '이': 2, '삼': 3, '사': 4, '오': 5, '육': 6, '륙': 6, '칠': 7, '팔': 8, '구': 9 };
 const TV_DIGIT_WORD = ['공', '일', '이', '삼', '사', '오', '육', '칠', '팔', '구'];
@@ -8219,7 +8220,71 @@ function tvParseDate(text, now) {
 }
 // <</TV-PURE>>
 
-const TV = { on: false, rec: null, data: {}, paused: false, resume: null, speaking: false, listening: false, sayFin: null, wake: null, voice: null };
+// ---- 안내 멘트 (Gemini 음성 미리 받기와 같은 문구를 쓰도록 한곳에 모음) ----
+const TV_T = {
+  start: '신규 TA를 등록하시겠습니까?', yn: '네 또는 아니오로 대답해 주세요.', miss: '잘 듣지 못했습니다. 다시 말씀해 주세요.', cancel: '등록을 취소합니다.',
+  company: '서비스제공처명은 무엇입니까?', addr: '주소는 나중에 지도에서 찾아 입력할 수 있습니다.',
+  contact: '고객 담당자는 누구입니까?', contactSkip: '담당자는 나중에 직접 입력하시면 됩니다.',
+  phone: '담당자 전화번호는 무엇입니까?', phoneSkip: '전화번호는 나중에 직접 입력하시면 됩니다.',
+  amount: '예상 용역료는 얼마입니까?', amountSkip: '예상 용역료는 나중에 직접 입력하시면 됩니다.',
+  product: '상품 종류는 무엇입니까? 알람, 정보보안, 블루스캔, 안전상품, 유지보수, 휴엔 중에 말씀해 주세요.',
+  conf: '수주확도는 A, B, C 중 어떻게 되나요?', date: '계약 예정일은 언제입니까?', today: '등록일자는 오늘로 입력하겠습니다.',
+  fail: '저장하지 못했습니다. 화면에서 내용을 확인하고 직접 저장해 주세요.', done: 'TA 신규등록이 모두 완료되었습니다. 좋은 성과를 기대합니다.',
+  prodSel: v => v + ' 선택되었습니다.', confSel: v => '수주확도가 ' + v + ' 이군요.'
+};
+function tvMotives() { return ta4MotiveList('').filter(m => m !== '콜/패밀리넷'); }
+function tvMotiveAsk(ms) { return '영업 동기는 무엇입니까? ' + ms.slice(0, 3).join(', ') + '와 같이 말씀해 주세요.'; }
+function tvStaticPhrases() {   // 항상 같은 멘트: 미리 받아 두면 질문이 바로 나온다 (한 번 받으면 이 기기에 저장됨)
+  const l = [TV_T.start, TV_T.company, TV_T.addr, TV_T.contact, TV_T.contactSkip, TV_T.phone, TV_T.phoneSkip, TV_T.amount, TV_T.amountSkip, TV_T.product,
+    tvMotiveAsk(tvMotives()), TV_T.conf, TV_T.date, TV_T.today, TV_T.yn, TV_T.miss, TV_T.cancel, TV_T.done, TV_T.fail];
+  ['알람', '정보보안', '블루스캔', '안전상품', '유지보수', '휴엔'].forEach(v => l.push(TV_T.prodSel(v)));
+  ['A', 'B', 'C'].forEach(v => l.push(TV_T.confSel(v)));
+  return l;
+}
+
+// ---- Gemini 음성 (엣지 함수 ta-tts, 키는 서버에만 있음). 안 되면 기존 브라우저 음성으로 자동 전환 ----
+const TV_TTS_FN = SUPABASE_URL + '/functions/v1/ta-tts', TV_TTS_CACHE = 'ta-tts-v1';
+const TV_TTS = { fails: 0, off: false, mem: new Map(), busy: new Map(), info: '', model: '' };
+function tvTtsKey(t) { return 'https://tts.local/' + encodeURIComponent(t); }
+function tvEngUi() {
+  const e = el('tvEng'); if (!e) return;
+  e.textContent = TV_TTS.off ? '음성: 기본 음성 사용 중 (Gemini 연결 실패' + (TV_TTS.info ? ': ' + TV_TTS.info : '') + ')' : (TV_TTS.model ? '음성: Gemini (' + TV_TTS.model + ')' : '음성: Gemini 연결 중…');
+}
+// 멘트 → 재생 가능한 주소(objectURL). 이 기기에 저장해 둔 것이 있으면 그것을 쓰고, 없으면 ta-tts 에서 받는다. 실패하면 오류를 던진다.
+async function tvTtsGet(text, ms) {
+  if (TV_TTS.mem.has(text)) return TV_TTS.mem.get(text);
+  if (TV_TTS.busy.has(text)) return TV_TTS.busy.get(text);
+  const job = (async () => {
+    let blob = null;
+    try { if (window.caches) { const c = await caches.open(TV_TTS_CACHE), m = await c.match(tvTtsKey(text)); if (m) blob = await m.blob(); } } catch (e) {}
+    if (!blob) {
+      const ctl = new AbortController(), to = setTimeout(() => ctl.abort(), ms || 8000);
+      try {
+        const r = await fetch(TV_TTS_FN, { method: 'POST', signal: ctl.signal, headers: { 'Content-Type': 'application/json', apikey: SUPABASE_ANON_KEY }, body: JSON.stringify({ phone: (currentUser && currentUser.phone) || '', text }) });
+        if (!r.ok) {
+          let d = ''; try { const j = await r.json(); d = (j.error || '') + (j.tried && j.tried[0] ? ' ' + j.tried[0].status : ''); } catch (e) {}
+          const er = new Error(r.status + (d ? ' ' + d.trim() : '')); er.status = r.status; throw er;
+        }
+        const m = r.headers.get('X-TTS-Model'); if (m) TV_TTS.model = m;
+        blob = await r.blob();
+        if (!blob || blob.size < 1000) throw new Error('빈 음성');
+      } catch (e) { if (e && e.name === 'AbortError') { const er = new Error('시간 초과'); er.status = 0; throw er; } throw e; }
+      finally { clearTimeout(to); }
+      try { if (window.caches) { const c = await caches.open(TV_TTS_CACHE); await c.put(tvTtsKey(text), new Response(blob, { headers: { 'Content-Type': 'audio/wav' } })); } } catch (e) {}
+    }
+    const url = URL.createObjectURL(blob); TV_TTS.mem.set(text, url); return url;
+  })();
+  TV_TTS.busy.set(text, job);
+  try { return await job; } finally { TV_TTS.busy.delete(text); }
+}
+async function tvPrefetch() {   // 질문 순서대로 하나씩 (한도 초과 방지). 실패해도 본 진행에는 영향 없음
+  for (const t of tvStaticPhrases()) {
+    if (!TV.on || TV_TTS.off) return;
+    try { await tvTtsGet(t, 8000); tvEngUi(); } catch (e) { return; }   // 한 번이라도 실패하면 중단 (본 진행에서 필요할 때 다시 시도)
+  }
+}
+
+const TV = { on: false, rec: null, data: {}, paused: false, resume: null, speaking: false, listening: false, sayFin: null, wake: null, voice: null, audio: null };
 const TV_RE_CANCEL = /^(취소|그만|종료|중단|스톱|stop)/;
 const TV_RE_BACK = /^(이전|뒤로|정정)/;
 
@@ -8247,16 +8312,37 @@ function tvSay(text) {
     const me = el('tvMe'); if (me) me.textContent = '';
     tvSetStatus('ai');
     let done = false, tm = null;
-    const fin = () => { if (done) return; done = true; clearTimeout(tm); TV.speaking = false; TV.sayFin = null; res(); };
-    TV.sayFin = fin;
-    if (!('speechSynthesis' in window)) { tm = setTimeout(fin, Math.min(5000, 800 + text.length * 140)); return; }
-    try { speechSynthesis.cancel(); } catch (e) {}
-    const u = new SpeechSynthesisUtterance(text);
-    u.lang = 'ko-KR'; u.rate = 1.0; u.pitch = 1.0; if (TV.voice) u.voice = TV.voice;
-    u.onend = fin; u.onerror = fin;
-    tm = setTimeout(fin, 2500 + text.length * 260);   // 일부 기기에서 onend가 안 오는 경우 대비
-    TV.speaking = true;
-    try { speechSynthesis.speak(u); } catch (e) { fin(); }
+    const fin = () => {
+      if (done) return; done = true; clearTimeout(tm); TV.speaking = false; TV.sayFin = null;
+      try { const a = TV.audio; if (a) { a.onended = null; a.onerror = null; a.pause(); } } catch (e) {}
+      res();
+    };
+    TV.sayFin = fin; TV.speaking = true;
+    // 기존 엔진: 브라우저 내장 음성 (Gemini 가 안 될 때만 사용)
+    const browserSay = () => {
+      if (done) return;
+      if (!('speechSynthesis' in window)) { tm = setTimeout(fin, Math.min(5000, 800 + text.length * 140)); return; }
+      try { speechSynthesis.cancel(); } catch (e) {}
+      const u = new SpeechSynthesisUtterance(text);
+      u.lang = 'ko-KR'; u.rate = 1.0; u.pitch = 1.0; if (TV.voice) u.voice = TV.voice;
+      u.onend = fin; u.onerror = fin;
+      clearTimeout(tm); tm = setTimeout(fin, 2500 + text.length * 260);   // 일부 기기에서 onend가 안 오는 경우 대비
+      try { speechSynthesis.speak(u); } catch (e) { fin(); }
+    };
+    if (TV_TTS.off || !TV.audio) { browserSay(); return; }
+    tvTtsGet(text, 8000).then(url => {
+      if (done || !TV.on) { fin(); return; }
+      TV_TTS.fails = 0; tvEngUi();
+      const a = TV.audio, fallback = () => { if (done) return; a.onended = null; a.onerror = null; browserSay(); };
+      a.onended = fin; a.onerror = fallback; a.src = url;
+      clearTimeout(tm); tm = setTimeout(fin, 30000);
+      let pr; try { pr = a.play(); } catch (e) { fallback(); return; }
+      if (pr && pr.catch) pr.catch(e => { if (e && e.name === 'NotAllowedError') { TV_TTS.off = true; TV_TTS.info = '재생 권한'; tvEngUi(); } fallback(); });
+    }).catch(e => {
+      if (done) return;
+      TV_TTS.fails++; TV_TTS.info = (e && e.message) || ''; if (TV_TTS.fails >= 2) TV_TTS.off = true;   // 연속 2번 실패하면 이번 등록은 기본 음성으로 계속
+      tvEngUi(); browserSay();
+    });
   });
 }
 function tvListen() {
@@ -8308,7 +8394,7 @@ async function tvTurn(prompt) {
       return t;
     }
     if (++tries >= 3) { await tvWaitResume(); if (!TV.on) throw { tv: 'cancel' }; tries = 0; await tvSay(prompt); continue; }
-    await tvSay('잘 듣지 못했습니다. 다시 말씀해 주세요.');
+    await tvSay(TV_T.miss);
   }
 }
 // 한 항목: 질문 → (대답 해석) → 확인 질문(필요 시) → 저장. 틀렸으면 "아니 OOO"로 바로 정정.
@@ -8337,44 +8423,43 @@ async function tvStep(o) {
       const nv = rest ? o.parse(rest) : null;
       if (nv !== null && nv !== undefined && nv !== '') { v = nv; continue; }   // "아니 대와마트" 또는 그냥 다시 말한 경우 → 새 값으로 다시 확인
       if (yn === 'no') { reask = true; prompt = o.ask; break; }
-      await tvSay('네 또는 아니오로 대답해 주세요.');
+      await tvSay(TV_T.yn);
     }
   }
 }
 function tvSteps() {
-  const motives = ta4MotiveList('').filter(m => m !== '콜/패밀리넷');
-  const eg = motives.slice(0, 3).join(', ');
+  const motives = tvMotives();
   return [
     { key: 'start', run: async () => {
       while (true) {
-        const a = await tvTurn('신규 TA를 등록하시겠습니까?'); const yn = tvYesNo(a);
+        const a = await tvTurn(TV_T.start); const yn = tvYesNo(a);
         if (yn === 'yes') return;
-        if (yn === 'no') { await tvSay('등록을 취소합니다.'); throw { tv: 'cancel', silent: true }; }
-        await tvSay('네 또는 아니오로 대답해 주세요.');
+        if (yn === 'no') { await tvSay(TV_T.cancel); throw { tv: 'cancel', silent: true }; }
+        await tvSay(TV_T.yn);
       }
     } },
-    { key: 'company', run: () => tvStep({ key: 'company', ask: '서비스제공처명은 무엇입니까?', parse: tvCleanName,
+    { key: 'company', run: () => tvStep({ key: 'company', ask: TV_T.company, parse: tvCleanName,
       confirm: v => tvJosa(v, '이', '가') + ' 맞습니까?' }) },
-    { key: 'addr', silent: true, run: () => tvSay('주소는 나중에 지도에서 찾아 입력할 수 있습니다.') },
-    { key: 'contact', run: () => tvStep({ key: 'contact', ask: '고객 담당자는 누구입니까?', optional: true, parse: tvCleanName,
-      skipMsg: '담당자는 나중에 직접 입력하시면 됩니다.', confirm: v => tvJosa(v, '이', '가') + ' 맞습니까?' }) },
-    { key: 'phone', run: () => tvStep({ key: 'phone', ask: '담당자 전화번호는 무엇입니까?', optional: true, parse: tvParsePhone,
+    { key: 'addr', silent: true, run: () => tvSay(TV_T.addr) },
+    { key: 'contact', run: () => tvStep({ key: 'contact', ask: TV_T.contact, optional: true, parse: tvCleanName,
+      skipMsg: TV_T.contactSkip, confirm: v => tvJosa(v, '이', '가') + ' 맞습니까?' }) },
+    { key: 'phone', run: () => tvStep({ key: 'phone', ask: TV_T.phone, optional: true, parse: tvParsePhone,
       retry: '전화번호를 알아듣지 못했습니다. 숫자로 다시 말씀해 주시거나, 모르면 모름이라고 말씀해 주세요.',
-      skipMsg: '전화번호는 나중에 직접 입력하시면 됩니다.', confirm: v => '전화번호는 ' + tvPhoneToKo(v) + ', 맞습니까?' }) },
-    { key: 'amount', run: () => tvStep({ key: 'amount', ask: '예상 용역료는 얼마입니까?', optional: true, skipVal: 0, parse: v => { const n = tvParseMoney(v); return n === null ? null : n; },
+      skipMsg: TV_T.phoneSkip, confirm: v => '전화번호는 ' + tvPhoneToKo(v) + ', 맞습니까?' }) },
+    { key: 'amount', run: () => tvStep({ key: 'amount', ask: TV_T.amount, optional: true, skipVal: 0, parse: v => { const n = tvParseMoney(v); return n === null ? null : n; },
       retry: '금액을 알아듣지 못했습니다. 예를 들어 십만원, 삼백오십만원처럼 말씀해 주세요.',
-      skipMsg: '예상 용역료는 나중에 직접 입력하시면 됩니다.', confirm: v => '예상 용역료가 ' + tvMoneyToKo(v) + ' 입니까?' }) },
-    { key: 'product', run: () => tvStep({ key: 'product', ask: '상품 종류는 무엇입니까? 알람, 정보보안, 블루스캔, 안전상품, 유지보수, 휴엔 중에 말씀해 주세요.', parse: tvParseProduct,
-      retry: '상품을 알아듣지 못했습니다. 알람, 정보보안, 블루스캔, 안전상품, 유지보수, 휴엔 중에 하나만 말씀해 주세요.', announce: v => v + ' 선택되었습니다.' }) },
-    { key: 'motive', run: () => tvStep({ key: 'motive', ask: '영업 동기는 무엇입니까? ' + eg + '와 같이 말씀해 주세요.', parse: v => tvParseMotive(v, motives),
+      skipMsg: TV_T.amountSkip, confirm: v => '예상 용역료가 ' + tvMoneyToKo(v) + ' 입니까?' }) },
+    { key: 'product', run: () => tvStep({ key: 'product', ask: TV_T.product, parse: tvParseProduct,
+      retry: '상품을 알아듣지 못했습니다. 알람, 정보보안, 블루스캔, 안전상품, 유지보수, 휴엔 중에 하나만 말씀해 주세요.', announce: TV_T.prodSel }) },
+    { key: 'motive', run: () => tvStep({ key: 'motive', ask: tvMotiveAsk(motives), parse: v => tvParseMotive(v, motives),
       retry: '영업 동기를 알아듣지 못했습니다. ' + motives.join(', ') + ' 중에 말씀해 주세요.', confirm: v => v + (tvHasBatchim(v) ? '이시군요?' : '시군요?') }) },
-    { key: 'conf', run: () => tvStep({ key: 'conf', ask: '수주확도는 A, B, C 중 어떻게 되나요?', parse: tvParseConf,
-      retry: '수주확도를 알아듣지 못했습니다. 에이, 비, 씨 중에 말씀해 주세요.', announce: v => '수주확도가 ' + v + ' 이군요.' }) },
-    { key: 'date', run: () => tvStep({ key: 'date', ask: '계약 예정일은 언제입니까?', parse: v => { const d = tvParseDate(v); return d ? d.iso : null; },
+    { key: 'conf', run: () => tvStep({ key: 'conf', ask: TV_T.conf, parse: tvParseConf,
+      retry: '수주확도를 알아듣지 못했습니다. 에이, 비, 씨 중에 말씀해 주세요.', announce: TV_T.confSel }) },
+    { key: 'date', run: () => tvStep({ key: 'date', ask: TV_T.date, parse: v => { const d = tvParseDate(v); return d ? d.iso : null; },
       retry: '날짜를 알아듣지 못했습니다. 예를 들어 11월 20일, 또는 내일처럼 말씀해 주세요.',
       onSet: v => { const [y, m, d] = v.split('-').map(Number); TV.data.dateKo = y + '. ' + m + '. ' + d; },
       confirm: v => { const [y, m, d] = v.split('-').map(Number); return y + '년 ' + m + '월 ' + d + '일이 맞나요?'; } }) },
-    { key: 'today', silent: true, run: () => tvSay('등록일자는 오늘로 입력하겠습니다.') }
+    { key: 'today', silent: true, run: () => tvSay(TV_T.today) }
   ];
 }
 function tvApplyToForm(d) {
@@ -8394,10 +8479,13 @@ async function tvOpen() {
   if (!('speechSynthesis' in window) || !(window.SpeechRecognition || window.webkitSpeechRecognition)) { ta3Toast('이 브라우저는 음성 등록을 지원하지 않습니다 (크롬 권장)', 3800); return; }
   if (!(await ta4MicPerm())) { ta4MicHelp(); return; }
   TV.on = true; TV.data = {}; TV.paused = false; TV.resume = null;
+  if (!TV.audio) { try { TV.audio = new Audio(); TV.audio.preload = 'auto'; } catch (e) { TV.audio = null; } }
+  TV_TTS.fails = 0; TV_TTS.off = !TV.audio; TV_TTS.info = TV.audio ? '' : '재생 불가';
   tvVoicePick(); try { speechSynthesis.onvoiceschanged = tvVoicePick; } catch (e) {}
   try { if (navigator.wakeLock && navigator.wakeLock.request) TV.wake = await navigator.wakeLock.request('screen'); } catch (e) { TV.wake = null; }
   el('tvOv').classList.add('on'); document.body.classList.add('tv-lock');
-  el('tvAi').textContent = ''; el('tvMe').textContent = ''; tvRenderSum(); tvSetStatus('ai');
+  el('tvAi').textContent = ''; el('tvMe').textContent = ''; tvRenderSum(); tvSetStatus('ai'); tvEngUi();
+  tvPrefetch();
   tvRun();
 }
 async function tvRun() {
@@ -8416,13 +8504,13 @@ async function tvRun() {
       tvSetStatus('idle'); el('tvAi').textContent = '저장 중입니다…'; el('tvMe').textContent = '';
       await handleAgentModalSubmit({ preventDefault() {} });
       if (PG.st.includes('agentLeadModalOverlay')) {   // 저장 실패 → 폼에 채워진 채로 남겨 직접 저장하게 함
-        await tvSay('저장하지 못했습니다. 화면에서 내용을 확인하고 직접 저장해 주세요.'); outcome = 'fail';
+        await tvSay(TV_T.fail); outcome = 'fail';
       } else {
-        await tvSay('TA 신규등록이 모두 완료되었습니다. 좋은 성과를 기대합니다.'); outcome = 'ok';
+        await tvSay(TV_T.done); outcome = 'ok';
       }
     }
   } catch (e) {
-    if (e && e.tv === 'cancel' && !e.silent && TV.on) { await tvSay('등록을 취소합니다.'); }
+    if (e && e.tv === 'cancel' && !e.silent && TV.on) { await tvSay(TV_T.cancel); }
     else if (e && !e.tv) { console.warn('[음성등록]', e); ta3Toast('음성 등록 중 오류: ' + (e.message || e), 3500); }
   }
   tvClose(false);
@@ -10642,6 +10730,7 @@ function ta8nDetail(i) {
   <button type="button" class="tv-mic" id="tvMic" onclick="tvTap()" aria-label="마이크"><span data-ic="mic"></span></button>
   <div class="tv-st" id="tvSt"></div>
   <div class="tv-hint">앞 질문으로: “이전” · 중단: “취소” · 마이크를 누르면 질문을 건너뛰고 바로 대답할 수 있습니다</div>
+  <div class="tv-hint" id="tvEng"></div>
 </div>
 
 <!-- 금일 수주 예정 -->
