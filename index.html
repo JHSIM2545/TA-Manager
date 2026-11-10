@@ -10255,8 +10255,8 @@ function ta4PsAutoAssign(i) {
   const r = ta4PsSuggest(p); p.zoneInfo = r;
   if (!p.manualAssign) {   // 수동으로 바꾼 건은 덮어쓰지 않음
     const sug = (r && r.consultant && CONSULTANTS.includes(r.consultant)) ? r.consultant : '';
-    p.assigned_to = sug || ta4PsSelf();   // 구역을 확정 못 하면 컨설턴트 본인에게 임시 배정
-    p.selfFallback = !sug && !!p.assigned_to;
+    p.assigned_to = sug;   // 구역을 확정 못 하면 비워 두고 직접 선택하게 함 (본인에게 자동 배정하지 않음)
+    p.selfFallback = false; p.needPick = !sug;
   }
   ta4PsAssignUi(i);
 }
@@ -10293,7 +10293,7 @@ function ta4PsAssignUi(i) {
   } else {
     h = tag('#f1f5f9', '#475569', '판정 불가') + `<span style="color:#64748b;">${e((r && r.basis) || '주소에서 구역을 찾지 못했습니다')} — 직접 선택하세요</span>` + (p.manualAssign ? reset : '');
   }
-  if (p.selfFallback && !p.manualAssign && p.assigned_to) h += `<div style="color:#475569;margin-top:2px;">구역을 확정하지 못해 <b>본인(${e(p.assigned_to)})</b>에게 임시 배정했습니다. 필요하면 위에서 변경하세요.</div>`;
+  if (p.needPick && !p.assigned_to) h += `<div style="color:#b91c1c;font-weight:700;margin-top:2px;">⚠ 구역을 확정하지 못했습니다. 담당 컨설턴트를 직접 선택해 주세요.</div>`;
   box.innerHTML = h;
 }
 
